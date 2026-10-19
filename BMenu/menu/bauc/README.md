@@ -66,17 +66,40 @@ git checkout main -- BMenu/menu/bauc
 
 ## Если `/ah` пишет `Menu not found: bauc:home`
 
-Это ошибка **загрузки меню**, а не анимации/оформления: BMenu не зарегистрировал `bauc:home`, поэтому BAuctionV2 не может его открыть.
+Почти всегда в логе рядом есть настоящая причина, например:
 
-Проверяйте по порядку:
+```
+[BMenu] Errors in plugins\BMenu\menu\bauc\home.yml
+unknown provider bauc:home
+```
 
-1. **Файл на месте?** Должен быть `plugins/BMenu/menu/bauc/home.yml` (рядом — `lots_items.yml`, `vault.yml` и т. д.). В репозитории это `BMenu/menu/bauc/`. Если папки нет — BAuctionV2 создаёт её только при первом запуске, когда `menu/bauc` отсутствует.
-2. **Был ли перезапуск/релоад?** BMenu читает меню при старте и по команде `/bmenu reload` (право `bmenu.reload`). Копирование файлов на работающий сервер без релоада ничего не меняет. После `/bmenu reload` в консоли должно быть `Reloaded N menus!`.
-3. **Что в логе?** В `logs/latest.log` при старте ищите строки с `bauc`:
-   - `Errors in .../bauc/home.yml` — ошибка разбора YAML (в тексте ниже будет конкретная строка/поле);
-   - `Failed to load menu config File: ...` — исключение при загрузке (со стектрейсом);
-   - если ничего нет — файл не найден по пути из п. 1.
-4. **Провайдер.** `bauc:home`, `bauc:vault` и остальные типы регистрирует сам BAuctionV2 в своём `onLoad`. Если BMenu загрузил меню раньше (например, после `/reload` сервера или при нестандартном порядке плагинов), провайдер будет неизвестен. Лечится полным перезапуском сервера (не `/reload`), либо `/bmenu reload` уже после включения BAuctionV2.
-5. **Проверка вручную:** `/bmenu open bauc:home`. Если и тут `Menu not found` — проблема в загрузке файла; если меню открылось — смотрите `ah_menu` в `plugins/BAuctionV2/config.yml` (по умолчанию `bauc:home`).
+Это значит: BMenu прочитал файл, но **не знает провайдера** `bauc:home`, поэтому меню не попало в реестр. `/ah` затем падает на `MenuLoader.create()` с `Menu not found` — это следствие, а не причина. Файлы и оформление тут ни при чём.
 
-Важно: оформление и анимация в этих файлах не меняют `id`/`provider` — структура файлов сверена с оригиналом BAuctionV2 1.3 (отличаются только цвета, звуки и добавленный блок `animation:`).
+### Почему провайдер «неизвестен»
+
+- `bauc:*` регистрирует сам BAuctionV2: `MenuBooter.boot(...)` + `BMenu.menuLoader().registerSubLoader(this, subLoader)` — в `onLoad` (`BAuction.java`, строки 108–110).
+- BMenu читает папку `menu` в своём `onEnable` (`loader.enable()`), то есть уже после `onLoad` всех плагинов — на нормальном старте порядок безопасен (`BAuctionV2` зависит от `BMenu`).
+- В `onDisable` BAuctionV2 делает `BMenu.menuLoader().unregisterSubLoader(this)` (строка 220) — и обратно регистрирует только в `onLoad`.
+
+Отсюда: если BMenu перечитал меню на загрузчике, где саблоадер BAuctionV2 не зарегистрирован, все `bauc:*` становятся «unknown provider», а `/ah` при этом продолжает работать. Типичные случаи: `/reload`, перезагрузка одного плагина через PlugMan, два jar'а BMenu/BAuctionV2 в `plugins`, либо `/aha reload`, прерванный ошибкой.
+
+### Что делать
+
+1. Полный **stop → start** сервера (не `/reload` и не `/bmenu reload`).
+2. Убедиться, что в логе старта нет `unknown provider bauc:`.
+3. `/bmenu reload` → должно быть `Reloaded N menus!` без ошибок по `bauc`.
+4. `/ah`.
+
+Если после полного перезапуска ошибки остались — присылать лог **старта** (строки про `BAuctionV2`, `BMenu`, `MenuBooter`) и список jar'ов в `plugins`: провайдеры не регистрируются вовсе.
+
+### Чего делать нельзя
+
+Не заменять в файлах `provider: bauc:*` на `bmenu:default`. Меню рисует BAuctionV2 — без её провайдера не будет ни лотов, ни плейсхолдеров, ни кнопок покупки.
+
+### Быстрые проверки
+
+- Файл на месте? `plugins/BMenu/menu/bauc/home.yml` (рядом обязателен `lots_items.yml` — он подключается через `include`). Скрытые расширения на Windows (`home.yml.txt`) BMenu не читает.
+- `/bmenu open bauc:home` — открылось, значит реестр в порядке и дело в `ah_menu` в `plugins/BAuctionV2/config.yml`; не открылось — меню не загрузилось.
+- `Errors in ...` в логе — ошибка разбора YAML; `Failed to load menu config File:` — исключение при загрузке (со стектрейсом).
+
+Важно: оформление и анимация не меняют `id`/`provider` — структура файлов сверена с оригиналом BAuctionV2 1.3 (отличаются только цвета, звуки и добавленный блок `animation:`).
