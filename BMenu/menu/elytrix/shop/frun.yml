@@ -1,0 +1,194 @@
+# Converted from DeluxeMenus/gui_menus/shop/frun.yml; source kept unchanged.
+id: elytrix:frun
+provider: default
+type: chest
+size: 54
+title: '&#F8BEFB&lПечки и зельеварки'
+items:
+  фастикомзапивасом:
+    slot: 20
+    material: brewing_stand
+    name: '&7« &#F8BEFBБыстрая зельеварка &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЭкономия: &#F8BEFBВ 2 раза меньше топлива'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB389 коинов'
+    - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    on_click:
+    - if: '%playerpoints_points% >= 389'
+      do:
+      - '[console] shadowbrewing give %player_name% onebrew'
+      - '[console] p take %player_name% 389'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+  скорость:
+    slot: 21
+    material: furnace
+    name: '&7« &#F8BEFBБыстрая печка &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fСкорость плавки: &#F8BEFBВ 2 раза быстрее'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB499 коинов'
+    - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    on_click:
+    - if: '%playerpoints_points% >= 499'
+      do:
+      - '[console] shadowfurnace give %player_name% twoFurnace'
+      - '[console] p take %player_name% 499'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+  дюпер:
+    slot: 22
+    material: furnace
+    name: '&7« &#F8BEFBПечка дюпера &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЭффективность: &#F8BEFBВ 2 раза больше руды'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB899 коинов'
+    - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    on_click:
+    - if: '%playerpoints_points% >= 899'
+      do:
+      - '[console] shadowfurnace give %player_name% threeFurnace'
+      - '[console] p take %player_name% 899'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+  эконом:
+    slot: 23
+    material: furnace
+    name: '&7« &#F8BEFBПечка экономиста &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЭкономия: &#F8BEFBВ 2 раза меньше топлива'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB699 коинов'
+    - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    on_click:
+    - if: '%playerpoints_points% >= 699'
+      do:
+      - '[console] shadowfurnace give %player_name% fourFurnace'
+      - '[console] p take %player_name% 699'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+  скоростьдадададвпдвп:
+    slot: 24
+    material: brewing_stand
+    name: '&7« &#F8BEFBСкоростная зельеварка &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЭкономия: &#F8BEFBВ 4 раза меньше топлива'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB589 коинов'
+    - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    on_click:
+    - if: '%playerpoints_points% >= 589'
+      do:
+      - '[console] shadowbrewing give %player_name% twobrew'
+      - '[console] p take %player_name% 589'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+  info:
+    slot: 49
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0=
+    name: '&7« &#F8BEFBНаши сообщества &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fБудьте в курсе: &#F8BEFBВсех новостей'
+    - '&#F8BEFB&l┃ &fСвежие обновления: &#F8BEFBАнонсы'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для отправки ссылок в чат'
+    on_click:
+    - '[message]'
+    - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBСообщества'
+    - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+    - '[message] &#F8BEFB&l┃ &fTelegram канал: &#229ED9t.me/elytrix_ru'
+    - '[message] &#F8BEFB&l┃ &fDiscord сервер: &#5865F2dsc.gg/elytrix'
+    - '[message]'
+    - '[close]'
+  close:
+    slot: 45
+    material: black_dye
+    name: '&7« &#F8BEFBНазад &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fВернуться в предыдущее меню.'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для перехода'
+    on_click:
+    - '[open] elytrix:shop'
+  design_purple_panel:
+    slot: 27,35,36,37,43,44,46,47,48,50,51,52,53
+    material: purple_stained_glass_pane
+    name: '&r'
+  design_black_panel:
+    slot: 0,1,2,3,4,5,6,7,8,9,10,16,17,18,26
+    material: black_stained_glass_pane
+    name: '&r'

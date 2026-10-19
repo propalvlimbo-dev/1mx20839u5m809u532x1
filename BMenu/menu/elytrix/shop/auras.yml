@@ -1,0 +1,137 @@
+# Converted from DeluxeMenus/gui_menus/shop/auras.yml; source kept unchanged.
+id: elytrix:auras
+provider: default
+type: chest
+size: 54
+title: '&#F8BEFB&lУникальные ауры'
+items:
+  fall_protection_aura:
+    slot: 20
+    material: light_gray_dye
+    name: '&7« &#EAEAEAАура защиты от падения &7»'
+    lore:
+    - '&#F8BEFB&l┃'
+    - '&#F8BEFB&l┃ &fТип: &#EAEAEAАура'
+    - '&#F8BEFB&l┃ &fЭффект: &#F8BEFBПолная защита от падения'
+    - '&#F8BEFB&l┃'
+    - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB799 коинов'
+    - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    on_click:
+    - if: '%playerpoints_points% >= 799'
+      do:
+      - '[console] elytrixitem:ei give %player_name% fall_protection_aura 1'
+      - '[console] p take %player_name% 799'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+  crystal_protection_aura:
+    slot: 22
+    material: black_dye
+    name: '&7« &#5B2C6FАура защиты от кристалла &7»'
+    lore:
+    - '&#F8BEFB&l┃'
+    - '&#F8BEFB&l┃ &fТип: &#5B2C6FАура'
+    - '&#F8BEFB&l┃ &fЭффект: &#F8BEFB-10% урона от кристалла'
+    - '&#F8BEFB&l┃'
+    - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB1299 коинов'
+    - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    on_click:
+    - if: '%playerpoints_points% >= 1299'
+      do:
+      - '[console] elytrixitem:ei give %player_name% crystal_protection_aura 1'
+      - '[console] p take %player_name% 1299'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+  miner_aura:
+    slot: 24
+    material: yellow_dye
+    name: '&7« &#FFD98CАура шахтёра &7»'
+    lore:
+    - '&#F8BEFB&l┃'
+    - '&#F8BEFB&l┃ &fТип: &#FFD98CАура'
+    - '&#F8BEFB&l┃ &fЭффект: &#F8BEFB20% на 100-1000 монет с руды'
+    - '&#F8BEFB&l┃'
+    - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB1499 коинов'
+    - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    on_click:
+    - if: '%playerpoints_points% >= 1499'
+      do:
+      - '[console] elytrixitem:ei give %player_name% miner_aura 1'
+      - '[console] p take %player_name% 1499'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+  info:
+    slot: 49
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0=
+    name: '&7« &#F8BEFBНаши сообщества &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fБудьте в курсе: &#F8BEFBВсех новостей'
+    - '&#F8BEFB&l┃ &fСвежие обновления: &#F8BEFBАнонсы'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для отправки ссылок в чат'
+    on_click:
+    - '[message]'
+    - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBСообщества'
+    - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+    - '[message] &#F8BEFB&l┃ &fTelegram канал: &#229ED9t.me/elytrix_ru'
+    - '[message] &#F8BEFB&l┃ &fDiscord сервер: &#5865F2dsc.gg/elytrix'
+    - '[message]'
+    - '[close]'
+  close:
+    slot: 45
+    material: black_dye
+    name: '&7« &#F8BEFBНазад &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fВернуться в предыдущее меню.'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для перехода'
+    on_click:
+    - '[open] elytrix:shop'
+  design_purple_panel:
+    slot: 27,35,36,37,43,44,46,47,48,50,51,52,53
+    material: purple_stained_glass_pane
+    name: '&r'
+  design_black_panel:
+    slot: 0,1,2,3,4,5,6,7,8,9,10,16,17,18,26
+    material: black_stained_glass_pane
+    name: '&r'

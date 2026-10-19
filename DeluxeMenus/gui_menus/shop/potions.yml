@@ -1,0 +1,304 @@
+menu_title: '&#F8BEFB&lЗелья'
+open_command: shop_potions
+size: 53
+items:
+  'potion_1':
+    material: potion
+    slot: 20
+    display_name: '&7« &#F8BEFBЗелье Оздоровления &7»'
+    rgb: 176,0,38
+    hide_effects: true
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fРегенерация IV &7(0:10)'
+      - '&#F8BEFB&l┃ &fСопротивление II &7(0:30)'
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB299 коинов'
+      - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для покупки'
+    click_requirement:
+      requirements:
+        anything_here:
+          type: '>='
+          input: '%playerpoints_points%'
+          output: '299'
+      deny_commands:
+        - '[message]'
+        - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+        - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+        - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+        - '[message]'
+        - '[close]'
+    click_commands:
+      - '[console] ei give %player_name% potion_healt 1'
+      - '[console] p take %player_name% 299'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+
+  'potion_2':
+    material: potion
+    slot: 21
+    display_name: '&7« &#F8BEFBЗелье Лёгкости &7»'
+    rgb: 206,50,184
+    hide_effects: true
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСкорость III &7(0:45)'
+      - '&#F8BEFB&l┃ &fСпешка &7(3:00)'
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB359 коинов'
+      - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для покупки'
+    click_requirement:
+      requirements:
+        anything_here:
+          type: '>='
+          input: '%playerpoints_points%'
+          output: '359'
+      deny_commands:
+        - '[message]'
+        - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+        - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+        - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+        - '[message]'
+        - '[close]'
+    click_commands:
+      - '[console] ei give %player_name% potion_lightness 1'
+      - '[console] p take %player_name% 359'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+
+  'potion_3':
+    material: potion
+    slot: 22
+    display_name: '&7« &#F8BEFBЗелье Войны &7» &fx3'
+    amount: 3
+    rgb: 199,248,128
+    hide_effects: true
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСила II &7(1:30)'
+      - '&#F8BEFB&l┃ &fСкорость II &7(1:30)'
+      - '&#F8BEFB&l┃ &fОгнестойкость &7(8:00)'
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB499 коинов'
+      - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для покупки'
+    click_requirement:
+      requirements:
+        anything_here:
+          type: '>='
+          input: '%playerpoints_points%'
+          output: '499'
+      deny_commands:
+        - '[message]'
+        - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+        - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+        - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+        - '[message]'
+        - '[close]'
+    click_commands:
+      - '[console] ei give %player_name% potion_voina 3'
+      - '[console] p take %player_name% 499'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+
+  'potion_4':
+    material: potion
+    slot: 23
+    display_name: '&7« &#F8BEFBЗелье Исчезновения &7»'
+    rgb: 128,255,0
+    hide_effects: true
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fНевидимость II &7(8:00)'
+      - '&#F8BEFB&l┃ &fСкорость II &7(3:00)'
+      - '&#F8BEFB&l┃ &fСопротивление &7(3:00)'
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB229 коинов'
+      - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для покупки'
+    click_requirement:
+      requirements:
+        anything_here:
+          type: '>='
+          input: '%playerpoints_points%'
+          output: '229'
+      deny_commands:
+        - '[message]'
+        - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+        - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+        - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+        - '[message]'
+        - '[close]'
+    click_commands:
+      - '[console] ei give %player_name% potion_disappearances 1'
+      - '[console] p take %player_name% 229'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+
+  'potion_5':
+    material: potion
+    slot: 24
+    display_name: '&7« &#F8BEFBЗелье Спортсмена &7»'
+    rgb: 58,179,178
+    hide_effects: true
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fРегенерация II &7(3:30)'
+      - '&#F8BEFB&l┃ &fСпешка II &7(1:30)'
+      - '&#F8BEFB&l┃ &fОгнестойкость &7(8:00)'
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB199 коинов'
+      - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для покупки'
+    click_requirement:
+      requirements:
+        anything_here:
+          type: '>='
+          input: '%playerpoints_points%'
+          output: '199'
+      deny_commands:
+        - '[message]'
+        - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+        - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+        - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+        - '[message]'
+        - '[close]'
+    click_commands:
+      - '[console] ei give %player_name% potion_sportsmena 1'
+      - '[console] p take %player_name% 199'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+
+  'potion_6':
+    material: potion
+    slot: 13
+    display_name: '&7« &#F8BEFBЗелье Спасения &7»'
+    rgb: 249,255,254
+    hide_effects: true
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fЛевитация IV &7(0:05)'
+      - '&#F8BEFB&l┃ &fУдача II &7(1:30)'
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB159 коинов'
+      - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для покупки'
+    click_requirement:
+      requirements:
+        anything_here:
+          type: '>='
+          input: '%playerpoints_points%'
+          output: '159'
+      deny_commands:
+        - '[message]'
+        - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+        - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+        - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+        - '[message]'
+        - '[close]'
+    click_commands:
+      - '[console] ei give %player_name% potion_salvation 1'
+      - '[console] p take %player_name% 159'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+
+  'info':
+    slot: 49
+    material: "basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0="
+    display_name: '&7« &#F8BEFBНаши сообщества &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fБудьте в курсе: &#F8BEFBВсех новостей'
+      - '&#F8BEFB&l┃ &fСвежие обновления: &#F8BEFBАнонсы'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для отправки ссылок в чат'
+    click_commands:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBСообщества'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message] &#F8BEFB&l┃ &fTelegram канал: &#229ED9t.me/elytrix_ru'
+      - '[message] &#F8BEFB&l┃ &fDiscord сервер: &#5865F2dsc.gg/elytrix'
+      - '[message]'
+      - '[close]'
+
+  'close':
+    material: black_dye
+    slot: 45
+    display_name: '&7« &#F8BEFBНазад &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fВернуться в предыдущее меню.'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для перехода'
+    click_commands:
+      - '[openguimenu] shop'
+
+  'design_purple_panel':
+    material: purple_stained_glass_pane
+    display_name: '&r'
+    slots:
+      - 27
+      - 35
+      - 36
+      - 37
+      - 43
+      - 44
+      - 46
+      - 47
+      - 48
+      - 50
+      - 51
+      - 52
+      - 53
+
+  'design_black_panel':
+    material: black_stained_glass_pane
+    display_name: '&r'
+    slots:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+      - 8
+      - 9
+      - 10
+      - 16
+      - 17
+      - 18
+      - 26

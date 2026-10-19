@@ -1,0 +1,116 @@
+# Converted from DeluxeMenus/gui_menus/events/airdrop_event.yml; source kept unchanged.
+id: elytrix:airdrop_event
+provider: default
+type: chest
+size: 54
+title: '&#F8BEFB&lАирдропы'
+items:
+  informations:
+    slot: 4
+    material: paper
+    name: '&7« &#F8BEFBИнформация об аирдропах &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fДо начала: &#F8BEFB%elytrixairdrop_time%'
+    - '&#F8BEFB&l┃ &fОнлайн для спавна: &#F8BEFB%elytrixairdrop_online%'
+    - '&#F8BEFB&l┃ &fЛокация: &#F8BEFB%elytrixairdrop_location%'
+    - '&#F8BEFB&l┃ &fПериодичность: &#F8BEFBКаждые 30 минут'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fСуть ивента: &#F8BEFBБитва за ценные припасы'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fИнформация обновляется в реальном времени'
+    on_click:
+    - '[close]'
+    tick_speed: 400
+    on_tick: '[update]'
+  peaceful:
+    slot: 20
+    material: chest
+    name: '&7« &#208BFBМирный аирдроп &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fОсобенность: &#F8BEFBБезопасная зона'
+    - '&#F8BEFB&l┃ &fPvP в радиусе 30 блоков: &cОтключено'
+    - '&#F8BEFB&l┃ &fСуть: &#F8BEFBОбычный сундук с лутом'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для отправки информации в чат'
+    on_click:
+    - '[message]'
+    - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#208BFBМирный аирдроп'
+    - '[message] &#F8BEFB&l┃ &fПоявляется сундук с полезными ресурсами.'
+    - '[message] &#F8BEFB&l┃ &fВ радиусе 30 блоков PvP режим полностью отключен.'
+    - '[message] &#F8BEFB&l┃ &fИдеально подходит для спокойного сбора лута.'
+    - '[message]'
+  sky:
+    slot: 22
+    material: cyan_shulker_box
+    name: '&7« &#F8BEFBВоздушный аирдроп &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fОсобенность: &#F8BEFBПарящая платформа'
+    - '&#F8BEFB&l┃ &fНаграды: &#F8BEFB5 шалкеров разной редкости'
+    - '&#F8BEFB&l┃ &fPvP в зоне: &#F8BEFBВключено'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для отправки информации в чат'
+    on_click:
+    - '[message]'
+    - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBВоздушный аирдроп'
+    - '[message] &#F8BEFB&l┃ &fСпавнится в воздухе на высоте 35-50 блоков.'
+    - '[message] &#F8BEFB&l┃ &fСодержит 5 шалкеров случайной ценности с лутом.'
+    - '[message] &#F8BEFB&l┃ &fPvP включено — будьте готовы к сражению.'
+    - '[message]'
+  fire:
+    slot: 24
+    material: magma_block
+    name: '&7« &cОгненный аирдроп &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fОпасность: &c5/5 &8(&fИссушение в зоне&8)'
+    - '&#F8BEFB&l┃ &fМеханика: &#F8BEFBМетеориты каждые 30 сек'
+    - '&#F8BEFB&l┃ &fНаграды: &#F8BEFBСамый ценный лут'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для отправки информации в чат'
+    on_click:
+    - '[message]'
+    - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОгненный аирдроп'
+    - '[message] &#F8BEFB&l┃ &fСамый опасный тип аирдропа с эффектом иссушения.'
+    - '[message] &#F8BEFB&l┃ &fКаждые 30 секунд в зону падает метеорит с лутом.'
+    - '[message] &#F8BEFB&l┃ &fМаксимальная концентрация топовых ресурсов!'
+    - '[message]'
+  close:
+    slot: 45
+    material: black_dye
+    name: '&7« &#F8BEFBНазад &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fВернуться в меню ивентов.'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для перехода'
+    on_click:
+    - '[open] elytrix:events'
+  info:
+    slot: 49
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0=
+    name: '&7« &#F8BEFBНаши сообщества &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fБудьте в курсе: &#F8BEFBВсех новостей'
+    - '&#F8BEFB&l┃ &fСвежие обновления: &#F8BEFBАнонсы'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для отправки ссылок в чат'
+    on_click:
+    - '[message]'
+    - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBСообщества'
+    - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+    - '[message] &#F8BEFB&l┃ &fTelegram канал: &#229ED9t.me/elytrix_ru'
+    - '[message] &#F8BEFB&l┃ &fDiscord сервер: &#5865F2dsc.gg/elytrix'
+    - '[message]'
+    - '[close]'
+  design_purple_panel:
+    slot: 27,35,36,37,43,44,46,47,48,50,51,52,53
+    material: purple_stained_glass_pane
+    name: '&r'
+  design_black_panel:
+    slot: 0,1,2,3,5,6,7,8,9,10,16,17,18,26
+    material: black_stained_glass_pane
+    name: '&r'

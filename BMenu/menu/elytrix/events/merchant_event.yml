@@ -1,0 +1,97 @@
+# Converted from DeluxeMenus/gui_menus/events/merchant_event.yml; source kept unchanged.
+id: elytrix:merchant_event
+provider: default
+type: chest
+size: 54
+title: '&#F8BEFB&lТорговец опытом'
+items:
+  informations:
+    slot: 4
+    material: paper
+    name: '&7« &#F8BEFBИнформация о торговце &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fСтатус: &#F8BEFB%elytrixtrader_time%'
+    - '&#F8BEFB&l┃ &fЛокация: &#F8BEFB%elytrixtrader_location%'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fРасписание: &#F8BEFB00:00, 04:00, 08:00, 12:00, 16:00, 20:00'
+    - '&#F8BEFB&l┃ &fПериодичность: &#F8BEFBРаз в 4 часа'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fИнформация обновляется в реальном времени'
+    on_click:
+    - '[close]'
+    tick_speed: 400
+    on_tick: '[update]'
+  assortment:
+    slot: 21
+    material: experience_bottle
+    name: '&7« &aАссортимент и валюта &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fВалюта оплаты: &aУровни опыта'
+    - '&#F8BEFB&l┃ &fТовары: &#F8BEFBРедкие зачарования и предметы'
+    - '&#F8BEFB&l┃ &fВремя стоянки: &#F8BEFBОграниченное'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для отправки информации в чат'
+    on_click:
+    - '[message]'
+    - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aТорговец опытом'
+    - '[message] &#F8BEFB&l┃ &fТорговец появляется раз в 4 часа в случайном месте мира.'
+    - '[message] &#F8BEFB&l┃ &fРасписание: &#F8BEFB00:00, 04:00, 08:00, 12:00, 16:00, 20:00 &fпо МСК.'
+    - '[message] &#F8BEFB&l┃ &fПродает редкий лут исключительно за &aУровни опыта&f.'
+    - '[message]'
+  tips:
+    slot: 23
+    material: compass
+    name: '&7« &#F8BEFBКоординаты и поиск &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fТекущие координаты: &#F8BEFB%elytrixtrader_location%'
+    - '&#F8BEFB&l┃ &fСовет: &#F8BEFBКопите опыт заранее'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для отправки информации в чат'
+    on_click:
+    - '[message]'
+    - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBПоиск торговца'
+    - '[message] &#F8BEFB&l┃ &fТекущая локация: &#F8BEFB%elytrixtrader_location%'
+    - '[message] &#F8BEFB&l┃ &fСледите за объявлениями в чате, чтобы не пропустить спавн!'
+    - '[message]'
+    tick_speed: 400
+    on_tick: '[update]'
+  close:
+    slot: 45
+    material: black_dye
+    name: '&7« &#F8BEFBНазад &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fВернуться в меню ивентов.'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для перехода'
+    on_click:
+    - '[open] elytrix:events'
+  info:
+    slot: 49
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0=
+    name: '&7« &#F8BEFBНаши сообщества &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fБудьте в курсе: &#F8BEFBВсех новостей'
+    - '&#F8BEFB&l┃ &fСвежие обновления: &#F8BEFBАнонсы'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для отправки ссылок в чат'
+    on_click:
+    - '[message]'
+    - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBСообщества'
+    - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+    - '[message] &#F8BEFB&l┃ &fTelegram канал: &#229ED9t.me/elytrix_ru'
+    - '[message] &#F8BEFB&l┃ &fDiscord сервер: &#5865F2dsc.gg/elytrix'
+    - '[message]'
+    - '[close]'
+  design_purple_panel:
+    slot: 27,35,36,37,43,44,46,47,48,50,51,52,53
+    material: purple_stained_glass_pane
+    name: '&r'
+  design_black_panel:
+    slot: 0,1,2,3,5,6,7,8,9,10,16,17,18,26
+    material: black_stained_glass_pane
+    name: '&r'

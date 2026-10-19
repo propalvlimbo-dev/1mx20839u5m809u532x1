@@ -1,0 +1,396 @@
+# Converted from DeluxeMenus/gui_menus/shop/armor.yml; source kept unchanged.
+id: elytrix:armor
+provider: default
+type: chest
+size: 54
+title: '&#F8BEFB&lАмуниция'
+items:
+  skull:
+    slot: 13
+    material: netherite_helmet
+    name: §x§F§8§B§E§F§B« §x§F§8§B§E§F§BШ§x§F§3§B§E§F§Bл§x§E§E§B§F§F§Bе§x§E§9§B§F§F§Bм §x§E§4§B§F§F§Bш§x§D§F§C§0§F§Bа§x§D§A§C§0§F§Bл§x§D§5§C§0§F§Bк§x§D§0§C§0§F§Bе§x§C§B§C§1§F§Bр§x§C§6§C§1§F§Bа
+      §x§F§8§B§E§F§B»
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЗащита IV'
+    - '&#F8BEFB&l┃ &fПодводное дыхание II'
+    - '&#F8BEFB&l┃ &fПрочность IV'
+    - '&#F8BEFB&l┃ &fПочинка'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЦена: &#F8BEFB999 коинов'
+    - '&#F8BEFB&l┃ &fБаланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    enchantments:
+      unbreaking: 3
+    item_flags:
+    - hide_enchants
+    - hide_attributes
+    on_click:
+    - if: '%playerpoints_points% >= 999'
+      do:
+      - '[console] ei give %player_name% shalker1 1'
+      - '[console] p take %player_name% 999'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+  skull1:
+    slot: 22
+    material: netherite_chestplate
+    name: §x§F§8§B§E§F§B« §x§F§8§B§E§F§BН§x§F§5§B§E§F§Bа§x§F§2§B§E§F§Bг§x§E§F§B§F§F§Bр§x§E§C§B§F§F§Bу§x§E§9§B§F§F§Bд§x§E§6§B§F§F§Bн§x§E§3§B§F§F§Bи§x§E§0§C§0§F§Bк §x§D§D§C§0§F§Bш§x§D§A§C§0§F§Bа§x§D§7§C§0§F§Bл§x§D§4§C§0§F§Bк§x§D§1§C§0§F§Bе§x§C§E§C§0§F§Bр§x§C§B§C§1§F§Bа
+      §x§F§8§B§E§F§B»
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЗащита IV'
+    - '&#F8BEFB&l┃ &fВзрывоустойчивость IV'
+    - '&#F8BEFB&l┃ &fПрочность IV'
+    - '&#F8BEFB&l┃ &fПочинка'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЦена: &#F8BEFB1190 коинов'
+    - '&#F8BEFB&l┃ &fБаланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    enchantments:
+      unbreaking: 3
+    item_flags:
+    - hide_enchants
+    - hide_attributes
+    - hide_additional_tooltip
+    on_click:
+    - if: '%playerpoints_points% >= 1190'
+      do:
+      - '[console] ei give %player_name% shalker2 1'
+      - '[console] p take %player_name% 1190'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+  skull2:
+    slot: 31
+    material: netherite_leggings
+    name: §x§F§8§B§E§F§B« §x§F§8§B§E§F§BП§x§F§4§B§E§F§Bо§x§F§0§B§F§F§Bн§x§E§C§B§F§F§Bо§x§E§8§B§F§F§Bж§x§E§4§B§F§F§Bи §x§E§0§C§0§F§Bш§x§D§C§C§0§F§Bа§x§D§8§C§0§F§Bл§x§D§4§C§0§F§Bк§x§D§0§C§0§F§Bе§x§C§C§C§1§F§Bр§x§C§8§C§1§F§Bа
+      §x§F§8§B§E§F§B»
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЗащита IV'
+    - '&#F8BEFB&l┃ &fПрочность IV'
+    - '&#F8BEFB&l┃ &fПочинка'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЦена: &#F8BEFB999 коинов'
+    - '&#F8BEFB&l┃ &fБаланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    enchantments:
+      unbreaking: 3
+    item_flags:
+    - hide_enchants
+    - hide_attributes
+    - hide_additional_tooltip
+    on_click:
+    - if: '%playerpoints_points% >= 999'
+      do:
+      - '[console] ei give %player_name% shalker3 1'
+      - '[console] p take %player_name% 999'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+  skull3:
+    slot: 40
+    material: netherite_boots
+    name: §x§F§8§B§E§F§B« §x§F§8§B§E§F§BБ§x§F§4§B§E§F§Bо§x§F§0§B§F§F§Bт§x§E§C§B§F§F§Bи§x§E§8§B§F§F§Bн§x§E§4§B§F§F§Bк§x§E§0§C§0§F§Bи §x§D§C§C§0§F§Bш§x§D§8§C§0§F§Bа§x§D§4§C§0§F§Bл§x§D§0§C§0§F§Bк§x§C§C§C§1§F§Bе§x§C§8§C§1§F§Bр§x§C§4§C§1§F§Bа
+      §x§F§8§B§E§F§B»
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЗащита IV'
+    - '&#F8BEFB&l┃ &fНевесомость IV'
+    - '&#F8BEFB&l┃ &fПодводная ходьба III'
+    - '&#F8BEFB&l┃ &fПрочность IV'
+    - '&#F8BEFB&l┃ &fПочинка'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЦена: &#F8BEFB999 коинов'
+    - '&#F8BEFB&l┃ &fБаланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    enchantments:
+      unbreaking: 3
+    item_flags:
+    - hide_enchants
+    - hide_attributes
+    - hide_additional_tooltip
+    on_click:
+    - if: '%playerpoints_points% >= 999'
+      do:
+      - '[console] ei give %player_name% shalker4 1'
+      - '[console] p take %player_name% 999'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+  skull4:
+    slot: 21
+    material: netherite_sword
+    name: §x§F§8§B§E§F§B« §x§F§8§B§E§F§BМ§x§F§3§B§E§F§Bе§x§E§E§B§F§F§Bч §x§E§9§B§F§F§Bш§x§E§4§B§F§F§Bа§x§D§F§C§0§F§Bл§x§D§A§C§0§F§Bк§x§D§5§C§0§F§Bе§x§D§0§C§0§F§Bр§x§C§B§C§1§F§Bа §x§F§8§B§E§F§B»
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fОстрота VI'
+    - '&#F8BEFB&l┃ &fЗаговор огня II'
+    - '&#F8BEFB&l┃ &fПрочность IV'
+    - '&#F8BEFB&l┃ &fПочинка'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЦена: &#F8BEFB1699 коинов'
+    - '&#F8BEFB&l┃ &fБаланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    enchantments:
+      unbreaking: 3
+    item_flags:
+    - hide_enchants
+    - hide_attributes
+    - hide_additional_tooltip
+    on_click:
+    - if: '%playerpoints_points% >= 1699'
+      do:
+      - '[console] ei give %player_name% shalker5 1'
+      - '[console] p take %player_name% 1699'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+  s312kull4:
+    slot: 20
+    material: netherite_sword
+    name: §x§F§8§B§E§F§B« §x§F§8§B§E§F§BМ§x§F§4§B§E§F§Bе§x§F§0§B§F§F§Bч §x§E§C§B§F§F§Bф§x§E§8§B§F§F§Bа§x§E§4§B§F§F§Bр§x§E§0§C§0§F§Bм§x§D§C§C§0§F§Bи§x§D§8§C§0§F§Bл§x§D§4§C§0§F§Bа §x§F§8§B§E§F§B»
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fОстрота V'
+    - '&#F8BEFB&l┃ &fЗаговор огня II'
+    - '&#F8BEFB&l┃ &fДобыча IV'
+    - '&#F8BEFB&l┃ &fПрочность III'
+    - '&#F8BEFB&l┃ &fПочинка'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЦена: &#F8BEFB1799 коинов'
+    - '&#F8BEFB&l┃ &fБаланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    enchantments:
+      unbreaking: 3
+    item_flags:
+    - hide_enchants
+    - hide_attributes
+    - hide_additional_tooltip
+    on_click:
+    - if: '%playerpoints_points% >= 1799'
+      do:
+      - '[console] ei give %player_name% farmila 1'
+      - '[console] p take %player_name% 1799'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+  skul32432:
+    slot: 23
+    material: elytra
+    name: §x§F§8§B§E§F§B« §x§F§8§B§E§F§BЭ§x§F§5§B§E§F§Bл§x§F§2§B§E§F§Bи§x§E§F§B§F§F§Bт§x§E§C§B§F§F§Bр§x§E§9§B§F§F§Bа §x§E§6§B§F§F§BШ§x§E§3§B§F§F§Bа§x§E§0§C§0§F§Bл§x§D§D§C§0§F§Bк§x§D§A§C§0§F§Bе§x§D§7§C§0§F§Bр§x§D§4§C§0§F§Bа
+      §x§F§8§B§E§F§B»
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЗащита IV'
+    - '&#F8BEFB&l┃ &fПрочность V'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЦена: &#F8BEFB1399 коинов'
+    - '&#F8BEFB&l┃ &fБаланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    enchantments:
+      unbreaking: 3
+    item_flags:
+    - hide_enchants
+    - hide_attributes
+    - hide_additional_tooltip
+    on_click:
+    - if: '%playerpoints_points% >= 1399'
+      do:
+      - '[console] ei give %player_name% elytra 1'
+      - '[console] p take %player_name% 1399'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+  вфывыфвф:
+    slot: 32
+    material: elytra
+    name: §x§F§8§B§E§F§B« §x§F§8§B§E§F§BЭ§x§F§5§B§E§F§Bл§x§F§2§B§E§F§Bи§x§E§F§B§F§F§Bт§x§E§C§B§F§F§Bр§x§E§9§B§F§F§Bа §x§E§6§B§F§F§BБ§x§E§3§B§F§F§Bо§x§E§0§C§0§F§Bг§x§D§D§C§0§F§Bа§x§D§A§C§0§F§Bт§x§D§7§C§0§F§Bы§x§D§4§C§0§F§Bр§x§D§1§C§0§F§Bя
+      §x§F§8§B§E§F§B»
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fНерушимость'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЦена: &#F8BEFB1699 коинов'
+    - '&#F8BEFB&l┃ &fБаланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    enchantments:
+      unbreaking: 3
+    item_flags:
+    - hide_enchants
+    - hide_attributes
+    - hide_additional_tooltip
+    on_click:
+    - if: '%playerpoints_points% >= 1699'
+      do:
+      - '[console] ei give %player_name% elytra1 1'
+      - '[console] p take %player_name% 1699'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+  skul31231232432:
+    slot: 30
+    material: netherite_pickaxe
+    name: §x§F§8§B§E§F§B«§x§F§8§B§E§F§BК§x§F§3§B§E§F§Bи§x§E§E§B§F§F§Bр§x§E§9§B§F§F§Bк§x§E§4§B§F§F§Bа §x§D§F§C§0§F§Bш§x§D§A§C§0§F§Bа§x§D§5§C§0§F§Bл§x§D§0§C§0§F§Bк§x§C§B§C§1§F§Bе§x§C§6§C§1§F§Bр§x§C§1§C§1§F§Bа§x§F§8§B§E§F§B»
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЭффективность VI'
+    - '&#F8BEFB&l┃ &fУдача II'
+    - '&#F8BEFB&l┃ &fПрочность IV'
+    - '&#F8BEFB&l┃ &fПочинка'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЦена: &#F8BEFB1390 коинов'
+    - '&#F8BEFB&l┃ &fБаланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    enchantments:
+      unbreaking: 3
+    item_flags:
+    - hide_enchants
+    - hide_attributes
+    - hide_additional_tooltip
+    on_click:
+    - if: '%playerpoints_points% >= 1390'
+      do:
+      - '[console] ei give %player_name% shalker6 1'
+      - '[console] p take %player_name% 1390'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+  info:
+    slot: 49
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0=
+    name: '&7« &#F8BEFBНаши сообщества &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fБудьте в курсе: &#F8BEFBВсех новостей'
+    - '&#F8BEFB&l┃ &fСвежие обновления: &#F8BEFBАнонсы'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для отправки ссылок в чат'
+    on_click:
+    - '[message]'
+    - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBСообщества'
+    - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+    - '[message] &#F8BEFB&l┃ &fTelegram канал: &#229ED9t.me/elytrix_ru'
+    - '[message] &#F8BEFB&l┃ &fDiscord сервер: &#5865F2dsc.gg/elytrix'
+    - '[message]'
+    - '[close]'
+  close:
+    slot: 45
+    material: black_dye
+    name: '&7« &#F8BEFBНазад &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fВернуться в предыдущее меню.'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для перехода'
+    on_click:
+    - '[open] elytrix:shop'
+  design_purple_panel:
+    slot: 27,35,36,37,43,44,46,47,48,50,51,52,53
+    material: purple_stained_glass_pane
+    name: '&r'
+  design_black_panel:
+    slot: 0,1,2,3,4,5,6,7,8,9,10,16,17,18,26
+    material: black_stained_glass_pane
+    name: '&r'

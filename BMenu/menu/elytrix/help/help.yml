@@ -1,0 +1,96 @@
+# Converted from DeluxeMenus/gui_menus/help/help.yml; source kept unchanged.
+id: elytrix:help
+provider: default
+type: chest
+size: 54
+title: '&#F8BEFB&lМеню помощи'
+items:
+  basics:
+    slot: 21
+    material: writable_book
+    name: '&7« &#F8BEFBОсновы игры &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЧто внутри: &#F8BEFBГайд для новичков'
+    - '&#F8BEFB&l┃ &fТемы: &#F8BEFBКоманды, правила, старт'
+    - '&#F8BEFB&l┃ &fПолезно: &#F8BEFBПервые шаги на сервере'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для перехода'
+    on_click:
+    - '[open] elytrix:help_basics'
+  events:
+    slot: 22
+    material: nether_star
+    name: '&7« &#F8BEFBИвенты сервера &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЧто внутри: &#F8BEFBСписок всех ивентов'
+    - '&#F8BEFB&l┃ &fТемы: &#F8BEFBРасписание и награды'
+    - '&#F8BEFB&l┃ &fПолезно: &#F8BEFBПрокачка и заработок коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для перехода'
+    on_click:
+    - '[open] elytrix:events'
+  free_donate:
+    slot: 23
+    material: honeycomb
+    name: '&7« &#F8BEFBБесплатный донат &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЧто внутри: &#F8BEFBСпособы получить ElytriX+'
+    - '&#F8BEFB&l┃ &fТемы: &#F8BEFBЗадания, активность, топы'
+    - '&#F8BEFB&l┃ &fПолезно: &#F8BEFBПривилегии без вложений'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для перехода'
+    on_click:
+    - '[open] elytrix:help_freedonate'
+  earnings:
+    slot: 31
+    material: gold_ingot
+    name: '&7« &#F8BEFBЗаработок &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЧто внутри: &#F8BEFBСпособы фарма коинов'
+    - '&#F8BEFB&l┃ &fТемы: &#F8BEFBСкупщик, рынок, аукцион'
+    - '&#F8BEFB&l┃ &fПолезно: &#F8BEFBБыстрый старт экономики'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для перехода'
+    on_click:
+    - '[message] &cРаздел «Заработок» пока недоступен: исходное меню help_earnings отсутствует в репозитории.'
+  info:
+    slot: 49
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0=
+    name: '&7« &#F8BEFBНаши сообщества &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fБудьте в курсе: &#F8BEFBВсех новостей'
+    - '&#F8BEFB&l┃ &fСвежие обновления: &#F8BEFBАнонсы'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для отправки ссылок в чат'
+    on_click:
+    - '[message]'
+    - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBСообщества'
+    - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+    - '[message] &#F8BEFB&l┃ &fTelegram канал: &#229ED9t.me/elytrix_ru'
+    - '[message] &#F8BEFB&l┃ &fDiscord сервер: &#5865F2dsc.gg/elytrix'
+    - '[message]'
+    - '[close]'
+  close:
+    slot: 45
+    material: black_dye
+    name: '&7« &#F8BEFBНазад &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fВернуться в предыдущее меню.'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для перехода'
+    on_click:
+    - '[open] elytrix:menu'
+  design_purple_panel:
+    slot: 27,35,36,37,43,44,46,47,48,50,51,52,53
+    material: purple_stained_glass_pane
+    name: '&r'
+  design_black_panel:
+    slot: 0,1,2,3,4,5,6,7,8,9,10,16,17,18,26
+    material: black_stained_glass_pane
+    name: '&r'

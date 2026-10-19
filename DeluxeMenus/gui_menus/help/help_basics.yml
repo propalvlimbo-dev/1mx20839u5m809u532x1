@@ -1,0 +1,205 @@
+menu_title: '&#F8BEFB&lОсновы игры'
+register_command: true
+open_command:
+  - help_basics
+  - основы
+size: 53
+items:
+
+  'privat':
+    material: wooden_axe
+    slot: 20
+    display_name: '&7« &#F8BEFBКак приватить территорию &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fПлагин: &#F8BEFBWorldGuard'
+      - '&#F8BEFB&l┃ &fИнструмент: &#F8BEFBДеревянный топор'
+      - '&#F8BEFB&l┃ &fЗащита: &aОт гриферов и краж'
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fКоманды:'
+      - '&7● &f//wand &8— &#F8BEFBполучить топор'
+      - '&7● &fЛКМ &8— &#F8BEFBпервая точка'
+      - '&7● &fПКМ &8— &#F8BEFBвторая точка'
+      - '&7● &f//expand <число> up &8— &#F8BEFBрасширить вверх'
+      - '&7● &f//expand <число> down &8— &#F8BEFBрасширить вниз'
+      - '&7● &f/region claim <название> &8— &#F8BEFBзаприватить'
+      - '&7● &f/region addmember <регион> <ник> &8— &#F8BEFBдобавить друга'
+      - '&#F8BEFB&l┃ '
+      - '&8[&#F8BEFBЛКМ&8] &7для отправки гайда в чат'
+    click_commands:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBГайд по привату'
+      - '[message] &#F8BEFB&l┃ &fПолучи топор: &#F8BEFB//wand'
+      - '[message] &#F8BEFB&l┃ &fЛКМ &8— &fпервый угол региона'
+      - '[message] &#F8BEFB&l┃ &fПКМ &8— &fвторой угол региона'
+      - '[message] &#F8BEFB&l┃ &fРасширить: &#F8BEFB//expand 50 up &fи &#F8BEFB//expand 50 down'
+      - '[message] &#F8BEFB&l┃ &fЗаприватить: &#F8BEFB/region claim <название>'
+      - '[message] &#F8BEFB&l┃ &fДобавить друга: &#F8BEFB/region addmember <регион> <ник>'
+      - '[message]'
+
+  'rtp':
+    material: ender_pearl
+    slot: 22
+    display_name: '&7« &#F8BEFBРандомная телепортация &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fКоманда: &#F8BEFB/rtp'
+      - '&#F8BEFB&l┃ &fНазначение: &#F8BEFBБыстрый старт и выживание'
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fВиды телепортации:'
+      - '&7● &fОбычный &8— &#F8BEFBдоступно всем'
+      - '&7● &fДальний &8— &#F8BEFBпривилегия WITHER'
+      - '&7● &fОхотничий &8— &#F8BEFBпривилегия ELDER'
+      - '&#F8BEFB&l┃ '
+      - '&8[&#F8BEFBЛКМ&8] &7для открытия меню телепортации'
+    click_commands:
+      - '[openguimenu] rtp'
+
+  'chat':
+    material: paper
+    slot: 24
+    display_name: '&7« &#F8BEFBЧаты и общение &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fЛокальный чат: &#F8BEFBпросто пишите'
+      - '&#F8BEFB&l┃ &fГлобальный чат: &#F8BEFB!сообщение'
+      - '&#F8BEFB&l┃ &fЛичные сообщения: &#F8BEFB/msg <ник> <текст>'
+      - '&#F8BEFB&l┃ &fОтвет на лс: &#F8BEFB/r <текст>'
+      - '&#F8BEFB&l┃ &fИгнор игрока: &#F8BEFB/ignore <ник>'
+      - '&#F8BEFB&l┃ '
+      - '&8[&#F8BEFBЛКМ&8] &7для отправки в чат'
+    click_commands:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBСистема чатов'
+      - '[message] &#F8BEFB&l┃ &fЛокальный: &#F8BEFBпросто пишите'
+      - '[message] &#F8BEFB&l┃ &fГлобальный: &#F8BEFB!привет всем'
+      - '[message] &#F8BEFB&l┃ &fЛичка: &#F8BEFB/msg <ник> <текст>'
+      - '[message] &#F8BEFB&l┃ &fОтвет: &#F8BEFB/r <текст>'
+      - '[message] &#F8BEFB&l┃ &fИгнор: &#F8BEFB/ignore <ник>'
+      - '[message]'
+
+  'home':
+    material: red_bed
+    slot: 29
+    display_name: '&7« &#F8BEFBСистема домов &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fКоманды:'
+      - '&7● &f/sethome [название] &8— &#F8BEFBсоздать точку дома'
+      - '&7● &f/home [название] &8— &#F8BEFBтелепортироваться'
+      - '&7● &f/home &8— &#F8BEFBоткрыть меню'
+      - '&7● &f/delhome <название> &8— &#F8BEFBудалить свою точку дома'
+      - '&7● &f/renamehome <старое> <новое> &8— &#F8BEFBпереименовать'
+      - '&7● &f/invitehome <игрок> <название> &8— &#F8BEFBпригласить игрока'
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fЛимит домов: &#F8BEFBЗависит от привилегии'
+    click_commands: []
+
+  'commands':
+    material: command_block
+    slot: 31
+    display_name: '&7« &#F8BEFBОсновные команды &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fКоманды:'
+      - '&7● &f/spawn &8— &#F8BEFBтелепорт на спавн'
+      - '&7● &f/menu &8— &#F8BEFBглавное меню сервера'
+      - '&7● &f/tpa <ник> &8— &#F8BEFBзапрос телепорта'
+      - '&7● &f/kit &8— &#F8BEFBвзять свой набор'
+      - '&#F8BEFB&l┃ '
+      - '&8[&#F8BEFBЛКМ&8] &7для отправки списка в чат'
+    click_commands:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBСписок команд'
+      - '[message] &#F8BEFB&l┃ &f/spawn &8— &#F8BEFBспавн сервера'
+      - '[message] &#F8BEFB&l┃ &f/menu &8— &#F8BEFBглавное меню'
+      - '[message] &#F8BEFB&l┃ &f/rtp &8— &#F8BEFBтелепорт в мир'
+      - '[message] &#F8BEFB&l┃ &f/tpa <ник> &8— &#F8BEFBзапрос телепорта'
+      - '[message] &#F8BEFB&l┃ &f/kit &8— &#F8BEFBвзять свой набор'
+      - '[message]'
+
+  'auction':
+    material: gold_nugget
+    slot: 33
+    display_name: '&7« &#F8BEFBАукцион игроков &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fОписание: &#F8BEFBТорговая площадка'
+      - '&#F8BEFB&l┃ &fВалюта: &#F8BEFBМонеты'
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fКоманды:'
+      - '&7● &f/ah &8— &#F8BEFBоткрыть аукцион'
+      - '&7● &f/ah search &8— &#F8BEFBпоиск предметов'
+      - '&7● &f/ah sell <цена> &8— &#F8BEFBвыставить предмет'
+      - '&#F8BEFB&l┃ '
+      - '&8[&#F8BEFBЛКМ&8] &7для открытия аукциона'
+    click_commands:
+      - '[player] ah'
+      - '[close]'
+
+  'back':
+    material: black_dye
+    slot: 45
+    display_name: '&7« &#F8BEFBНазад в меню помощи &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fВозврат в: &#F8BEFBМеню /help'
+      - '&#F8BEFB&l┃ '
+      - '&8[&#F8BEFBЛКМ&8] &7для возврата'
+    left_click_commands:
+      - '[openguimenu] help'
+
+  'info':
+    slot: 49
+    material: "basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0="
+    display_name: '&7« &#F8BEFBНаши сообщества &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fБудьте в курсе: &#F8BEFBВсех новостей'
+      - '&#F8BEFB&l┃ &fСвежие обновления: &#F8BEFBАнонсы'
+      - '&#F8BEFB&l┃ '
+      - '&8[&#F8BEFBЛКМ&8] &7для отправки ссылок в чат'
+    click_commands:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBСообщества'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message] &#F8BEFB&l┃ &fTelegram канал: &#229ED9t.me/elytrix_ru'
+      - '[message] &#F8BEFB&l┃ &fDiscord сервер: &#5865F2dsc.gg/elytrix'
+      - '[message]'
+      - '[close]'
+
+  'design_purple_panel':
+    material: purple_stained_glass_pane
+    display_name: '&r'
+    slots:
+      - 27
+      - 35
+      - 36
+      - 37
+      - 44
+      - 46
+      - 47
+      - 48
+      - 50
+      - 51
+      - 52
+      - 53
+  'design_black_panel':
+    material: black_stained_glass_pane
+    display_name: '&r'
+    slots:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+      - 8
+      - 9
+      - 10
+      - 16
+      - 17
+      - 18
+      - 26

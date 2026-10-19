@@ -1,0 +1,143 @@
+# Converted from DeluxeMenus/gui_menus/main/menu.yml; source kept unchanged.
+id: elytrix:menu
+provider: default
+type: chest
+size: 54
+title: '&#F8BEFB&lГлавное меню'
+items:
+  rtp:
+    slot: 21
+    material: ender_pearl
+    name: '&7« &#F8BEFBРандомная телепортация &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fТелепортация в: &#F8BEFBСлучайную точку'
+    - '&#F8BEFB&l┃ &fБезопасная зона: &#F8BEFBВключена'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для перемещения'
+    on_click:
+    - '[open] elytrix:rtp'
+  shop:
+    slot: 22
+    material: netherite_scrap
+    name: '&7« &#F8BEFBМагазин предметов &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fПокупка товаров: &#F8BEFBДоступно'
+    - '&#F8BEFB&l┃ &fПродажа ресурсов: &#F8BEFBВключена'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для перехода'
+    on_click:
+    - '[open] elytrix:shop'
+  ah:
+    slot: 23
+    material: gold_nugget
+    name: '&7« &#F8BEFBРынок игроков &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fТорговая площадка: &#F8BEFBАукцион'
+    - '&#F8BEFB&l┃ &fАктивные товары: &#F8BEFBПосмотреть'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для открытия'
+    on_click:
+    - '[player] ah'
+  customize:
+    slot: 24
+    material: purple_dye
+    name: '&7« &#F8BEFBКастомизация &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fУникальный вид: &#F8BEFBВыделяйтесь'
+    - '&#F8BEFB&l┃ &fНастройка профиля: &#F8BEFBЭффекты и префиксы'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для настройки'
+    on_click:
+    - '[open] elytrix:customizemenu'
+  clans:
+    slot: 20
+    material: prismarine_shard
+    name: '&7« &#F8BEFBКлановые союзы &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fСоздание клана: &#F8BEFBОбъединяйтесь'
+    - '&#F8BEFB&l┃ &fКлановые войны: &#F8BEFBСражайтесь'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите, чтобы открыть меню'
+    on_click:
+    - '[player] clan'
+    - '[close]'
+  seller:
+    slot: 30
+    material: ender_pearl
+    name: '&7« &#F8BEFBСкупщик ресурсов &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fМоментальная продажа: &#F8BEFBРесурсы'
+    - '&#F8BEFB&l┃ &fЗаработок валюты: &#F8BEFBВысокий'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите, чтобы открыть меню'
+    on_click:
+    - '[player] seller'
+  sub:
+    slot: 31
+    material: honeycomb
+    name: '&7« &#F8BEFBДонатерская подписка &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fПодписка ElytriX'
+    - '&#F8BEFB&l┃ &fУникальные бонусы'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите, чтобы открыть меню'
+    on_click:
+    - '[open] elytrix:sub'
+  help:
+    slot: 32
+    material: book
+    name: '&7« &#F8BEFBПомощь &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЧто внутри: &#F8BEFBГайд для новичков'
+    - '&#F8BEFB&l┃ &fТемы: &#F8BEFBКоманды, правила, старт'
+    - '&#F8BEFB&l┃ &fПолезно: &#F8BEFBПервые шаги на сервере'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для перехода'
+    on_click:
+    - '[player] помощь'
+    - '[close]'
+  info:
+    slot: 49
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0=
+    name: '&7« &#F8BEFBНаши сообщества &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fБудьте в курсе: &#F8BEFBВсех новостей'
+    - '&#F8BEFB&l┃ &fСвежие обновления: &#F8BEFBАнонсы'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для отправки ссылок в чат'
+    on_click:
+    - '[message]'
+    - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBСообщества'
+    - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+    - '[message] &#F8BEFB&l┃ &fTelegram канал: &#229ED9t.me/elytrix_ru'
+    - '[message] &#F8BEFB&l┃ &fDiscord сервер: &#5865F2dsc.gg/elytrix'
+    - '[message]'
+    - '[close]'
+  close:
+    slot: 45
+    material: red_dye
+    name: '&7« &cЗакрыть меню &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fВыход в игровой мир.'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для закрытия'
+    on_left_click:
+    - '[close]'
+  design_purple_panel:
+    slot: 27,35,36,37,43,44,46,47,48,50,51,52,53
+    material: purple_stained_glass_pane
+    name: '&r'
+  design_black_panel:
+    slot: 0,1,2,3,4,5,6,7,8,9,10,16,17,18,26
+    material: black_stained_glass_pane
+    name: '&r'

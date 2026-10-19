@@ -1,0 +1,46 @@
+# Converted from DeluxeMenus/gui_menus/help/help_events.yml; source kept unchanged.
+id: elytrix:help_events
+provider: default
+type: chest
+size: 9
+title: Default Menu
+menu-events:
+  on_open:
+  - if: '!has deluxemenus.admin'
+    do:
+    - '[message] &cYou don''t have permission to do that!'
+items:
+  dirt:
+    slot: 0
+    material: dirt
+  grass:
+    slot: 1
+    material: grass_block
+  gravel:
+    slot: 2
+    material: gravel
+  cobblestone:
+    slot: 3
+    material: cobblestone
+  stone:
+    slot: 4
+    material: stone
+  coal_ore:
+    slot: 5
+    material: coal_ore
+  iron_ore:
+    slot: 6
+    material: iron_ore
+  gold_ore:
+    slot: 7
+    material: gold_ore
+  diamond_ore:
+    slot: 8
+    material: diamond_ore
+    name: Exit
+    lore:
+    - click to exit
+    on_left_click:
+    - '[close]'
+    on_right_click:
+    - '[close]'

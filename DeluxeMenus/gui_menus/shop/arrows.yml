@@ -1,0 +1,271 @@
+menu_title: '&#F8BEFB&lСтрелы'
+register_command: true
+open_command: arrows
+size: 54
+items:
+  'arrow1':
+    material: tipped_arrow
+    nbt_int: CustomPotionColor:9768414
+    hide_effects: true
+    slot: 20
+    display_name: '&7« &#F8BEFBСтрела поражения &7»'
+    amount: 8
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fУтомление I &7(0:10)'
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB599 коинов'
+      - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для покупки'
+    click_requirement:
+      requirements:
+        anything_here:
+          type: '>='
+          input: '%playerpoints_points%'
+          output: '599'
+      deny_commands:
+        - '[message]'
+        - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+        - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+        - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+        - '[message]'
+        - '[close]'
+    click_commands:
+      - '[sound] BLOCK_CHEST_CLOSE'
+      - '[console] ei give %player_name% arrow1 8'
+      - '[console] p take %player_name% 599'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+
+  'arrow2':
+    material: tipped_arrow
+    nbt_int: CustomPotionColor:7194613
+    hide_effects: true
+    slot: 21
+    display_name: '&7« &#F8BEFBСтрела негатива &7»'
+    amount: 8
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fТошнота II &7(0:10)'
+      - '&#F8BEFB&l┃ &fСлепота II &7(0:10)'
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB719 коинов'
+      - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для покупки'
+    click_requirement:
+      requirements:
+        anything_here:
+          type: '>='
+          input: '%playerpoints_points%'
+          output: '719'
+      deny_commands:
+        - '[message]'
+        - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+        - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+        - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+        - '[message]'
+        - '[close]'
+    click_commands:
+      - '[sound] BLOCK_CHEST_CLOSE'
+      - '[console] ei give %player_name% arrow2 8'
+      - '[console] p take %player_name% 719'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+
+  'arrow3':
+    material: tipped_arrow
+    nbt_int: CustomPotionColor:6194613
+    hide_effects: true
+    slot: 22
+    display_name: '&7« &#F8BEFBСтрела психа &7»'
+    amount: 8
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fТошнота II &7(0:10)'
+      - '&#F8BEFB&l┃ &fОтравление II &7(0:10)'
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB459 коинов'
+      - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для покупки'
+    click_requirement:
+      requirements:
+        anything_here:
+          type: '>='
+          input: '%playerpoints_points%'
+          output: '459'
+      deny_commands:
+        - '[message]'
+        - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+        - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+        - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+        - '[message]'
+        - '[close]'
+    click_commands:
+      - '[sound] BLOCK_CHEST_CLOSE'
+      - '[console] ei give %player_name% arrow3 8'
+      - '[console] p take %player_name% 459'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+
+  'arrow4':
+    material: tipped_arrow
+    nbt_int: CustomPotionColor:98145125
+    hide_effects: true
+    slot: 23
+    display_name: '&7« &#F8BEFBСтрела черепахи &7»'
+    amount: 8
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСлабость II &7(0:10)'
+      - '&#F8BEFB&l┃ &fГолод II &7(0:10)'
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB679 коинов'
+      - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для покупки'
+    click_requirement:
+      requirements:
+        anything_here:
+          type: '>='
+          input: '%playerpoints_points%'
+          output: '679'
+      deny_commands:
+        - '[message]'
+        - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+        - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+        - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+        - '[message]'
+        - '[close]'
+    click_commands:
+      - '[sound] BLOCK_CHEST_CLOSE'
+      - '[console] ei give %player_name% arrow5 8'
+      - '[console] p take %player_name% 679'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+
+  'arrow5':
+    material: tipped_arrow
+    nbt_int: CustomPotionColor:16382196
+    hide_effects: true
+    slot: 24
+    display_name: '&7« &#F8BEFBСтрела фантома &7»'
+    amount: 8
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fЛевитация II &7(0:05)'
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB559 коинов'
+      - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для покупки'
+    click_requirement:
+      requirements:
+        anything_here:
+          type: '>='
+          input: '%playerpoints_points%'
+          output: '559'
+      deny_commands:
+        - '[message]'
+        - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+        - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+        - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+        - '[message]'
+        - '[close]'
+    click_commands:
+      - '[sound] BLOCK_CHEST_CLOSE'
+      - '[console] ei give %player_name% arrow_levit 8'
+      - '[console] p take %player_name% 559'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+
+  'close':
+    material: black_dye
+    slot: 45
+    display_name: '&7« &#F8BEFBНазад &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fВернуться в предыдущее меню.'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для перехода'
+    click_commands:
+      - '[openguimenu] shop'
+
+  'design_purple_panel':
+    material: purple_stained_glass_pane
+    display_name: '&r'
+    slots:
+      - 27
+      - 35
+      - 36
+      - 37
+      - 43
+      - 44
+      - 46
+      - 47
+      - 48
+      - 50
+      - 51
+      - 52
+      - 53
+
+  'design_black_panel':
+    material: black_stained_glass_pane
+    display_name: '&r'
+    slots:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+      - 8
+      - 9
+      - 10
+      - 16
+      - 17
+      - 18
+      - 26
+
+  'info':
+    slot: 49
+    material: "basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0="
+    display_name: '&7« &#F8BEFBНаши сообщества &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fБудьте в курсе: &#F8BEFBВсех новостей'
+      - '&#F8BEFB&l┃ &fСвежие обновления: &#F8BEFBАнонсы'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для отправки ссылок в чат'
+    click_commands:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBСообщества'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message] &#F8BEFB&l┃ &fTelegram канал: &#229ED9t.me/elytrix_ru'
+      - '[message] &#F8BEFB&l┃ &fDiscord сервер: &#5865F2dsc.gg/elytrix'
+      - '[message]'
+      - '[close]'

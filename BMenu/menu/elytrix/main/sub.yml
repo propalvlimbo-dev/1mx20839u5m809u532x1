@@ -1,0 +1,128 @@
+# Converted from DeluxeMenus/gui_menus/main/sub.yml; source kept unchanged.
+id: elytrix:sub
+provider: default
+type: chest
+size: 54
+title: '&#F8BEFB&lПодписка ElytriX+'
+items:
+  auto-totem:
+    slot: 21
+    material: totem_of_undying
+    name: '&7« &#F8BEFBАвто-тотем &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fОписание: &#F8BEFBАвтоматическая активация тотема'
+    - '&#F8BEFB&l┃ &fСрабатывание: &#F8BEFBПри смертельном уроне'
+    - '&#F8BEFB&l┃ &fПерезарядка: &#F8BEFB30 секунд'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для переключения'
+    on_click:
+    - '[player] subscribe toggle auto-totem'
+  damag:
+    slot: 22
+    material: feather
+    name: '&7« &#F8BEFBСкорость &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fОписание: &#F8BEFBУвеличение скорость передвижения'
+    - '&#F8BEFB&l┃ &fБонус: &#F8BEFB+20% к базовой скорости'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для переключения'
+    on_click:
+    - '[player] subscribe toggle speed'
+  parrot:
+    slot: 23
+    material: gold_nugget
+    name: '&7« &#F8BEFBПопугай-пират &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fОписание: &#F8BEFBВаш личный попугай'
+    - '&#F8BEFB&l┃ &fКосметика: &#F8BEFBНастоящий пиратский попугай'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите &7ЛКМ &fдля переключения'
+    - '&7● &fНажмите &7ПКМ &fдля настройки'
+    on_left_click:
+    - '[player] subscribe toggle parrot'
+    on_right_click:
+    - '[player] subscribe menu parrot'
+  anbti-food:
+    slot: 24
+    material: cooked_beef
+    name: '&7« &#F8BEFBАнти-голод &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fОписание: &#F8BEFBБлокировка чувства голода'
+    - '&#F8BEFB&l┃ &fСтатус сытости: &#F8BEFBНе уменьшается'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для переключения'
+    on_click:
+    - '[player] subscribe toggle antifood'
+  rast:
+    slot: 20
+    material: leather_boots
+    name: '&7« &#F8BEFBЗащита от падения &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fОписание: &#F8BEFBПропадает урон от падения'
+    - '&#F8BEFB&l┃ &fЭффект: &#F8BEFBПропадает урон от падения полностью'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для переключения'
+    on_click:
+    - '[player] subscribe toggle anti-fall'
+  informations:
+    slot: 4
+    material: paper
+    name: '&7« &#F8BEFBИнформация о подписке &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fДополнительные команды:'
+    - '&#F8BEFB&l┃ &7● &fРежим бессмертия: &#F8BEFB/god'
+    - '&#F8BEFB&l┃ &7● &fПеревод коинов: &#F8BEFB/p pay'
+    - '&#F8BEFB&l┃ &7● &fУникальный набор: &#F8BEFB/kit plus'
+    - '&#F8BEFB&l┃ &7● &fОбход цензуры чата: &#F8BEFBДоступно'
+    - '&#F8BEFB&l┃ &7● &fЦветное описание варпов: &#F8BEFBДоступно'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЦены на подписку:'
+    - '&#F8BEFB&l┃ &7● &fПодписка на 30 дней: &#F8BEFB299₽'
+    - '&#F8BEFB&l┃ &7● &fПодписка на 90 дней: &#F8BEFB699₽'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fСтатус: %slidesubscribe_hassubscribe%'
+    on_click:
+    - '[close]'
+  info:
+    slot: 49
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0=
+    name: '&7« &#F8BEFBНаши сообщества &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fБудьте в курсе: &#F8BEFBВсех новостей'
+    - '&#F8BEFB&l┃ &fСвежие обновления: &#F8BEFBАнонсы'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для отправки ссылок в чат'
+    on_click:
+    - '[message]'
+    - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBСообщества'
+    - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+    - '[message] &#F8BEFB&l┃ &fTelegram канал: &#229ED9t.me/elytrix_ru'
+    - '[message] &#F8BEFB&l┃ &fDiscord сервер: &#5865F2dsc.gg/elytrix'
+    - '[message]'
+    - '[close]'
+  close:
+    slot: 45
+    material: black_dye
+    name: '&7« &#F8BEFBНазад &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fВернуться в предыдущее меню.'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для перехода'
+    on_click:
+    - '[open] elytrix:menu'
+  design_purple_panel:
+    slot: 27,35,36,37,43,44,46,47,48,50,51,52,53
+    material: purple_stained_glass_pane
+    name: '&r'
+  design_black_panel:
+    slot: 0,1,2,3,5,6,7,8,9,10,16,17,18,26
+    material: black_stained_glass_pane
+    name: '&r'
