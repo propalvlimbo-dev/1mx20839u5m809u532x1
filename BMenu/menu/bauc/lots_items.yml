@@ -14,27 +14,27 @@
 # любой предмет f - найти аналоги
 
 item_info_lore: &info
-  - "<st><#FF0000>                         "
-  - "<#00FF00>$<#FFFFE6> Ценa:<#00FF00> $${price}"
-  - "<#FFFF00>⭐<#FFFFE6> Продавец:<#FFFF00> {seller_name}"
-  - "<#FF0066>⟲<#FFFFE6> Истeкaeт:<#FF0066> {expires}"
-  - "<st><#FF0000>                         "
+  - "<st><#F8BEFB>                         "
+  - "<#A8FFC0>$<#FFFFFF> Ценa:<#A8FFC0> $${price}"
+  - "<#F8BEFB>⭐<#FFFFFF> Продавец:<#F8BEFB> {seller_name}"
+  - "<#FF9AD5>⟲<#FFFFFF> Истeкaeт:<#FF9AD5> {expires}"
+  - "<st><#F8BEFB>                         "
 
 vault_lot:
   lore:
-    - '<#FF6600> ➥ Нажмите<#FFFFE6>, чтобы <#FFFF00>забрать'
-    - "<st><#FF0000>                         "
+    - '<#F8BEFB> ➥ Нажмите<#FFFFFF>, чтобы <#F8BEFB>забрать'
+    - "<st><#F8BEFB>                         "
     - '&r '
-    - '<#00FF00>$<#FFFFE6> Цена:<#00FF00> $${price}'
-    - "<#FF6600>●<#FFFFE6> Статус: {lot_status}"
-    - '<#FF0066>⟲<#FFFFE6> Удаление: <#FF0066>{expires}'
-    - "<st><#FF0000>                         "
+    - '<#A8FFC0>$<#FFFFFF> Цена:<#A8FFC0> $${price}'
+    - "<#F8BEFB>●<#FFFFFF> Статус: {lot_status}"
+    - '<#FF9AD5>⟲<#FFFFFF> Удаление: <#FF9AD5>{expires}'
+    - "<st><#F8BEFB>                         "
     - '&r '
   on_click: # забрать предмет
     - take_lot: ''
 
 sold:
-  name: "<#FF0000>Товар не актуален"
+  name: "<#F8BEFB>Товар не актуален"
   material: gray_dye
   lore:
     - ""
@@ -45,11 +45,11 @@ sold:
     - delay: '1 [research]' # у майна какие-то баги из-за чего предмет по которому кликнули через f остаётся...
   all_flags: true
   on_click:
-    - '<#FF0000>[✘] Ошибка!<#FFFFE6> Этот товар не актуален!'
-    - sound: 'block.note_block.basedrum 1 1'
+    - '<#F8BEFB>[✘] Ошибка!<#FFFFFF> Этот товар не актуален!'
+    - sound: 'block.note_block.basedrum 0.35 1'
 
 purchased:
-  name: "<#51f542>Товар куплен!"
+  name: "<#A8FFC0>Товар куплен!"
   material: lime_dye
   lore:
     - ""
@@ -60,11 +60,11 @@ purchased:
     - delay: '1 [research]'
   all_flags: true
   on_click:
-    - '<#FF0000>[✘] Ошибка!<#FFFFE6> Вы уже купили этот товар!'
-    - sound: 'block.note_block.basedrum 1 1'
+    - '<#F8BEFB>[✘] Ошибка!<#FFFFFF> Вы уже купили этот товар!'
+    - sound: 'block.note_block.basedrum 0.35 1'
 
 taken:
-  name: "<#51f542>Товар убран!"
+  name: "<#A8FFC0>Товар убран!"
   material: lime_dye
   lore:
     - ""
@@ -75,13 +75,13 @@ taken:
     - delay: '1 [research]'
   all_flags: true
   on_click:
-    - '<#FF0000>[✘] Ошибка!<#FFFFE6> Вы уже забрали этот товар!'
-    - sound: 'block.note_block.basedrum 1 1'
+    - '<#F8BEFB>[✘] Ошибка!<#FFFFFF> Вы уже забрали этот товар!'
+    - sound: 'block.note_block.basedrum 0.35 1'
 
 # Когда игрок owner предмета
 owned:
   lore:
-    - '<#FF6600> ➥ Нажмите<#FFFFE6>, чтобы <#FFFF00>забрать'
+    - '<#F8BEFB> ➥ Нажмите<#FFFFFF>, чтобы <#F8BEFB>забрать'
     - *info
     - '<gray>f чтобы найти аналоги'
   on_swap_offhand_click:
@@ -92,7 +92,7 @@ owned:
 
 one:
   lore:
-    - '<#FF6600> ➥ Нажмите<#FFFFE6>, чтобы <#00FF00>купить'
+    - '<#F8BEFB> ➥ Нажмите<#FFFFFF>, чтобы <#A8FFC0>купить'
     - *info
     - '<gray>f чтобы найти аналоги'
   on_swap_offhand_click:
@@ -107,11 +107,11 @@ one:
 
 container:
   lore:
-    - '<#FF6600> ➥ Нажмите<#FFFFE6>, чтобы <#00FF00>купить'
+    - '<#F8BEFB> ➥ Нажмите<#FFFFFF>, чтобы <#A8FFC0>купить'
     - *info
     - '&r '
-    - '<#E99100>↪ <white>Нажмите <#E99100>Пкм'
-    - '<#E99100> <white>чтобы осмотреть содержимое.'
+    - '<#F8BEFB>↪ <white>Нажмите <#F8BEFB>Пкм'
+    - ' <white>чтобы осмотреть содержимое.'
     - '<gray>f чтобы найти аналоги'
   on_swap_offhand_click:
     - find_analogs: ''
@@ -127,11 +127,11 @@ container:
 
 many:
   lore:
-    - '<#FF6600> ➥ Нажмите<#FFFFE6>, чтобы <#00FF00>купить'
+    - '<#F8BEFB> ➥ Нажмите<#FFFFFF>, чтобы <#A8FFC0>купить'
     - *info
     - '&r '
-    - '<#E99100>↪ <white>Нажмите <#E99100>Пкм'
-    - '<#E99100> <white>чтобы купить количество'
+    - '<#F8BEFB>↪ <white>Нажмите <#F8BEFB>Пкм'
+    - ' <white>чтобы купить количество'
     - '<gray>f чтобы найти аналоги'
   on_swap_offhand_click:
     - find_analogs: ''

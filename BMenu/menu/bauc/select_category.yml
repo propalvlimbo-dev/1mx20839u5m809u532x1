@@ -2,14 +2,14 @@ id: bauc:select_category
 provider: default
 type: chest
 size: 45
-title: "<#FF0000>☃<b><#FF6600> Выбор категории"
+title: "<#F8BEFB>☃<b><#F8BEFB> Выбор категории"
 items:
   _o_:
     slot: 15
     damage: 0
     #name: "[❖] Снаряжение"
-    name: "<#FF0000>[❖] <#FF6600>Снаряжение"
-    lore: "<#FF6600>➥ Нажмите<#FFFFE6>, чтобы перейти"
+    name: "<#F8BEFB>[❖] Снаряжение"
+    lore: "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
     all_flags: true
     material: netherite_chestplate
     on_click:
@@ -20,8 +20,8 @@ items:
     slot: 14
     damage: 0
     #name: "[❖] Оружие"
-    name: "<#FF0000>[❖] <#FF6600>Оружие"
-    lore: "<#FF6600>➥ Нажмите<#FFFFE6>, чтобы перейти"
+    name: "<#F8BEFB>[❖] Оружие"
+    lore: "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
     all_flags: true
     material: netherite_sword
     on_click:
@@ -31,8 +31,8 @@ items:
   _n_:
     slot: 29
     #name: "[❖] Яйца и Спавнеры"
-    name: "<#FF0000>[❖] <#FF6600>Яйца и Спавнеры"
-    lore: "<#FF6600>➥ Нажмите<#FFFFE6>, чтобы перейти"
+    name: "<#F8BEFB>[❖] Яйца и Спавнеры"
+    lore: "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
     all_flags: true
     material: bee_spawn_egg
     on_click:
@@ -42,8 +42,8 @@ items:
   _k_:
     slot: 30
     #name: "[❖] Талисманы"
-    name: "<#FF0000>[❖] <#FF6600>Талисманы"
-    lore: "<#FF6600>➥ Нажмите<#FFFFE6>, чтобы перейти"
+    name: "<#F8BEFB>[❖] Талисманы"
+    lore: "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
     all_flags: true
     material: totem_of_undying
     on_click:
@@ -53,8 +53,8 @@ items:
   _l_:
     slot: 20
     #name: "[❖] Ценные ресурсы"
-    name: "<#FF0000>[❖] <#FF6600>Ценные ресурсы"
-    lore: "<#FF6600>➥ Нажмите<#FFFFE6>, чтобы перейти"
+    name: "<#F8BEFB>[❖] Ценные ресурсы"
+    lore: "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
     all_flags: true
     material: netherite_ingot
     on_click:
@@ -64,8 +64,8 @@ items:
   _i_:
     slot: 12
     #name: "[❖] Блоки"
-    name: "<#FF0000>[❖] <#FF6600>Блоки"
-    lore: "<#FF6600>➥ Нажмите<#FFFFE6>, чтобы перейти"
+    name: "<#F8BEFB>[❖] Блоки"
+    lore: "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
     all_flags: true
     material: coarse_dirt
     on_click:
@@ -75,8 +75,8 @@ items:
   _j_:
     slot: 11
     #name: "[❖] Все товары"
-    name: "<#FF0000>[❖] <#FF6600>Все товары"
-    lore: "<#FF6600>➥ Нажмите<#FFFFE6>, чтобы перейти"
+    name: "<#F8BEFB>[❖] Все товары"
+    lore: "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
     all_flags: true
     material: hopper_minecart
     on_click:
@@ -86,8 +86,8 @@ items:
   _g_:
     slot: 21
     #name: "[❖] Прочие ресурсы"
-    name: "<#FF0000>[❖] <#FF6600>Прочие ресурсы"
-    lore: "<#FF6600>➥ Нажмите<#FFFFE6>, чтобы перейти"
+    name: "<#F8BEFB>[❖] Прочие ресурсы"
+    lore: "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
     all_flags: true
     material: fermented_spider_eye
     on_click:
@@ -98,8 +98,8 @@ items:
     slot: 13
     damage: 0
     #name: "[❖] Инструменты"
-    name: "<#FF0000>[❖] <#FF6600>Инструменты"
-    lore: "<#FF6600>➥ Нажмите<#FFFFE6>, чтобы перейти"
+    name: "<#F8BEFB>[❖] Инструменты"
+    lore: "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
     all_flags: true
     material: netherite_pickaxe
     on_click:
@@ -109,8 +109,8 @@ items:
   _e_:
     slot: 33
     #name: "[❖] Для Грифа"
-    name: "<#FF0000>[❖] <#FF6600>Для Грифа"
-    lore: "<#FF6600>➥ Нажмите<#FFFFE6>, чтобы перейти"
+    name: "<#F8BEFB>[❖] Для Грифа"
+    lore: "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
     all_flags: true
     material: comparator
     on_click:
@@ -120,8 +120,8 @@ items:
   _f_:
     slot: 24
     #name: "[❖] Книги"
-    name: "<#FF0000>[❖] <#FF6600>Книги"
-    lore: "<#FF6600>➥ Нажмите<#FFFFE6>, чтобы перейти"
+    name: "<#F8BEFB>[❖] Книги"
+    lore: "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
     all_flags: true
     material: enchanted_book
     on_click:
@@ -131,8 +131,8 @@ items:
   _c_:
     slot: 31
     #name: "[❖] Настоящие вещи"
-    name: "<#FF0000>[❖] <#FF6600>Настоящие вещи"
-    lore: "<#FF6600>➥ Нажмите<#FFFFE6>, чтобы перейти"
+    name: "<#F8BEFB>[❖] Настоящие вещи"
+    lore: "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
     all_flags: true
     material: enchanted_golden_apple
     on_click:
@@ -142,8 +142,8 @@ items:
   _d_:
     slot: 22
     #name: "[❖] Еда"
-    name: "<#FF0000>[❖] <#FF6600>Еда"
-    lore: "<#FF6600>➥ Нажмите<#FFFFE6>, чтобы перейти"
+    name: "<#F8BEFB>[❖] Еда"
+    lore: "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
     all_flags: true
     material: sweet_berries
     on_click:
@@ -153,8 +153,8 @@ items:
   _a_:
     slot: 32
     #name: "[❖] Зельеварение"
-    name: "<#FF0000>[❖] <#FF6600>Зельеварение"
-    lore: "<#FF6600>➥ Нажмите<#FFFFE6>, чтобы перейти"
+    name: "<#F8BEFB>[❖] Зельеварение"
+    lore: "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
     all_flags: true
     material: brewing_stand
     on_click:
@@ -164,11 +164,37 @@ items:
   _b_:
     slot: 23
     #name: "[❖] Зелья"
-    name: "<#FF0000>[❖] <#FF6600>Зелья"
-    lore: "<#FF6600>➥ Нажмите<#FFFFE6>, чтобы перейти"
+    name: "<#F8BEFB>[❖] Зелья"
+    lore: "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
     all_flags: true
     material: dragon_breath
     on_click:
       - open:
           menu: 'bauc:home'
           category: 'potions'
+
+  # ── панели для анимации (без slot: ставятся только кадрами animation) ──
+  frame:
+    name: ""
+    material: black_stained_glass_pane
+  accent:
+    name: ""
+    material: purple_stained_glass_pane
+
+animation:
+  - tick: 0
+    opcodes:
+      - set: frame 11-15,20-24,29-33
+      - sound: 'block.enchantment_table.use 0.3 1.5'
+  - tick: 3
+    opcodes:
+      - remove: 11-15
+      - sound: 'block.note_block.chime 0.24 1.0'
+  - tick: 6
+    opcodes:
+      - remove: 20-24
+      - sound: 'block.note_block.pling 0.30 1.2'
+  - tick: 9
+    opcodes:
+      - remove: 29-33
+      - sound: 'block.amethyst_block.chime 0.42 1.40'

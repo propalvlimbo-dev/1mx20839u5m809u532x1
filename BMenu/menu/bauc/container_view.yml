@@ -1,30 +1,30 @@
 id: bauc:container_view
 provider: bauc:container_view
-title: "<#FF0000>☃<b><#FF6600> Подтверждение покупки"
+title: "<#F8BEFB>☃<b><#F8BEFB> Подтверждение покупки"
 
 items:
   a:
     slot: 5
-    name: "<#00FF00>[Кyпить]"
+    name: "<#A8FFC0>[Кyпить]"
     lore:
       - ""
-      - "<st><#FF0000>                        "
-      - "<#00FF00>$<#FFFFE6> Ценa<#00FF00> $${price}"
-      - "<#FF6600>⚕<#FFFFE6> Прoдaвeц:<#FF6600> {seller_name}"
-      - "<st><#FF0000>                        "
+      - "<st><#F8BEFB>                        "
+      - "<#A8FFC0>$<#FFFFFF> Ценa<#A8FFC0> $${price}"
+      - "<#F8BEFB>⚕<#FFFFFF> Прoдaвeц:<#F8BEFB> {seller_name}"
+      - "<st><#F8BEFB>                        "
     material: lime_dye
     on_click:
       - back_or_close: ''
       - buy_lot: ''
   b:
     slot: 3
-    name: "<#FF0000>[Вернуться]"
+    name: "<#F8BEFB>[Вернуться]"
     lore:
-      - "<#FFFFE6>Отказаться от покупки"
-      - "<#FFFFE6>и вернуться в меню"
+      - "<#FFFFFF>Отказаться от покупки"
+      - "<#FFFFFF>и вернуться в меню"
     material: tipped_arrow
     on_click:
-      - sound: 'ui.button.click 1 1'
+      - sound: 'ui.button.click 0.35 1'
       - back_or_close: ''
   c:
     slot: 0-2,4,6-8

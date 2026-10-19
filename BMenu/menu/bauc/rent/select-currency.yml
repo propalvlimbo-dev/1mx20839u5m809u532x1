@@ -2,7 +2,7 @@ id: auc_rent:select_currency
 provider: default
 type: chest
 size: 45
-title: "<#FF0000>☃ <b><#FF6600>Выберите валюту:"
+title: "<#F8BEFB>☃ <b><#F8BEFB>Выберите валюту:"
 # 1h = 3600000 ms
 args:
   eco_price: 1
@@ -38,14 +38,14 @@ items:
     args:
       expiry: '%bauctionv2_ms_format_%bauctionv2_lp_ttl_{perm}%%'
       expiri_ceil_hours: '{math:ceil(%bauctionv2_lp_ttl_{perm}% / 3600000)}'
-    name: "<#FF6600>[☃]<#FFFFE6> Аренда:<#FFFF00> {slot_count} слот<#8C8C8C>/<#FF6600>1 час"
+    name: "<#F8BEFB>[☃]<#FFFFFF> Аренда:<#F8BEFB> {slot_count} слот<#8C8C8C>/<#F8BEFB>1 час"
     material: golden_carrot
     amount: '{slot_count}'
     base_lore: &base_lore
-      - "<#FF0000><st>                         "
-      - "<#FFFF00> $<#FFFFE6> Цена: <#FFFF00>$${eco_price_commas}"
-      - "<#FF6600> ⛁<#FFFFE6> Баланс: <#FF6600>$%vault_eco_balance_commas%"
-      - "<#FF0000><st>                         "
+      - "<#F8BEFB><st>                         "
+      - "<#F8BEFB> $<#FFFFFF> Цена: <#F8BEFB>$${eco_price_commas}"
+      - "<#F8BEFB> ⛁<#FFFFFF> Баланс: <#F8BEFB>$%vault_eco_balance_commas%"
+      - "<#F8BEFB><st>                         "
     oneOf:
       - on_view:
           - '{squid_only}'
@@ -53,50 +53,50 @@ items:
         lore:
           - *base_lore
           - ""
-          - " <#FFFF00>⚠<#FFFFE6> Доступно от:<#FFFF00> Сквид"
+          - " <#F8BEFB>⚠<#FFFFFF> Доступно от:<#F8BEFB> Сквид"
         on_click:
-          - '<#FF0000>[✘] Ошибка!<#FFFFE6> У Вас нет необходимой<#FFFF00> Привилегии<#FFFFE6>! Не беда, ее можно купить на<#FFFF00> YourServer'
-          - sound: entity.creeper.hurt 1 1
-          - sound: block.glass.place 1 1
+          - '<#F8BEFB>[✘] Ошибка!<#FFFFFF> У Вас нет необходимой<#F8BEFB> Привилегии<#FFFFFF>! Не беда, ее можно купить на<#F8BEFB> ElytriX'
+          - sound: entity.creeper.hurt 0.35 1
+          - sound: block.enchantment_table.use 0.3 1.5
       - on_view: '{expiri_ceil_hours} >= {eco_limit}'
         enchanted: true
         lore:
           - *base_lore
           - ""
-          - "<#FFFF00>⚠<#FFFFE6> Аренда уже<#00FF00> Активна<#FFFFE6>!"
-          - "<#FF6600>⌛<#FFFFE6> Истечет через:<#FFFF00> {expiry}"
+          - "<#F8BEFB>⚠<#FFFFFF> Аренда уже<#A8FFC0> Активна<#FFFFFF>!"
+          - "<#F8BEFB>⌛<#FFFFFF> Истечет через:<#F8BEFB> {expiry}"
         on_click:
-          - '<#FFFF00>[⚠] Упс!<#FFFFE6> Достигнут лимит аренды:<#FFFF00> {eco_limit}<#8C8C8C>/<#FF6600>{eco_limit} час.'
-          - sound: block.glass.place 1 1
+          - '<#F8BEFB>[⚠] Упс!<#FFFFFF> Достигнут лимит аренды:<#F8BEFB> {eco_limit}<#8C8C8C>/<#F8BEFB>{eco_limit} час.'
+          - sound: block.note_block.chime 0.22 0.95
       - on_view: '{expiri_ceil_hours} > 0'
         enchanted: true
         lore:
           - *base_lore
           - ""
-          - "<#FFFF00>⚠<#FFFFE6> Аренда уже<#00FF00> Активна<#FFFFE6>!"
-          - "<#FF6600>⌛<#FFFFE6> Истечет через:<#FFFF00> {expiry}"
+          - "<#F8BEFB>⚠<#FFFFFF> Аренда уже<#A8FFC0> Активна<#FFFFFF>!"
+          - "<#F8BEFB>⌛<#FFFFFF> Истечет через:<#F8BEFB> {expiry}"
           - ""
-          - "<#FF6600>$<#FFFFE6> После покупки аренда"
-          - "<#FF6600>||<#FFFFE6> продлится на<#FFFF00> 1 час"
-          - "<#FF6600>||<#FFFFE6> Лимит:<#FFFF00> {expiri_ceil_hours}<#8C8C8C>/<#FF6600>{eco_limit} час."
+          - "<#F8BEFB>$<#FFFFFF> После покупки аренда"
+          - "<#F8BEFB>||<#FFFFFF> продлится на<#F8BEFB> 1 час"
+          - "<#F8BEFB>||<#FFFFFF> Лимит:<#F8BEFB> {expiri_ceil_hours}<#8C8C8C>/<#F8BEFB>{eco_limit} час."
           - ""
-          - "<#FF6600> ➥ Нажмите<#FFFFE6>, чтобы арендовать"
+          - "<#F8BEFB> ➥ Нажмите<#FFFFFF>, чтобы арендовать"
         on_click:
           - open:
               <<+: *eco_confirm_open
               lore:
                 - *base_lore
                 - ""
-                - "<#FFFF00>⚠<#FFFFE6> Аренда уже<#00FF00> Активна<#FFFFE6>!"
-                - "<#FF6600>⌛<#FFFFE6> Истечет через:<#FFFF00> {expiry}"
+                - "<#F8BEFB>⚠<#FFFFFF> Аренда уже<#A8FFC0> Активна<#FFFFFF>!"
+                - "<#F8BEFB>⌛<#FFFFFF> Истечет через:<#F8BEFB> {expiry}"
                 - ""
-                - "<#FF6600>$<#FFFFE6> После покупки аренда"
-                - "<#FF6600>||<#FFFFE6> продлится на<#FFFF00> 1 час"
-                - "<#FF6600>||<#FFFFE6> Лимит:<#FFFF00> {expiri_ceil_hours}<#8C8C8C>/<#FF6600>{eco_limit} час."
+                - "<#F8BEFB>$<#FFFFFF> После покупки аренда"
+                - "<#F8BEFB>||<#FFFFFF> продлится на<#F8BEFB> 1 час"
+                - "<#F8BEFB>||<#FFFFFF> Лимит:<#F8BEFB> {expiri_ceil_hours}<#8C8C8C>/<#F8BEFB>{eco_limit} час."
       - lore:
           - *base_lore
           - ""
-          - "<#FF6600> ➥ Нажмите<#FFFFE6>, чтобы арендовать"
+          - "<#F8BEFB> ➥ Нажмите<#FFFFFF>, чтобы арендовать"
         on_click:
           open:
             <<+: *eco_confirm_open
@@ -105,17 +105,17 @@ items:
   e:
     tick_speed: 20
     on_tick: '[update]'
-    name: "<#FF6600>[☃]<#FFFFE6> Аренда:<#FFFF00> {slot_count} слот<#8C8C8C>/<#FF6600>1 час"
+    name: "<#F8BEFB>[☃]<#FFFFFF> Аренда:<#F8BEFB> {slot_count} слот<#8C8C8C>/<#F8BEFB>1 час"
     material: golden_carrot
     amount: '{slot_count}'
     args:
       expiry: '%bauctionv2_ms_format_%bauctionv2_lp_ttl_{perm}%%'
       expiri_ceil_hours: '{math:ceil(%bauctionv2_lp_ttl_{perm}% / 3600000)}'
     base_lore: &base_lore
-      - "<#FF0000><st>                         "
-      - "<#00FF00> $<#FFFFE6> Цена: <#00FF00>{pp_price_commas} ТК"
-      - "<#009900> ⛁<#FFFFE6> Баланс: <#009900>%playerpoints_points% ТК"
-      - "<#FF0000><st>                         "
+      - "<#F8BEFB><st>                         "
+      - "<#A8FFC0> $<#FFFFFF> Цена: <#A8FFC0>{pp_price_commas} ТК"
+      - "<#7CFFA8> ⛁<#FFFFFF> Баланс: <#7CFFA8>%playerpoints_points% ТК"
+      - "<#F8BEFB><st>                         "
     oneOf:
       - on_view:
           - '{squid_only}'
@@ -123,107 +123,107 @@ items:
         lore:
           - *base_lore
           - ""
-          - " <#FFFF00>⚠<#FFFFE6> Доступно от:<#FFFF00> Сквид"
+          - " <#F8BEFB>⚠<#FFFFFF> Доступно от:<#F8BEFB> Сквид"
         on_click:
-          - '<#FF0000>[✘] Ошибка!<#FFFFE6> У Вас нет необходимой<#FFFF00> Привилегии<#FFFFE6>! Не беда, ее можно купить на<#FFFF00> YourServer'
-          - sound: entity.creeper.hurt 1 1
-          - sound: block.glass.place 1 1
+          - '<#F8BEFB>[✘] Ошибка!<#FFFFFF> У Вас нет необходимой<#F8BEFB> Привилегии<#FFFFFF>! Не беда, ее можно купить на<#F8BEFB> ElytriX'
+          - sound: entity.creeper.hurt 0.35 1
+          - sound: block.note_block.chime 0.24 1.05
       - on_view: '{expiri_ceil_hours} >= {pp_limit}'
         enchanted: true
         lore:
           - *base_lore
           - ""
-          - "<#FFFF00>⚠<#FFFFE6> Аренда уже<#00FF00> Активна<#FFFFE6>!"
-          - "<#FF6600>⌛<#FFFFE6> Истечет через:<#FFFF00> {expiry}"
+          - "<#F8BEFB>⚠<#FFFFFF> Аренда уже<#A8FFC0> Активна<#FFFFFF>!"
+          - "<#F8BEFB>⌛<#FFFFFF> Истечет через:<#F8BEFB> {expiry}"
         on_click:
-          - '<#FFFF00>[⚠] Упс!<#FFFFE6> Достигнут лимит аренды:<#FFFF00> {pp_limit}<#8C8C8C>/<#FF6600>{pp_limit} час.'
-          - sound: block.glass.place 1 1
+          - '<#F8BEFB>[⚠] Упс!<#FFFFFF> Достигнут лимит аренды:<#F8BEFB> {pp_limit}<#8C8C8C>/<#F8BEFB>{pp_limit} час.'
+          - sound: block.note_block.pling 0.28 1.10
       - on_view: '{expiri_ceil_hours} > 0'
         enchanted: true
         lore:
           - *base_lore
           - ""
-          - "<#FFFF00>⚠<#FFFFE6> Аренда уже<#00FF00> Активна<#FFFFE6>!"
-          - "<#FF6600>⌛<#FFFFE6> Истечет через:<#FFFF00> {expiry}"
+          - "<#F8BEFB>⚠<#FFFFFF> Аренда уже<#A8FFC0> Активна<#FFFFFF>!"
+          - "<#F8BEFB>⌛<#FFFFFF> Истечет через:<#F8BEFB> {expiry}"
           - ""
-          - "<#FF6600>$<#FFFFE6> После покупки аренда"
-          - "<#FF6600>||<#FFFFE6> продлится на<#FFFF00> 1 час"
-          - "<#FF6600>||<#FFFFE6> Лимит:<#FFFF00> {expiri_ceil_hours}<#8C8C8C>/<#FF6600>{pp_limit} час."
+          - "<#F8BEFB>$<#FFFFFF> После покупки аренда"
+          - "<#F8BEFB>||<#FFFFFF> продлится на<#F8BEFB> 1 час"
+          - "<#F8BEFB>||<#FFFFFF> Лимит:<#F8BEFB> {expiri_ceil_hours}<#8C8C8C>/<#F8BEFB>{pp_limit} час."
           - ""
-          - "<#FF6600> ➥ Нажмите<#FFFFE6>, чтобы арендовать"
+          - "<#F8BEFB> ➥ Нажмите<#FFFFFF>, чтобы арендовать"
         on_click:
           - open:
               <<+: *pp_confirm_open
               lore:
                 - *base_lore
                 - ""
-                - "<#FFFF00>⚠<#FFFFE6> Аренда уже<#00FF00> Активна<#FFFFE6>!"
-                - "<#FF6600>⌛<#FFFFE6> Истечет через:<#FFFF00> {expiry}"
+                - "<#F8BEFB>⚠<#FFFFFF> Аренда уже<#A8FFC0> Активна<#FFFFFF>!"
+                - "<#F8BEFB>⌛<#FFFFFF> Истечет через:<#F8BEFB> {expiry}"
                 - ""
-                - "<#FF6600>$<#FFFFE6> После покупки аренда"
-                - "<#FF6600>||<#FFFFE6> продлится на<#FFFF00> 1 час"
-                - "<#FF6600>||<#FFFFE6> Лимит:<#FFFF00> {expiri_ceil_hours}<#8C8C8C>/<#FF6600>{pp_limit} час."
+                - "<#F8BEFB>$<#FFFFFF> После покупки аренда"
+                - "<#F8BEFB>||<#FFFFFF> продлится на<#F8BEFB> 1 час"
+                - "<#F8BEFB>||<#FFFFFF> Лимит:<#F8BEFB> {expiri_ceil_hours}<#8C8C8C>/<#F8BEFB>{pp_limit} час."
       - lore:
           - *base_lore
           - ""
-          - "<#FF6600> ➥ Нажмите<#FFFFE6>, чтобы арендовать"
+          - "<#F8BEFB> ➥ Нажмите<#FFFFFF>, чтобы арендовать"
         on_click:
           open:
             <<+: *pp_confirm_open
             lore: *base_lore
   f:
     #name: "[⟲] Вернуться.."
-    name: "<#FF0000>[⟲]<#FF6600> Вернуться.."
+    name: "<#F8BEFB>[⟲] Вернуться.."
     color: "#00FF6600"
     all_flags: true
     material: tipped_arrow
     on_click:
       - back: ''
   b:
-    #name: "YourServer"
-    name: "<gradient:#FF0000:#FF5000>YourS</gradient><#FF5000>e<gradient:#FF3C00:#FF0000>rver</gradient>"
-    material: red_stained_glass_pane
+    #name: "ElytriX"
+    name: "<gradient:#F8BEFB:#D9B8FF>Elyt</gradient><#D9B8FF>r<gradient:#D9B8FF:#F8BEFB>iX</gradient>"
+    material: purple_stained_glass_pane
   c:
-    #name: "YourServer"
-    name: "<gradient:#FF6600:#FF1500>YourS</gradient><#FF1500>e<gradient:#FF2900:#FF6600>rver</gradient>"
-    material: orange_stained_glass_pane
+    #name: "ElytriX"
+    name: "<gradient:#8A6FA0:#3A2F45>Elyt</gradient><#8A6FA0>r<gradient:#8A6FA0:#3A2F45>iX</gradient>"
+    material: black_stained_glass_pane
 animation:
   - tick: 0
     opcodes:
       - set: b 0,1,7,8,9,17,18,26,27,35,36,37,43,44
       - set: c 38,39,40,41,42
-      - sound: block.glass.place 1 1
+      - sound: block.note_block.pling 0.30 1.20
   - tick: 1
     opcodes:
       - set: c 28,29,30,31,32,33,34
-      - sound: block.glass.place 1 1
+      - sound: block.note_block.pling 0.32 1.30
   - tick: 2
     opcodes:
       - set: c 19,20,21,22,23,24,25
-      - sound: block.glass.place 1 1
+      - sound: block.note_block.pling 0.30 1.40
   - tick: 3
     opcodes:
       - set: c 10,11,12,13,14,15,16
-      - sound: block.glass.place 1 1
+      - sound: block.amethyst_block.chime 0.40 1.40
   - tick: 4
     opcodes:
       - set: c 2,3,4,5,6
-      - sound: block.glass.place 1 1
+      - sound: block.enchantment_table.use 0.3 1.5
   - tick: 5
     opcodes:
       - remove: 30,31,32
-      - sound: block.glass.place 1 1
+      - sound: block.note_block.chime 0.22 0.95
   - tick: 6
     opcodes:
       - remove: 20,22,24
       - set: d 21
       - set: e 23
-      - sound: block.glass.place 1 1
+      - sound: block.note_block.chime 0.24 1.05
   - tick: 7
     opcodes:
       - remove: 12,13,14
-      - sound: block.glass.place 1 1
+      - sound: block.note_block.pling 0.28 1.10
   - tick: 8
     opcodes:
       - set: f 4
-      - sound: block.glass.place 1 1
+      - sound: block.note_block.pling 0.30 1.20

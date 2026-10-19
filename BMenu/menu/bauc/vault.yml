@@ -3,7 +3,7 @@ include: [
 ]
 id: bauc:vault
 provider: bauc:vault
-title: "<#FF0000>☃ <#FF6600>Хранилище<off_title><b><gray>[<gold>{current_page}<gray>/<gold>{max_page}<gray>]"
+title: "<#F8BEFB>☃ Хранилище<off_title><b><gray>[<#F8BEFB>{current_page}<gray>/<#F8BEFB>{max_page}<gray>]"
 
 slots: 0-44
 vault_type: 'vault_and_active' # vault_and_active, only_active, only_vault
@@ -12,48 +12,48 @@ always_show_vault_lot: true # всегда показываем vault_lot из l
 items:
   back:
     slot: 46
-    name: "<#FF0000>[⟲]<#FF6600> Вернуться"
+    name: "<#F8BEFB>[⟲] Вернуться"
     material: tipped_arrow
     on_click:
-      - sound: 'entity.enderman.teleport 1 1'
+      - sound: 'entity.enderman.teleport 0.35 1'
       - back_or_close: ''
   resell:
     slot: 52
-    name: "<#FF0000>[⟲]<#FF6600> Перевыставить предметы"
+    name: "<#F8BEFB>[⟲] Перевыставить предметы"
     lore:
-      - "<#FF6600>➥ Нажмите<#FFFFE6>, чтобы перевыставить"
+      - "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перевыставить"
       - ""
-      - "<#FFFFE6>Автоматически выставит все"
-      - "<#FFFFE6>Ваши предметы заново в Аукцион"
-      - "<#FFFFE6>по тем же ценам"
+      - "<#FFFFFF>Автоматически выставит все"
+      - "<#FFFFFF>Ваши предметы заново в Аукцион"
+      - "<#FFFFFF>по тем же ценам"
     material: clock
     on_click:
       - resell: ''
       - delay: 1 [research]
   research:
     slot: 49
-    name: "<#FF0000>[⟲]<#FF6600> Обновить"
+    name: "<#F8BEFB>[⟲] Обновить"
     lore:
-      - "<#FF6600>➥ Нажмите<#FFFFE6>, чтобы обновить"
+      - "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы обновить"
       - ""
-      - "<#FFFFE6>Эта кнопка позволяет"
-      - "<#FFFFE6>обновить список товаров"
+      - "<#FFFFFF>Эта кнопка позволяет"
+      - "<#FFFFFF>обновить список товаров"
     material: nether_star
     on_click:
-      - sound: 'entity.ender_eye.launch 1 1'
+      - sound: 'entity.ender_eye.launch 0.35 1'
       - '[research]'
   rent:
     slot: 53
-    name: "<#FF0000>[☃]<#FF6600> Аренда слотов"
+    name: "<#F8BEFB>[☃] Аренда слотов"
     lore:
-      - "<#FF6600>➥ Нажмите<#FFFFE6>, чтобы перейти"
+      - "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
       - ""
-      - "<#FFFFE6>Здесь можно арендовать,"
-      - "<#FFFFE6>дополнительные слоты"
+      - "<#FFFFFF>Здесь можно арендовать,"
+      - "<#FFFFFF>дополнительные слоты"
     all_flags: true
     material: crafting_table
     on_click:
-      - '[sound] ui.button.click 1 1'
+      - '[sound] ui.button.click 0.35 1'
       - open: 'auc_rent:home'
 
   # фулл скрыть next_page если нет некст страницы не получится из-за особеностей вычисления {has_next_page}
@@ -62,10 +62,10 @@ items:
     material: spectral_arrow
     oneOf:
       - on_view: '{has_next_page} == true'
-        name: "<#FF0000>[»]<#FF6600> Следующая страница"
+        name: "<#F8BEFB>[»] Следующая страница"
       - name: "<gray>[»] Следующая страница"
     on_click:
-      - sound: 'entity.ender_eye.launch 1 1'
+      - sound: 'entity.ender_eye.launch 0.35 1'
       - next_page: ''
 
   previous_page:
@@ -73,8 +73,52 @@ items:
     material: spectral_arrow
     oneOf:
       - on_view: '{current_page} != 1'
-        name: "<#FF0000>[«]<#FF6600> Предыдущая страница"
+        name: "<#F8BEFB>[«] Предыдущая страница"
       - name: "<gray>[«] Предыдущая страница"
     on_click:
-      - sound: 'entity.ender_eye.launch 1 1'
+      - sound: 'entity.ender_eye.launch 0.35 1'
       - previous_page: ''
+
+  # ── панели для анимации (без slot: ставятся только кадрами animation) ──
+  frame:
+    name: ""
+    material: black_stained_glass_pane
+  accent:
+    name: ""
+    material: purple_stained_glass_pane
+
+animation:
+  - tick: 0
+    opcodes:
+      - set: frame 45-53
+      - sound: 'block.enchantment_table.use 0.3 1.5'
+  - tick: 2
+    opcodes:
+      - set: accent 45
+      - set: accent 47
+      - set: accent 51
+      - sound: 'block.note_block.chime 0.22 0.95'
+  - tick: 4
+    opcodes:
+      - remove: 46
+      - sound: 'block.note_block.pling 0.28 1.05'
+  - tick: 6
+    opcodes:
+      - remove: 49
+      - sound: 'block.note_block.pling 0.29 1.15'
+  - tick: 8
+    opcodes:
+      - remove: 48
+      - sound: 'block.note_block.pling 0.30 1.25'
+  - tick: 10
+    opcodes:
+      - remove: 50
+      - sound: 'block.note_block.pling 0.31 1.35'
+  - tick: 12
+    opcodes:
+      - remove: 52
+      - sound: 'block.note_block.pling 0.32 1.45'
+  - tick: 14
+    opcodes:
+      - remove: 53
+      - sound: 'block.amethyst_block.chime 0.42 1.40'
