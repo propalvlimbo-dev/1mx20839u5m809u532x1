@@ -11,31 +11,22 @@ menu-events:
     - '[message] &cYou don''t have permission to do that!'
 items:
   dirt:
-    slot: 0
     material: dirt
   grass:
-    slot: 1
     material: grass_block
   gravel:
-    slot: 2
     material: gravel
   cobblestone:
-    slot: 3
     material: cobblestone
   stone:
-    slot: 4
     material: stone
   coal_ore:
-    slot: 5
     material: coal_ore
   iron_ore:
-    slot: 6
     material: iron_ore
   gold_ore:
-    slot: 7
     material: gold_ore
   diamond_ore:
-    slot: 8
     material: diamond_ore
     name: Exit
     lore:
@@ -44,3 +35,32 @@ items:
     - '[close]'
     on_right_click:
     - '[close]'
+
+# ---------------------------------------------------------------------------
+# Анимация открытия: меню размером 9 без панелей — предметы появляются по одному.
+# Один кадр = 1 тик (50 мс), кадр без tick: = предыдущий + 1.
+#   st: <id предмета> <слоты>  — алиас set, кладёт предмет в слой анимации.
+# Итог после последнего кадра совпадает с исходной раскладкой DeluxeMenus.
+# ---------------------------------------------------------------------------
+animation:
+  - tick: 0
+    opcodes:
+      - st: dirt 0
+      - sound: 'ui.button.click 0.35 1.4'
+  - opcodes:
+      - st: grass 1
+  - opcodes:
+      - st: gravel 2
+  - opcodes:
+      - st: cobblestone 3
+  - opcodes:
+      - st: stone 4
+  - opcodes:
+      - st: coal_ore 5
+  - opcodes:
+      - st: iron_ore 6
+  - opcodes:
+      - st: gold_ore 7
+  - opcodes:
+      - st: diamond_ore 8
+      - sound: 'entity.player.levelup 0.6 1.2'

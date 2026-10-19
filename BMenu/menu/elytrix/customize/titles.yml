@@ -6,7 +6,6 @@ size: 54
 title: '&#F8BEFB&lУникальные титулы'
 items:
   slot-20:
-    slot: 20
     oneOf:
     - material: book
       name: '%vault_prefix%&f%player_name% §x§F§B§A§8§E§1с§x§F§C§B§E§E§9и§x§F§D§D§4§F§0к§x§F§E§E§9§F§8с§x§F§F§F§F§F§Fе§x§F§E§E§9§F§8в§x§F§D§D§4§F§0е§x§F§C§B§E§E§9е§x§F§B§A§8§E§1н'
@@ -31,7 +30,6 @@ items:
       item_flags:
       - hide_attributes
   slot-21:
-    slot: 21
     oneOf:
     - material: book
       name: '%vault_prefix%&f%player_name% §x§F§B§8§0§8§0ф§x§F§C§9§0§9§0р§x§F§C§A§0§A§0и§x§F§D§B§0§B§0г§x§F§D§C§0§C§0и§x§F§E§C§F§C§Fд§x§F§E§D§F§D§Fн§x§F§F§E§F§E§Fы§x§F§F§F§F§F§Fй'
@@ -56,7 +54,6 @@ items:
       item_flags:
       - hide_attributes
   slot-22:
-    slot: 22
     oneOf:
     - material: book
       name: '%vault_prefix%&f%player_name% §x§7§6§F§7§F§Bк§x§8§2§F§7§F§Cо§x§8§F§F§7§F§Cч §x§9§B§F§6§F§Dб§x§A§8§F§6§F§Dр§x§B§4§F§6§F§Eа§x§C§0§F§6§F§Eт§x§C§D§F§5§F§Fа§x§D§9§F§5§F§Fн'
@@ -81,7 +78,6 @@ items:
       item_flags:
       - hide_attributes
   slot-23:
-    slot: 23
     oneOf:
     - material: book
       name: '%vault_prefix%&f%player_name% §x§F§B§F§0§A§3к§x§F§C§F§2§A§Eу§x§F§D§F§3§B§9н§x§F§D§F§5§C§5ч§x§F§E§F§6§D§0и§x§F§F§F§8§D§Bк'
@@ -106,7 +102,6 @@ items:
       item_flags:
       - hide_attributes
   slot-24:
-    slot: 24
     oneOf:
     - material: book
       name: '%vault_prefix%&f%player_name% §x§8§9§F§F§F§4к§x§A§3§F§F§F§6в§x§B§D§F§F§F§9а§x§D§8§F§F§F§Bд§x§F§2§F§F§F§Eр§x§F§2§F§F§F§Eо§x§D§8§F§F§F§Bб§x§B§D§F§F§F§9и§x§A§3§F§F§F§6к§x§8§9§F§F§F§4а'
@@ -131,7 +126,6 @@ items:
       item_flags:
       - hide_attributes
   slot-29:
-    slot: 29
     oneOf:
     - material: book
       name: '%vault_prefix%&f%player_name% §x§F§F§7§7§7§71§x§C§F§A§4§6§E4§x§9§E§D§2§6§58§x§6§E§F§F§5§C8'
@@ -156,7 +150,6 @@ items:
       item_flags:
       - hide_attributes
   slot-30:
-    slot: 30
     oneOf:
     - material: book
       name: '%vault_prefix%&f%player_name% &x&B&7&3&5&3&5д&x&C&B&5&D&4&Fе&x&D&E&8&5&6&9п&x&D&1&6&A&5&8н&x&C&4&5&0&4&6у&x&B&7&3&5&3&5л'
@@ -181,7 +174,6 @@ items:
       item_flags:
       - hide_attributes
   slot-31:
-    slot: 31
     oneOf:
     - material: book
       name: '%vault_prefix%&f%player_name% &x&1&2&F&F&9&5м&x&1&2&F&1&C&Aа&x&1&2&E&2&F&Fб&x&1&2&F&1&C&Aо&x&1&2&F&F&9&5й'
@@ -206,7 +198,6 @@ items:
       item_flags:
       - hide_attributes
   slot-32:
-    slot: 32
     oneOf:
     - material: book
       name: '%vault_prefix%&f%player_name% &x&1&2&7&8&F&Fс&x&0&E&8&2&F&Fу&x&0&B&8&D&F&Fб&x&0&7&9&7&F&Fо &x&0&0&A&C&F&Fб&x&0&4&A&2&F&Fр&x&0&7&9&7&F&Fа&x&0&B&8&D&F&Fт&x&0&E&8&2&F&Fи&x&1&2&7&8&F&Fк'
@@ -231,7 +222,6 @@ items:
       item_flags:
       - hide_attributes
   slot-33:
-    slot: 33
     oneOf:
     - material: book
       name: '%vault_prefix%&f%player_name% &x&F&2&F&F&1&2с&x&F&6&E&3&1&2п&x&F&B&C&8&1&2о&x&F&F&A&C&1&2р&x&F&B&C&8&1&2т&x&F&6&E&3&1&2и&x&F&2&F&F&1&2к'
@@ -256,7 +246,6 @@ items:
       item_flags:
       - hide_attributes
   cleartitle:
-    slot: 4
     material: writable_book
     name: '&7« &#F8BEFBОчистить титул &7»'
     lore:
@@ -270,7 +259,6 @@ items:
     - '[console] lp user %player_name% meta clear'
     - '[sound] block.note_block.bell'
   info:
-    slot: 49
     material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0=
     name: '&7« &#F8BEFBНаши сообщества &7»'
     lore:
@@ -288,7 +276,6 @@ items:
     - '[message]'
     - '[close]'
   close:
-    slot: 45
     material: black_dye
     name: '&7« &#F8BEFBНазад &7»'
     lore:
@@ -299,10 +286,76 @@ items:
     on_click:
     - '[open] elytrix:customizemenu'
   design_purple_panel:
-    slot: 27,35,36,37,43,44,46,47,48,50,51,52,53
     material: purple_stained_glass_pane
     name: '&r'
   design_black_panel:
-    slot: 0,1,2,3,5,6,7,8,9,10,16,17,18,26
     material: black_stained_glass_pane
     name: '&r'
+
+# ---------------------------------------------------------------------------
+# Анимация открытия: рамка собирается по 2 панели за кадр, затем по очереди
+# появляются кнопки. Один кадр = 1 тик (50 мс), кадр без tick: = предыдущий + 1.
+#   st: <id предмета> <слоты>  — алиас set, кладёт предмет в слой анимации;
+#   панели-«кисти»: design_purple_panel / design_black_panel (у них убран slot:).
+# Предметы без slot: статически не ставятся и появляются только из кадров.
+# Итог после последнего кадра совпадает с исходной раскладкой DeluxeMenus.
+# ---------------------------------------------------------------------------
+animation:
+  - tick: 0
+    opcodes:
+      - st: design_purple_panel 46,47
+      - sound: 'ui.button.click 0.35 1.4'
+  - opcodes:
+      - st: design_purple_panel 48,50
+  - opcodes:
+      - st: design_purple_panel 51,52
+  - opcodes:
+      - st: design_purple_panel 53,36
+  - opcodes:
+      - st: design_purple_panel 37,43
+  - opcodes:
+      - st: design_purple_panel 44,27
+  - opcodes:
+      - st: design_purple_panel 35
+  - opcodes:
+      - st: design_black_panel 18,9
+  - opcodes:
+      - st: design_black_panel 10,0
+  - opcodes:
+      - st: design_black_panel 1,2
+  - opcodes:
+      - st: design_black_panel 3,5
+  - opcodes:
+      - st: design_black_panel 6,7
+  - opcodes:
+      - st: design_black_panel 8,16
+  - opcodes:
+      - st: design_black_panel 17,26
+  - opcodes:
+      - st: cleartitle 4
+      - sound: 'block.note_block.hat 0.5 1.2'
+  - opcodes:
+      - st: slot-20 20
+  - opcodes:
+      - st: slot-21 21
+  - opcodes:
+      - st: slot-22 22
+  - opcodes:
+      - st: slot-23 23
+  - opcodes:
+      - st: slot-24 24
+  - opcodes:
+      - st: slot-29 29
+  - opcodes:
+      - st: slot-30 30
+  - opcodes:
+      - st: slot-31 31
+  - opcodes:
+      - st: slot-32 32
+  - opcodes:
+      - st: slot-33 33
+  - opcodes:
+      - st: close 45
+  - opcodes:
+      - st: info 49
+      - sound: 'entity.player.levelup 0.6 1.2'

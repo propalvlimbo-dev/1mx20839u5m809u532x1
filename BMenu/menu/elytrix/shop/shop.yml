@@ -6,7 +6,6 @@ size: 54
 title: '&#F8BEFB&lМагазин'
 items:
   balls:
-    slot: 20
     material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODhhMGY3YmQzZDU4YzU4ZmI5NWU0OGIyYjQ0OTIzZjVlYWEyYzFkNTRkY2Q3MmZhN2NlZmNiYmMxZDRjODFhZCJ9fX0=
     name: '&7« &#F8BEFBМагические шары &7»'
     lore:
@@ -18,7 +17,6 @@ items:
     on_click:
     - '[open] elytrix:shari'
   potions:
-    slot: 21
     material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjM2OGJkM2Q2NjYwMzYyMTJlZTFkMWIxYzM5ZWQ4NWI4ZmY3ZDhiNTdhNjVkOGEyYjkxNDg5YTc1MGMyYmUifX19
     name: '&7« &#F8BEFBЗелья и напитки &7»'
     lore:
@@ -30,7 +28,6 @@ items:
     on_click:
     - '[open] elytrix:potions'
   totems:
-    slot: 22
     material: totem_of_undying
     name: '&7« &#F8BEFBМистические тотемы &7»'
     lore:
@@ -42,7 +39,6 @@ items:
     on_click:
     - '[open] elytrix:totems'
   furnace:
-    slot: 23
     material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTM5MzM0NzM5YTQwODMxZTIzNzQzM2VhMzdlMjk3MzQ2ZDgxODZlMTZmNzEyNWI4YzFlNDkxOWQ5ZWJiNjNkIn19fQ==
     name: '&7« &#F8BEFBПечки и зельеварки &7»'
     lore:
@@ -54,7 +50,6 @@ items:
     on_click:
     - '[open] elytrix:frun'
   arrows:
-    slot: 24
     material: arrow
     name: '&7« &#F8BEFBОсобые стрелы &7»'
     lore:
@@ -66,7 +61,6 @@ items:
     on_click:
     - '[open] elytrix:arrows'
   bronb:
-    slot: 30
     material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTlmMzY4N2FhYTZmNmQ3NTY2MzkxYzM3OWNlNjliMjE5ZGQ3YjBiNmVmMTY0ODI1ZjNkMjNiM2I0MjdjODkifX19
     name: '&7« &#F8BEFBАмуниция и броня &7»'
     lore:
@@ -78,7 +72,6 @@ items:
     on_click:
     - '[open] elytrix:armor'
   unicalitems:
-    slot: 31
     material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTk3M2ZmYWMyOGVmYzMzNGVmYWFjZjYxZmVjNTcyMmNmZjBjOTg1OTUxZTVkMjBhNjIyOWNkMTU0YjdlMTljIn19fQ==
     name: '&7« &#F8BEFBУникальные предметы &7»'
     lore:
@@ -90,7 +83,6 @@ items:
     on_click:
     - '[open] elytrix:unical_items'
   спавнера:
-    slot: 11
     material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjQ3ZTJlNWQ1NWI2ZDA0OTQzNTE5YmVkMjU1N2M2MzI5ZTMzYjYwYjkwOWRlZTg5MjNjZDg4YjExNTIxMCJ9fX0=
     name: '&7« &#F8BEFBСпавнеры мобов &7»'
     lore:
@@ -102,7 +94,6 @@ items:
     on_click:
     - '[open] elytrix:spawners'
   enchants:
-    slot: 15
     material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjJmNzkwMTZjYWQ4NGQxYWUyMTYwOWM0ODEzNzgyNTk4ZTM4Nzk2MWJlMTNjMTU2ODI3NTJmMTI2ZGNlN2EifX19
     name: '&7« &#F8BEFBЗачарования &7»'
     lore:
@@ -114,7 +105,6 @@ items:
     on_click:
     - '[open] elytrix:enchants'
   яйко:
-    slot: 13
     material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmU0N2Q3M2UxZjRkNmRlNmFmMjI1NjJhNWI0NDQ3OTIxYmQ4ODZlNTY4NWY0NGMxZGFhYzY4ZTliYzk2MSJ9fX0=
     name: '&7« &#F8BEFBЯйца призыва &7»'
     lore:
@@ -126,7 +116,6 @@ items:
     on_click:
     - '[open] elytrix:eggs'
   ауры:
-    slot: 32
     material: white_dye
     name: '&7« &#F8BEFBУникальные ауры &7»'
     lore:
@@ -138,7 +127,6 @@ items:
     on_click:
     - '[open] elytrix:auras'
   info:
-    slot: 49
     material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0=
     name: '&7« &#F8BEFBНаши сообщества &7»'
     lore:
@@ -156,7 +144,6 @@ items:
     - '[message]'
     - '[close]'
   close:
-    slot: 45
     material: black_dye
     name: '&7« &#F8BEFBНазад &7»'
     lore:
@@ -167,10 +154,78 @@ items:
     on_click:
     - '[open] elytrix:menu'
   design_purple_panel:
-    slot: 27,35,36,37,43,44,46,47,48,50,51,52,53
     material: purple_stained_glass_pane
     name: '&r'
   design_black_panel:
-    slot: 0,1,2,3,4,5,6,7,8,9,10,16,17,18,26
     material: black_stained_glass_pane
     name: '&r'
+
+# ---------------------------------------------------------------------------
+# Анимация открытия: рамка собирается по 2 панели за кадр, затем по очереди
+# появляются кнопки. Один кадр = 1 тик (50 мс), кадр без tick: = предыдущий + 1.
+#   st: <id предмета> <слоты>  — алиас set, кладёт предмет в слой анимации;
+#   панели-«кисти»: design_purple_panel / design_black_panel (у них убран slot:).
+# Предметы без slot: статически не ставятся и появляются только из кадров.
+# Итог после последнего кадра совпадает с исходной раскладкой DeluxeMenus.
+# ---------------------------------------------------------------------------
+animation:
+  - tick: 0
+    opcodes:
+      - st: design_purple_panel 46,47
+      - sound: 'ui.button.click 0.35 1.4'
+  - opcodes:
+      - st: design_purple_panel 48,50
+  - opcodes:
+      - st: design_purple_panel 51,52
+  - opcodes:
+      - st: design_purple_panel 53,36
+  - opcodes:
+      - st: design_purple_panel 37,43
+  - opcodes:
+      - st: design_purple_panel 44,27
+  - opcodes:
+      - st: design_purple_panel 35
+  - opcodes:
+      - st: design_black_panel 18,9
+  - opcodes:
+      - st: design_black_panel 10,0
+  - opcodes:
+      - st: design_black_panel 1,2
+  - opcodes:
+      - st: design_black_panel 3,4
+  - opcodes:
+      - st: design_black_panel 5,6
+  - opcodes:
+      - st: design_black_panel 7,8
+  - opcodes:
+      - st: design_black_panel 16,17
+  - opcodes:
+      - st: design_black_panel 26
+  - opcodes:
+      - st: спавнера 11
+      - sound: 'block.note_block.hat 0.5 1.2'
+  - opcodes:
+      - st: яйко 13
+  - opcodes:
+      - st: enchants 15
+  - opcodes:
+      - st: balls 20
+  - opcodes:
+      - st: potions 21
+  - opcodes:
+      - st: totems 22
+  - opcodes:
+      - st: furnace 23
+  - opcodes:
+      - st: arrows 24
+  - opcodes:
+      - st: bronb 30
+  - opcodes:
+      - st: unicalitems 31
+  - opcodes:
+      - st: ауры 32
+  - opcodes:
+      - st: close 45
+  - opcodes:
+      - st: info 49
+      - sound: 'entity.player.levelup 0.6 1.2'

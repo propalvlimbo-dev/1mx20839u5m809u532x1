@@ -6,7 +6,6 @@ size: 54
 title: '&#F8BEFB&lУникальные предметы'
 items:
   tyagun:
-    slot: 13
     material: trident
     name: '&7« &bТягун &7»'
     lore:
@@ -38,7 +37,6 @@ items:
       - '[message]'
       - '[close]'
   collector_sword:
-    slot: 21
     material: netherite_sword
     name: '&7« &#A8FF78Меч Сбора &7»'
     lore:
@@ -70,7 +68,6 @@ items:
       - '[message]'
       - '[close]'
   infinite_firework:
-    slot: 22
     material: firework_rocket
     name: '&7« &#D8A6FFБесконечный фейерверк &7»'
     lore:
@@ -102,7 +99,6 @@ items:
       - '[message]'
       - '[close]'
   anti_pearl:
-    slot: 23
     material: ender_eye
     name: '&7« &#8C5196Анти-Пёрл &7»'
     lore:
@@ -135,7 +131,6 @@ items:
       - '[message]'
       - '[close]'
   explosive_trap:
-    slot: 30
     material: fire_charge
     name: '&7« &#FF6B6BВзрывная ловушка &7»'
     lore:
@@ -172,7 +167,6 @@ items:
       - '[message]'
       - '[close]'
   experience_pot:
-    slot: 32
     material: flower_pot
     name: '&7« &#8B7D6BГоршочек с опытом &7»'
     lore:
@@ -203,7 +197,6 @@ items:
       - '[message]'
       - '[close]'
   info:
-    slot: 49
     material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0=
     name: '&7« &#F8BEFBНаши сообщества &7»'
     lore:
@@ -221,7 +214,6 @@ items:
     - '[message]'
     - '[close]'
   close:
-    slot: 45
     material: black_dye
     name: '&7« &#F8BEFBНазад &7»'
     lore:
@@ -232,10 +224,68 @@ items:
     on_click:
     - '[open] elytrix:shop'
   design_purple_panel:
-    slot: 27,35,36,37,43,44,46,47,48,50,51,52,53
     material: purple_stained_glass_pane
     name: '&r'
   design_black_panel:
-    slot: 0,1,2,3,4,5,6,7,8,9,10,16,17,18,26
     material: black_stained_glass_pane
     name: '&r'
+
+# ---------------------------------------------------------------------------
+# Анимация открытия: рамка собирается по 2 панели за кадр, затем по очереди
+# появляются кнопки. Один кадр = 1 тик (50 мс), кадр без tick: = предыдущий + 1.
+#   st: <id предмета> <слоты>  — алиас set, кладёт предмет в слой анимации;
+#   панели-«кисти»: design_purple_panel / design_black_panel (у них убран slot:).
+# Предметы без slot: статически не ставятся и появляются только из кадров.
+# Итог после последнего кадра совпадает с исходной раскладкой DeluxeMenus.
+# ---------------------------------------------------------------------------
+animation:
+  - tick: 0
+    opcodes:
+      - st: design_purple_panel 46,47
+      - sound: 'ui.button.click 0.35 1.4'
+  - opcodes:
+      - st: design_purple_panel 48,50
+  - opcodes:
+      - st: design_purple_panel 51,52
+  - opcodes:
+      - st: design_purple_panel 53,36
+  - opcodes:
+      - st: design_purple_panel 37,43
+  - opcodes:
+      - st: design_purple_panel 44,27
+  - opcodes:
+      - st: design_purple_panel 35
+  - opcodes:
+      - st: design_black_panel 18,9
+  - opcodes:
+      - st: design_black_panel 10,0
+  - opcodes:
+      - st: design_black_panel 1,2
+  - opcodes:
+      - st: design_black_panel 3,4
+  - opcodes:
+      - st: design_black_panel 5,6
+  - opcodes:
+      - st: design_black_panel 7,8
+  - opcodes:
+      - st: design_black_panel 16,17
+  - opcodes:
+      - st: design_black_panel 26
+  - opcodes:
+      - st: tyagun 13
+      - sound: 'block.note_block.hat 0.5 1.2'
+  - opcodes:
+      - st: collector_sword 21
+  - opcodes:
+      - st: infinite_firework 22
+  - opcodes:
+      - st: anti_pearl 23
+  - opcodes:
+      - st: explosive_trap 30
+  - opcodes:
+      - st: experience_pot 32
+  - opcodes:
+      - st: close 45
+  - opcodes:
+      - st: info 49
+      - sound: 'entity.player.levelup 0.6 1.2'

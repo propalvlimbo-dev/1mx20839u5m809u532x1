@@ -6,7 +6,6 @@ size: 54
 title: '&#F8BEFB&lАмуниция'
 items:
   skull:
-    slot: 13
     material: netherite_helmet
     name: §x§F§8§B§E§F§B« §x§F§8§B§E§F§BШ§x§F§3§B§E§F§Bл§x§E§E§B§F§F§Bе§x§E§9§B§F§F§Bм §x§E§4§B§F§F§Bш§x§D§F§C§0§F§Bа§x§D§A§C§0§F§Bл§x§D§5§C§0§F§Bк§x§D§0§C§0§F§Bе§x§C§B§C§1§F§Bр§x§C§6§C§1§F§Bа
       §x§F§8§B§E§F§B»
@@ -45,7 +44,6 @@ items:
       - '[message]'
       - '[close]'
   skull1:
-    slot: 22
     material: netherite_chestplate
     name: §x§F§8§B§E§F§B« §x§F§8§B§E§F§BН§x§F§5§B§E§F§Bа§x§F§2§B§E§F§Bг§x§E§F§B§F§F§Bр§x§E§C§B§F§F§Bу§x§E§9§B§F§F§Bд§x§E§6§B§F§F§Bн§x§E§3§B§F§F§Bи§x§E§0§C§0§F§Bк §x§D§D§C§0§F§Bш§x§D§A§C§0§F§Bа§x§D§7§C§0§F§Bл§x§D§4§C§0§F§Bк§x§D§1§C§0§F§Bе§x§C§E§C§0§F§Bр§x§C§B§C§1§F§Bа
       §x§F§8§B§E§F§B»
@@ -85,7 +83,6 @@ items:
       - '[message]'
       - '[close]'
   skull2:
-    slot: 31
     material: netherite_leggings
     name: §x§F§8§B§E§F§B« §x§F§8§B§E§F§BП§x§F§4§B§E§F§Bо§x§F§0§B§F§F§Bн§x§E§C§B§F§F§Bо§x§E§8§B§F§F§Bж§x§E§4§B§F§F§Bи §x§E§0§C§0§F§Bш§x§D§C§C§0§F§Bа§x§D§8§C§0§F§Bл§x§D§4§C§0§F§Bк§x§D§0§C§0§F§Bе§x§C§C§C§1§F§Bр§x§C§8§C§1§F§Bа
       §x§F§8§B§E§F§B»
@@ -124,7 +121,6 @@ items:
       - '[message]'
       - '[close]'
   skull3:
-    slot: 40
     material: netherite_boots
     name: §x§F§8§B§E§F§B« §x§F§8§B§E§F§BБ§x§F§4§B§E§F§Bо§x§F§0§B§F§F§Bт§x§E§C§B§F§F§Bи§x§E§8§B§F§F§Bн§x§E§4§B§F§F§Bк§x§E§0§C§0§F§Bи §x§D§C§C§0§F§Bш§x§D§8§C§0§F§Bа§x§D§4§C§0§F§Bл§x§D§0§C§0§F§Bк§x§C§C§C§1§F§Bе§x§C§8§C§1§F§Bр§x§C§4§C§1§F§Bа
       §x§F§8§B§E§F§B»
@@ -165,7 +161,6 @@ items:
       - '[message]'
       - '[close]'
   skull4:
-    slot: 21
     material: netherite_sword
     name: §x§F§8§B§E§F§B« §x§F§8§B§E§F§BМ§x§F§3§B§E§F§Bе§x§E§E§B§F§F§Bч §x§E§9§B§F§F§Bш§x§E§4§B§F§F§Bа§x§D§F§C§0§F§Bл§x§D§A§C§0§F§Bк§x§D§5§C§0§F§Bе§x§D§0§C§0§F§Bр§x§C§B§C§1§F§Bа §x§F§8§B§E§F§B»
     lore:
@@ -204,7 +199,6 @@ items:
       - '[message]'
       - '[close]'
   s312kull4:
-    slot: 20
     material: netherite_sword
     name: §x§F§8§B§E§F§B« §x§F§8§B§E§F§BМ§x§F§4§B§E§F§Bе§x§F§0§B§F§F§Bч §x§E§C§B§F§F§Bф§x§E§8§B§F§F§Bа§x§E§4§B§F§F§Bр§x§E§0§C§0§F§Bм§x§D§C§C§0§F§Bи§x§D§8§C§0§F§Bл§x§D§4§C§0§F§Bа §x§F§8§B§E§F§B»
     lore:
@@ -244,7 +238,6 @@ items:
       - '[message]'
       - '[close]'
   skul32432:
-    slot: 23
     material: elytra
     name: §x§F§8§B§E§F§B« §x§F§8§B§E§F§BЭ§x§F§5§B§E§F§Bл§x§F§2§B§E§F§Bи§x§E§F§B§F§F§Bт§x§E§C§B§F§F§Bр§x§E§9§B§F§F§Bа §x§E§6§B§F§F§BШ§x§E§3§B§F§F§Bа§x§E§0§C§0§F§Bл§x§D§D§C§0§F§Bк§x§D§A§C§0§F§Bе§x§D§7§C§0§F§Bр§x§D§4§C§0§F§Bа
       §x§F§8§B§E§F§B»
@@ -282,7 +275,6 @@ items:
       - '[message]'
       - '[close]'
   вфывыфвф:
-    slot: 32
     material: elytra
     name: §x§F§8§B§E§F§B« §x§F§8§B§E§F§BЭ§x§F§5§B§E§F§Bл§x§F§2§B§E§F§Bи§x§E§F§B§F§F§Bт§x§E§C§B§F§F§Bр§x§E§9§B§F§F§Bа §x§E§6§B§F§F§BБ§x§E§3§B§F§F§Bо§x§E§0§C§0§F§Bг§x§D§D§C§0§F§Bа§x§D§A§C§0§F§Bт§x§D§7§C§0§F§Bы§x§D§4§C§0§F§Bр§x§D§1§C§0§F§Bя
       §x§F§8§B§E§F§B»
@@ -319,7 +311,6 @@ items:
       - '[message]'
       - '[close]'
   skul31231232432:
-    slot: 30
     material: netherite_pickaxe
     name: §x§F§8§B§E§F§B«§x§F§8§B§E§F§BК§x§F§3§B§E§F§Bи§x§E§E§B§F§F§Bр§x§E§9§B§F§F§Bк§x§E§4§B§F§F§Bа §x§D§F§C§0§F§Bш§x§D§A§C§0§F§Bа§x§D§5§C§0§F§Bл§x§D§0§C§0§F§Bк§x§C§B§C§1§F§Bе§x§C§6§C§1§F§Bр§x§C§1§C§1§F§Bа§x§F§8§B§E§F§B»
     lore:
@@ -358,7 +349,6 @@ items:
       - '[message]'
       - '[close]'
   info:
-    slot: 49
     material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0=
     name: '&7« &#F8BEFBНаши сообщества &7»'
     lore:
@@ -376,7 +366,6 @@ items:
     - '[message]'
     - '[close]'
   close:
-    slot: 45
     material: black_dye
     name: '&7« &#F8BEFBНазад &7»'
     lore:
@@ -387,10 +376,74 @@ items:
     on_click:
     - '[open] elytrix:shop'
   design_purple_panel:
-    slot: 27,35,36,37,43,44,46,47,48,50,51,52,53
     material: purple_stained_glass_pane
     name: '&r'
   design_black_panel:
-    slot: 0,1,2,3,4,5,6,7,8,9,10,16,17,18,26
     material: black_stained_glass_pane
     name: '&r'
+
+# ---------------------------------------------------------------------------
+# Анимация открытия: рамка собирается по 2 панели за кадр, затем по очереди
+# появляются кнопки. Один кадр = 1 тик (50 мс), кадр без tick: = предыдущий + 1.
+#   st: <id предмета> <слоты>  — алиас set, кладёт предмет в слой анимации;
+#   панели-«кисти»: design_purple_panel / design_black_panel (у них убран slot:).
+# Предметы без slot: статически не ставятся и появляются только из кадров.
+# Итог после последнего кадра совпадает с исходной раскладкой DeluxeMenus.
+# ---------------------------------------------------------------------------
+animation:
+  - tick: 0
+    opcodes:
+      - st: design_purple_panel 46,47
+      - sound: 'ui.button.click 0.35 1.4'
+  - opcodes:
+      - st: design_purple_panel 48,50
+  - opcodes:
+      - st: design_purple_panel 51,52
+  - opcodes:
+      - st: design_purple_panel 53,36
+  - opcodes:
+      - st: design_purple_panel 37,43
+  - opcodes:
+      - st: design_purple_panel 44,27
+  - opcodes:
+      - st: design_purple_panel 35
+  - opcodes:
+      - st: design_black_panel 18,9
+  - opcodes:
+      - st: design_black_panel 10,0
+  - opcodes:
+      - st: design_black_panel 1,2
+  - opcodes:
+      - st: design_black_panel 3,4
+  - opcodes:
+      - st: design_black_panel 5,6
+  - opcodes:
+      - st: design_black_panel 7,8
+  - opcodes:
+      - st: design_black_panel 16,17
+  - opcodes:
+      - st: design_black_panel 26
+  - opcodes:
+      - st: skull 13
+      - sound: 'block.note_block.hat 0.5 1.2'
+  - opcodes:
+      - st: s312kull4 20
+  - opcodes:
+      - st: skull4 21
+  - opcodes:
+      - st: skull1 22
+  - opcodes:
+      - st: skul32432 23
+  - opcodes:
+      - st: skul31231232432 30
+  - opcodes:
+      - st: skull2 31
+  - opcodes:
+      - st: вфывыфвф 32
+  - opcodes:
+      - st: skull3 40
+  - opcodes:
+      - st: close 45
+  - opcodes:
+      - st: info 49
+      - sound: 'entity.player.levelup 0.6 1.2'

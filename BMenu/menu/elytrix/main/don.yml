@@ -6,7 +6,6 @@ size: 54
 title: '&#F8BEFB&lСписок привилегий'
 items:
   info:
-    slot: 49
     material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0=
     name: '&7« &#F8BEFBНаши сообщества &7»'
     lore:
@@ -24,7 +23,6 @@ items:
     - '[message]'
     - '[close]'
   close:
-    slot: 45
     material: black_dye
     name: '&7« &#F8BEFBНазад &7»'
     lore:
@@ -35,15 +33,12 @@ items:
     on_click:
     - '[open] elytrix:menu'
   design_purple_panel:
-    slot: 27,35,36,37,43,44,46,47,48,50,51,52,53
     material: purple_stained_glass_pane
     name: '&r'
   design_black_panel:
-    slot: 0,1,2,3,4,5,6,7,8,9,10,16,17,18,26
     material: black_stained_glass_pane
     name: '&r'
   lite:
-    slot: 19
     material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDBmZDY3OTc4MDE0OTY5YzVmNTE3MmJmMzlkMjQzNDcyODFkNmQ5NWFlNzBmMTliNDlkODRmMWY4ZmVlNjg1In19fQ==
     name: '&#8D8D8D&lʟ&#969696&lɪ&#9F9F9F&lᴛ&#A8A8A8&lᴇ &f%player_name% &7| &#8D8D8D19 рублей&7/&fнавсегда'
     lore:
@@ -63,7 +58,6 @@ items:
     - '&#8D8D8D&l┃ '
     - '&7● &fПокупка на сайте: &#8D8D8Delytrix.pw'
   prime:
-    slot: 20
     material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2RiMTc5YWUyYmZkOGRlNjdiZmIyYmMzMDhhMjEzNGJkNzUxOTQyZDM0Mjg3NGY4NmI1NzQ3ZDE2ZWVkNzIifX19
     name: '&#89A0FF&lᴘ&#99AEFF&lʀ&#A8BCFF&lɪ&#B8CAFF&lᴍ&#C7D8FF&lᴇ &f%player_name% &7| &#89A0FF29 рублей&7/&fнавсегда'
     lore:
@@ -83,7 +77,6 @@ items:
     - '&#89A0FF&l┃ '
     - '&7● &fПокупка на сайте: &#89A0FFelytrix.pw'
   griefer:
-    slot: 21
     material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWI0ZWFjZWRiYjEzNWZlMTEwNzcyMWZhYmFiOTFhYjZjYjc4YjBmNDM2ZTQ1YmE2OTBjMzQ5N2M3ZGU4M2U3NyJ9fX0=
     name: '&#FF9191&lɢ&#FF9999&lʀ&#FFA1A1&lɪ&#FFAAAA&lᴇ&#FFB2B2&lꜰ&#FFBABA&lᴇ&#FFC2C2&lʀ &f%player_name% &7| &#FF919139 рублей&7/&fнавсегда'
     lore:
@@ -103,7 +96,6 @@ items:
     - '&#FF9191&l┃ '
     - '&7● &fПокупка на сайте: &#FF9191elytrix.pw'
   wither:
-    slot: 22
     material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODUyODQ5YjY0NWZjZTg2YWNiZDIzMTk5MWJhOTBkMjBkYTQyZTNhOWE4YjU4ZTc2ZGQ0ZTM4NmRiZThiIn19fQ==
     name: '&#96FF91&lᴡ&#A0FF9D&lɪ&#AAFFA8&lᴛ&#B3FFB4&lʜ&#BDFFBF&lᴇ&#C7FFCB&lʀ &f%player_name% &7| &#96FF9179 рублей&7/&fнавсегда'
     lore:
@@ -124,7 +116,6 @@ items:
     - '&#96FF91&l┃ '
     - '&7● &fПокупка на сайте: &#96FF91elytrix.pw'
   immortal:
-    slot: 23
     material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmFjNTAxM2IyMjdhNDk0ZWMxNmM0ZWFmYWIxZjg0ZGVhNTcyZWZiMmYzYzRiNWMzZmY4ODI1MmYzNTZhMDJiIn19fQ==
     name: '&#FF3030&lɪ&#FF3A3A&lᴍ&#FF4444&lᴍ&#FF4E4E&lᴏ&#FF5757&lʀ&#FF6161&lᴛ&#FF6B6B&lᴀ&#FF7575&lʟ &f%player_name% &7| &#FF3030279 рублей&7/&fнавсегда'
     lore:
@@ -146,7 +137,6 @@ items:
     - '&#FF3030&l┃ '
     - '&7● &fПокупка на сайте: &#FF3030elytrix.pw'
   dragon:
-    slot: 24
     material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDZiMDdlNzEyNThkYjhmZTI0MWJjNjU5ZTg3NDk0MWNjYjNkMTJjNzVlNDgyZWE5YjUwYTA0OGU2Njc3YTMifX19
     name: '&#FF7AFE&lᴅ&#FF81FB&lʀ&#FF88F7&lᴀ&#FF90F4&lɢ&#FF97F0&lᴏ&#FF9EED&lɴ &f%player_name% &7| &#FF7AFE429 рублей&7/&fнавсегда'
     lore:
@@ -170,7 +160,6 @@ items:
     - '&#FF7AFE&l┃ '
     - '&7● &fПокупка на сайте: &#FF7AFEelytrix.pw'
   elder:
-    slot: 25
     material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMDFiOTUzYzg4ODU5NGE1N2EzNzY1YjA4YjU5NzIxNTcyNmM2NTkwYTJmNzMwZjA0N2NiOTU1YTI5ZmRmYWI2In19fQ==
     name: '&#AC72FF&lᴇ&#AF74FF&lʟ&#B376FF&lᴅ&#B678FF&lᴇ&#B97AFF&lʀ &f%player_name% &7| &#AC72FF&l699 рублей&7/&fнавсегда'
     lore:
@@ -194,7 +183,6 @@ items:
     - '&#AC72FF&l┃ '
     - '&7● &fПокупка на сайте: &#AC72FFelytrix.pw'
   eternity:
-    slot: 31
     material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNThiOWUyOWFiMWE3OTVlMmI4ODdmYWYxYjFhMzEwMjVlN2NjMzA3MzMzMGFmZWMzNzUzOTNiNDVmYTMzNWQxIn19fQ==
     name: '&#F8BEFB&lᴇᴛᴇʀɴɪᴛʏ &f%player_name% &7| &#F8BEFB&l&n799 рублей&7/&fнавсегда'
     lore:
@@ -218,3 +206,67 @@ items:
     - '&#F8BEFB&l┃ &7● &fСлотов на аукционе: &#F8BEFB20'
     - '&#F8BEFB&l┃ '
     - '&7● &fПокупка на сайте: &#F8BEFBelytrix.pw'
+
+# ---------------------------------------------------------------------------
+# Анимация открытия: рамка собирается по 2 панели за кадр, затем по очереди
+# появляются кнопки. Один кадр = 1 тик (50 мс), кадр без tick: = предыдущий + 1.
+#   st: <id предмета> <слоты>  — алиас set, кладёт предмет в слой анимации;
+#   панели-«кисти»: design_purple_panel / design_black_panel (у них убран slot:).
+# Предметы без slot: статически не ставятся и появляются только из кадров.
+# Итог после последнего кадра совпадает с исходной раскладкой DeluxeMenus.
+# ---------------------------------------------------------------------------
+animation:
+  - tick: 0
+    opcodes:
+      - st: design_purple_panel 46,47
+      - sound: 'ui.button.click 0.35 1.4'
+  - opcodes:
+      - st: design_purple_panel 48,50
+  - opcodes:
+      - st: design_purple_panel 51,52
+  - opcodes:
+      - st: design_purple_panel 53,36
+  - opcodes:
+      - st: design_purple_panel 37,43
+  - opcodes:
+      - st: design_purple_panel 44,27
+  - opcodes:
+      - st: design_purple_panel 35
+  - opcodes:
+      - st: design_black_panel 18,9
+  - opcodes:
+      - st: design_black_panel 10,0
+  - opcodes:
+      - st: design_black_panel 1,2
+  - opcodes:
+      - st: design_black_panel 3,4
+  - opcodes:
+      - st: design_black_panel 5,6
+  - opcodes:
+      - st: design_black_panel 7,8
+  - opcodes:
+      - st: design_black_panel 16,17
+  - opcodes:
+      - st: design_black_panel 26
+  - opcodes:
+      - st: lite 19
+      - sound: 'block.note_block.hat 0.5 1.2'
+  - opcodes:
+      - st: prime 20
+  - opcodes:
+      - st: griefer 21
+  - opcodes:
+      - st: wither 22
+  - opcodes:
+      - st: immortal 23
+  - opcodes:
+      - st: dragon 24
+  - opcodes:
+      - st: elder 25
+  - opcodes:
+      - st: eternity 31
+  - opcodes:
+      - st: close 45
+  - opcodes:
+      - st: info 49
+      - sound: 'entity.player.levelup 0.6 1.2'
