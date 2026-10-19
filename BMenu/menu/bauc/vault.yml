@@ -1,5 +1,4 @@
-include:
-  - './lots_items.yml'
+include: [ './lots_items.yml' ]
 id: bauc:vault
 provider: bauc:vault
 title: '<#F8BEFB>☁ <white>Хранилище<gray> [<#F8BEFB>{current_page}<gray>/<#F8BEFB>{max_page}<gray>]'

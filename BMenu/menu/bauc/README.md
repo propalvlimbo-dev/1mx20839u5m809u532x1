@@ -118,6 +118,43 @@ git revert <commit>
 - Количество лотов: `slots: 10-16,19-25,28-34,37-43` (28). Больше — `slots: 9-44` (36) или `0-44` (45, тогда уберите `slot:` у `frame`/`accent`/`gap`).
 - Панели `frame`/`gap` (чёрные), `accent` (фиолетовая) — меняйте `material`.
 
+## Ошибка `include: ... sequence entries are not allowed here`
+
+Если в логе появилось:
+
+```
+[BMenu] Errors in plugins\BMenu\menu\bauc\home.yml
+в файле обнаружено include: я его прочитал но не получилось его проанализировать...
+то что я прочитал 'include:  - './lots_items.yml'id: bauc:homeprovider: bauc:hometitle: ...'
+Caused by: sequence entries are not allowed here
+ in 'reader', line 1, column 11
+```
+
+это не порча файла. Так работает препроцессор BMenu 2.7 (`MenuFilePreprocessor`): увидев строку с `include:`, он ищет в ней `]` и, пока не найдёт, **склеивает следующие строки без переводов строки**. Если `]` нет в первой строке, в include попадает `id`, `provider`, `title` — и YAML падает.
+
+Поэтому `include` в BMenu пишется **в одну строку**:
+
+```yaml
+include: [ './lots_items.yml' ]
+id: bauc:home
+provider: bauc:home
+```
+
+Так тоже работает (скобка открывается на строке `include`):
+
+```yaml
+include: [
+  "./lots_items.yml"
+]
+```
+
+А так — **не работает**, хотя это обычный YAML:
+
+```yaml
+include:
+  - './lots_items.yml'
+```
+
 ## Если `/ah` пишет `Menu not found: bauc:home`
 
 Почти всегда в логе рядом есть настоящая причина, например:

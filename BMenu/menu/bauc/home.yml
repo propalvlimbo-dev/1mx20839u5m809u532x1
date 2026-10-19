@@ -1,5 +1,4 @@
-include:
-  - './lots_items.yml'
+include: [ './lots_items.yml' ]
 id: bauc:home
 provider: bauc:home
 title: '<lang:bauctionv2.categories.{current_category_id}.title>{search_input}<off_title><gray>[<#F8BEFB>{current_page}<gray>/<#F8BEFB>{max_page}<gray>]'
