@@ -5,7 +5,7 @@ id: bauc:home
 provider: bauc:home
 title: "<lang:bauctionv2.categories.{current_category_id}.title>{search_input}<off_title><b><gray>[<#F8BEFB>{current_page}<gray>/<#F8BEFB>{max_page}<gray>]"
 
-slots: 0-44
+slots: 10-16,19-25,28-34,37-43
 
 category_line:
   if_selected: '<white><#F8BEFB>✔ <lang:bauctionv2.categories.{id}.name>'
@@ -117,52 +117,82 @@ items:
       - sound: 'entity.ender_eye.launch 0.35 1'
       - previous_page: ''
 
-  # ── панели для анимации (без slot: ставятся только кадрами animation) ──
+  # ── рамка вокруг сетки лотов (0,8,36,44 — акцентные углы) ──
   frame:
+    slot: 1-7,9,17,18,26,27,35
+    name: ""
+    material: black_stained_glass_pane
+  gap:
+    slot: 47
     name: ""
     material: black_stained_glass_pane
   accent:
+    slot: 0,8,36,44
     name: ""
     material: purple_stained_glass_pane
 
 animation:
+  # Волна по диагонали: товары проявляются из левого верхнего угла,
+  # впереди идёт фиолетовая полоса-«комета», в конце загорается панель кнопок.
   - tick: 0
     opcodes:
-      - set: frame 45-53
-      - sound: 'block.enchantment_table.use 0.3 1.5'
+      - set: frame 10-16,19-25,28-34,37-43,45-53
+      - sound: 'block.enchantment_table.use 0.30 1.30'
   - tick: 2
     opcodes:
-      - set: accent 47
-      - sound: 'block.note_block.chime 0.22 0.95'
+      - remove: 10
+      - set: accent 11,19
+      - sound: 'block.note_block.pling 0.12 1.00'
   - tick: 4
     opcodes:
-      - remove: 46
-      - sound: 'block.note_block.pling 0.28 1.05'
+      - remove: 11,19
+      - remove: 10
   - tick: 6
     opcodes:
-      - remove: 49
-      - sound: 'block.note_block.pling 0.29 1.15'
+      - remove: 12,20,28
+      - remove: 11,19
+      - set: accent 13,21,29,37
+      - sound: 'block.note_block.pling 0.13 1.06'
   - tick: 8
     opcodes:
-      - remove: 48
-      - sound: 'block.note_block.pling 0.30 1.25'
+      - remove: 13,21,29,37
+      - remove: 12,20,28
   - tick: 10
     opcodes:
-      - remove: 50
-      - sound: 'block.note_block.pling 0.31 1.35'
+      - remove: 14,22,30,38
+      - remove: 13,21,29,37
+      - set: accent 15,23,31,39
+      - sound: 'block.note_block.pling 0.14 1.12'
   - tick: 12
     opcodes:
-      - remove: 51
-      - sound: 'block.note_block.pling 0.32 1.45'
+      - remove: 15,23,31,39
+      - remove: 14,22,30,38
   - tick: 14
     opcodes:
-      - remove: 52
-      - sound: 'block.note_block.pling 0.33 1.50'
+      - remove: 16,24,32,40
+      - remove: 15,23,31,39
+      - set: accent 25,33,41
+      - sound: 'block.note_block.pling 0.15 1.20'
   - tick: 16
     opcodes:
-      - remove: 53
-      - sound: 'block.note_block.chime 0.34 1.40'
+      - remove: 25,33,41
+      - remove: 16,24,32,40
   - tick: 18
     opcodes:
-      - remove: 45
-      - sound: 'block.amethyst_block.chime 0.42 1.40'
+      - remove: 34,42
+      - remove: 25,33,41
+      - set: accent 43
+      - sound: 'block.note_block.pling 0.16 1.28'
+  - tick: 20
+    opcodes:
+      - remove: 43
+      - remove: 34,42
+      - sound: 'block.amethyst_block.chime 0.26 1.45'
+  - tick: 22
+    opcodes:
+      - set: accent 45-53
+      - sound: 'block.note_block.chime 0.22 1.20'
+  - tick: 24
+    opcodes:
+      - remove: 45-53
+      - sound: 'block.amethyst_block.chime 0.32 1.55'
