@@ -1,0 +1,19 @@
+# Паттерны с * работают только для материалов
+# Читаемые названия категорий должны быть в lang.yml
+# по сути здесь можно укзать больше 1 тега, но если делать это в tags.yml то там паттерны не только на материалы и аук будет работать быстрее
+categories:
+  any: ""
+  blocks: 'block'
+  tools: 'category_tools'
+  weapons: 'category_weapons'
+  armor: 'category_armor'
+  resources: 'category_resources'
+  other_resources: 'category_other_resources'
+  edible: 'edible'
+  potions: 'potions'
+  books: 'books'
+  spawners_and_eggs: 'category_spawners_and_eggs'
+  talismans: 'category_talismans'
+  donat_items: 'category_donat_items'
+  brewing: 'category_brewing'
+  grief: 'category_grief'

@@ -1,0 +1,68 @@
+# <#FF0000>[✘] Ошибка!<#FFFFE6> У Вас не хватает <#FFFF00>Монет<#FFFFE6>!
+# <#FF6600>[☃]<#FFFFE6> У Вас купили <#FF6600>Золотой слиток<#FFFFE6> за <#FFFF00>$10,000<#FFFFE6> на <#FFFF00>/ah
+# <#FF6600>[☃]<#FFFFE6> Предмет <#FF6600>Золотой слиток <#FFFFE6>выставлен на продажу за <#FFFF00>$10,000<#FFFFE6>!
+# <#FF6600>[☃]<#FFFFE6> Предмет <#FF6600>Лазурит x39 <#FFFFE6>выставлен на продажу за <#FFFF00>$2,000<#FFFFE6>!
+# <#FF6600>[☃]<#FFFFE6> Минимальная цена на <#FF6600>Лазурит x64 <#FFFFE6>в текущий момент <#FFFF00>$64<#FFFFE6>!
+# <#FF6600>[☃]<#FFFFE6> Максимальная цена на <#FF6600>Лазурит x64 <#FFFFE6>в текущий момент <#FFFF00>$99,200<#FFFFE6>!
+# <#FF6600>[☃]<#FFFFE6> Предмет <#FF6600>Лазурит x64 <#FFFFE6>выставлен на продажу за <#FFFF00>$500<#FFFFE6>!
+# <#FF6600>[☃]<#FFFFE6> Предмет <#FF6600>Огненный стержень x64 <#FFFFE6>выставлен на продажу за <#FFFF00>$15,000<#FFFFE6>!
+# <#00FF00>[✔] <#FFFFE6>Предметы успешно перевыставлены!
+# <#FF6600>[☃]<#FFFFE6> У Вас купили <#FF6600>Огненный стержень x64<#FFFFE6> за <#FFFF00>$15,000<#FFFFE6> на <#FFFF00>/ah
+# <#FF6600>[☃]<#FFFFE6> Пока вас не было, продажи с аукциона принесли вам <#FFFF00>$3,999<#FFFFE6>!
+$lang: ru_RU
+
+outdated_plugin: '<green>[BAuctionV2] Доступна новая версия {latest}'
+sell_success: '<#FF6600>[☃]<#FFFFE6> Предмет <#FF6600>{item_name} x{count} <#FFFFE6>выставлен на продажу за <#FFFF00>${price}<#FFFFE6>!'
+sell_req_item: '<#FF6600>[☃]<#FFFFE6> Вы не можете продать<#FFFF00> Воздух<#FFFFE6>!'
+sell_req_price: '<#FF6600>[☃]<#FFFFE6> Укажите цену продажи!'
+sell_qa_moved_to_vault: '<#FF6600>[☃]<#FFFFE6>Некоторые предметы перемещены в хранилище'
+sell_gui: '<#FF6600>[☃]<#FFFFE6> На продажу успешно выставлено <#FFFF00>{count} <#FFFFE6>предметов по <#FFFF00>${price}<#FFFFE6>!'
+illegal_item: 'Вы не можете выставить на аукцион этот предмет!'
+minimum_price: '<#FF6600>[☃]<#FFFFE6> Минимальная цена на <#FF6600>{item_name} x{count} <#FFFFE6>в текущий момент <#FFFF00>${min}<#FFFFE6>!'
+lots_add_error_bad_count: 'не удалось выставить на аук'
+lots_add_error: 'не удалось выставимть на аук'
+auction_is_disabled: 'Аукцион временно не работает('
+outdated_lot: 'Этого товара больше нет'
+slots_limited: 'Вы достигли максимума по слотам!'
+insufficient_balance:
+  - 'У Вас не достаточно монет!'
+  - visual: 'insufficient_balance'
+not_owner_lot:
+  - 'Вы не владелец этого товара'
+  - visual: 'not_owner_lot'
+item_taken: 'Вы успешно забрали {item_name}<white> с аукциона!'
+err_full_inv_added_to_vault:
+  - 'инвентарь полон! Предметы перемещены в хранилище!'
+  - visual: 'added_to_vault'
+vault_take_inv_is_full:
+  - 'Ваш инвентарь полон!'
+  - visual: 'inv_is_full'
+vault_take_but_dropped: 'Не все предметы поместились в инвентарь! Некоторые упали на пол!'
+
+buy_success: 'Вы успешно купили {item_name} <white>за {price}'
+
+on_sell_lot: 'Игрок {buyer} купил у Вас {item_name} <white>за {price}'
+
+has_no_items_resell:
+  - '<#FF6600>[☃]<#FFFFE6> В хранилище отсутствуют предметы для перевыставления.'
+  - sound: block.note_block.basedrum
+resell_failed:
+  - '<#FF6600>[☃]<#FFFFE6> Вы можете переставлять предметы раз в минуту!'
+  - sound: block.note_block.basedrum
+resell_success:
+  - '<#00FF00>[✔] Предметы успешно перевыставлены'
+  - sound: entity.enderman.teleport
+
+ah_help: |
+  <#FF6600>[☃]<#FFFFE6> Помощь по Аукционам:
+  <#FF6600>/ah <#FFFFE6>- Открыть меню Аукциона
+  <#FF6600>/ah sell Сумма <#FFFFE6>- Выставить товар
+  <#FF6600>/ah dsell Сумма <#FFFFE6>- Выставить товар под защитой 10 сек
+  <#FF6600>/ah sellgui Сумма <#FFFFE6>- Продать несколько предметов по введенной цене
+  <#FF6600>/ah search Предмет<#FFFFE6> - Поиск предмета
+  <#FF6600>/ah search Предмет <#FFFF00>МаксЦена<#FFFFE6> - Поиск предмета (Для князей)
+  <#FF6600>/ah rent<#FFFFE6> - Аренда слотов
+  <#FF6600>/ah НИК <#FFFFE6>- Посмотреть товары игрока
+
+post_join_use_delay: '<#FF6600>[☃]<#FFFFE6> После входа на режим необходимо немного подождать перед использованием аукциона. Подождите <#FFFF00>{time} сек.'
+maximum_price: '<#FF6600>[☃]<#FFFFE6> Максимальная цена на этот товар<#FFFF00> ${max}<#FFFFE6>!'
