@@ -7,6 +7,7 @@ item_info_lore: &info
 
 vault_lot:
   lore:
+    - '<#F8BEFB><b>┃</b> '
     - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>${price}'
     - '<#F8BEFB><b>┃</b> <white>Статус: <#F8BEFB>{lot_status}'
     - '<#F8BEFB><b>┃</b> <white>Удаление: <#F8BEFB>{expires}'
@@ -19,6 +20,7 @@ sold:
   name: '<gray>Товар не актуален'
   material: gray_dye
   lore:
+    - '<#F8BEFB><b>┃</b> '
     - *info
     - '<#F8BEFB><b>┃</b> '
     - '<gray>● <white>F — найти аналоги'
@@ -34,6 +36,7 @@ purchased:
   name: '<green>Товар куплен'
   material: lime_dye
   lore:
+    - '<#F8BEFB><b>┃</b> '
     - *info
     - '<#F8BEFB><b>┃</b> '
     - '<gray>● <white>F — найти аналоги'
@@ -49,6 +52,7 @@ taken:
   name: '<green>Товар забран'
   material: lime_dye
   lore:
+    - '<#F8BEFB><b>┃</b> '
     - *info
     - '<#F8BEFB><b>┃</b> '
     - '<gray>● <white>F — найти аналоги'
@@ -62,6 +66,7 @@ taken:
 
 owned:
   lore:
+    - '<#F8BEFB><b>┃</b> '
     - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>${price}'
     - '<#F8BEFB><b>┃</b> <white>Статус: <#F8BEFB>ваш лот'
     - '<#F8BEFB><b>┃</b> '
@@ -74,6 +79,7 @@ owned:
 
 one:
   lore:
+    - '<#F8BEFB><b>┃</b> '
     - *info
     - '<#F8BEFB><b>┃</b> '
     - '<gray>● <white>ЛКМ — купить'
@@ -90,6 +96,7 @@ one:
 
 container:
   lore:
+    - '<#F8BEFB><b>┃</b> '
     - *info
     - '<#F8BEFB><b>┃</b> '
     - '<gray>● <white>ЛКМ — купить'
@@ -108,6 +115,7 @@ container:
 
 many:
   lore:
+    - '<#F8BEFB><b>┃</b> '
     - *info
     - '<#F8BEFB><b>┃</b> '
     - '<gray>● <white>ЛКМ — купить'
@@ -140,6 +148,7 @@ items:
     material: red_dye
     name: '<#F8BEFB>Назад'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '<gray>● <white>Вернуться в аукцион'
     on_click:
       - sound: 'entity.enderman.teleport 0.35 1'
@@ -150,6 +159,7 @@ items:
     material: clock
     name: '<#F8BEFB>Перевыставить'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '<#F8BEFB><b>┃</b> <white>Все предметы из хранилища'
       - '<#F8BEFB><b>┃</b> <white>встанут на аукцион заново'
       - '<#F8BEFB><b>┃</b> <white>по тем же ценам'
@@ -164,6 +174,7 @@ items:
     material: nether_star
     name: '<#F8BEFB>Обновить'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '<#F8BEFB><b>┃</b> <white>Обновляет список лотов'
       - '<#F8BEFB><b>┃</b> '
       - '<gray>● <white>Нажмите, чтобы обновить'
@@ -176,6 +187,7 @@ items:
     material: crafting_table
     name: '<#F8BEFB>Аренда слотов'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '<#F8BEFB><b>┃</b> <white>Больше лотов на аукционе'
       - '<#F8BEFB><b>┃</b> '
       - '<gray>● <white>Нажмите, чтобы открыть'
@@ -191,9 +203,11 @@ items:
       - on_view: '{has_next_page} == true'
         name: '<#F8BEFB>Вперёд'
         lore:
+          - '<#F8BEFB><b>┃</b> '
           - '<gray>● <white>Следующая страница'
       - name: '<gray>Вперёд'
         lore:
+          - '<#F8BEFB><b>┃</b> '
           - '<dark_gray>● Последняя страница'
     on_click:
       - sound: 'entity.ender_eye.launch 0.35 1'
@@ -206,9 +220,11 @@ items:
       - on_view: '{current_page} != 1'
         name: '<#F8BEFB>Назад'
         lore:
+          - '<#F8BEFB><b>┃</b> '
           - '<gray>● <white>Предыдущая страница'
       - name: '<gray>Назад'
         lore:
+          - '<#F8BEFB><b>┃</b> '
           - '<dark_gray>● Первая страница'
     on_click:
       - sound: 'entity.ender_eye.launch 0.35 1'
@@ -222,15 +238,16 @@ items:
     material: purple_stained_glass_pane
 
 animation:
-  # Шторка в слое 3 — выше слоя лотов BAuctionV2 (слой 2).
-  # Кадры 0 и 1 дублируются, потому что после первого кадра меню пересобирается.
+  # Кнопки 45-53 закрываем в слое анимации (1), лоты 0-44 — в слое 3,
+  # потому что товары рисуются в слое 2 поверх обычного set:.
   - tick: 0
     opcodes:
-      - cmd: '[layer] 3 set frame 0-44,45-53'
+      - set: frame 45-53
+      - cmd: '[layer] 3 set frame 0-8,9-17,18-26,27-35,36-44'
       - sound: 'block.enchantment_table.use 0.28 1.30'
   - tick: 1
     opcodes:
-      - cmd: '[layer] 3 set frame 0-44,45-53'
+      - cmd: '[layer] 3 set frame 0-8,9-17,18-26,27-35,36-44'
   - tick: 2
     opcodes:
       - cmd: '[layer] 3 remove 0-8'
@@ -253,9 +270,9 @@ animation:
       - sound: 'block.note_block.pling 0.18 1.32'
   - tick: 11
     opcodes:
-      - cmd: '[layer] 3 set accent 45-53'
+      - set: accent 45-53
       - sound: 'block.note_block.chime 0.22 1.25'
   - tick: 13
     opcodes:
-      - cmd: '[layer] 3 remove 45-53'
+      - remove: 45-53
       - sound: 'block.amethyst_block.chime 0.28 1.55'

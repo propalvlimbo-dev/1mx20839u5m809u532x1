@@ -7,6 +7,7 @@ item_info_lore: &info
 
 vault_lot:
   lore:
+    - '<#F8BEFB><b>┃</b> '
     - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>${price}'
     - '<#F8BEFB><b>┃</b> <white>Статус: <#F8BEFB>{lot_status}'
     - '<#F8BEFB><b>┃</b> <white>Удаление: <#F8BEFB>{expires}'
@@ -19,6 +20,7 @@ sold:
   name: '<gray>Товар не актуален'
   material: gray_dye
   lore:
+    - '<#F8BEFB><b>┃</b> '
     - *info
     - '<#F8BEFB><b>┃</b> '
     - '<gray>● <white>F — найти аналоги'
@@ -34,6 +36,7 @@ purchased:
   name: '<green>Товар куплен'
   material: lime_dye
   lore:
+    - '<#F8BEFB><b>┃</b> '
     - *info
     - '<#F8BEFB><b>┃</b> '
     - '<gray>● <white>F — найти аналоги'
@@ -49,6 +52,7 @@ taken:
   name: '<green>Товар забран'
   material: lime_dye
   lore:
+    - '<#F8BEFB><b>┃</b> '
     - *info
     - '<#F8BEFB><b>┃</b> '
     - '<gray>● <white>F — найти аналоги'
@@ -62,6 +66,7 @@ taken:
 
 owned:
   lore:
+    - '<#F8BEFB><b>┃</b> '
     - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>${price}'
     - '<#F8BEFB><b>┃</b> <white>Статус: <#F8BEFB>ваш лот'
     - '<#F8BEFB><b>┃</b> '
@@ -74,6 +79,7 @@ owned:
 
 one:
   lore:
+    - '<#F8BEFB><b>┃</b> '
     - *info
     - '<#F8BEFB><b>┃</b> '
     - '<gray>● <white>ЛКМ — купить'
@@ -90,6 +96,7 @@ one:
 
 container:
   lore:
+    - '<#F8BEFB><b>┃</b> '
     - *info
     - '<#F8BEFB><b>┃</b> '
     - '<gray>● <white>ЛКМ — купить'
@@ -108,6 +115,7 @@ container:
 
 many:
   lore:
+    - '<#F8BEFB><b>┃</b> '
     - *info
     - '<#F8BEFB><b>┃</b> '
     - '<gray>● <white>ЛКМ — купить'
@@ -142,9 +150,10 @@ sorting_line:
 items:
   vault:
     slot: 46
-    material: ender_chest
+    material: purple_bundle
     name: '<#F8BEFB>Хранилище'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '<#F8BEFB><b>┃</b> <white>Товары, которые вы продаёте'
       - '<#F8BEFB><b>┃</b> <white>и купленные лоты'
       - '<#F8BEFB><b>┃</b> '
@@ -155,9 +164,10 @@ items:
 
   research:
     slot: 49
-    material: nether_star
+    material: music_disc_mellohi
     name: '<#F8BEFB>Обновить'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '<#F8BEFB><b>┃</b> <white>Обновляет список лотов'
       - '<#F8BEFB><b>┃</b> '
       - '<gray>● <white>Нажмите, чтобы обновить'
@@ -170,6 +180,7 @@ items:
     material: chest
     name: '<#F8BEFB>Категории'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '<#F8BEFB><b>┃</b> <white>Все разделы аукциона'
       - '<#F8BEFB><b>┃</b> '
       - '<gray>● <white>Нажмите, чтобы выбрать'
@@ -182,6 +193,7 @@ items:
     material: chest_minecart
     name: '<#F8BEFB>Категории'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '{all_categories}'
       - '<#F8BEFB><b>┃</b> '
       - '<gray>● <white>ЛКМ / ПКМ — листать'
@@ -197,6 +209,7 @@ items:
     material: hopper
     name: '<#F8BEFB>Сортировка'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '{all_sorting}'
       - '<#F8BEFB><b>┃</b> '
       - '<gray>● <white>ЛКМ / ПКМ — листать'
@@ -212,6 +225,7 @@ items:
     material: crafting_table
     name: '<#F8BEFB>Аренда слотов'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '<#F8BEFB><b>┃</b> <white>Больше лотов на аукционе'
       - '<#F8BEFB><b>┃</b> '
       - '<gray>● <white>Нажмите, чтобы открыть'
@@ -227,9 +241,11 @@ items:
       - on_view: '{has_next_page} == true'
         name: '<#F8BEFB>Вперёд'
         lore:
+          - '<#F8BEFB><b>┃</b> '
           - '<gray>● <white>Следующая страница'
       - name: '<gray>Вперёд'
         lore:
+          - '<#F8BEFB><b>┃</b> '
           - '<dark_gray>● Последняя страница'
     on_click:
       - sound: 'entity.ender_eye.launch 0.35 1'
@@ -242,20 +258,22 @@ items:
       - on_view: '{current_page} != 1'
         name: '<#F8BEFB>Назад'
         lore:
+          - '<#F8BEFB><b>┃</b> '
           - '<gray>● <white>Предыдущая страница'
       - name: '<gray>Назад'
         lore:
+          - '<#F8BEFB><b>┃</b> '
           - '<dark_gray>● Первая страница'
     on_click:
       - sound: 'entity.ender_eye.launch 0.35 1'
       - previous_page: ''
 
   frame:
-    slot: 1-7,9,17,18,26,27,35
+    slot: 9,17,18,26,27,35,36,44
     name: ''
     material: black_stained_glass_pane
   accent:
-    slot: 0,8,36,44
+    slot: 0-8
     name: ''
     material: purple_stained_glass_pane
   gap:
@@ -264,18 +282,18 @@ items:
     material: black_stained_glass_pane
 
 animation:
-  # Слои меню: 0 — база (кнопки и рамка), 1 — штатный слой анимации BMenu,
-  # 2 — слой лотов BAuctionV2, 3 — верхний. Товары рисуются в слое 2, поэтому
-  # шторку пишем в слой 3 — иначе лоты перекрывают анимацию.
-  # Кадры 0 и 1 дублируются: после первого кадра BAuctionV2 пересобирает меню
-  # и очищает слой 3, второй кадр возвращает шторку.
+  # Кнопки (45-53) лежат в базовом слое (0), поэтому их шторка живёт в штатном
+  # слое анимации (1) — его BAuctionV2 не очищает, поэтому ряда не "моргает".
+  # Сетка лотов лежит в слое 2, её закрываем только через [layer] 3.
+  # Кадр 1 повторяет установку сетки: при открытии LotsMenu.generate() чистит слой 3.
   - tick: 0
     opcodes:
-      - cmd: '[layer] 3 set frame 10-16,19-25,28-34,37-43,45-53'
+      - set: frame 45-53
+      - cmd: '[layer] 3 set frame 10-16,19-25,28-34,37-43'
       - sound: 'block.enchantment_table.use 0.28 1.35'
   - tick: 1
     opcodes:
-      - cmd: '[layer] 3 set frame 10-16,19-25,28-34,37-43,45-53'
+      - cmd: '[layer] 3 set frame 10-16,19-25,28-34,37-43'
   - tick: 2
     opcodes:
       - cmd: '[layer] 3 remove 10-16'
@@ -294,9 +312,9 @@ animation:
       - sound: 'block.note_block.pling 0.16 1.30'
   - tick: 9
     opcodes:
-      - cmd: '[layer] 3 set accent 45-53'
+      - set: accent 45-53
       - sound: 'block.note_block.chime 0.22 1.25'
   - tick: 11
     opcodes:
-      - cmd: '[layer] 3 remove 45-53'
+      - remove: 45-53
       - sound: 'block.amethyst_block.chime 0.28 1.55'

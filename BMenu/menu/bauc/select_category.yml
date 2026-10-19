@@ -9,6 +9,7 @@ items:
     slot: 11
     name: '<#F8BEFB>Все товары'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '<gray>● <white>Перейти в категорию'
     all_flags: true
     material: hopper_minecart
@@ -21,6 +22,7 @@ items:
     slot: 12
     name: '<#F8BEFB>Блоки'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '<gray>● <white>Перейти в категорию'
     all_flags: true
     material: coarse_dirt
@@ -33,6 +35,7 @@ items:
     slot: 13
     name: '<#F8BEFB>Инструменты'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '<gray>● <white>Перейти в категорию'
     all_flags: true
     material: netherite_pickaxe
@@ -45,6 +48,7 @@ items:
     slot: 14
     name: '<#F8BEFB>Оружие'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '<gray>● <white>Перейти в категорию'
     all_flags: true
     material: netherite_sword
@@ -57,6 +61,7 @@ items:
     slot: 15
     name: '<#F8BEFB>Снаряжение'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '<gray>● <white>Перейти в категорию'
     all_flags: true
     material: netherite_chestplate
@@ -69,6 +74,7 @@ items:
     slot: 20
     name: '<#F8BEFB>Ценные ресурсы'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '<gray>● <white>Перейти в категорию'
     all_flags: true
     material: netherite_ingot
@@ -81,6 +87,7 @@ items:
     slot: 21
     name: '<#F8BEFB>Прочие ресурсы'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '<gray>● <white>Перейти в категорию'
     all_flags: true
     material: fermented_spider_eye
@@ -93,6 +100,7 @@ items:
     slot: 22
     name: '<#F8BEFB>Еда'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '<gray>● <white>Перейти в категорию'
     all_flags: true
     material: sweet_berries
@@ -105,6 +113,7 @@ items:
     slot: 23
     name: '<#F8BEFB>Зелья'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '<gray>● <white>Перейти в категорию'
     all_flags: true
     material: dragon_breath
@@ -117,6 +126,7 @@ items:
     slot: 24
     name: '<#F8BEFB>Книги'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '<gray>● <white>Перейти в категорию'
     all_flags: true
     material: enchanted_book
@@ -129,6 +139,7 @@ items:
     slot: 29
     name: '<#F8BEFB>Яйца и спавнеры'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '<gray>● <white>Перейти в категорию'
     all_flags: true
     material: bee_spawn_egg
@@ -141,6 +152,7 @@ items:
     slot: 30
     name: '<#F8BEFB>Талисманы'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '<gray>● <white>Перейти в категорию'
     all_flags: true
     material: totem_of_undying
@@ -153,6 +165,7 @@ items:
     slot: 31
     name: '<#F8BEFB>Настоящие вещи'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '<gray>● <white>Перейти в категорию'
     all_flags: true
     material: enchanted_golden_apple
@@ -165,6 +178,7 @@ items:
     slot: 32
     name: '<#F8BEFB>Зельеварение'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '<gray>● <white>Перейти в категорию'
     all_flags: true
     material: brewing_stand
@@ -177,6 +191,7 @@ items:
     slot: 33
     name: '<#F8BEFB>Для грифа'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '<gray>● <white>Перейти в категорию'
     all_flags: true
     material: comparator
@@ -191,6 +206,7 @@ items:
     material: red_dye
     name: '<#F8BEFB>Назад'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '<gray>● <white>Вернуться в аукцион'
     on_click:
       - sound: 'ui.button.click 0.35 1'

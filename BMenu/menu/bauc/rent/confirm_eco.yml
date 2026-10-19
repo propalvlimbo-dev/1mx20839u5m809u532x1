@@ -52,6 +52,7 @@ items:
     slot: 20
     name: '<green>Купить'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '<gray>● <white>Подтвердить аренду'
     material: lime_dye
     on_click: *do_click
@@ -60,6 +61,7 @@ items:
     slot: 24
     name: '<red>Отмена'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '<gray>● <white>Вернуться назад'
     material: red_dye
     on_click:

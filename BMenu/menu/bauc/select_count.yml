@@ -10,6 +10,7 @@ args:
 show_item:
   slot: 2
   lore:
+    - '<#F8BEFB><b>┃</b> '
     - '<#F8BEFB><b>┃</b> <white>Продавец: <#F8BEFB>{seller_name}'
     - '<#F8BEFB><b>┃</b> <white>Итого: <#F8BEFB>{result_price}'
     - '<#F8BEFB><b>┃</b> <white>За штуку: <#F8BEFB>{price_for_one}'
@@ -23,6 +24,7 @@ items:
     slot: 0
     name: '<red>−1'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '<gray>● <white>Убрать одну единицу'
     material: red_dye
     on_click:
@@ -32,6 +34,7 @@ items:
     slot: 1
     name: '<red>−10'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '<gray>● <white>Убрать десять единиц'
     material: red_dye
     on_click:
@@ -41,6 +44,7 @@ items:
     slot: 3
     name: '<green>+1'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '<gray>● <white>Добавить одну единицу'
     material: lime_dye
     on_click:
@@ -50,6 +54,7 @@ items:
     slot: 4
     name: '<green>+10'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '<gray>● <white>Добавить десять единиц'
     material: lime_dye
     on_click:

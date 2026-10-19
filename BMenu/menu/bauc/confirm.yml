@@ -10,6 +10,7 @@ args:
 show_item:
   slot: 13
   lore:
+    - '<#F8BEFB><b>┃</b> '
     - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>${price}'
     - '<#F8BEFB><b>┃</b> <white>Продавец: <#F8BEFB>{seller_name}'
     - '<#F8BEFB><b>┃</b> '
@@ -22,6 +23,7 @@ items:
     slot: 11
     name: '<green>Купить'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '<gray>● <white>Подтвердить покупку'
     all_flags: true
     material: lime_dye
@@ -32,6 +34,7 @@ items:
     slot: 15
     name: '<red>Отмена'
     lore:
+      - '<#F8BEFB><b>┃</b> '
       - '<gray>● <white>Вернуться в аукцион'
     all_flags: true
     material: red_dye
