@@ -1,12 +1,20 @@
 # Converted from DeluxeMenus/gui_menus/main/menu.yml; source kept unchanged.
+# Дополнительно: анимация сборки рамки и появления кнопок (блок animation: в конце файла).
 id: elytrix:menu
 provider: default
 type: chest
 size: 54
 title: '&#F8BEFB&lГлавное меню'
 items:
+  # Панели-«кисти» для анимации: без slot — статически не ставятся,
+  # их раскладывает animation через st: <id> <слоты>.
+  filter:
+    material: purple_stained_glass_pane
+    name: '&r'
+  filter1:
+    material: black_stained_glass_pane
+    name: '&r'
   rtp:
-    slot: 21
     material: ender_pearl
     name: '&7« &#F8BEFBРандомная телепортация &7»'
     lore:
@@ -18,7 +26,6 @@ items:
     on_click:
     - '[open] elytrix:rtp'
   shop:
-    slot: 22
     material: netherite_scrap
     name: '&7« &#F8BEFBМагазин предметов &7»'
     lore:
@@ -30,7 +37,6 @@ items:
     on_click:
     - '[open] elytrix:shop'
   ah:
-    slot: 23
     material: gold_nugget
     name: '&7« &#F8BEFBРынок игроков &7»'
     lore:
@@ -42,7 +48,6 @@ items:
     on_click:
     - '[player] ah'
   customize:
-    slot: 24
     material: purple_dye
     name: '&7« &#F8BEFBКастомизация &7»'
     lore:
@@ -54,7 +59,6 @@ items:
     on_click:
     - '[open] elytrix:customizemenu'
   clans:
-    slot: 20
     material: prismarine_shard
     name: '&7« &#F8BEFBКлановые союзы &7»'
     lore:
@@ -67,7 +71,6 @@ items:
     - '[player] clan'
     - '[close]'
   seller:
-    slot: 30
     material: ender_pearl
     name: '&7« &#F8BEFBСкупщик ресурсов &7»'
     lore:
@@ -79,7 +82,6 @@ items:
     on_click:
     - '[player] seller'
   sub:
-    slot: 31
     material: honeycomb
     name: '&7« &#F8BEFBДонатерская подписка &7»'
     lore:
@@ -91,7 +93,6 @@ items:
     on_click:
     - '[open] elytrix:sub'
   help:
-    slot: 32
     material: book
     name: '&7« &#F8BEFBПомощь &7»'
     lore:
@@ -105,7 +106,6 @@ items:
     - '[player] помощь'
     - '[close]'
   info:
-    slot: 49
     material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0=
     name: '&7« &#F8BEFBНаши сообщества &7»'
     lore:
@@ -123,7 +123,6 @@ items:
     - '[message]'
     - '[close]'
   close:
-    slot: 45
     material: red_dye
     name: '&7« &cЗакрыть меню &7»'
     lore:
@@ -134,10 +133,113 @@ items:
     on_left_click:
     - '[close]'
   design_purple_panel:
-    slot: 27,35,36,37,43,44,46,47,48,50,51,52,53
     material: purple_stained_glass_pane
     name: '&r'
   design_black_panel:
-    slot: 0,1,2,3,4,5,6,7,8,9,10,16,17,18,26
     material: black_stained_glass_pane
     name: '&r'
+
+# ---------------------------------------------------------------------------
+# Анимация открытия: рамка рисуется по кусочкам, затем появляются кнопки.
+#
+# Это тот же самый приём, что и в присланном примере:
+#   animation:
+#     - opcodes:
+#         - st: filter 45
+#
+# Как это работает в BMenu:
+#   * animation: (единственное число) — анимация по умолчанию, запускается при открытии;
+#   * кадр без tick: получает tick = предыдущий + 1 (0, 1, 2, ...);
+#   * st — короткий алиас set: первым аргументом id предмета, вторым — слоты;
+#   * set кладёт предмет в слой анимации ПОВЕРХ базового слоя, кадры накапливаются:
+#     поставленное в предыдущих кадрах остаётся, поэтому рамка и «достраивается»;
+#   * предметы без slot: (filter, filter1 и все кнопки) статически не ставятся —
+#     они появляются только из кадров, иначе эффект сборки не был бы виден.
+#
+# Один кадр = один тик сервера (50 мс). Здесь 40 кадров ≈ 2 секунды.
+# ---------------------------------------------------------------------------
+animation:
+  - tick: 0
+    opcodes:
+      - st: filter 45
+      - sound: 'ui.button.click 0.35 1.4'
+  - opcodes:
+      - st: filter 46
+  - opcodes:
+      - st: filter 47
+  - opcodes:
+      - st: filter 48
+  - opcodes:
+      - st: filter 49
+  - opcodes:
+      - st: filter 50
+  - opcodes:
+      - st: filter 51
+  - opcodes:
+      - st: filter 52
+  - opcodes:
+      - st: filter 53
+  - opcodes:
+      - st: filter 36
+  - opcodes:
+      - st: filter 37
+  - opcodes:
+      - st: filter 43
+  - opcodes:
+      - st: filter 44
+  - opcodes:
+      - st: filter 27
+  - opcodes:
+      - st: filter 35
+  - opcodes:
+      - st: filter1 18
+  - opcodes:
+      - st: filter1 9
+  - opcodes:
+      - st: filter1 10
+  - opcodes:
+      - st: filter1 0
+  - opcodes:
+      - st: filter1 1
+  - opcodes:
+      - st: filter1 2
+  - opcodes:
+      - st: filter1 3
+  - opcodes:
+      - st: filter1 4
+  - opcodes:
+      - st: filter1 5
+  - opcodes:
+      - st: filter1 6
+  - opcodes:
+      - st: filter1 7
+  - opcodes:
+      - st: filter1 8
+  - opcodes:
+      - st: filter1 16
+  - opcodes:
+      - st: filter1 17
+  - opcodes:
+      - st: filter1 26
+  - opcodes:
+      - st: rtp 21
+      - sound: 'block.note_block.hat 0.5 1.2'
+  - opcodes:
+      - st: ah 23
+  - opcodes:
+      - st: seller 30
+  - opcodes:
+      - st: help 32
+  - opcodes:
+      - st: sub 31
+  - opcodes:
+      - st: shop 22
+  - opcodes:
+      - st: clans 20
+  - opcodes:
+      - st: customize 24
+  - opcodes:
+      - st: close 45
+  - opcodes:
+      - st: info 49
+      - sound: 'entity.player.levelup 0.6 1.2'
