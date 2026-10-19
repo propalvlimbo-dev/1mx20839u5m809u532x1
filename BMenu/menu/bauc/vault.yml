@@ -232,47 +232,38 @@ items:
 
   frame:
     name: ''
-    material: black_stained_glass_pane
-  accent:
-    name: ''
-    material: purple_stained_glass_pane
+    material: chain
 
 animation:
-  # Кнопки 45-53 закрываем в слое анимации (1), лоты 0-44 — в слое 3,
-  # потому что товары рисуются в слое 2 поверх обычного set:.
+  # Та же «клетка», что и в /ah: цепи лежат поверх лотов (слой 3) и падают
+  # сверху вниз — хранилище открывается сверху. Кнопки 45-53 не закрываем.
   - tick: 0
     opcodes:
-      - set: frame 45-53
       - cmd: '[layer] 3 set frame 0-8,9-17,18-26,27-35,36-44'
-      - sound: 'block.enchantment_table.use 0.28 1.30'
+      - sound: 'block.chain.place 0.50 1.05'
   - tick: 1
     opcodes:
       - cmd: '[layer] 3 set frame 0-8,9-17,18-26,27-35,36-44'
-  - tick: 2
+  - tick: 3
     opcodes:
       - cmd: '[layer] 3 remove 0-8'
-      - sound: 'block.note_block.pling 0.10 1.00'
-  - tick: 4
+      - sound: 'block.chain.break 0.55 1.00'
+  - tick: 5
     opcodes:
       - cmd: '[layer] 3 remove 9-17'
-      - sound: 'block.note_block.pling 0.12 1.08'
-  - tick: 6
+      - sound: 'block.chain.break 0.58 1.10'
+  - tick: 7
     opcodes:
       - cmd: '[layer] 3 remove 18-26'
-      - sound: 'block.note_block.pling 0.14 1.16'
-  - tick: 8
+      - sound: 'block.chain.break 0.62 1.20'
+  - tick: 9
     opcodes:
       - cmd: '[layer] 3 remove 27-35'
-      - sound: 'block.note_block.pling 0.16 1.24'
-  - tick: 10
-    opcodes:
-      - cmd: '[layer] 3 remove 36-44'
-      - sound: 'block.note_block.pling 0.18 1.32'
+      - sound: 'block.chain.break 0.66 1.30'
   - tick: 11
     opcodes:
-      - set: accent 45-53
-      - sound: 'block.note_block.chime 0.22 1.25'
+      - cmd: '[layer] 3 remove 36-44'
+      - sound: 'block.chain.fall 0.45 1.15'
   - tick: 13
     opcodes:
-      - remove: 45-53
-      - sound: 'block.amethyst_block.chime 0.28 1.55'
+      - sound: 'block.amethyst_block.chime 0.30 1.40'
