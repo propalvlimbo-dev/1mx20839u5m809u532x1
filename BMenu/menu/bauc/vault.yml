@@ -96,41 +96,40 @@ items:
     material: purple_stained_glass_pane
 
 animation:
+  # Шторка в слое 3 — выше слоя лотов BAuctionV2 (слой 2).
+  # Кадры 0 и 1 дублируются, потому что после первого кадра меню пересобирается.
   - tick: 0
     opcodes:
-      - set: frame 45-53
-      - sound: 'block.enchantment_table.use 0.30 1.30'
+      - cmd: '[layer] 3 set frame 0-44,45-53'
+      - sound: 'block.enchantment_table.use 0.28 1.30'
+  - tick: 1
+    opcodes:
+      - cmd: '[layer] 3 set frame 0-44,45-53'
   - tick: 2
     opcodes:
-      - set: accent 47
-      - sound: 'block.note_block.chime 0.22 0.95'
+      - cmd: '[layer] 3 remove 0-8'
+      - sound: 'block.note_block.pling 0.10 1.00'
   - tick: 4
     opcodes:
-      - remove: 46
-      - sound: 'block.note_block.pling 0.26 1.05'
+      - cmd: '[layer] 3 remove 9-17'
+      - sound: 'block.note_block.pling 0.12 1.08'
   - tick: 6
     opcodes:
-      - remove: 49
-      - sound: 'block.note_block.pling 0.27 1.15'
+      - cmd: '[layer] 3 remove 18-26'
+      - sound: 'block.note_block.pling 0.14 1.16'
   - tick: 8
     opcodes:
-      - remove: 48
-      - sound: 'block.note_block.pling 0.28 1.25'
+      - cmd: '[layer] 3 remove 27-35'
+      - sound: 'block.note_block.pling 0.16 1.24'
   - tick: 10
     opcodes:
-      - remove: 50
-      - sound: 'block.note_block.pling 0.29 1.35'
-  - tick: 12
+      - cmd: '[layer] 3 remove 36-44'
+      - sound: 'block.note_block.pling 0.18 1.32'
+  - tick: 11
     opcodes:
-      - remove: 52
-      - sound: 'block.note_block.pling 0.30 1.45'
-  - tick: 14
+      - cmd: '[layer] 3 set accent 45-53'
+      - sound: 'block.note_block.chime 0.22 1.25'
+  - tick: 13
     opcodes:
-      - remove: 53
-      - sound: 'block.amethyst_block.chime 0.32 1.45'
-  - tick: 16
-    opcodes:
-      - remove: 45
-      - remove: 47
-      - remove: 51
-      - sound: 'block.amethyst_block.chime 0.34 1.55'
+      - cmd: '[layer] 3 remove 45-53'
+      - sound: 'block.amethyst_block.chime 0.28 1.55'
