@@ -1,4 +1,131 @@
-include: [ './lots_items.yml' ]
+# Шаблоны лотов (lots_items.yml) вставлены прямо сюда: BMenu-препроцессор
+# ломается на многострочном include, поэтому файл самодостаточный.
+item_info_lore: &info
+  - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>${price}'
+  - '<#F8BEFB><b>┃</b> <white>Продавец: <#F8BEFB>{seller_name}'
+  - '<#F8BEFB><b>┃</b> <white>Истекает: <#F8BEFB>{expires}'
+
+vault_lot:
+  lore:
+    - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>${price}'
+    - '<#F8BEFB><b>┃</b> <white>Статус: <#F8BEFB>{lot_status}'
+    - '<#F8BEFB><b>┃</b> <white>Удаление: <#F8BEFB>{expires}'
+    - '<#F8BEFB><b>┃</b> '
+    - '<gray>● <white>Нажмите, чтобы забрать'
+  on_click:
+    - take_lot: ''
+
+sold:
+  name: '<gray>Товар не актуален'
+  material: gray_dye
+  lore:
+    - *info
+    - '<#F8BEFB><b>┃</b> '
+    - '<gray>● <white>F — найти аналоги'
+  on_swap_offhand_click:
+    - find_analogs: ''
+    - delay: '1 [research]'
+  all_flags: true
+  on_click:
+    - '<white>☁ <#F8BEFB>ᴇ<#F6BEFB>ʟ<#F3BEFB>ʏ<#F1BFFB>ᴛ<#EEBFFB>ʀ<#ECBFFB>ɪ<#E9BFFB>x <gray>» <red>Товар больше не актуален'
+    - sound: 'block.note_block.basedrum 0.35 1'
+
+purchased:
+  name: '<green>Товар куплен'
+  material: lime_dye
+  lore:
+    - *info
+    - '<#F8BEFB><b>┃</b> '
+    - '<gray>● <white>F — найти аналоги'
+  on_swap_offhand_click:
+    - find_analogs: ''
+    - delay: '1 [research]'
+  all_flags: true
+  on_click:
+    - '<white>☁ <#F8BEFB>ᴇ<#F6BEFB>ʟ<#F3BEFB>ʏ<#F1BFFB>ᴛ<#EEBFFB>ʀ<#ECBFFB>ɪ<#E9BFFB>x <gray>» <red>Вы уже купили этот товар'
+    - sound: 'block.note_block.basedrum 0.35 1'
+
+taken:
+  name: '<green>Товар забран'
+  material: lime_dye
+  lore:
+    - *info
+    - '<#F8BEFB><b>┃</b> '
+    - '<gray>● <white>F — найти аналоги'
+  on_swap_offhand_click:
+    - find_analogs: ''
+    - delay: '1 [research]'
+  all_flags: true
+  on_click:
+    - '<white>☁ <#F8BEFB>ᴇ<#F6BEFB>ʟ<#F3BEFB>ʏ<#F1BFFB>ᴛ<#EEBFFB>ʀ<#ECBFFB>ɪ<#E9BFFB>x <gray>» <red>Вы уже забрали этот товар'
+    - sound: 'block.note_block.basedrum 0.35 1'
+
+owned:
+  lore:
+    - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>${price}'
+    - '<#F8BEFB><b>┃</b> <white>Статус: <#F8BEFB>ваш лот'
+    - '<#F8BEFB><b>┃</b> '
+    - '<gray>● <white>Нажмите, чтобы забрать'
+  on_swap_offhand_click:
+    - find_analogs: ''
+    - delay: '1 [research]'
+  on_click:
+    - take_lot: ''
+
+one:
+  lore:
+    - *info
+    - '<#F8BEFB><b>┃</b> '
+    - '<gray>● <white>ЛКМ — купить'
+    - '<gray>● <white>Shift + ЛКМ — купить сразу'
+  on_swap_offhand_click:
+    - find_analogs: ''
+    - delay: '1 [research]'
+  on_left_click:
+    - open:
+        menu: 'bauc:confirm'
+        on_accept_command: '[buy_lot]'
+  on_shift_left_click:
+    - buy_lot: ''
+
+container:
+  lore:
+    - *info
+    - '<#F8BEFB><b>┃</b> '
+    - '<gray>● <white>ЛКМ — купить'
+    - '<gray>● <white>ПКМ — посмотреть содержимое'
+  on_swap_offhand_click:
+    - find_analogs: ''
+    - delay: '1 [research]'
+  on_left_click:
+    - open:
+        menu: 'bauc:confirm'
+        on_accept_command: '[buy_lot]'
+  on_shift_left_click:
+    - buy_lot: ''
+  on_right_click:
+    - open: 'bauc:container_view'
+
+many:
+  lore:
+    - *info
+    - '<#F8BEFB><b>┃</b> '
+    - '<gray>● <white>ЛКМ — купить'
+    - '<gray>● <white>ПКМ — выбрать количество'
+  on_swap_offhand_click:
+    - find_analogs: ''
+    - delay: '1 [research]'
+  on_left_click:
+    - open:
+        menu: 'bauc:confirm'
+        on_accept_command: '[buy_lot]'
+  on_shift_left_click:
+    - buy_lot: ''
+  on_right_click:
+    - open:
+        menu: 'bauc:select_count'
+        on_accept_command: '[buy_lot] {result_count}'
+
 id: bauc:home
 provider: bauc:home
 title: '<lang:bauctionv2.categories.{current_category_id}.title>{search_input}<off_title><gray>[<#F8BEFB>{current_page}<gray>/<#F8BEFB>{max_page}<gray>]'

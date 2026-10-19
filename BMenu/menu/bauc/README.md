@@ -118,42 +118,51 @@ git revert <commit>
 - Количество лотов: `slots: 10-16,19-25,28-34,37-43` (28). Больше — `slots: 9-44` (36) или `0-44` (45, тогда уберите `slot:` у `frame`/`accent`/`gap`).
 - Панели `frame`/`gap` (чёрные), `accent` (фиолетовая) — меняйте `material`.
 
-## Ошибка `include: ... sequence entries are not allowed here`
+## Про `include` — его больше нет
 
-Если в логе появилось:
-
-```
-[BMenu] Errors in plugins\BMenu\menu\bauc\home.yml
-в файле обнаружено include: я его прочитал но не получилось его проанализировать...
-то что я прочитал 'include:  - './lots_items.yml'id: bauc:homeprovider: bauc:hometitle: ...'
-Caused by: sequence entries are not allowed here
- in 'reader', line 1, column 11
-```
-
-это не порча файла. Так работает препроцессор BMenu 2.7 (`MenuFilePreprocessor`): увидев строку с `include:`, он ищет в ней `]` и, пока не найдёт, **склеивает следующие строки без переводов строки**. Если `]` нет в первой строке, в include попадает `id`, `provider`, `title` — и YAML падает.
-
-Поэтому `include` в BMenu пишется **в одну строку**:
-
-```yaml
-include: [ './lots_items.yml' ]
-id: bauc:home
-provider: bauc:home
-```
-
-Так тоже работает (скобка открывается на строке `include`):
-
-```yaml
-include: [
-  "./lots_items.yml"
-]
-```
-
-А так — **не работает**, хотя это обычный YAML:
+BMenu 2.7 читает меню через `MenuFilePreprocessor`, и тот работает с `include` очень грубо: увидев строку с `include:`, он ищет в ней `]` и, пока не найдёт, **склеивает следующие строки без переводов строки**. На обычном YAML
 
 ```yaml
 include:
   - './lots_items.yml'
 ```
+
+он проглатывает `id`, `provider`, `title` и падает с `sequence entries are not allowed here` на первой строке. Это не порча файла — это особенность препроцессора.
+
+Поэтому `home.yml` и `vault.yml` теперь **самодостаточные**: содержимое `lots_items.yml` вставлено в них напрямую, `include` не используется нигде. Файл `lots_items.yml` оставлен для справки — на загрузку он больше не влияет.
+
+Если понадобится вернуть `include`, единственный безопасный вид — закрывающая скобка на той же строке:
+
+```yaml
+include: [ './lots_items.yml' ]
+```
+
+## Провайдеры `bauc:*` не найдены
+
+Сообщение в логе:
+
+```
+[BMenu] Errors in plugins\BMenu\menu\bauc\home.yml
+unknown provider bauc:home
+```
+
+означает, что BMenu при разборе файла не нашёл кодек провайдера `bauc:home`. К самим файлам это отношения не имеет: `provider: bauc:home` — правильный.
+
+Как это устроено:
+
+- BAuctionV2 в своём `onLoad` делает `MenuBooter.boot(subLoader, lifecycle)` (регистрирует `bauc:home`, `bauc:vault`, `bauc:confirm`, `bauc:select_count`, `bauc:container_view`, `bauc:sell_gui`) и `BMenu.menuLoader().registerSubLoader(this, subLoader)`.
+- В `onDisable` — `unregisterSubLoader(this)`.
+- BMenu ищет провайдера в своём реестре и в зарегистрированных саблоадерах. Нет саблоадера → нет провайдера.
+
+Значит ошибка означает одно из двух: BAuctionV2 не дошла до регистрации, либо регистрация ушла в **другой экземпляр** `MenuLoader` (BMenu пережил перезагрузку/Plugman после того, как BAuctionV2 зарегистрировалась).
+
+Что делать по порядку:
+
+1. `/aha reload` — штатная перезагрузка BAuctionV2: она заново регистрирует саблоадер и **после этого** перечитывает все меню BMenu.
+2. Если не помогло — полный **stop → start**. Не `/reload`, не `/plugman reload`, не `/bmenu reload` в качестве «лечения».
+3. После старта в логе не должно быть `unknown provider`. Если есть — прислать фрагмент старта, где видны `Enabling BMenu` и `Enabling BAuctionV2` (порядок важен), и список jar'ов в `plugins`.
+
+Отдельно: `/bmenu reload` перечитывает меню, но **не** перерегистрирует провайдеры. Поэтому если BAuctionV2 перезагружали через Plugman, помогает только `/aha reload` или полный рестарт.
 
 ## Если `/ah` пишет `Menu not found: bauc:home`
 
