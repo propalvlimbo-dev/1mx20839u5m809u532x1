@@ -1,124 +1,136 @@
-include: [
-  "./lots_items.yml"
-]
+include:
+  - './lots_items.yml'
 id: bauc:vault
 provider: bauc:vault
-title: "<#F8BEFB>☃ Хранилище<off_title><b><gray>[<#F8BEFB>{current_page}<gray>/<#F8BEFB>{max_page}<gray>]"
+title: '<#F8BEFB>☁ <white>Хранилище<gray> [<#F8BEFB>{current_page}<gray>/<#F8BEFB>{max_page}<gray>]'
 
 slots: 0-44
-vault_type: 'vault_and_active' # vault_and_active, only_active, only_vault
-always_show_vault_lot: true # всегда показываем vault_lot из lots_items.yml (тогда шалкер не получится осмотреть)
+vault_type: 'vault_and_active'
+always_show_vault_lot: true
 
 items:
   back:
     slot: 46
-    name: "<#F8BEFB>[⟲] Вернуться"
-    material: tipped_arrow
+    material: red_dye
+    name: '<#F8BEFB>Назад'
+    lore:
+      - '<gray>● <white>Вернуться в аукцион'
     on_click:
       - sound: 'entity.enderman.teleport 0.35 1'
       - back_or_close: ''
+
   resell:
     slot: 52
-    name: "<#F8BEFB>[⟲] Перевыставить предметы"
-    lore:
-      - "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перевыставить"
-      - ""
-      - "<#FFFFFF>Автоматически выставит все"
-      - "<#FFFFFF>Ваши предметы заново в Аукцион"
-      - "<#FFFFFF>по тем же ценам"
     material: clock
+    name: '<#F8BEFB>Перевыставить'
+    lore:
+      - '<#F8BEFB><b>┃</b> <white>Все предметы из хранилища'
+      - '<#F8BEFB><b>┃</b> <white>встанут на аукцион заново'
+      - '<#F8BEFB><b>┃</b> <white>по тем же ценам'
+      - '<#F8BEFB><b>┃</b> '
+      - '<gray>● <white>Нажмите, чтобы перевыставить'
     on_click:
       - resell: ''
       - delay: 1 [research]
+
   research:
     slot: 49
-    name: "<#F8BEFB>[⟲] Обновить"
-    lore:
-      - "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы обновить"
-      - ""
-      - "<#FFFFFF>Эта кнопка позволяет"
-      - "<#FFFFFF>обновить список товаров"
     material: nether_star
+    name: '<#F8BEFB>Обновить'
+    lore:
+      - '<#F8BEFB><b>┃</b> <white>Обновляет список лотов'
+      - '<#F8BEFB><b>┃</b> '
+      - '<gray>● <white>Нажмите, чтобы обновить'
     on_click:
       - sound: 'entity.ender_eye.launch 0.35 1'
       - '[research]'
+
   rent:
     slot: 53
-    name: "<#F8BEFB>[☃] Аренда слотов"
-    lore:
-      - "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
-      - ""
-      - "<#FFFFFF>Здесь можно арендовать,"
-      - "<#FFFFFF>дополнительные слоты"
-    all_flags: true
     material: crafting_table
+    name: '<#F8BEFB>Аренда слотов'
+    lore:
+      - '<#F8BEFB><b>┃</b> <white>Больше лотов на аукционе'
+      - '<#F8BEFB><b>┃</b> '
+      - '<gray>● <white>Нажмите, чтобы открыть'
+    all_flags: true
     on_click:
-      - '[sound] ui.button.click 0.35 1'
+      - sound: 'ui.button.click 0.35 1'
       - open: 'auc_rent:home'
 
-  # фулл скрыть next_page если нет некст страницы не получится из-за особеностей вычисления {has_next_page}
   next_page:
     slot: 50
-    material: spectral_arrow
+    material: black_dye
     oneOf:
       - on_view: '{has_next_page} == true'
-        name: "<#F8BEFB>[»] Следующая страница"
-      - name: "<gray>[»] Следующая страница"
+        name: '<#F8BEFB>Вперёд'
+        lore:
+          - '<gray>● <white>Следующая страница'
+      - name: '<gray>Вперёд'
+        lore:
+          - '<dark_gray>● Последняя страница'
     on_click:
       - sound: 'entity.ender_eye.launch 0.35 1'
       - next_page: ''
 
   previous_page:
     slot: 48
-    material: spectral_arrow
+    material: black_dye
     oneOf:
       - on_view: '{current_page} != 1'
-        name: "<#F8BEFB>[«] Предыдущая страница"
-      - name: "<gray>[«] Предыдущая страница"
+        name: '<#F8BEFB>Назад'
+        lore:
+          - '<gray>● <white>Предыдущая страница'
+      - name: '<gray>Назад'
+        lore:
+          - '<dark_gray>● Первая страница'
     on_click:
       - sound: 'entity.ender_eye.launch 0.35 1'
       - previous_page: ''
 
-  # ── панели для анимации (без slot: ставятся только кадрами animation) ──
   frame:
-    name: ""
+    name: ''
     material: black_stained_glass_pane
   accent:
-    name: ""
+    name: ''
     material: purple_stained_glass_pane
 
 animation:
   - tick: 0
     opcodes:
       - set: frame 45-53
-      - sound: 'block.enchantment_table.use 0.3 1.5'
+      - sound: 'block.enchantment_table.use 0.30 1.30'
   - tick: 2
     opcodes:
-      - set: accent 45
       - set: accent 47
-      - set: accent 51
       - sound: 'block.note_block.chime 0.22 0.95'
   - tick: 4
     opcodes:
       - remove: 46
-      - sound: 'block.note_block.pling 0.28 1.05'
+      - sound: 'block.note_block.pling 0.26 1.05'
   - tick: 6
     opcodes:
       - remove: 49
-      - sound: 'block.note_block.pling 0.29 1.15'
+      - sound: 'block.note_block.pling 0.27 1.15'
   - tick: 8
     opcodes:
       - remove: 48
-      - sound: 'block.note_block.pling 0.30 1.25'
+      - sound: 'block.note_block.pling 0.28 1.25'
   - tick: 10
     opcodes:
       - remove: 50
-      - sound: 'block.note_block.pling 0.31 1.35'
+      - sound: 'block.note_block.pling 0.29 1.35'
   - tick: 12
     opcodes:
       - remove: 52
-      - sound: 'block.note_block.pling 0.32 1.45'
+      - sound: 'block.note_block.pling 0.30 1.45'
   - tick: 14
     opcodes:
       - remove: 53
-      - sound: 'block.amethyst_block.chime 0.42 1.40'
+      - sound: 'block.amethyst_block.chime 0.32 1.45'
+  - tick: 16
+    opcodes:
+      - remove: 45
+      - remove: 47
+      - remove: 51
+      - sound: 'block.amethyst_block.chime 0.34 1.55'

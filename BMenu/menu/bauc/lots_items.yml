@@ -1,148 +1,125 @@
-# если свой предмет
-#любой клик - забрать
-#
-#если чужой
-#лкм - купить
-#шифт лкм - купить фастом
-#
-#если шалкер или мешочек
-#пкм - осмотреть содержимое
-#
-#если больше 1 (шалкер и мешочек максимум 1)
-#пкм купить количество
-#
-# любой предмет f - найти аналоги
-
 item_info_lore: &info
-  - "<st><#F8BEFB>                         "
-  - "<#A8FFC0>$<#FFFFFF> Ценa:<#A8FFC0> $${price}"
-  - "<#F8BEFB>⭐<#FFFFFF> Продавец:<#F8BEFB> {seller_name}"
-  - "<#FF9AD5>⟲<#FFFFFF> Истeкaeт:<#FF9AD5> {expires}"
-  - "<st><#F8BEFB>                         "
+  - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>${price}'
+  - '<#F8BEFB><b>┃</b> <white>Продавец: <#F8BEFB>{seller_name}'
+  - '<#F8BEFB><b>┃</b> <white>Истекает: <#F8BEFB>{expires}'
 
 vault_lot:
   lore:
-    - '<#F8BEFB> ➥ Нажмите<#FFFFFF>, чтобы <#F8BEFB>забрать'
-    - "<st><#F8BEFB>                         "
-    - '&r '
-    - '<#A8FFC0>$<#FFFFFF> Цена:<#A8FFC0> $${price}'
-    - "<#F8BEFB>●<#FFFFFF> Статус: {lot_status}"
-    - '<#FF9AD5>⟲<#FFFFFF> Удаление: <#FF9AD5>{expires}'
-    - "<st><#F8BEFB>                         "
-    - '&r '
-  on_click: # забрать предмет
+    - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>${price}'
+    - '<#F8BEFB><b>┃</b> <white>Статус: <#F8BEFB>{lot_status}'
+    - '<#F8BEFB><b>┃</b> <white>Удаление: <#F8BEFB>{expires}'
+    - '<#F8BEFB><b>┃</b> '
+    - '<gray>● <white>Нажмите, чтобы забрать'
+  on_click:
     - take_lot: ''
 
 sold:
-  name: "<#F8BEFB>Товар не актуален"
+  name: '<gray>Товар не актуален'
   material: gray_dye
   lore:
-    - ""
     - *info
-    - '<gray>f чтобы найти аналоги'
+    - '<#F8BEFB><b>┃</b> '
+    - '<gray>● <white>F — найти аналоги'
   on_swap_offhand_click:
     - find_analogs: ''
-    - delay: '1 [research]' # у майна какие-то баги из-за чего предмет по которому кликнули через f остаётся...
+    - delay: '1 [research]'
   all_flags: true
   on_click:
-    - '<#F8BEFB>[✘] Ошибка!<#FFFFFF> Этот товар не актуален!'
+    - '<white>☁ <#F8BEFB>ᴇ<#F6BEFB>ʟ<#F3BEFB>ʏ<#F1BFFB>ᴛ<#EEBFFB>ʀ<#ECBFFB>ɪ<#E9BFFB>x <gray>» <red>Товар больше не актуален'
     - sound: 'block.note_block.basedrum 0.35 1'
 
 purchased:
-  name: "<#A8FFC0>Товар куплен!"
+  name: '<green>Товар куплен'
   material: lime_dye
   lore:
-    - ""
     - *info
-    - '<gray>f чтобы найти аналоги'
+    - '<#F8BEFB><b>┃</b> '
+    - '<gray>● <white>F — найти аналоги'
   on_swap_offhand_click:
     - find_analogs: ''
     - delay: '1 [research]'
   all_flags: true
   on_click:
-    - '<#F8BEFB>[✘] Ошибка!<#FFFFFF> Вы уже купили этот товар!'
+    - '<white>☁ <#F8BEFB>ᴇ<#F6BEFB>ʟ<#F3BEFB>ʏ<#F1BFFB>ᴛ<#EEBFFB>ʀ<#ECBFFB>ɪ<#E9BFFB>x <gray>» <red>Вы уже купили этот товар'
     - sound: 'block.note_block.basedrum 0.35 1'
 
 taken:
-  name: "<#A8FFC0>Товар убран!"
+  name: '<green>Товар забран'
   material: lime_dye
   lore:
-    - ""
     - *info
-    - '<gray>f чтобы найти аналоги'
+    - '<#F8BEFB><b>┃</b> '
+    - '<gray>● <white>F — найти аналоги'
   on_swap_offhand_click:
     - find_analogs: ''
     - delay: '1 [research]'
   all_flags: true
   on_click:
-    - '<#F8BEFB>[✘] Ошибка!<#FFFFFF> Вы уже забрали этот товар!'
+    - '<white>☁ <#F8BEFB>ᴇ<#F6BEFB>ʟ<#F3BEFB>ʏ<#F1BFFB>ᴛ<#EEBFFB>ʀ<#ECBFFB>ɪ<#E9BFFB>x <gray>» <red>Вы уже забрали этот товар'
     - sound: 'block.note_block.basedrum 0.35 1'
 
-# Когда игрок owner предмета
 owned:
   lore:
-    - '<#F8BEFB> ➥ Нажмите<#FFFFFF>, чтобы <#F8BEFB>забрать'
-    - *info
-    - '<gray>f чтобы найти аналоги'
+    - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>${price}'
+    - '<#F8BEFB><b>┃</b> <white>Статус: <#F8BEFB>ваш лот'
+    - '<#F8BEFB><b>┃</b> '
+    - '<gray>● <white>Нажмите, чтобы забрать'
   on_swap_offhand_click:
     - find_analogs: ''
     - delay: '1 [research]'
-  on_click: # забрать предмет
+  on_click:
     - take_lot: ''
 
 one:
   lore:
-    - '<#F8BEFB> ➥ Нажмите<#FFFFFF>, чтобы <#A8FFC0>купить'
     - *info
-    - '<gray>f чтобы найти аналоги'
+    - '<#F8BEFB><b>┃</b> '
+    - '<gray>● <white>ЛКМ — купить'
+    - '<gray>● <white>Shift + ЛКМ — купить сразу'
   on_swap_offhand_click:
     - find_analogs: ''
     - delay: '1 [research]'
-  on_left_click: # купить +конфирм
+  on_left_click:
     - open:
         menu: 'bauc:confirm'
         on_accept_command: '[buy_lot]'
-  on_shift_left_click: # купить -конфирм
+  on_shift_left_click:
     - buy_lot: ''
 
 container:
   lore:
-    - '<#F8BEFB> ➥ Нажмите<#FFFFFF>, чтобы <#A8FFC0>купить'
     - *info
-    - '&r '
-    - '<#F8BEFB>↪ <white>Нажмите <#F8BEFB>Пкм'
-    - ' <white>чтобы осмотреть содержимое.'
-    - '<gray>f чтобы найти аналоги'
+    - '<#F8BEFB><b>┃</b> '
+    - '<gray>● <white>ЛКМ — купить'
+    - '<gray>● <white>ПКМ — посмотреть содержимое'
   on_swap_offhand_click:
     - find_analogs: ''
     - delay: '1 [research]'
-  on_left_click: # купить +конфирм
+  on_left_click:
     - open:
         menu: 'bauc:confirm'
         on_accept_command: '[buy_lot]'
-  on_shift_left_click: # купить -конфирм
+  on_shift_left_click:
     - buy_lot: ''
-  on_right_click: # открыть шалкер
+  on_right_click:
     - open: 'bauc:container_view'
 
 many:
   lore:
-    - '<#F8BEFB> ➥ Нажмите<#FFFFFF>, чтобы <#A8FFC0>купить'
     - *info
-    - '&r '
-    - '<#F8BEFB>↪ <white>Нажмите <#F8BEFB>Пкм'
-    - ' <white>чтобы купить количество'
-    - '<gray>f чтобы найти аналоги'
+    - '<#F8BEFB><b>┃</b> '
+    - '<gray>● <white>ЛКМ — купить'
+    - '<gray>● <white>ПКМ — выбрать количество'
   on_swap_offhand_click:
     - find_analogs: ''
     - delay: '1 [research]'
-  on_left_click: # купить +конфирм
+  on_left_click:
     - open:
         menu: 'bauc:confirm'
         on_accept_command: '[buy_lot]'
-  on_shift_left_click: # купить -конфирм
+  on_shift_left_click:
     - buy_lot: ''
-  on_right_click: # купить количество
+  on_right_click:
     - open:
         menu: 'bauc:select_count'
         on_accept_command: '[buy_lot] {result_count}'

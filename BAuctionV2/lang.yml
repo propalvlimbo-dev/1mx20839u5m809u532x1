@@ -10,65 +10,65 @@ ru_RU:
   time.format.minutes: '{} мин.'
   time.format.minutes.seconds: '{} мин. {} сек.'
   time.format.seconds: '{} сек.'
-  visual.inv_is_full: 'Ваш инвентарь полон!'
-  visual.not_owner_lot: 'Вы не владелец этого товара'
-  visual.added_to_vault: 'Предмет перемещен в хранилище!'
-  visual.insufficient_balance: 'У Вас не достаточно монет!'
 
-  categories.any.title: '<#FF0000>☃ <#FF6600>Аукцион'
+  visual.inv_is_full: 'Инвентарь полон'
+  visual.not_owner_lot: 'Вы не владелец товара'
+  visual.added_to_vault: 'Предметы в хранилище'
+  visual.insufficient_balance: 'Недостаточно коинов'
+
+  categories.any.title: '<#F8BEFB>☁ <white>Аукцион'
   categories.any.name: 'Все товары'
 
-  categories.blocks.title: '<#FF0000>☃ <#FF6600>Категория: <#FF0000>Блоки'
+  categories.blocks.title: '<#F8BEFB>☁ <white>Блоки'
   categories.blocks.name: 'Блоки'
 
-  categories.tools.title: '<#FF0000>☃ <#FF6600>Категория: <#FF0000>Инструменты'
+  categories.tools.title: '<#F8BEFB>☁ <white>Инструменты'
   categories.tools.name: 'Инструменты'
 
-  categories.weapons.title: '<#FF0000>☃ <#FF6600>Категория: <#FF0000>Оружие'
+  categories.weapons.title: '<#F8BEFB>☁ <white>Оружие'
   categories.weapons.name: 'Оружие'
 
-  categories.armor.title: '<#FF0000>☃ <#FF6600>Категория: <#FF0000>Снаряжение'
+  categories.armor.title: '<#F8BEFB>☁ <white>Снаряжение'
   categories.armor.name: 'Снаряжение'
 
-  categories.resources.title: '<#FF0000>☃ <#FF6600>Категория: <#FF0000>Ценные ресурсы'
+  categories.resources.title: '<#F8BEFB>☁ <white>Ценные ресурсы'
   categories.resources.name: 'Ценные ресурсы'
 
-  categories.other_resources.title: '<#FF0000>☃ <#FF6600>Категория: <#FF0000>Прочие ресурсы'
+  categories.other_resources.title: '<#F8BEFB>☁ <white>Прочие ресурсы'
   categories.other_resources.name: 'Прочие ресурсы'
 
-  categories.edible.title: '<#FF0000>☃ <#FF6600>Категория: <#FF0000>Еда'
+  categories.edible.title: '<#F8BEFB>☁ <white>Еда'
   categories.edible.name: 'Еда'
 
-  categories.potions.title: '<#FF0000>☃ <#FF6600>Категория: <#FF0000>Зелья'
+  categories.potions.title: '<#F8BEFB>☁ <white>Зелья'
   categories.potions.name: 'Зелья'
 
-  categories.books.title: '<#FF0000>☃ <#FF6600>Категория: <#FF0000>Книги'
+  categories.books.title: '<#F8BEFB>☁ <white>Книги'
   categories.books.name: 'Книги'
 
-  categories.spawners_and_eggs.title: '<#FF0000>☃ <#FF6600>Категория: <#FF0000>Яйца и Спавнеры'
-  categories.spawners_and_eggs.name: 'Яйца и Спавнеры'
+  categories.spawners_and_eggs.title: '<#F8BEFB>☁ <white>Яйца и спавнеры'
+  categories.spawners_and_eggs.name: 'Яйца и спавнеры'
 
-  categories.talismans.title: '<#FF0000>☃ <#FF6600>Категория: <#FF0000>Талисманы'
+  categories.talismans.title: '<#F8BEFB>☁ <white>Талисманы'
   categories.talismans.name: 'Талисманы'
 
-  categories.donat_items.title: '<#FF0000>☃ <#FF6600>Категория: <#FF0000>Настоящие вещи'
+  categories.donat_items.title: '<#F8BEFB>☁ <white>Настоящие вещи'
   categories.donat_items.name: 'Настоящие вещи'
 
-  categories.brewing.title: '<#FF0000>☃ <#FF6600>Категория: <#FF0000>Зельеварение'
+  categories.brewing.title: '<#F8BEFB>☁ <white>Зельеварение'
   categories.brewing.name: 'Зельеварение'
 
-  categories.grief.title: '<#FF0000>☃ <#FF6600>Категория: <#FF0000>Для Грифа'
-  categories.grief.name: 'Для Грифа'
+  categories.grief.title: '<#F8BEFB>☁ <white>Для грифа'
+  categories.grief.name: 'Для грифа'
 
-  categories.search.title: '<#FF0000>☃ <#FF6600>Поиск:<#FF0000> '
+  categories.search.title: '<#F8BEFB>☁ <white>Поиск: '
   categories.search.name: 'Поиск'
 
   sorting.newest.name: 'Сначала новые'
   sorting.oldest.name: 'Сначала старые'
-  sorting.cheaper.name: 'Сначала дешевые'
+  sorting.cheaper.name: 'Сначала дешёвые'
   sorting.expensive.name: 'Сначала дорогие'
 
-  lot.status.lot: '<#FFFF00>[Продается]'
-  lot.status.vault: '<#FF6600>[На складе]'
+  lot.status.lot: '<#F8BEFB>В продаже'
+  lot.status.vault: '<gray>В хранилище'
   ah.search.analogs: 'Аналогов'
-

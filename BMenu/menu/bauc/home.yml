@@ -1,65 +1,64 @@
-include: [
-  "./lots_items.yml"
-]
+include:
+  - './lots_items.yml'
 id: bauc:home
 provider: bauc:home
-title: "<lang:bauctionv2.categories.{current_category_id}.title>{search_input}<off_title><b><gray>[<#F8BEFB>{current_page}<gray>/<#F8BEFB>{max_page}<gray>]"
+title: '<lang:bauctionv2.categories.{current_category_id}.title>{search_input}<off_title><gray>[<#F8BEFB>{current_page}<gray>/<#F8BEFB>{max_page}<gray>]'
 
 slots: 10-16,19-25,28-34,37-43
 
 category_line:
-  if_selected: '<white><#F8BEFB>✔ <lang:bauctionv2.categories.{id}.name>'
-  else: '<white><#F8BEFB>●<white> <lang:bauctionv2.categories.{id}.name>'
+  if_selected: '<#F8BEFB>● <white><lang:bauctionv2.categories.{id}.name>'
+  else: '<gray>● <white><lang:bauctionv2.categories.{id}.name>'
 sorting_line:
-  if_selected: '<white><#F8BEFB>✔ <lang:bauctionv2.sorting.{id}.name>'
-  else: '<white><#F8BEFB>●<white> <lang:bauctionv2.sorting.{id}.name>'
+  if_selected: '<#F8BEFB>● <white><lang:bauctionv2.sorting.{id}.name>'
+  else: '<gray>● <white><lang:bauctionv2.sorting.{id}.name>'
 
 items:
   vault:
     slot: 46
     material: ender_chest
-    name: "<#F8BEFB>[☃] Хранилище"
+    name: '<#F8BEFB>Хранилище'
     lore:
-      - "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
-      - ""
-      - "<#FFFFFF>Здесь хранятся товары,"
-      - "<#FFFFFF>которые Вы продаете, или"
-      - "<#FFFFFF>ваши купленные предметы"
+      - '<#F8BEFB><b>┃</b> <white>Товары, которые вы продаёте'
+      - '<#F8BEFB><b>┃</b> <white>и купленные лоты'
+      - '<#F8BEFB><b>┃</b> '
+      - '<gray>● <white>Нажмите, чтобы открыть'
     on_click:
       - sound: 'ui.button.click 0.35 1'
       - open: 'bauc:vault'
+
   research:
     slot: 49
-    name: "<#F8BEFB>[⟲] Обновить"
-    lore:
-      - "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы обновить"
-      - ""
-      - "<#FFFFFF>Эта кнопка позволяет"
-      - "<#FFFFFF>обновить список товаров"
     material: nether_star
+    name: '<#F8BEFB>Обновить'
+    lore:
+      - '<#F8BEFB><b>┃</b> <white>Обновляет список лотов'
+      - '<#F8BEFB><b>┃</b> '
+      - '<gray>● <white>Нажмите, чтобы обновить'
     on_click:
       - sound: 'entity.ender_eye.launch 0.35 1'
       - '[research]'
+
   categories:
     slot: 52
-    name: "<#F8BEFB>[❖] Категории"
-    lore:
-      - "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
-      - ""
-      - "<#FFFFFF>В этом меню можно"
-      - "<#FFFFFF>удобно отсортировать"
-      - "<#FFFFFF>товары по категориям"
     material: chest
+    name: '<#F8BEFB>Категории'
+    lore:
+      - '<#F8BEFB><b>┃</b> <white>Все разделы аукциона'
+      - '<#F8BEFB><b>┃</b> '
+      - '<gray>● <white>Нажмите, чтобы выбрать'
     on_click:
       - sound: 'ui.button.click 0.35 1'
       - open: 'bauc:select_category'
 
   categories_HW:
     slot: 51
-    name: "<#F8BEFB>[❖] Категории"
+    material: chest_minecart
+    name: '<#F8BEFB>Категории'
     lore:
       - '{all_categories}'
-    material: chest_minecart
+      - '<#F8BEFB><b>┃</b> '
+      - '<gray>● <white>ЛКМ / ПКМ — листать'
     on_left_click:
       - sound: 'ui.button.click 0.35 1'
       - next_category: ''
@@ -69,10 +68,12 @@ items:
 
   sorting_HW:
     slot: 45
-    name: "<#D9B8FF> Сортировка"
+    material: hopper
+    name: '<#F8BEFB>Сортировка'
     lore:
       - '{all_sorting}'
-    material: hopper
+      - '<#F8BEFB><b>┃</b> '
+      - '<gray>● <white>ЛКМ / ПКМ — листать'
     on_left_click:
       - sound: 'ui.button.click 0.35 1'
       - next_sorting: ''
@@ -82,60 +83,61 @@ items:
 
   rent:
     slot: 53
-    name: "<#F8BEFB>[☃] Аренда слотов"
-    lore:
-      - "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
-      - ""
-      - "<#FFFFFF>Здесь можно арендовать,"
-      - "<#FFFFFF>дополнительные слоты"
-    all_flags: true
     material: crafting_table
+    name: '<#F8BEFB>Аренда слотов'
+    lore:
+      - '<#F8BEFB><b>┃</b> <white>Больше лотов на аукционе'
+      - '<#F8BEFB><b>┃</b> '
+      - '<gray>● <white>Нажмите, чтобы открыть'
+    all_flags: true
     on_click:
-      - '[sound] ui.button.click 0.35 1'
+      - sound: 'ui.button.click 0.35 1'
       - open: 'auc_rent:home'
 
-  # фулл скрыть next_page если нет некст страницы не получится из-за особеностей вычисления {has_next_page}
   next_page:
     slot: 50
-    material: spectral_arrow
+    material: black_dye
     oneOf:
       - on_view: '{has_next_page} == true'
-        name: "<#F8BEFB>[»] Следующая страница"
-      - name: "<gray>[»] Следующая страница"
+        name: '<#F8BEFB>Вперёд'
+        lore:
+          - '<gray>● <white>Следующая страница'
+      - name: '<gray>Вперёд'
+        lore:
+          - '<dark_gray>● Последняя страница'
     on_click:
       - sound: 'entity.ender_eye.launch 0.35 1'
       - next_page: ''
 
   previous_page:
     slot: 48
-    material: spectral_arrow
+    material: black_dye
     oneOf:
       - on_view: '{current_page} != 1'
-        name: "<#F8BEFB>[«] Предыдущая страница"
-      - name: "<gray>[«] Предыдущая страница"
+        name: '<#F8BEFB>Назад'
+        lore:
+          - '<gray>● <white>Предыдущая страница'
+      - name: '<gray>Назад'
+        lore:
+          - '<dark_gray>● Первая страница'
     on_click:
       - sound: 'entity.ender_eye.launch 0.35 1'
       - previous_page: ''
 
-  # ── рамка вокруг сетки лотов (0,8,36,44 — акцентные углы) ──
   frame:
     slot: 1-7,9,17,18,26,27,35
-    name: ""
-    material: black_stained_glass_pane
-  gap:
-    slot: 47
-    name: ""
+    name: ''
     material: black_stained_glass_pane
   accent:
     slot: 0,8,36,44
-    name: ""
+    name: ''
     material: purple_stained_glass_pane
+  gap:
+    slot: 47
+    name: ''
+    material: black_stained_glass_pane
 
 animation:
-  # Диагональная волна. Кадр 0 накрывает всю сетку лотов и панель кнопок чёрной
-  # «шторкой», дальше диагонали проявляются из левого верхнего угла, а впереди
-  # идёт фиолетовая полоса-«комета» (живёт 2 тика, поэтому видна глазом).
-  # Финал — вспышка панели кнопок 45–53.
   - tick: 0
     opcodes:
       - set: frame 10,11,12,13,14,15,16,19,20,21,22,23,24,25,28,29,30,31,32,33,34,37,38,39,40,41,42,43,45-53

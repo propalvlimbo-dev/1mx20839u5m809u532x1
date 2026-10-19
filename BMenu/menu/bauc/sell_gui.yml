@@ -2,37 +2,38 @@ id: bauc:sell_gui
 provider: bauc:sell_gui
 type: chest
 size: 54
-title: "<#F8BEFB>☃ <b><#F8BEFB>Продажа: $${price}"
+title: '<#F8BEFB>☁ <white>Продажа <gray>· <#F8BEFB>${price}'
+
 blocked:
-  name: "<#F8BEFB>Слот недоступен"
-  lore: "<#F8BEFB>➥ /ah rent<#FFFFFF> - аренда слотов"
+  name: '<#F8BEFB>Слот недоступен'
+  lore:
+    - '<gray>● <white>/ah rent — аренда слотов'
   all_flags: true
   material: gray_dye
+
 items:
   _d_:
     slot: 5
-    name: "<#A8FFC0>Подтвердить"
+    name: '<green>Подтвердить'
     lore:
-      - "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы подтвердить"
-      - ""
-      - "<#FFFFFF>Выставит все предметы"
-      - "<#FFFFFF>из меню на Аукцион"
+      - '<gray>● <white>Выставить все предметы'
     all_flags: true
     material: lime_dye
     on_click:
+      - sound: 'entity.item.pickup 0.35 1'
       - do_sell: ''
   _c_:
     slot: 3
-    name: "<#F8BEFB>Отменить"
+    name: '<red>Отменить'
     lore:
-      - "<#FFFFFF>Отказаться от продажи"
-      - "<#FFFFFF>и закрыть меню"
+      - '<gray>● <white>Закрыть меню'
     all_flags: true
-    material: tipped_arrow
+    material: red_dye
     on_click:
+      - sound: 'ui.button.click 0.35 1'
       - close: ''
   _a_:
-    slot: 0-8
-    name: ""
+    slot: 0-2,4,6-8
+    name: ''
     all_flags: true
     material: black_stained_glass_pane

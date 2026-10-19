@@ -2,25 +2,27 @@ id: auc_rent:confirm
 provider: default
 type: chest
 size: 45
-title: "<b><#7CFFA8>＄<#6E6E6E> Подтверждение покупки"
+title: '<#F8BEFB>☁ <white>Подтверждение'
+
 args:
   slot_count: 1
   hours_count: 1
   lore: 'todo'
   perm: 'auc.boost.rent1'
   balance_perm: 'vault_eco_balance'
-  #take_balance_command: 'eco take _By1337_ {price}'
   price: 999
   ttl: '0'
   is_pp: false
+
 menu-events:
   on_open: &open
     - set_param: ttl %bauctionv2_lp_ttl_{perm}%
   on_reopen: *open
+
 items:
   b:
     slot: 22
-    name: "<#F8BEFB>[☃]<#FFFFFF> Аренда:<#F8BEFB> {slot_count} слот<#8C8C8C>/<#F8BEFB>{hours_count} час"
+    name: '<#F8BEFB>Аренда <white>+{slot_count} <gray>· <white>{hours_count} час'
     amount: '{slot_count}'
     lore: '{lore}'
     material: golden_carrot
@@ -29,7 +31,7 @@ items:
     on_click: &do_click
       - if: '%{balance_perm}% >= {price}'
         do:
-          - '<#A8FFC0>[✔] Успешная покупка!'
+          - '<white>☁ <#F8BEFB>ᴇ<#F6BEFB>ʟ<#F3BEFB>ʏ<#F1BFFB>ᴛ<#EEBFFB>ʀ<#ECBFFB>ɪ<#E9BFFB>x <gray>» <green>Аренда оформлена'
           - sound: entity.item.pickup 0.35 1
           - console: '{take_balance_command}'
           - console: 'lp user %player_name% permission unsettemp {perm}'
@@ -38,31 +40,33 @@ items:
         else:
           if: '{is_pp}'
           do:
-            - |
-              <#FF9AA2>[✘] Ошибка!<white> У Вас не хватает <#A8FFC0>Токенов<white>!
-              <white> Не беда, их можно купить на <#F8BEFB>ElytriX
-            - sound: entity.villager.no 1 0.7
-            - sound: ui.button.click 0.35 1
+            - |-
+              <white>☁ <#F8BEFB>ᴇ<#F6BEFB>ʟ<#F3BEFB>ʏ<#F1BFFB>ᴛ<#EEBFFB>ʀ<#ECBFFB>ɪ<#E9BFFB>x <gray>» <red>Недостаточно коинов
+              <gray>● <white>Пополнить можно на <#F8BEFB>elytrix.pw
+            - sound: entity.villager.no 0.35 1
           else:
-            - '[✘] Ошибка!<#FFFFFF> Недостаточно средств:<#F8BEFB> Монеты<#FFFFFF>!'
-            - sound: entity.creeper.hurt 0.35 1
-            - sound: ui.button.click 0.35 1
+            - '<white>☁ <#F8BEFB>ᴇ<#F6BEFB>ʟ<#F3BEFB>ʏ<#F1BFFB>ᴛ<#EEBFFB>ʀ<#ECBFFB>ɪ<#E9BFFB>x <gray>» <red>Недостаточно монет'
+            - sound: entity.villager.no 0.35 1
+
   a:
-    slot: 2,10,11,12,18,19,20,21,28,29,30,38
-    #name: "[Купить]"
-    name: "<#A8FFC0>[Купить]"
-    material: lime_stained_glass_pane
+    slot: 20
+    name: '<green>Купить'
+    lore:
+      - '<gray>● <white>Подтвердить аренду'
+    material: lime_dye
     on_click: *do_click
 
   c:
-    slot: 6,14,15,16,23,24,25,26,32,33,34,42
-    name: "<#F8BEFB>[Отменить]"
-    material: red_stained_glass_pane
+    slot: 24
+    name: '<red>Отмена'
+    lore:
+      - '<gray>● <white>Вернуться назад'
+    material: red_dye
     on_click:
+      - sound: 'ui.button.click 0.35 1'
       - back: ''
-  d:
-    slot: 0,1,3,4,5,7,8,9,13,17,27,31,35,36,37,39,40,41,43,44
-    #name: "ElytriX"
-    name: "<gradient:#3A2F45:#8A6FA0>Elyt</gradient><#8A6FA0>r<gradient:#8A6FA0:#3A2F45>iX</gradient>"
-    material: black_stained_glass_pane
 
+  d:
+    slot: 0-19,21,23,25-44
+    name: ''
+    material: black_stained_glass_pane

@@ -1,16 +1,12 @@
-# Здесь можно удалить не нужные сортировки или поменять порядок
 sorting:
   - newest
   - cheaper
   - oldest
   - expensive
 
-# Максимальные цены предметов
 prices:
   enabled: true
-  # максимальная цена без разницы сколько штук
   max: 10kk
-  # максимальная цена поштучно, если здесь нет то будет просто max
   by_tag:
     'dirt': 100
     'bettertalismans*': 100kk
@@ -21,31 +17,23 @@ post_join_use_delay:
   delay: 10s
 
 commands:
-  # какое меню открывать по /ah
   ah_menu: 'bauc:home'
-  # выключите не нужные команды
   disabled_commands: [ ]
-    #- sell
-  #- search
-  # ренейм команд
   commands_renamer:
     ah: ah
     sell: sell
     search: search
 
-ah_search_max_price_perm: 'bauc.search.knyaz' # с какой привилегии будет доступен 'ah search Предмет <макс цена>'
+ah_search_max_price_perm: 'bauc.search.knyaz'
 resell_cooldown: '1m'
 selling_duration: '1d'
 
 slots:
-  # по пермишену выбираем максимальное количество лотов
-  # если у игрока есть bauc.default и bauc.vip то слотов у него будет 5 так как bauc.vip даёт 5 слотов против 3 у bauc.default
   select_max:
     - 3 bauc.default
     - 5 bauc.vip
     - 7 bauc.donate
-    - 10 auc.boost.squid # в меню /ah rent также по пермишену auc.boost.squid проверяется что игрок может купить буст для сквида
-  # добавляемые слоты, у игрока будет (select_max) + все слоты на которые есть пермишен
+    - 10 auc.boost.squid
   add_slots:
     - 1 bauc.add1
     - 2 bauc.add2
@@ -64,18 +52,17 @@ $barrier: &auto_removal
 visual:
   inv_is_full:
     <<: *auto_removal
-    name: '&c<lang:bauctionv2.visual.inv_is_full>'
+    name: '<red><lang:bauctionv2.visual.inv_is_full>'
   not_owner_lot:
     <<: *auto_removal
-    name: '&c<lang:bauctionv2.visual.not_owner_lot>'
+    name: '<red><lang:bauctionv2.visual.not_owner_lot>'
   added_to_vault:
     <<: *auto_removal
     material: yellow_dye
-    name: '&e<lang:bauctionv2.visual.added_to_vault>'
+    name: '<#F8BEFB><lang:bauctionv2.visual.added_to_vault>'
   insufficient_balance:
     <<: *auto_removal
-    material: red_dye
-    name: '&c<lang:bauctionv2.visual.insufficient_balance>'
+    name: '<red><lang:bauctionv2.visual.insufficient_balance>'
 
 web:
   static: 'baucv2'

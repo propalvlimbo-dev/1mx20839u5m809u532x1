@@ -2,199 +2,218 @@ id: bauc:select_category
 provider: default
 type: chest
 size: 45
-title: "<#F8BEFB>☃<b><#F8BEFB> Выбор категории"
+title: '<#F8BEFB>☁ <white>Категории'
+
 items:
-  _o_:
-    slot: 15
-    damage: 0
-    #name: "[❖] Снаряжение"
-    name: "<#F8BEFB>[❖] Снаряжение"
-    lore: "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
+  _j_:
+    slot: 11
+    name: '<#F8BEFB>Все товары'
+    lore:
+      - '<gray>● <white>Перейти в категорию'
     all_flags: true
-    material: netherite_chestplate
+    material: hopper_minecart
     on_click:
+      - sound: 'ui.button.click 0.35 1'
       - open:
           menu: 'bauc:home'
-          category: 'armor'
+          category: 'any'
+  _i_:
+    slot: 12
+    name: '<#F8BEFB>Блоки'
+    lore:
+      - '<gray>● <white>Перейти в категорию'
+    all_flags: true
+    material: coarse_dirt
+    on_click:
+      - sound: 'ui.button.click 0.35 1'
+      - open:
+          menu: 'bauc:home'
+          category: 'blocks'
+  _h_:
+    slot: 13
+    name: '<#F8BEFB>Инструменты'
+    lore:
+      - '<gray>● <white>Перейти в категорию'
+    all_flags: true
+    material: netherite_pickaxe
+    on_click:
+      - sound: 'ui.button.click 0.35 1'
+      - open:
+          menu: 'bauc:home'
+          category: 'tools'
   _m_:
     slot: 14
-    damage: 0
-    #name: "[❖] Оружие"
-    name: "<#F8BEFB>[❖] Оружие"
-    lore: "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
+    name: '<#F8BEFB>Оружие'
+    lore:
+      - '<gray>● <white>Перейти в категорию'
     all_flags: true
     material: netherite_sword
     on_click:
+      - sound: 'ui.button.click 0.35 1'
       - open:
           menu: 'bauc:home'
           category: 'weapons'
+  _o_:
+    slot: 15
+    name: '<#F8BEFB>Снаряжение'
+    lore:
+      - '<gray>● <white>Перейти в категорию'
+    all_flags: true
+    material: netherite_chestplate
+    on_click:
+      - sound: 'ui.button.click 0.35 1'
+      - open:
+          menu: 'bauc:home'
+          category: 'armor'
+  _l_:
+    slot: 20
+    name: '<#F8BEFB>Ценные ресурсы'
+    lore:
+      - '<gray>● <white>Перейти в категорию'
+    all_flags: true
+    material: netherite_ingot
+    on_click:
+      - sound: 'ui.button.click 0.35 1'
+      - open:
+          menu: 'bauc:home'
+          category: 'resources'
+  _g_:
+    slot: 21
+    name: '<#F8BEFB>Прочие ресурсы'
+    lore:
+      - '<gray>● <white>Перейти в категорию'
+    all_flags: true
+    material: fermented_spider_eye
+    on_click:
+      - sound: 'ui.button.click 0.35 1'
+      - open:
+          menu: 'bauc:home'
+          category: 'other_resources'
+  _d_:
+    slot: 22
+    name: '<#F8BEFB>Еда'
+    lore:
+      - '<gray>● <white>Перейти в категорию'
+    all_flags: true
+    material: sweet_berries
+    on_click:
+      - sound: 'ui.button.click 0.35 1'
+      - open:
+          menu: 'bauc:home'
+          category: 'edible'
+  _b_:
+    slot: 23
+    name: '<#F8BEFB>Зелья'
+    lore:
+      - '<gray>● <white>Перейти в категорию'
+    all_flags: true
+    material: dragon_breath
+    on_click:
+      - sound: 'ui.button.click 0.35 1'
+      - open:
+          menu: 'bauc:home'
+          category: 'potions'
+  _f_:
+    slot: 24
+    name: '<#F8BEFB>Книги'
+    lore:
+      - '<gray>● <white>Перейти в категорию'
+    all_flags: true
+    material: enchanted_book
+    on_click:
+      - sound: 'ui.button.click 0.35 1'
+      - open:
+          menu: 'bauc:home'
+          category: 'books'
   _n_:
     slot: 29
-    #name: "[❖] Яйца и Спавнеры"
-    name: "<#F8BEFB>[❖] Яйца и Спавнеры"
-    lore: "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
+    name: '<#F8BEFB>Яйца и спавнеры'
+    lore:
+      - '<gray>● <white>Перейти в категорию'
     all_flags: true
     material: bee_spawn_egg
     on_click:
+      - sound: 'ui.button.click 0.35 1'
       - open:
           menu: 'bauc:home'
           category: 'spawners_and_eggs'
   _k_:
     slot: 30
-    #name: "[❖] Талисманы"
-    name: "<#F8BEFB>[❖] Талисманы"
-    lore: "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
+    name: '<#F8BEFB>Талисманы'
+    lore:
+      - '<gray>● <white>Перейти в категорию'
     all_flags: true
     material: totem_of_undying
     on_click:
+      - sound: 'ui.button.click 0.35 1'
       - open:
           menu: 'bauc:home'
           category: 'talismans'
-  _l_:
-    slot: 20
-    #name: "[❖] Ценные ресурсы"
-    name: "<#F8BEFB>[❖] Ценные ресурсы"
-    lore: "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
-    all_flags: true
-    material: netherite_ingot
-    on_click:
-      - open:
-          menu: 'bauc:home'
-          category: 'resources'
-  _i_:
-    slot: 12
-    #name: "[❖] Блоки"
-    name: "<#F8BEFB>[❖] Блоки"
-    lore: "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
-    all_flags: true
-    material: coarse_dirt
-    on_click:
-      - open:
-          menu: 'bauc:home'
-          category: 'blocks'
-  _j_:
-    slot: 11
-    #name: "[❖] Все товары"
-    name: "<#F8BEFB>[❖] Все товары"
-    lore: "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
-    all_flags: true
-    material: hopper_minecart
-    on_click:
-      - open:
-          menu: 'bauc:home'
-          category: 'any'
-  _g_:
-    slot: 21
-    #name: "[❖] Прочие ресурсы"
-    name: "<#F8BEFB>[❖] Прочие ресурсы"
-    lore: "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
-    all_flags: true
-    material: fermented_spider_eye
-    on_click:
-      - open:
-          menu: 'bauc:home'
-          category: 'other_resources'
-  _h_:
-    slot: 13
-    damage: 0
-    #name: "[❖] Инструменты"
-    name: "<#F8BEFB>[❖] Инструменты"
-    lore: "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
-    all_flags: true
-    material: netherite_pickaxe
-    on_click:
-      - open:
-          menu: 'bauc:home'
-          category: 'tools'
-  _e_:
-    slot: 33
-    #name: "[❖] Для Грифа"
-    name: "<#F8BEFB>[❖] Для Грифа"
-    lore: "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
-    all_flags: true
-    material: comparator
-    on_click:
-      - open:
-          menu: 'bauc:home'
-          category: 'grief'
-  _f_:
-    slot: 24
-    #name: "[❖] Книги"
-    name: "<#F8BEFB>[❖] Книги"
-    lore: "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
-    all_flags: true
-    material: enchanted_book
-    on_click:
-      - open:
-          menu: 'bauc:home'
-          category: 'books'
   _c_:
     slot: 31
-    #name: "[❖] Настоящие вещи"
-    name: "<#F8BEFB>[❖] Настоящие вещи"
-    lore: "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
+    name: '<#F8BEFB>Настоящие вещи'
+    lore:
+      - '<gray>● <white>Перейти в категорию'
     all_flags: true
     material: enchanted_golden_apple
     on_click:
+      - sound: 'ui.button.click 0.35 1'
       - open:
           menu: 'bauc:home'
           category: 'donat_items'
-  _d_:
-    slot: 22
-    #name: "[❖] Еда"
-    name: "<#F8BEFB>[❖] Еда"
-    lore: "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
-    all_flags: true
-    material: sweet_berries
-    on_click:
-      - open:
-          menu: 'bauc:home'
-          category: 'edible'
   _a_:
     slot: 32
-    #name: "[❖] Зельеварение"
-    name: "<#F8BEFB>[❖] Зельеварение"
-    lore: "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
+    name: '<#F8BEFB>Зельеварение'
+    lore:
+      - '<gray>● <white>Перейти в категорию'
     all_flags: true
     material: brewing_stand
     on_click:
+      - sound: 'ui.button.click 0.35 1'
       - open:
           menu: 'bauc:home'
           category: 'brewing'
-  _b_:
-    slot: 23
-    #name: "[❖] Зелья"
-    name: "<#F8BEFB>[❖] Зелья"
-    lore: "<#F8BEFB>➥ Нажмите<#FFFFFF>, чтобы перейти"
+  _e_:
+    slot: 33
+    name: '<#F8BEFB>Для грифа'
+    lore:
+      - '<gray>● <white>Перейти в категорию'
     all_flags: true
-    material: dragon_breath
+    material: comparator
     on_click:
+      - sound: 'ui.button.click 0.35 1'
       - open:
           menu: 'bauc:home'
-          category: 'potions'
+          category: 'grief'
 
-  # ── панели для анимации (без slot: ставятся только кадрами animation) ──
+  back:
+    slot: 40
+    material: red_dye
+    name: '<#F8BEFB>Назад'
+    lore:
+      - '<gray>● <white>Вернуться в аукцион'
+    on_click:
+      - sound: 'ui.button.click 0.35 1'
+      - back_or_close: ''
+
   frame:
-    name: ""
+    name: ''
     material: black_stained_glass_pane
-  accent:
-    name: ""
-    material: purple_stained_glass_pane
 
 animation:
   - tick: 0
     opcodes:
       - set: frame 11-15,20-24,29-33
-      - sound: 'block.enchantment_table.use 0.3 1.5'
+      - sound: 'block.enchantment_table.use 0.28 1.25'
   - tick: 3
     opcodes:
       - remove: 11-15
-      - sound: 'block.note_block.chime 0.24 1.0'
+      - sound: 'block.note_block.chime 0.20 1.00'
   - tick: 6
     opcodes:
       - remove: 20-24
-      - sound: 'block.note_block.pling 0.30 1.2'
+      - sound: 'block.note_block.pling 0.24 1.15'
   - tick: 9
     opcodes:
       - remove: 29-33
-      - sound: 'block.amethyst_block.chime 0.42 1.40'
+      - sound: 'block.amethyst_block.chime 0.30 1.40'
