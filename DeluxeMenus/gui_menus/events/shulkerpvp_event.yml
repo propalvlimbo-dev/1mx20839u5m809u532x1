@@ -1,0 +1,110 @@
+menu_title: '&#F8BEFB&lШалкер PvP'
+register_command: true
+open_command:
+  - shulkerpvp_event
+  - event_shulkerpvp
+  - shulkerpvp_menu
+size: 53
+update_interval: 20
+items:
+
+  'informations':
+    material: paper
+    slot: 4
+    display_name: '&7« &#F8BEFBИнформация об ивенте &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fАктивно на: &#F8BEFB/warp pvp'
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСуть ивента: &#F8BEFBБорьба за лут шалкера'
+      - '&#F8BEFB&l┃ &fPvP режим: &#F8BEFBВключен'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fПриходите на арену для участия в битве'
+    click_commands:
+      - '[close]'
+
+  'gameplay':
+    material: netherite_sword
+    slot: 22
+    display_name: '&7« &#F8BEFBМеханика сражения &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fЛокация: &#F8BEFB/warp pvp'
+      - '&#F8BEFB&l┃ &fЦель: &#F8BEFBЗахватить и открыть шалкер'
+      - '&#F8BEFB&l┃ &fОпасность: &#F8BEFBОжесточённое PvP'
+      - '&#F8BEFB&l┃ &fНаграда: &#F8BEFBТоповая экипировка и ресурсы'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для отправки информации в чат'
+    click_commands:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBШалкер PvP'
+      - '[message] &#F8BEFB&l┃ &fНа &d/warp pvp &fпериодически спавнится шалкер с ценным лутом.'
+      - '[message] &#F8BEFB&l┃ &fПобеждает тот, кто сможет устранить соперников и забрать ресурсы.'
+      - '[message]'
+
+  'close':
+    material: black_dye
+    slot: 45
+    display_name: '&7« &#F8BEFBНазад &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fВернуться в меню ивентов.'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для перехода'
+    click_commands:
+      - '[openguimenu] events'
+
+  'info':
+    slot: 49
+    material: "basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0="
+    display_name: '&7« &#F8BEFBНаши сообщества &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fБудьте в курсе: &#F8BEFBВсех новостей'
+      - '&#F8BEFB&l┃ &fСвежие обновления: &#F8BEFBАнонсы'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для отправки ссылок в чат'
+    click_commands:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBСообщества'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message] &#F8BEFB&l┃ &fTelegram канал: &#229ED9t.me/elytrix_ru'
+      - '[message] &#F8BEFB&l┃ &fDiscord сервер: &#5865F2dsc.gg/elytrix'
+      - '[message]'
+      - '[close]'
+
+  'design_purple_panel':
+    material: purple_stained_glass_pane
+    display_name: '&r'
+    slots:
+      - 27
+      - 35
+      - 36
+      - 37
+      - 43
+      - 44
+      - 46
+      - 47
+      - 48
+      - 50
+      - 51
+      - 52
+      - 53
+  'design_black_panel':
+    material: black_stained_glass_pane
+    display_name: '&r'
+    slots:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 5
+      - 6
+      - 7
+      - 8
+      - 9
+      - 10
+      - 16
+      - 17
+      - 18
+      - 26

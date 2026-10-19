@@ -1,0 +1,375 @@
+menu_title: '&#F8BEFB&lЗарплата коинами'
+open_command:
+  - rub
+  - rubsalary
+register_command: true
+size: 54
+items:
+  comet_2:
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGQxMTEwOWY0YWIwM2FhNmM1Yjc2Y2FkMTI5MTc2ZmZiMWZjZThjMTc0ZTY5YzllOGJhMDZiOWY4MDYxZTVhZCJ9fX0=
+    slot: 20
+    priority: 1
+    update: true
+    view_requirement:
+      requirements:
+        stop_zp_ancient:
+          type: has permission
+          permission: zarplata.rub.stop1
+    display_name: '&7« &#F8BEFBЗарплата: Comet &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСтатус: &cУже получено'
+      - '&#F8BEFB&l┃ &fОбновление: &#F8BEFBРаз в 24 часа'
+      - '&#F8BEFB&l┃ '
+      - '&7● &cНедоступно к получению'
+    click_commands:
+      - '[close]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cЗарплата уже получена! Подождите: &#F8BEFB%mcd_left_formatted_salary_rub%'
+      - '[sound] ENTITY_VILLAGER_NO'
+
+  comet_1:
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTQ2N2E3YjlkNzZiYTZkMGZlZDc0MzYwMjUzM2ZjOThjODdhZjBjNjBmODBmMzhkYTc3NGY3YTAxYTIwOTNmYSJ9fX0=
+    slot: 20
+    priority: 2
+    display_name: '&7« &#F8BEFBЗарплата: Comet &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fНаграда: &#F8BEFB50 коинов'
+      - '&#F8BEFB&l┃ &fПериодичность: &#F8BEFB1 раз в сутки'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для получения'
+    click_requirement:
+      requirements:
+        ancient_1:
+          type: has permission
+          permission: zarplata.rub1
+      deny_commands:
+        - '[close]'
+        - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cУ вас нет доступа к этой зарплате!'
+        - '[sound] ENTITY_VILLAGER_NO'
+    click_commands:
+      - '[close]'
+      - '[sound] ENTITY_PLAYER_LEVELUP'
+      - '[console] p give %player_name% 50'
+      - '[console] mcd add %player_name% salary_rub 1d'
+      - '[console] lp user %player_name% permission settemp zarplata.rub.stop1 true 1d'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aВы успешно получили зарплату!'
+
+  void_2:
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGQxMTEwOWY0YWIwM2FhNmM1Yjc2Y2FkMTI5MTc2ZmZiMWZjZThjMTc0ZTY5YzllOGJhMDZiOWY4MDYxZTVhZCJ9fX0=
+    slot: 21
+    priority: 1
+    update: true
+    view_requirement:
+      requirements:
+        stop_zp_ancient:
+          type: has permission
+          permission: zarplata.rub.stop2
+    display_name: '&7« &#F8BEFBЗарплата: Void &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСтатус: &cУже получено'
+      - '&#F8BEFB&l┃ &fОбновление: &#F8BEFBРаз в 24 часа'
+      - '&#F8BEFB&l┃ '
+      - '&7● &cНедоступно к получению'
+    click_commands:
+      - '[close]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cЗарплата уже получена! Подождите: &#F8BEFB%mcd_left_formatted_salary_rub%'
+      - '[sound] ENTITY_VILLAGER_NO'
+
+  void_1:
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTQ2N2E3YjlkNzZiYTZkMGZlZDc0MzYwMjUzM2ZjOThjODdhZjBjNjBmODBmMzhkYTc3NGY3YTAxYTIwOTNmYSJ9fX0=
+    slot: 21
+    priority: 2
+    display_name: '&7« &#F8BEFBЗарплата: Void &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fНаграда: &#F8BEFB130 коинов'
+      - '&#F8BEFB&l┃ &fПериодичность: &#F8BEFB1 раз в сутки'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для получения'
+    click_requirement:
+      requirements:
+        ancient_1:
+          type: has permission
+          permission: zarplata.rub2
+      deny_commands:
+        - '[close]'
+        - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cУ вас нет доступа к этой зарплате!'
+        - '[sound] ENTITY_VILLAGER_NO'
+    click_commands:
+      - '[close]'
+      - '[sound] ENTITY_PLAYER_LEVELUP'
+      - '[console] p give %player_name% 130'
+      - '[console] mcd add %player_name% salary_rub 1d'
+      - '[console] lp user %player_name% permission settemp zarplata.rub.stop2 true 1d'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aВы успешно получили зарплату!'
+
+  cosmos_2:
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGQxMTEwOWY0YWIwM2FhNmM1Yjc2Y2FkMTI5MTc2ZmZiMWZjZThjMTc0ZTY5YzllOGJhMDZiOWY4MDYxZTVhZCJ9fX0=
+    slot: 22
+    priority: 1
+    update: true
+    view_requirement:
+      requirements:
+        stop_zp_ancient:
+          type: has permission
+          permission: zarplata.rub.stop3
+    display_name: '&7« &#F8BEFBЗарплата: Cosmos &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСтатус: &cУже получено'
+      - '&#F8BEFB&l┃ &fОбновление: &#F8BEFBРаз в 24 часа'
+      - '&#F8BEFB&l┃ '
+      - '&7● &cНедоступно к получению'
+    click_commands:
+      - '[close]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cЗарплата уже получена! Подождите: &#F8BEFB%mcd_left_formatted_salary_rub%'
+      - '[sound] ENTITY_VILLAGER_NO'
+
+  cosmos_1:
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTQ2N2E3YjlkNzZiYTZkMGZlZDc0MzYwMjUzM2ZjOThjODdhZjBjNjBmODBmMzhkYTc3NGY3YTAxYTIwOTNmYSJ9fX0=
+    slot: 22
+    priority: 2
+    display_name: '&7« &#F8BEFBЗарплата: Cosmos &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fНаграда: &#F8BEFB215 коинов'
+      - '&#F8BEFB&l┃ &fПериодичность: &#F8BEFB1 раз в сутки'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для получения'
+    click_requirement:
+      requirements:
+        ancient_1:
+          type: has permission
+          permission: zarplata.rub3
+      deny_commands:
+        - '[close]'
+        - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cУ вас нет доступа к этой зарплате!'
+        - '[sound] ENTITY_VILLAGER_NO'
+    click_commands:
+      - '[close]'
+      - '[sound] ENTITY_PLAYER_LEVELUP'
+      - '[console] p give %player_name% 215'
+      - '[console] mcd add %player_name% salary_rub 1d'
+      - '[console] lp user %player_name% permission settemp zarplata.rub.stop3 true 1d'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aВы успешно получили зарплату!'
+
+  reall_2:
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGQxMTEwOWY0YWIwM2FhNmM1Yjc2Y2FkMTI5MTc2ZmZiMWZjZThjMTc0ZTY5YzllOGJhMDZiOWY4MDYxZTVhZCJ9fX0=
+    slot: 23
+    priority: 1
+    update: true
+    view_requirement:
+      requirements:
+        stop_zp_ancient:
+          type: has permission
+          permission: zarplata.rub.stop4
+    display_name: '&7« &#F8BEFBЗарплата: Reall &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСтатус: &cУже получено'
+      - '&#F8BEFB&l┃ &fОбновление: &#F8BEFBРаз в 24 часа'
+      - '&#F8BEFB&l┃ '
+      - '&7● &cНедоступно к получению'
+    click_commands:
+      - '[close]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cЗарплата уже получена! Подождите: &#F8BEFB%mcd_left_formatted_salary_rub%'
+      - '[sound] ENTITY_VILLAGER_NO'
+
+  reall_1:
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTQ2N2E3YjlkNzZiYTZkMGZlZDc0MzYwMjUzM2ZjOThjODdhZjBjNjBmODBmMzhkYTc3NGY3YTAxYTIwOTNmYSJ9fX0=
+    slot: 23
+    priority: 2
+    display_name: '&7« &#F8BEFBЗарплата: Reall &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fНаграда: &#F8BEFB400 коинов'
+      - '&#F8BEFB&l┃ &fПериодичность: &#F8BEFB1 раз в сутки'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для получения'
+    click_requirement:
+      requirements:
+        ancient_1:
+          type: has permission
+          permission: zarplata.rub4
+      deny_commands:
+        - '[close]'
+        - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cУ вас нет доступа к этой зарплате!'
+        - '[sound] ENTITY_VILLAGER_NO'
+    click_commands:
+      - '[close]'
+      - '[sound] ENTITY_PLAYER_LEVELUP'
+      - '[console] p give %player_name% 400'
+      - '[console] mcd add %player_name% salary_rub 1d'
+      - '[console] lp user %player_name% permission settemp zarplata.rub.stop4 true 1d'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aВы успешно получили зарплату!'
+
+  summer_2:
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGQxMTEwOWY0YWIwM2FhNmM1Yjc2Y2FkMTI5MTc2ZmZiMWZjZThjMTc0ZTY5YzllOGJhMDZiOWY4MDYxZTVhZCJ9fX0=
+    slot: 24
+    priority: 1
+    update: true
+    view_requirement:
+      requirements:
+        stop_zp_ancient:
+          type: has permission
+          permission: zarplata.rub.stop5
+    display_name: '&7« &#F8BEFBЗарплата: Summer &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСтатус: &cУже получено'
+      - '&#F8BEFB&l┃ &fОбновление: &#F8BEFBРаз в 24 часа'
+      - '&#F8BEFB&l┃ '
+      - '&7● &cНедоступно к получению'
+    click_commands:
+      - '[close]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cЗарплата уже получена! Подождите: &#F8BEFB%mcd_left_formatted_salary_rub%'
+      - '[sound] ENTITY_VILLAGER_NO'
+
+  summer_1:
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTQ2N2E3YjlkNzZiYTZkMGZlZDc0MzYwMjUzM2ZjOThjODdhZjBjNjBmODBmMzhkYTc3NGY3YTAxYTIwOTNmYSJ9fX0=
+    slot: 24
+    priority: 2
+    display_name: '&7« &#F8BEFBЗарплата: Summer &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fНаграда: &#F8BEFB560 коинов'
+      - '&#F8BEFB&l┃ &fПериодичность: &#F8BEFB1 раз в сутки'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для получения'
+    click_requirement:
+      requirements:
+        ancient_1:
+          type: has permission
+          permission: zarplata.rub5
+      deny_commands:
+        - '[close]'
+        - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cУ вас нет доступа к этой зарплате!'
+        - '[sound] ENTITY_VILLAGER_NO'
+    click_commands:
+      - '[close]'
+      - '[sound] ENTITY_PLAYER_LEVELUP'
+      - '[console] p give %player_name% 560'
+      - '[console] mcd add %player_name% salary_rub 1d'
+      - '[console] lp user %player_name% permission settemp zarplata.rub.stop5 true 1d'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aВы успешно получили зарплату!'
+
+  custom_2:
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGQxMTEwOWY0YWIwM2FhNmM1Yjc2Y2FkMTI5MTc2ZmZiMWZjZThjMTc0ZTY5YzllOGJhMDZiOWY4MDYxZTVhZCJ9fX0=
+    slot: 31
+    priority: 1
+    update: true
+    view_requirement:
+      requirements:
+        stop_zp_ancient:
+          type: has permission
+          permission: zarplata.rub.stop6
+    display_name: '&7« &#F8BEFBЗарплата: Custom &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСтатус: &cУже получено'
+      - '&#F8BEFB&l┃ &fОбновление: &#F8BEFBРаз в 24 часа'
+      - '&#F8BEFB&l┃ '
+      - '&7● &cНедоступно к получению'
+    click_commands:
+      - '[close]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cЗарплата уже получена! Подождите: &#F8BEFB%mcd_left_formatted_salary_rub%'
+      - '[sound] ENTITY_VILLAGER_NO'
+
+  custom_1:
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTQ2N2E3YjlkNzZiYTZkMGZlZDc0MzYwMjUzM2ZjOThjODdhZjBjNjBmODBmMzhkYTc3NGY3YTAxYTIwOTNmYSJ9fX0=
+    slot: 31
+    priority: 2
+    display_name: '&7« &#F8BEFBЗарплата: Custom &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fНаграда: &#F8BEFB710 коинов'
+      - '&#F8BEFB&l┃ &fПериодичность: &#F8BEFB1 раз в сутки'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для получения'
+    click_requirement:
+      requirements:
+        ancient_1:
+          type: has permission
+          permission: zarplata.rub6
+      deny_commands:
+        - '[close]'
+        - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cУ вас нет доступа к этой зарплате!'
+        - '[sound] ENTITY_VILLAGER_NO'
+    click_commands:
+      - '[close]'
+      - '[sound] ENTITY_PLAYER_LEVELUP'
+      - '[console] p give %player_name% 710'
+      - '[console] mcd add %player_name% salary_rub 1d'
+      - '[console] lp user %player_name% permission settemp zarplata.rub.stop6 true 1d'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aВы успешно получили зарплату!'
+
+  'info':
+    slot: 49
+    material: "basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0="
+    display_name: '&7« &#F8BEFBНаши сообщества &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fБудьте в курсе: &#F8BEFBВсех новостей'
+      - '&#F8BEFB&l┃ &fСвежие обновления: &#F8BEFBАнонсы'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для отправки ссылок в чат'
+    click_commands:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBСообщества'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message] &#F8BEFB&l┃ &fTelegram канал: &#229ED9t.me/elytrix_ru'
+      - '[message] &#F8BEFB&l┃ &fDiscord сервер: &#5865F2dsc.gg/elytrix'
+      - '[message]'
+      - '[close]'
+
+  'close':
+    material: black_dye
+    slot: 45
+    display_name: '&7« &#F8BEFBНазад &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fВернуться в предыдущее меню.'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для перехода'
+    click_commands:
+      - '[openguimenu] menu'
+
+  'design_purple_panel':
+    material: purple_stained_glass_pane
+    display_name: '&r'
+    slots:
+      - 27
+      - 35
+      - 36
+      - 37
+      - 43
+      - 44
+      - 46
+      - 47
+      - 48
+      - 50
+      - 51
+      - 52
+      - 53
+
+  'design_black_panel':
+    material: black_stained_glass_pane
+    display_name: '&r'
+    slots:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+      - 8
+      - 9
+      - 10
+      - 16
+      - 17
+      - 18
+      - 26

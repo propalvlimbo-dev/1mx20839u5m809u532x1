@@ -1,0 +1,82 @@
+menu_title: '&#F8BEFB&lПереход в лобби'
+open_command: 
+  - hub
+  - lobby
+  - рги
+  - дщиин
+register_command: true
+size: 53
+items:
+  '1':
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODFjZTk1ZGQ0ODBmMTdmZWUwNzFmOWU4ZjdlMmU5YzA1NDJhYzcyYWI1ZDJhZTUzY2NlYWQyYmQ3MjM3MGMyNSJ9fX0=
+    slot: 21
+    display_name: '&7« &aПодтвердить &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fНазначение: &#F8BEFBГлавное лобби'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для перехода'
+    click_commands:
+      - '[connect] lobby'
+
+  '2':
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTMzYTViZmM4YTJhM2ExNTJkNjQ2YTViZWE2OTRhNDI1YWI3OWRiNjk0YjIxNGYxNTZjMzdjNzE4M2FhIn19fQ==
+    slot: 23
+    display_name: '&7« &cОтклонить &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fДействие: &#F8BEFBОтмена перехода'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для отмены'
+    click_commands:
+      - '[close]'
+
+  'close':
+    material: black_dye
+    slot: 45
+    display_name: '&7« &#F8BEFBНазад &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fВернуться в предыдущее меню.'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для перехода'
+    click_commands:
+      - '[openguimenu] menu'
+
+  'design_purple_panel':
+    material: purple_stained_glass_pane
+    display_name: '&r'
+    slots:
+      - 27
+      - 35
+      - 36
+      - 37
+      - 43
+      - 44
+      - 46
+      - 47
+      - 48
+      - 50
+      - 51
+      - 52
+      - 53
+
+  'design_black_panel':
+    material: black_stained_glass_pane
+    display_name: '&r'
+    slots:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+      - 8
+      - 9
+      - 10
+      - 16
+      - 17
+      - 18
+      - 26

@@ -1,0 +1,135 @@
+menu_title: '&#F8BEFB&lРандомная телепортация'
+size: 53
+register_command: true
+open_command: 
+  - rtp
+  - rtps
+  - ртп
+items:
+  'info':
+    slot: 49
+    material: "basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0="
+    display_name: '&7« &#F8BEFBНаши сообщества &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fБудьте в курсе: &#F8BEFBВсех новостей'
+      - '&#F8BEFB&l┃ &fСвежие обновления: &#F8BEFBАнонсы'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для отправки ссылок в чат'
+    click_commands:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBСообщества'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message] &#F8BEFB&l┃ &fTelegram канал: &#229ED9t.me/elytrix_ru'
+      - '[message] &#F8BEFB&l┃ &fDiscord сервер: &#5865F2dsc.gg/elytrix'
+      - '[message]'
+      - '[close]'
+
+  'close':
+    material: black_dye
+    slot: 45
+    display_name: '&7« &#F8BEFBНазад &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fВернуться в предыдущее меню.'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для перехода'
+    click_commands:
+      - '[openguimenu] menu'
+
+  'design_purple_panel':
+    material: purple_stained_glass_pane
+    display_name: '&r'
+    slots:
+      - 27
+      - 35
+      - 36
+      - 37
+      - 43
+      - 44
+      - 46
+      - 47
+      - 48
+      - 50
+      - 51
+      - 52
+      - 53
+  'design_black_panel':
+    material: black_stained_glass_pane
+    display_name: '&r'
+    slots:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+      - 8
+      - 9
+      - 10
+      - 16
+      - 17
+      - 18
+      - 26
+
+  rtpdef:
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzUyNmZiMGFiZjAyYWZiZGYyMWYxZGM4OWE4MzI2NWQ2Y2E5MzM2NTQ4ZDUzMThlMmMxYjZjNGUxNjE0YzE5In19fQ==
+    hide_attributes: true 
+    hide_enchantments: true
+    enchantments:
+      - riptide;1
+    slot: 20
+    display_name: '&7« &#F8BEFBОбычная телепортация &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fТип: &#F8BEFBОбычный RTP'
+      - '&#F8BEFB&l┃ &fКоординаты: &#F8BEFBНачальные / Нулевые'
+      - '&#F8BEFB&l┃ &fНазначение: &#F8BEFBБыстрый старт и выживание'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для телепортации'
+    left_click_commands:
+      - '[player] ovrandomteleport def'
+    right_click_commands:
+      - '[player] ovrandomteleport def'
+
+  rtp_far:
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmFiZWMyNDBhNGNiNTFjYWRjMTg1YTY2MDcyYTJhZWQ3ZjU2MTEyNjk2ZjI0NjU3M2E1MmVlN2RmNGMzMiJ9fX0=
+    slot: 24
+    hide_attributes: true 
+    hide_enchantments: true
+    enchantments:
+      - riptide;1
+    display_name: '&7« &#F8BEFBДалекая телепортация &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fТип: &#F8BEFBДальний RTP'
+      - '&#F8BEFB&l┃ &fКоординаты: &#F8BEFBМаксимальное удаление'
+      - '&#F8BEFB&l┃ &fДоступность: &#96FF91&lᴡ&#A0FF9D&lɪ&#AAFFA8&lᴛ&#B3FFB4&lʜ&#BDFFBF&lᴇ&#C7FFCB&lʀ'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для телепортации'
+    left_click_commands:
+      - '[player] ovrandomteleport far'
+    right_click_commands:
+      - '[player] ovrandomteleport far'
+ 
+  rtp_near:
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDUyZGNhNjhjOGY4YWY1MzNmYjczN2ZhZWVhY2JlNzE3Yjk2ODc2N2ZjMTg4MjRkYzJkMzdhYzc4OWZjNzcifX19
+    slot: 31
+    hide_attributes: true 
+    hide_enchantments: true
+    enchantments:
+      - riptide;1
+    display_name: '&7« &#F8BEFBУбийственная телепортация &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fТип: &#F8BEFBОхотничий RTP'
+      - '&#F8BEFB&l┃ &fКоординаты: &#F8BEFBРядом с игроками'
+      - '&#F8BEFB&l┃ &fДоступность: &#AC72FF&lᴇ&#AF74FF&lʟ&#B376FF&lᴅ&#B678FF&lᴇ&#B97AFF&lʀ'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для телепортации'
+    left_click_commands:
+      - '[player] ovrandomteleport near'
+    right_click_commands:
+      - '[player] ovrandomteleport near'

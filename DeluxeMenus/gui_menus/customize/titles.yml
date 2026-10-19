@@ -1,0 +1,393 @@
+menu_title: '&#F8BEFB&lУникальные титулы'
+size: 53
+items:
+  'титул1нет':
+    material: barrier
+    priority: 1
+    item_flags: [HIDE_ATTRIBUTES]
+    slot: 20
+    display_name: '%vault_prefix%&f%player_name% §x§F§B§A§8§E§1с§x§F§C§B§E§E§9и§x§F§D§D§4§F§0к§x§F§E§E§9§F§8с§x§F§F§F§F§F§Fе§x§F§E§E§9§F§8в§x§F§D§D§4§F§0е§x§F§C§B§E§E§9е§x§F§B§A§8§E§1н'
+    lore:
+      - '&#FFDBDB&l┃ '
+      - '&#FFDBDB&l┃ &fТитул: §x§F§B§A§8§E§1с§x§F§C§B§E§E§9и§x§F§D§D§4§F§0к§x§F§E§E§9§F§8с§x§F§F§F§F§F§Fе§x§F§E§E§9§F§8в§x§F§D§D§4§F§0е§x§F§C§B§E§E§9е§x§F§B§A§8§E§1н'
+      - '&#FFDBDB&l┃ &fДоступ: &cНет'
+  'титул1да':
+    material: book
+    priority: 0
+    item_flags: [HIDE_ATTRIBUTES]
+    slot: 20
+    display_name: '%vault_prefix%&f%player_name% §x§F§B§A§8§E§1с§x§F§C§B§E§E§9и§x§F§D§D§4§F§0к§x§F§E§E§9§F§8с§x§F§F§F§F§F§Fе§x§F§E§E§9§F§8в§x§F§D§D§4§F§0е§x§F§C§B§E§E§9е§x§F§B§A§8§E§1н'
+    lore:
+      - '&#FFDBDB&l┃ '
+      - '&#FFDBDB&l┃ &fТитул: §x§F§B§A§8§E§1с§x§F§C§B§E§E§9и§x§F§D§D§4§F§0к§x§F§E§E§9§F§8с§x§F§F§F§F§F§Fе§x§F§E§E§9§F§8в§x§F§D§D§4§F§0е§x§F§C§B§E§E§9е§x§F§B§A§8§E§1н'
+      - '&#FFDBDB&l┃ &fДоступ: &aДа'
+      - '&#FFDBDB&l┃ '
+      - '&7● &fНажмите, чтобы применить'
+    view_requirement:
+      requirements:
+        perm_check:
+          type: 'has permission'
+          permission: title.1
+    click_commands:
+      - '[console] lp user %player_name% meta setsuffix " §x§F§B§A§8§E§1с§x§F§C§B§E§E§9и§x§F§D§D§4§F§0к§x§F§E§E§9§F§8с§x§F§F§F§F§F§Fе§x§F§E§E§9§F§8в§x§F§D§D§4§F§0е§x§F§C§B§E§E§9е§x§F§B§A§8§E§1н"'
+      - '[sound] BLOCK_NOTE_BLOCK_BELL'
+
+  'титул2нет':
+    material: barrier
+    priority: 1
+    item_flags: [HIDE_ATTRIBUTES]
+    slot: 21
+    display_name: '%vault_prefix%&f%player_name% §x§F§B§8§0§8§0ф§x§F§C§9§0§9§0р§x§F§C§A§0§A§0и§x§F§D§B§0§B§0г§x§F§D§C§0§C§0и§x§F§E§C§F§C§Fд§x§F§E§D§F§D§Fн§x§F§F§E§F§E§Fы§x§F§F§F§F§F§Fй'
+    lore:
+      - '§x§F§B§8§0§8§0&l┃ '
+      - '§x§F§B§8§0§8§0&l┃ &fТитул: §x§F§B§8§0§8§0ф§x§F§C§9§0§9§0р§x§F§C§A§0§A§0и§x§F§D§B§0§B§0г§x§F§D§C§0§C§0и§x§F§E§C§F§C§Fд§x§F§E§D§F§D§Fн§x§F§F§E§F§E§Fы§x§F§F§F§F§F§Fй'
+      - '§x§F§B§8§0§8§0&l┃ &fДоступ: &cНет'
+  'титул2да':
+    material: book
+    priority: 0
+    item_flags: [HIDE_ATTRIBUTES]
+    slot: 21
+    display_name: '%vault_prefix%&f%player_name% §x§F§B§8§0§8§0ф§x§F§C§9§0§9§0р§x§F§C§A§0§A§0и§x§F§D§B§0§B§0г§x§F§D§C§0§C§0и§x§F§E§C§F§C§Fд§x§F§E§D§F§D§Fн§x§F§F§E§F§E§Fы§x§F§F§F§F§F§Fй'
+    lore:
+      - '§x§F§B§8§0§8§0&l┃ '
+      - '§x§F§B§8§0§8§0&l┃ &fТитул: §x§F§B§8§0§8§0ф§x§F§C§9§0§9§0р§x§F§C§A§0§A§0и§x§F§D§B§0§B§0г§x§F§D§C§0§C§0и§x§F§E§C§F§C§Fд§x§F§E§D§F§D§Fн§x§F§F§E§F§E§Fы§x§F§F§F§F§F§Fй'
+      - '§x§F§B§8§0§8§0&l┃ &fДоступ: &aДа'
+      - '§x§F§B§8§0§8§0&l┃ '
+      - '&7● &fНажмите, чтобы применить'
+    view_requirement:
+      requirements:
+        perm_check:
+          type: 'has permission'
+          permission: title.2
+    click_commands:
+      - '[console] lp user %player_name% meta setsuffix " §x§F§B§8§0§8§0ф§x§F§C§9§0§9§0р§x§F§C§A§0§A§0и§x§F§D§B§0§B§0г§x§F§D§C§0§C§0и§x§F§E§C§F§C§Fд§x§F§E§D§F§D§Fн§x§F§F§E§F§E§Fы§x§F§F§F§F§F§Fй"'
+      - '[sound] BLOCK_NOTE_BLOCK_BELL'
+
+  'титул3нет':
+    material: barrier
+    priority: 1
+    item_flags: [HIDE_ATTRIBUTES]
+    slot: 22
+    display_name: '%vault_prefix%&f%player_name% §x§7§6§F§7§F§Bк§x§8§2§F§7§F§Cо§x§8§F§F§7§F§Cч §x§9§B§F§6§F§Dб§x§A§8§F§6§F§Dр§x§B§4§F§6§F§Eа§x§C§0§F§6§F§Eт§x§C§D§F§5§F§Fа§x§D§9§F§5§F§Fн'
+    lore:
+      - '&#76F7FB&l┃ '
+      - '&#76F7FB&l┃ &fТитул: §x§7§6§F§7§F§Bк§x§8§2§F§7§F§Cо§x§8§F§F§7§F§Cч §x§9§B§F§6§F§Dб§x§A§8§F§6§F§Dр§x§B§4§F§6§F§Eа§x§C§0§F§6§F§Eт§x§C§D§F§5§F§Fа§x§D§9§F§5§F§Fн'
+      - '&#76F7FB&l┃ &fДоступ: &cНет'
+  'титул3да':
+    material: book
+    priority: 0
+    item_flags: [HIDE_ATTRIBUTES]
+    slot: 22
+    display_name: '%vault_prefix%&f%player_name% §x§7§6§F§7§F§Bк§x§8§2§F§7§F§Cо§x§8§F§F§7§F§Cч §x§9§B§F§6§F§Dб§x§A§8§F§6§F§Dр§x§B§4§F§6§F§Eа§x§C§0§F§6§F§Eт§x§C§D§F§5§F§Fа§x§D§9§F§5§F§Fн'
+    lore:
+      - '&#76F7FB&l┃ '
+      - '&#76F7FB&l┃ &fТитул: §x§7§6§F§7§F§Bк§x§8§2§F§7§F§Cо§x§8§F§F§7§F§Cч §x§9§B§F§6§F§Dб§x§A§8§F§6§F§Dр§x§B§4§F§6§F§Eа§x§C§0§F§6§F§Eт§x§C§D§F§5§F§Fа§x§D§9§F§5§F§Fн'
+      - '&#76F7FB&l┃ &fДоступ: &aДа'
+      - '&#76F7FB&l┃ '
+      - '&7● &fНажмите, чтобы применить'
+    view_requirement:
+      requirements:
+        perm_check:
+          type: 'has permission'
+          permission: title.3
+    click_commands:
+      - '[console] lp user %player_name% meta setsuffix " §x§7§6§F§7§F§Bк§x§8§2§F§7§F§Cо§x§8§F§F§7§F§Cч §x§9§B§F§6§F§Dб§x§A§8§F§6§F§Dр§x§B§4§F§6§F§Eа§x§C§0§F§6§F§Eт§x§C§D§F§5§F§Fа§x§D§9§F§5§F§Fн"'
+      - '[sound] BLOCK_NOTE_BLOCK_BELL'
+
+  'титул4нет':
+    material: barrier
+    priority: 1
+    item_flags: [HIDE_ATTRIBUTES]
+    slot: 23
+    display_name: '%vault_prefix%&f%player_name% §x§F§B§F§0§A§3к§x§F§C§F§2§A§Eу§x§F§D§F§3§B§9н§x§F§D§F§5§C§5ч§x§F§E§F§6§D§0и§x§F§F§F§8§D§Bк'
+    lore:
+      - '&#FBF0A3&l┃ '
+      - '&#FBF0A3&l┃ &fТитул: §x§F§B§F§0§A§3к§x§F§C§F§2§A§Eу§x§F§D§F§3§B§9н§x§F§D§F§5§C§5ч§x§F§E§F§6§D§0и§x§F§F§F§8§D§Bк'
+      - '&#FBF0A3&l┃ &fДоступ: &cНет'
+  'титул4да':
+    material: book
+    priority: 0
+    item_flags: [HIDE_ATTRIBUTES]
+    slot: 23
+    display_name: '%vault_prefix%&f%player_name% §x§F§B§F§0§A§3к§x§F§C§F§2§A§Eу§x§F§D§F§3§B§9н§x§F§D§F§5§C§5ч§x§F§E§F§6§D§0и§x§F§F§F§8§D§Bк'
+    lore:
+      - '&#FBF0A3&l┃ '
+      - '&#FBF0A3&l┃ &fТитул: §x§F§B§F§0§A§3к§x§F§C§F§2§A§Eу§x§F§D§F§3§B§9н§x§F§D§F§5§C§5ч§x§F§E§F§6§D§0и§x§F§F§F§8§D§Bк'
+      - '&#FBF0A3&l┃ &fДоступ: &aДа'
+      - '&#FBF0A3&l┃ '
+      - '&7● &fНажмите, чтобы применить'
+    view_requirement:
+      requirements:
+        perm_check:
+          type: 'has permission'
+          permission: title.4
+    click_commands:
+      - '[console] lp user %player_name% meta setsuffix " §x§F§B§F§0§A§3к§x§F§C§F§2§A§Eу§x§F§D§F§3§B§9н§x§F§D§F§5§C§5ч§x§F§E§F§6§D§0и§x§F§F§F§8§D§Bк"'
+      - '[sound] BLOCK_NOTE_BLOCK_BELL'
+
+  'титул5нет':
+    material: barrier
+    priority: 1
+    item_flags: [HIDE_ATTRIBUTES]
+    slot: 24
+    display_name: '%vault_prefix%&f%player_name% §x§8§9§F§F§F§4к§x§A§3§F§F§F§6в§x§B§D§F§F§F§9а§x§D§8§F§F§F§Bд§x§F§2§F§F§F§Eр§x§F§2§F§F§F§Eо§x§D§8§F§F§F§Bб§x§B§D§F§F§F§9и§x§A§3§F§F§F§6к§x§8§9§F§F§F§4а'
+    lore:
+      - '&#008DFF&l┃ '
+      - '&#008DFF&l┃ &fТитул: §x§8§9§F§F§F§4к§x§A§3§F§F§F§6в§x§B§D§F§F§F§9а§x§D§8§F§F§F§Bд§x§F§2§F§F§F§Eр§x§F§2§F§F§F§Eо§x§D§8§F§F§F§Bб§x§B§D§F§F§F§9и§x§A§3§F§F§F§6к§x§8§9§F§F§F§4а'
+      - '&#008DFF&l┃ &fДоступ: &cНет'
+  'титул5да':
+    material: book
+    priority: 0
+    item_flags: [HIDE_ATTRIBUTES]
+    slot: 24
+    display_name: '%vault_prefix%&f%player_name% §x§8§9§F§F§F§4к§x§A§3§F§F§F§6в§x§B§D§F§F§F§9а§x§D§8§F§F§F§Bд§x§F§2§F§F§F§Eр§x§F§2§F§F§F§Eо§x§D§8§F§F§F§Bб§x§B§D§F§F§F§9и§x§A§3§F§F§F§6к§x§8§9§F§F§F§4а'
+    lore:
+      - '&#008DFF&l┃ '
+      - '&#008DFF&l┃ &fТитул: §x§8§9§F§F§F§4к§x§A§3§F§F§F§6в§x§B§D§F§F§F§9а§x§D§8§F§F§F§Bд§x§F§2§F§F§F§Eр§x§F§2§F§F§F§Eо§x§D§8§F§F§F§Bб§x§B§D§F§F§F§9и§x§A§3§F§F§F§6к§x§8§9§F§F§F§4а'
+      - '&#008DFF&l┃ &fДоступ: &aДа'
+      - '&#008DFF&l┃ '
+      - '&7● &fНажмите, чтобы применить'
+    view_requirement:
+      requirements:
+        perm_check:
+          type: 'has permission'
+          permission: title.5
+    click_commands:
+      - '[console] lp user %player_name% meta setsuffix " §x§8§9§F§F§F§4к§x§A§3§F§F§F§6в§x§B§D§F§F§F§9а§x§D§8§F§F§F§Bд§x§F§2§F§F§F§Eр§x§F§2§F§F§F§Eо§x§D§8§F§F§F§Bб§x§B§D§F§F§F§9и§x§A§3§F§F§F§6к§x§8§9§F§F§F§4а"'
+      - '[sound] BLOCK_NOTE_BLOCK_BELL'
+
+  'титул6нет':
+    material: barrier
+    priority: 1
+    item_flags: [HIDE_ATTRIBUTES]
+    slot: 29
+    display_name: '%vault_prefix%&f%player_name% §x§F§F§7§7§7§71§x§C§F§A§4§6§E4§x§9§E§D§2§6§58§x§6§E§F§F§5§C8'
+    lore:
+      - '&#FFA500&l┃ '
+      - '&#FFA500&l┃ &fТитул: §x§F§F§7§7§7§71§x§C§F§A§4§6§E4§x§9§E§D§2§6§58§x§6§E§F§F§5§C8'
+      - '&#FFA500&l┃ &fДоступ: &cНет'
+  'титул6да':
+    material: book
+    priority: 0
+    item_flags: [HIDE_ATTRIBUTES]
+    slot: 29
+    display_name: '%vault_prefix%&f%player_name% §x§F§F§7§7§7§71§x§C§F§A§4§6§E4§x§9§E§D§2§6§58§x§6§E§F§F§5§C8'
+    lore:
+      - '&#FFA500&l┃ '
+      - '&#FFA500&l┃ &fТитул: §x§F§F§7§7§7§71§x§C§F§A§4§6§E4§x§9§E§D§2§6§58§x§6§E§F§F§5§C8'
+      - '&#FFA500&l┃ &fДоступ: &aДа'
+      - '&#FFA500&l┃ '
+      - '&7● &fНажмите, чтобы применить'
+    view_requirement:
+      requirements:
+        perm_check:
+          type: 'has permission'
+          permission: title.6
+    click_commands:
+      - '[console] lp user %player_name% meta setsuffix " §x§F§F§7§7§7§71§x§C§F§A§4§6§E4§x§9§E§D§2§6§58§x§6§E§F§F§5§C8"'
+      - '[sound] BLOCK_NOTE_BLOCK_BELL'
+
+  'титул7нет':
+    material: barrier
+    priority: 1
+    item_flags: [HIDE_ATTRIBUTES]
+    slot: 30
+    display_name: '%vault_prefix%&f%player_name% &x&B&7&3&5&3&5д&x&C&B&5&D&4&Fе&x&D&E&8&5&6&9п&x&D&1&6&A&5&8н&x&C&4&5&0&4&6у&x&B&7&3&5&3&5л'
+    lore:
+      - '&#B73535&l┃ '
+      - '&#B73535&l┃ &fТитул: &x&B&7&3&5&3&5д&x&C&B&5&D&4&Fе&x&D&E&8&5&6&9п&x&D&1&6&A&5&8н&x&C&4&5&0&4&6у&x&B&7&3&5&3&5л'
+      - '&#B73535&l┃ &fДоступ: &cНет'
+  'титул7да':
+    material: book
+    priority: 0
+    item_flags: [HIDE_ATTRIBUTES]
+    slot: 30
+    display_name: '%vault_prefix%&f%player_name% &x&B&7&3&5&3&5д&x&C&B&5&D&4&Fе&x&D&E&8&5&6&9п&x&D&1&6&A&5&8н&x&C&4&5&0&4&6у&x&B&7&3&5&3&5л'
+    lore:
+      - '&#B73535&l┃ '
+      - '&#B73535&l┃ &fТитул: &x&B&7&3&5&3&5д&x&C&B&5&D&4&Fе&x&D&E&8&5&6&9п&x&D&1&6&A&5&8н&x&C&4&5&0&4&6у&x&B&7&3&5&3&5л'
+      - '&#B73535&l┃ &fДоступ: &aДа'
+      - '&#B73535&l┃ '
+      - '&7● &fНажмите, чтобы применить'
+    view_requirement:
+      requirements:
+        perm_check:
+          type: 'has permission'
+          permission: title.7
+    click_commands:
+      - '[console] lp user %player_name% meta setsuffix " &x&B&7&3&5&3&5д&x&C&B&5&D&4&Fе&x&D&E&8&5&6&9п&x&D&1&6&A&5&8н&x&C&4&5&0&4&6у&x&B&7&3&5&3&5л"'
+      - '[sound] BLOCK_NOTE_BLOCK_BELL'
+
+  'титул8нет':
+    material: barrier
+    priority: 1
+    item_flags: [HIDE_ATTRIBUTES]
+    slot: 31
+    display_name: '%vault_prefix%&f%player_name% &x&1&2&F&F&9&5м&x&1&2&F&1&C&Aа&x&1&2&E&2&F&Fб&x&1&2&F&1&C&Aо&x&1&2&F&F&9&5й'
+    lore:
+      - '&#12FF95&l┃ '
+      - '&#12FF95&l┃ &fТитул: &x&1&2&F&F&9&5м&x&1&2&F&1&C&Aа&x&1&2&E&2&F&Fб&x&1&2&F&1&C&Aо&x&1&2&F&F&9&5й'
+      - '&#12FF95&l┃ &fДоступ: &cНет'
+  'титул8да':
+    material: book
+    priority: 0
+    item_flags: [HIDE_ATTRIBUTES]
+    slot: 31
+    display_name: '%vault_prefix%&f%player_name% &x&1&2&F&F&9&5м&x&1&2&F&1&C&Aа&x&1&2&E&2&F&Fб&x&1&2&F&1&C&Aо&x&1&2&F&F&9&5й'
+    lore:
+      - '&#12FF95&l┃ '
+      - '&#12FF95&l┃ &fТитул: &x&1&2&F&F&9&5м&x&1&2&F&1&C&Aа&x&1&2&E&2&F&Fб&x&1&2&F&1&C&Aо&x&1&2&F&F&9&5й'
+      - '&#12FF95&l┃ &fДоступ: &aДа'
+      - '&#12FF95&l┃ '
+      - '&7● &fНажмите, чтобы применить'
+    view_requirement:
+      requirements:
+        perm_check:
+          type: 'has permission'
+          permission: title.8
+    click_commands:
+      - '[console] lp user %player_name% meta setsuffix " &x&1&2&F&F&9&5м&x&1&2&F&1&C&Aа&x&1&2&E&2&F&Fб&x&1&2&F&1&C&Aо&x&1&2&F&F&9&5й"'
+      - '[sound] BLOCK_NOTE_BLOCK_BELL'
+
+  'титул9нет':
+    material: barrier
+    priority: 1
+    item_flags: [HIDE_ATTRIBUTES]
+    slot: 32
+    display_name: '%vault_prefix%&f%player_name% &x&1&2&7&8&F&Fс&x&0&E&8&2&F&Fу&x&0&B&8&D&F&Fб&x&0&7&9&7&F&Fо &x&0&0&A&C&F&Fб&x&0&4&A&2&F&Fр&x&0&7&9&7&F&Fа&x&0&B&8&D&F&Fт&x&0&E&8&2&F&Fи&x&1&2&7&8&F&Fк'
+    lore:
+      - '&#1278FF&l┃ '
+      - '&#1278FF&l┃ &fТитул: &x&1&2&7&8&F&Fс&x&0&E&8&2&F&Fу&x&0&B&8&D&F&Fб&x&0&7&9&7&F&Fо &x&0&0&A&C&F&Fб&x&0&4&A&2&F&Fр&x&0&7&9&7&F&Fа&x&0&B&8&D&F&Fт&x&0&E&8&2&F&Fи&x&1&2&7&8&F&Fк'
+      - '&#1278FF&l┃ &fДоступ: &cНет'
+  'титул9да':
+    material: book
+    priority: 0
+    item_flags: [HIDE_ATTRIBUTES]
+    slot: 32
+    display_name: '%vault_prefix%&f%player_name% &x&1&2&7&8&F&Fс&x&0&E&8&2&F&Fу&x&0&B&8&D&F&Fб&x&0&7&9&7&F&Fо &x&0&0&A&C&F&Fб&x&0&4&A&2&F&Fр&x&0&7&9&7&F&Fа&x&0&B&8&D&F&Fт&x&0&E&8&2&F&Fи&x&1&2&7&8&F&Fк'
+    lore:
+      - '&#1278FF&l┃ '
+      - '&#1278FF&l┃ &fТитул: &x&1&2&7&8&F&Fс&x&0&E&8&2&F&Fу&x&0&B&8&D&F&Fб&x&0&7&9&7&F&Fо &x&0&0&A&C&F&Fб&x&0&4&A&2&F&Fр&x&0&7&9&7&F&Fа&x&0&B&8&D&F&Fт&x&0&E&8&2&F&Fи&x&1&2&7&8&F&Fк'
+      - '&#1278FF&l┃ &fДоступ: &aДа'
+      - '&#1278FF&l┃ '
+      - '&7● &fНажмите, чтобы применить'
+    view_requirement:
+      requirements:
+        perm_check:
+          type: 'has permission'
+          permission: title.9
+    click_commands:
+      - '[console] lp user %player_name% meta setsuffix " &x&1&2&7&8&F&Fс&x&0&E&8&2&F&Fу&x&0&B&8&D&F&Fб&x&0&7&9&7&F&Fо &x&0&0&A&C&F&Fб&x&0&4&A&2&F&Fр&x&0&7&9&7&F&Fа&x&0&B&8&D&F&Fт&x&0&E&8&2&F&Fи&x&1&2&7&8&F&Fк"'
+      - '[sound] BLOCK_NOTE_BLOCK_BELL'
+
+  'титул10нет':
+    material: barrier
+    priority: 1
+    item_flags: [HIDE_ATTRIBUTES]
+    slot: 33
+    display_name: '%vault_prefix%&f%player_name% &x&F&2&F&F&1&2с&x&F&6&E&3&1&2п&x&F&B&C&8&1&2о&x&F&F&A&C&1&2р&x&F&B&C&8&1&2т&x&F&6&E&3&1&2и&x&F&2&F&F&1&2к'
+    lore:
+      - '&#F2FF12&l┃ '
+      - '&#F2FF12&l┃ &fТитул: &x&F&2&F&F&1&2с&x&F&6&E&3&1&2п&x&F&B&C&8&1&2о&x&F&F&A&C&1&2р&x&F&B&C&8&1&2т&x&F&6&E&3&1&2и&x&F&2&F&F&1&2к'
+      - '&#F2FF12&l┃ &fДоступ: &cНет'
+  'титул10да':
+    material: book
+    priority: 0
+    item_flags: [HIDE_ATTRIBUTES]
+    slot: 33
+    display_name: '%vault_prefix%&f%player_name% &x&F&2&F&F&1&2с&x&F&6&E&3&1&2п&x&F&B&C&8&1&2о&x&F&F&A&C&1&2р&x&F&B&C&8&1&2т&x&F&6&E&3&1&2и&x&F&2&F&F&1&2к'
+    lore:
+      - '&#F2FF12&l┃ '
+      - '&#F2FF12&l┃ &fТитул: &x&F&2&F&F&1&2с&x&F&6&E&3&1&2п&x&F&B&C&8&1&2о&x&F&F&A&C&1&2р&x&F&B&C&8&1&2т&x&F&6&E&3&1&2и&x&F&2&F&F&1&2к'
+      - '&#F2FF12&l┃ &fДоступ: &aДа'
+      - '&#F2FF12&l┃ '
+      - '&7● &fНажмите, чтобы применить'
+    view_requirement:
+      requirements:
+        perm_check:
+          type: 'has permission'
+          permission: title.10
+    click_commands:
+      - '[console] lp user %player_name% meta setsuffix " &x&F&2&F&F&1&2с&x&F&6&E&3&1&2п&x&F&B&C&8&1&2о&x&F&F&A&C&1&2р&x&F&B&C&8&1&2т&x&F&6&E&3&1&2и&x&F&2&F&F&1&2к"'
+      - '[sound] BLOCK_NOTE_BLOCK_BELL'
+
+  'cleartitle':
+    material: writable_book
+    item_flags: [HIDE_ATTRIBUTES]
+    slot: 4
+    display_name: '&7« &#F8BEFBОчистить титул &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fОписание: &#F8BEFBСбросить действующий титул'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для очистки'
+    click_commands:
+      - '[console] lp user %player_name% meta clear'
+      - '[sound] BLOCK_NOTE_BLOCK_BELL'
+
+  'info':
+    slot: 49
+    material: "basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0="
+    display_name: '&7« &#F8BEFBНаши сообщества &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fБудьте в курсе: &#F8BEFBВсех новостей'
+      - '&#F8BEFB&l┃ &fСвежие обновления: &#F8BEFBАнонсы'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для отправки ссылок в чат'
+    click_commands:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBСообщества'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message] &#F8BEFB&l┃ &fTelegram канал: &#229ED9t.me/elytrix_ru'
+      - '[message] &#F8BEFB&l┃ &fDiscord сервер: &#5865F2dsc.gg/elytrix'
+      - '[message]'
+      - '[close]'
+
+  'close':
+    material: black_dye
+    slot: 45
+    display_name: '&7« &#F8BEFBНазад &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fВернуться в предыдущее меню.'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для перехода'
+    click_commands:
+      - '[openguimenu] customizemenu'
+
+  'design_purple_panel':
+    material: purple_stained_glass_pane
+    display_name: '&r'
+    slots:
+      - 27
+      - 35
+      - 36
+      - 37
+      - 43
+      - 44
+      - 46
+      - 47
+      - 48
+      - 50
+      - 51
+      - 52
+      - 53
+  'design_black_panel':
+    material: black_stained_glass_pane
+    display_name: '&r'
+    slots:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 5
+      - 6
+      - 7
+      - 8
+      - 9
+      - 10
+      - 16
+      - 17
+      - 18
+      - 26

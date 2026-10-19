@@ -1,0 +1,217 @@
+menu_title: '&#F8BEFB&lЗачарования'
+size: 53
+items:
+  'bur':
+    material: enchanted_book
+    slot: 20
+    display_name: '&7« &aБур &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fОписание: &#F8BEFBЛомает область 3x3'
+      - '&#F8BEFB&l┃ &fПредмет: &#F8BEFBКирка'
+      - '&#F8BEFB&l┃ &fУправление: &#F8BEFBSHIFT + ПКМ'
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB499 коинов'
+      - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для покупки'
+    click_requirement:
+      requirements:
+        anything_here:
+          type: '>='
+          input: '%playerpoints_points%'
+          output: '499'
+      deny_commands:
+        - '[message]'
+        - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+        - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+        - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+        - '[message]'
+        - '[close]'
+    click_commands:
+      - '[console] elytrixitem:ei give %player_name% enchant_byr 1'
+      - '[console] p take %player_name% 499'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+
+  'explosive_arrow':
+    material: enchanted_book
+    slot: 22
+    display_name: '&7« &cВзрывная стрела &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fОписание: &#F8BEFBВзрыв 2 блока при попадании'
+      - '&#F8BEFB&l┃ &fПредмет: &#F8BEFBЛук, Арбалет'
+      - '&#F8BEFB&l┃ &fШанс: &#F8BEFB40%'
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB399 коинов'
+      - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для покупки'
+    click_requirement:
+      requirements:
+        anything_here:
+          type: '>='
+          input: '%playerpoints_points%'
+          output: '399'
+      deny_commands:
+        - '[message]'
+        - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+        - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+        - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+        - '[message]'
+        - '[close]'
+    click_commands:
+      - '[console] elytrixitem:ei give %player_name% enchant_explosive_arrow 1'
+      - '[console] p take %player_name% 399'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+
+  'sun_shackles':
+    material: enchanted_book
+    slot: 24
+    display_name: '&7« &6Солнечные оковы &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fОписание: &#F8BEFBЗолотой вид + статы незерита'
+      - '&#F8BEFB&l┃ &fПредмет: &#F8BEFBАлмазный / Незеритовый шлем'
+      - '&#F8BEFB&l┃ &fПрочность: &#F8BEFBНеразрушимый'
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB599 коинов'
+      - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для покупки'
+    click_requirement:
+      requirements:
+        anything_here:
+          type: '>='
+          input: '%playerpoints_points%'
+          output: '599'
+      deny_commands:
+        - '[message]'
+        - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+        - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+        - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+        - '[message]'
+        - '[close]'
+    click_commands:
+      - '[console] elytrixitem:ei give %player_name% enchant_sun_shackles 1'
+      - '[console] p take %player_name% 599'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+
+  'anvil':
+    material: anvil
+    slot: 31
+    display_name: '&7« &#F8BEFBНаковальня &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fОписание: &#F8BEFBОбычная наковальня'
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB29 коинов'
+      - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для покупки'
+    click_requirement:
+      requirements:
+        anything_here:
+          type: '>='
+          input: '%playerpoints_points%'
+          output: '29'
+      deny_commands:
+        - '[message]'
+        - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+        - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+        - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+        - '[message]'
+        - '[close]'
+    click_commands:
+      - '[console] minecraft:give %player_name% minecraft:anvil 1'
+      - '[console] p take %player_name% 29'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+
+  'info':
+    slot: 49
+    material: "basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0="
+    display_name: '&7« &#F8BEFBНаши сообщества &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fБудьте в курсе: &#F8BEFBВсех новостей'
+      - '&#F8BEFB&l┃ &fСвежие обновления: &#F8BEFBАнонсы'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для отправки ссылок в чат'
+    click_commands:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBСообщества'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message] &#F8BEFB&l┃ &fTelegram канал: &#229ED9t.me/elytrix_ru'
+      - '[message] &#F8BEFB&l┃ &fDiscord сервер: &#5865F2dsc.gg/elytrix'
+      - '[message]'
+      - '[close]'
+
+  'close':
+    material: black_dye
+    slot: 45
+    display_name: '&7« &#F8BEFBНазад &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fВернуться в предыдущее меню.'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для перехода'
+    click_commands:
+      - '[openguimenu] shop'
+
+  'design_purple_panel':
+    material: purple_stained_glass_pane
+    display_name: '&r'
+    slots:
+      - 27
+      - 35
+      - 36
+      - 37
+      - 43
+      - 44
+      - 46
+      - 47
+      - 48
+      - 50
+      - 51
+      - 52
+      - 53
+
+  'design_black_panel':
+    material: black_stained_glass_pane
+    display_name: '&r'
+    slots:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+      - 8
+      - 9
+      - 10
+      - 16
+      - 17
+      - 18
+      - 26

@@ -1,0 +1,298 @@
+menu_title: '&#F8BEFB&lУникальные предметы'
+size: 53
+items:
+  'tyagun':
+    slot: 13
+    material: trident
+    display_name: '&7« &bТягун &7»'
+    lore:
+      - '&#F8BEFB&l┃'  
+      - '&#F8BEFB&l┃ &fТип: &bРеликвия'
+      - '&#F8BEFB&l┃ &fСвойство: &bПритягивает вас к цели при попадании'
+      - '&#F8BEFB&l┃ &fЦель: &#F8BEFBНа всех мобов и игроков'
+      - '&#F8BEFB&l┃'
+      - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB1199 коинов'
+      - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для покупки'
+    click_requirement:
+      requirements:
+        anything_here:
+          type: '>='
+          input: '%playerpoints_points%'
+          output: '1199'
+      deny_commands:
+        - '[message]'
+        - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+        - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+        - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+        - '[message]'
+        - '[close]'
+    click_commands:
+      - '[console] elytrixitem:ei give %player_name% tyagun 1'
+      - '[console] p take %player_name% 1199'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+
+  'collector_sword':
+    slot: 21
+    material: netherite_sword
+    display_name: '&7« &#A8FF78Меч Сбора &7»'
+    lore:
+      - '&#F8BEFB&l┃'  
+      - '&#F8BEFB&l┃ &fТип: &#A8FF78Артефакт'
+      - '&#F8BEFB&l┃ &fСвойство: &#F8BEFBУдваивает выпадение опыта'
+      - '&#F8BEFB&l┃ &fЦель: &#F8BEFBТолько мобы'
+      - '&#F8BEFB&l┃'
+      - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB2499 коинов'
+      - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для покупки'
+    click_requirement:
+      requirements:
+        anything_here:
+          type: '>='
+          input: '%playerpoints_points%'
+          output: '2499'
+      deny_commands:
+        - '[message]'
+        - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+        - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+        - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+        - '[message]'
+        - '[close]'
+    click_commands:
+      - '[console] elytrixitem:ei give %player_name% collector_sword 1'
+      - '[console] p take %player_name% 2499'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+
+  'infinite_firework':
+    slot: 22
+    material: firework_rocket
+    display_name: '&7« &#D8A6FFБесконечный фейерверк &7»'
+    lore:
+      - '&#F8BEFB&l┃'  
+      - '&#F8BEFB&l┃ &fТип: &#D8A6FFАртефакт'
+      - '&#F8BEFB&l┃ &fСвойство: &#F8BEFBНе тратится при использовании'
+      - '&#F8BEFB&l┃ &fПерезарядка: &#F8BEFB5 секунд'
+      - '&#F8BEFB&l┃'
+      - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB999 коинов'
+      - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для покупки'
+    click_requirement:
+      requirements:
+        anything_here:
+          type: '>='
+          input: '%playerpoints_points%'
+          output: '999'
+      deny_commands:
+        - '[message]'
+        - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+        - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+        - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+        - '[message]'
+        - '[close]'
+    click_commands:
+      - '[console] elytrixitem:ei give %player_name% infinite_firework 1'
+      - '[console] p take %player_name% 999'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+
+  'anti_pearl':
+    slot: 23
+    material: ender_eye
+    display_name: '&7« &#8C5196Анти-Пёрл &7»'
+    lore:
+      - '&#F8BEFB&l┃'  
+      - '&#F8BEFB&l┃ &fТип: &#8C5196Артефакт'
+      - '&#F8BEFB&l┃ &fРадиус: &#F8BEFB15 блоков'
+      - '&#F8BEFB&l┃ &fДлительность: &#F8BEFB30 секунд'
+      - '&#F8BEFB&l┃ &fПерезарядка: &#F8BEFB60 секунд'
+      - '&#F8BEFB&l┃'
+      - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB49 коинов'
+      - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для покупки'
+    click_requirement:
+      requirements:
+        anything_here:
+          type: '>='
+          input: '%playerpoints_points%'
+          output: '49'
+      deny_commands:
+        - '[message]'
+        - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+        - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+        - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+        - '[message]'
+        - '[close]'
+    click_commands:
+      - '[console] elytrixitem:ei give %player_name% anti_pearl 1'
+      - '[console] p take %player_name% 49'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+
+  'explosive_trap':
+    slot: 30
+    material: fire_charge
+    display_name: '&7« &#FF6B6BВзрывная ловушка &7»'
+    lore:
+      - '&#F8BEFB&l┃'
+      - '&#F8BEFB&l┃ &fТип: &#FF6B6BАртефакт'
+      - '&#F8BEFB&l┃ &fРадиус урона: &#FF6B6B5 блоков'
+      - '&#F8BEFB&l┃ &fДействует: &#FF6B6B20 секунд'
+      - '&#F8BEFB&l┃'
+      - '&7● &fСоздаёт укреплённый метеоритный кратер'
+      - '&7● &fНе позволяет выбраться из ловушки'
+      - '&7● &fРезко выбрасывает игроков одним импульсом'
+      - '&7● &fНажмите ПКМ для активации'
+      - '&#F8BEFB&l┃'
+      - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB99 коинов'
+      - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для покупки'
+    click_requirement:
+      requirements:
+        anything_here:
+          type: '>='
+          input: '%playerpoints_points%'
+          output: '99'
+      deny_commands:
+        - '[message]'
+        - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+        - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+        - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+        - '[message]'
+        - '[close]'
+    click_commands:
+      - '[console] elytrixitem:ei give %player_name% explosive_trap 1'
+      - '[console] p take %player_name% 99'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+
+  'experience_pot':
+    slot: 32
+    material: flower_pot
+    display_name: '&7« &#8B7D6BГоршочек с опытом &7»'
+    lore:
+      - '&#F8BEFB&l┃'  
+      - '&#F8BEFB&l┃ &fТип: &#8B7D6BАртефакт'
+      - '&#F8BEFB&l┃ &fХранение: &#F8BEFBДо 100 уровней'
+      - '&#F8BEFB&l┃'
+      - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB1299 коинов'
+      - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для покупки'
+    click_requirement:
+      requirements:
+        anything_here:
+          type: '>='
+          input: '%playerpoints_points%'
+          output: '1299'
+      deny_commands:
+        - '[message]'
+        - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+        - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+        - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+        - '[message]'
+        - '[close]'
+    click_commands:
+      - '[console] elytrixitem:ei give %player_name% experience_pot 1'
+      - '[console] p take %player_name% 1299'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+
+  'info':
+    slot: 49
+    material: "basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0="
+    display_name: '&7« &#F8BEFBНаши сообщества &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fБудьте в курсе: &#F8BEFBВсех новостей'
+      - '&#F8BEFB&l┃ &fСвежие обновления: &#F8BEFBАнонсы'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для отправки ссылок в чат'
+    click_commands:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBСообщества'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message] &#F8BEFB&l┃ &fTelegram канал: &#229ED9t.me/elytrix_ru'
+      - '[message] &#F8BEFB&l┃ &fDiscord сервер: &#5865F2dsc.gg/elytrix'
+      - '[message]'
+      - '[close]'
+
+  'close':
+    material: black_dye
+    slot: 45
+    display_name: '&7« &#F8BEFBНазад &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fВернуться в предыдущее меню.'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для перехода'
+    click_commands:
+      - '[openguimenu] shop'
+
+  'design_purple_panel':
+    material: purple_stained_glass_pane
+    display_name: '&r'
+    slots:
+      - 27
+      - 35
+      - 36
+      - 37
+      - 43
+      - 44
+      - 46
+      - 47
+      - 48
+      - 50
+      - 51
+      - 52
+      - 53
+
+  'design_black_panel':
+    material: black_stained_glass_pane
+    display_name: '&r'
+    slots:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+      - 8
+      - 9
+      - 10
+      - 16
+      - 17
+      - 18
+      - 26

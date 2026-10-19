@@ -1,0 +1,242 @@
+menu_title: '&#F8BEFB&lМагические шары'
+size: 53
+items:
+  'donshar':
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzg0NzU3ZWM3MjYxMmVlYWMxOWNjYWY4MGIzMWM4NjFjNzkxZjI1ZDMyZGRhM2ZiMzdmNTUyMDU3NTVhMDQifX19
+    slot: 31
+    display_name: '&7« &#F8BEFBШар Повелителя &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСила III'
+      - '&#F8BEFB&l┃ &fСкорость II'
+      - '&#F8BEFB&l┃ &fРегенерация I'
+      - '&#F8BEFB&l┃ &fСопротивление I'
+      - '&#F8BEFB&l┃ &fОгнестойкость I'
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB99 рублей'
+      - '&#F8BEFB&l┃ &fПокупка на сайте: &#F8BEFBelytrix.pw'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для получения ссылки'
+    click_commands:
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &fПриобрести предмет можно на сайте: &#F8BEFBelytrix.pw'
+      - '[close]'
+
+  'shar1':
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTQ1ZmQyYzM3MzZhZjRiZDI4MTEyOTY2NjFlMGNiNDliYWIyY2ZhNjVmNWM5ZTU5OGFhNDNiZWJmYTFlYTM2OCJ9fX0=
+    slot: 20
+    display_name: '&7« &#F8BEFBШар Новичка &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСила II'
+      - '&#F8BEFB&l┃ &fОгнестойкость I'
+      - '&#F8BEFB&l┃ &fСопротивление I'
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB389 коинов'
+      - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для покупки'
+    click_requirement:
+      requirements:
+        anything_here:
+          type: '>='
+          input: '%playerpoints_points%'
+          output: '389'
+      deny_commands:
+        - '[message]'
+        - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+        - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+        - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+        - '[message]'
+        - '[close]'
+    click_commands:
+      - '[console] shadowci give %player_name% shar1'
+      - '[console] p take %player_name% 389'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+
+  'shar2':
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTFiNGIyMDE4OWQ5MDJiYzZjM2ZhYmUyM2Q5ZjU3ODY5N2Y1NDRjZjQxNTMxNzc4NzM3NDExODM5M2RhNCJ9fX0=
+    slot: 21
+    display_name: '&7« &#F8BEFBШар Змеи &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСила II'
+      - '&#F8BEFB&l┃ &fСкорость I'
+      - '&#F8BEFB&l┃ &fСопротивление I'
+      - '&#F8BEFB&l┃ &fОгнестойкость I'
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB679 коинов'
+      - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для покупки'
+    click_requirement:
+      requirements:
+        anything_here:
+          type: '>='
+          input: '%playerpoints_points%'
+          output: '679'
+      deny_commands:
+        - '[message]'
+        - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+        - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+        - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+        - '[message]'
+        - '[close]'
+    click_commands:
+      - '[console] shadowci give %player_name% shar2'
+      - '[console] p take %player_name% 679'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+
+  'shar3':
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjg5MDQyMDgyYmI3YTc2MThiNzg0ZWU3NjA1YTEzNGM1ODgzNGUyMWUzNzRjODg4OTM3MTYxMDU3ZjZjNyJ9fX0=
+    slot: 23
+    display_name: '&7« &#F8BEFBШар Солнца &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСила II'
+      - '&#F8BEFB&l┃ &fСкорость II'
+      - '&#F8BEFB&l┃ &fСопротивление I'
+      - '&#F8BEFB&l┃ &fОгнестойкость I'
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB949 коинов'
+      - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для покупки'
+    click_requirement:
+      requirements:
+        anything_here:
+          type: '>='
+          input: '%playerpoints_points%'
+          output: '949'
+      deny_commands:
+        - '[message]'
+        - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+        - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+        - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+        - '[message]'
+        - '[close]'
+    click_commands:
+      - '[console] shadowci give %player_name% shar3'
+      - '[console] p take %player_name% 949'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+
+  'shar4':
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjVjNGQyNGFmZmRkNDgxMDI2MjAzNjE1MjdkMjE1NmUxOGMyMjNiYWU1MTg5YWM0Mzk4MTU2NDNmM2NmZjlkIn19fQ==
+    slot: 24
+    display_name: '&7« &#F8BEFBШар Шалкера &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСила II'
+      - '&#F8BEFB&l┃ &fСкорость II'
+      - '&#F8BEFB&l┃ &fСопротивление II'
+      - '&#F8BEFB&l┃ &fОгнестойкость I'
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB1379 коинов'
+      - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для покупки'
+    click_requirement:
+      requirements:
+        anything_here:
+          type: '>='
+          input: '%playerpoints_points%'
+          output: '1379'
+      deny_commands:
+        - '[message]'
+        - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+        - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+        - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+        - '[message]'
+        - '[close]'
+    click_commands:
+      - '[console] shadowci give %player_name% shar4'
+      - '[console] p take %player_name% 1379'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[close]'
+
+  'info':
+    slot: 49
+    material: "basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0="
+    display_name: '&7« &#F8BEFBНаши сообщества &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fБудьте в курсе: &#F8BEFBВсех новостей'
+      - '&#F8BEFB&l┃ &fСвежие обновления: &#F8BEFBАнонсы'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для отправки ссылок в чат'
+    click_commands:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBСообщества'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message] &#F8BEFB&l┃ &fTelegram канал: &#229ED9t.me/elytrix_ru'
+      - '[message] &#F8BEFB&l┃ &fDiscord сервер: &#5865F2dsc.gg/elytrix'
+      - '[message]'
+      - '[close]'
+
+  'close':
+    material: black_dye
+    slot: 45
+    display_name: '&7« &#F8BEFBНазад &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fВернуться в предыдущее меню.'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для перехода'
+    click_commands:
+      - '[openguimenu] shop'
+
+  'design_purple_panel':
+    material: purple_stained_glass_pane
+    display_name: '&r'
+    slots:
+      - 27
+      - 35
+      - 36
+      - 37
+      - 43
+      - 44
+      - 46
+      - 47
+      - 48
+      - 50
+      - 51
+      - 52
+      - 53
+
+  'design_black_panel':
+    material: black_stained_glass_pane
+    display_name: '&r'
+    slots:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+      - 8
+      - 9
+      - 10
+      - 16
+      - 17
+      - 18
+      - 26
