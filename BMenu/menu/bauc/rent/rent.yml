@@ -6,7 +6,6 @@ title: '<#F8BEFB>☁ <white>Аренда слотов'
 
 items:
   d:
-    slot: 20
     material: golden_carrot
     amount: '{slot_count}'
     name: '<#F8BEFB>Аренда <white>+{slot_count} <gray>· <white>1 час'
@@ -44,6 +43,7 @@ items:
           - '<green>● Аренда активна'
           - '<gray>● Истекает: <#F8BEFB>{expiry}'
       - lore:
+          - '<#F8BEFB><b>┃</b> '
           - '<#F8BEFB><b>┃</b> <white>Коины: <#F8BEFB>{pp_price_commas}'
           - '<#F8BEFB><b>┃</b> <white>Монеты: <#F8BEFB>${eco_price_commas}'
           - '<#F8BEFB><b>┃</b> <white>Баланс: <#F8BEFB>%playerpoints_points% <gray>| <#F8BEFB>$%vault_eco_balance_commas%'
@@ -65,7 +65,6 @@ items:
           expiri_ceil_hours: '{math:ceil(%bauctionv2_lp_ttl_auc.boost.rent1% / 3600000)}'
 
   e:
-    slot: 21
     material: golden_carrot
     amount: '{slot_count}'
     name: '<#F8BEFB>Аренда <white>+{slot_count} <gray>· <white>1 час'
@@ -103,6 +102,7 @@ items:
           - '<green>● Аренда активна'
           - '<gray>● Истекает: <#F8BEFB>{expiry}'
       - lore:
+          - '<#F8BEFB><b>┃</b> '
           - '<#F8BEFB><b>┃</b> <white>Коины: <#F8BEFB>{pp_price_commas}'
           - '<#F8BEFB><b>┃</b> <white>Монеты: <#F8BEFB>${eco_price_commas}'
           - '<#F8BEFB><b>┃</b> <white>Баланс: <#F8BEFB>%playerpoints_points% <gray>| <#F8BEFB>$%vault_eco_balance_commas%'
@@ -124,7 +124,6 @@ items:
           expiri_ceil_hours: '{math:ceil(%bauctionv2_lp_ttl_auc.boost.rent3% / 3600000)}'
 
   f:
-    slot: 22
     material: golden_carrot
     amount: '{slot_count}'
     name: '<#F8BEFB>Аренда <white>+{slot_count} <gray>· <white>1 час'
@@ -162,6 +161,7 @@ items:
           - '<green>● Аренда активна'
           - '<gray>● Истекает: <#F8BEFB>{expiry}'
       - lore:
+          - '<#F8BEFB><b>┃</b> '
           - '<#F8BEFB><b>┃</b> <white>Коины: <#F8BEFB>{pp_price_commas}'
           - '<#F8BEFB><b>┃</b> <white>Монеты: <#F8BEFB>${eco_price_commas}'
           - '<#F8BEFB><b>┃</b> <white>Баланс: <#F8BEFB>%playerpoints_points% <gray>| <#F8BEFB>$%vault_eco_balance_commas%'
@@ -183,7 +183,6 @@ items:
           expiri_ceil_hours: '{math:ceil(%bauctionv2_lp_ttl_auc.boost.rent5% / 3600000)}'
 
   g:
-    slot: 23
     material: golden_carrot
     amount: '{slot_count}'
     name: '<#F8BEFB>Аренда <white>+{slot_count} <gray>· <white>1 час'
@@ -221,6 +220,7 @@ items:
           - '<green>● Аренда активна'
           - '<gray>● Истекает: <#F8BEFB>{expiry}'
       - lore:
+          - '<#F8BEFB><b>┃</b> '
           - '<#F8BEFB><b>┃</b> <white>Коины: <#F8BEFB>{pp_price_commas}'
           - '<#F8BEFB><b>┃</b> <white>Монеты: <#F8BEFB>${eco_price_commas}'
           - '<#F8BEFB><b>┃</b> <white>Баланс: <#F8BEFB>%playerpoints_points% <gray>| <#F8BEFB>$%vault_eco_balance_commas%'
@@ -242,7 +242,6 @@ items:
           expiri_ceil_hours: '{math:ceil(%bauctionv2_lp_ttl_auc.boost.rent10% / 3600000)}'
 
   h:
-    slot: 24
     material: golden_carrot
     amount: 20
     name: '<#F8BEFB>Аренда <white>+20 <gray>· <white>1 час'
@@ -294,6 +293,7 @@ items:
               price: '2490'
               is_pp: true
       - lore:
+          - '<#F8BEFB><b>┃</b> '
           - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>2,490 коинов'
           - '<#F8BEFB><b>┃</b> <white>Баланс: <#F8BEFB>%playerpoints_points%'
           - '<#F8BEFB><b>┃</b> '
@@ -316,7 +316,6 @@ items:
               is_pp: true
 
   i:
-    slot: 40
     material: red_dye
     name: '<#F8BEFB>Назад'
     lore:
@@ -328,42 +327,83 @@ items:
       - '[chat] /ah'
 
   b:
-    slot: 1-7,9-19,25-35,37-39,41-43
     name: ''
     material: black_stained_glass_pane
 
   c:
-    slot: 0,8,36,44
     name: ''
     material: purple_stained_glass_pane
 
-  frame:
-    name: ''
-    material: black_stained_glass_pane
-  accent:
-    name: ''
-    material: purple_stained_glass_pane
-
+# Раскладка и порядок сборки — как в elytrix:menu 54, но сжатые в 45 слотов:
+# чёрная «крышка» сверху, фиолетовая «чаша» снизу.
 animation:
   - tick: 0
     opcodes:
-      - set: frame 20-24
-      - sound: 'block.enchantment_table.use 0.28 1.25'
+      - st: i 40
+      - sound: 'block.enchantment_table.use 0.30 1.30'
+  - tick: 1
+    opcodes:
+      - st: c 38,41
+      - sound: 'block.note_block.chime 0.20 0.90'
   - tick: 2
     opcodes:
-      - set: accent 22
-      - sound: 'block.note_block.chime 0.20 1.00'
+      - st: c 39,42
+  - tick: 3
+    opcodes:
+      - st: c 37,43
+      - sound: 'block.note_block.chime 0.21 0.97'
   - tick: 4
     opcodes:
-      - remove: 22
-      - set: accent 21,23
-      - sound: 'block.note_block.pling 0.22 1.10'
+      - st: c 36,44
+  - tick: 5
+    opcodes:
+      - st: c 27,35
+      - sound: 'block.note_block.chime 0.23 1.05'
   - tick: 6
     opcodes:
-      - remove: 21,23
-      - set: accent 20,24
-      - sound: 'block.note_block.pling 0.24 1.20'
+      - st: b 18,26
+      - sound: 'block.note_block.chime 0.25 1.12'
+  - tick: 7
+    opcodes:
+      - st: b 16,17
   - tick: 8
     opcodes:
-      - remove: 20,24
-      - sound: 'block.amethyst_block.chime 0.30 1.40'
+      - st: b 9,10
+      - sound: 'block.note_block.chime 0.26 1.20'
+  - tick: 9
+    opcodes:
+      - st: b 0,8
+  - tick: 10
+    opcodes:
+      - st: b 1,7
+      - sound: 'block.note_block.chime 0.27 1.28'
+  - tick: 11
+    opcodes:
+      - st: b 2,6
+  - tick: 12
+    opcodes:
+      - st: b 3,5
+      - sound: 'block.note_block.chime 0.28 1.36'
+  - tick: 13
+    opcodes:
+      - st: b 4
+  - tick: 14
+    opcodes:
+      - st: d 20
+      - sound: 'block.note_block.pling 0.26 1.00'
+  - tick: 15
+    opcodes:
+      - st: e 21
+      - sound: 'block.note_block.pling 0.27 1.07'
+  - tick: 16
+    opcodes:
+      - st: f 22
+      - sound: 'block.note_block.pling 0.28 1.15'
+  - tick: 17
+    opcodes:
+      - st: g 23
+      - sound: 'block.note_block.pling 0.29 1.23'
+  - tick: 18
+    opcodes:
+      - st: h 24
+      - sound: 'block.amethyst_block.chime 0.32 1.35'

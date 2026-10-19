@@ -271,7 +271,7 @@ items:
   frame:
     slot: 9,17,18,26,27,35,36,44
     name: ''
-    material: black_stained_glass_pane
+    material: chain
   accent:
     slot: 0-8
     name: ''
@@ -279,42 +279,42 @@ items:
   gap:
     slot: 47
     name: ''
-    material: black_stained_glass_pane
+    material: chain
+  cage:
+    name: ''
+    material: chain
 
 animation:
-  # Кнопки (45-53) лежат в базовом слое (0), поэтому их шторка живёт в штатном
-  # слое анимации (1) — его BAuctionV2 не очищает, поэтому ряда не "моргает".
-  # Сетка лотов лежит в слое 2, её закрываем только через [layer] 3.
-  # Кадр 1 повторяет установку сетки: при открытии LotsMenu.generate() чистит слой 3.
+  # «Клетка»: товары при открытии закованы в цепи — как закрытый аукцион.
+  # Цепи ставим в слой 3 (над лотами, которые лежат в слое 2), затем снимаем
+  # снизу вверх, ряд за рядом. Звуки — родные для цепей в 1.21.4.
+  # Кадр 1 повторяет установку: при открытии LotsMenu.generate() чистит слой 3.
   - tick: 0
     opcodes:
-      - set: frame 45-53
-      - cmd: '[layer] 3 set frame 10-16,19-25,28-34,37-43'
-      - sound: 'block.enchantment_table.use 0.28 1.35'
+      - cmd: '[layer] 3 set cage 10-16,19-25,28-34,37-43'
+      - sound: 'block.chain.place 0.50 1.10'
   - tick: 1
     opcodes:
-      - cmd: '[layer] 3 set frame 10-16,19-25,28-34,37-43'
-  - tick: 2
+      - cmd: '[layer] 3 set cage 10-16,19-25,28-34,37-43'
+  - tick: 3
     opcodes:
-      - cmd: '[layer] 3 remove 10-16'
-      - sound: 'block.note_block.pling 0.10 1.00'
-  - tick: 4
-    opcodes:
-      - cmd: '[layer] 3 remove 19-25'
-      - sound: 'block.note_block.pling 0.12 1.10'
+      - cmd: '[layer] 3 remove 37-43'
+      - sound: 'block.chain.break 0.55 1.05'
   - tick: 6
     opcodes:
       - cmd: '[layer] 3 remove 28-34'
-      - sound: 'block.note_block.pling 0.14 1.20'
-  - tick: 8
-    opcodes:
-      - cmd: '[layer] 3 remove 37-43'
-      - sound: 'block.note_block.pling 0.16 1.30'
+      - sound: 'block.chain.break 0.60 1.15'
   - tick: 9
     opcodes:
-      - set: accent 45-53
-      - sound: 'block.note_block.chime 0.22 1.25'
-  - tick: 11
+      - cmd: '[layer] 3 remove 19-25'
+      - sound: 'block.chain.break 0.65 1.25'
+  - tick: 12
     opcodes:
-      - remove: 45-53
-      - sound: 'block.amethyst_block.chime 0.28 1.55'
+      - cmd: '[layer] 3 remove 10-16'
+      - sound: 'block.chain.break 0.70 1.35'
+  - tick: 14
+    opcodes:
+      - sound: 'block.chain.fall 0.45 1.20'
+  - tick: 16
+    opcodes:
+      - sound: 'block.amethyst_block.chime 0.30 1.45'

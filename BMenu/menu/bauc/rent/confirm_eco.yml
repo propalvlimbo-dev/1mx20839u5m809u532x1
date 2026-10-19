@@ -21,7 +21,6 @@ menu-events:
 
 items:
   b:
-    slot: 22
     name: '<#F8BEFB>Аренда <white>+{slot_count} <gray>· <white>{hours_count} час'
     amount: '{slot_count}'
     lore: '{lore}'
@@ -49,7 +48,6 @@ items:
             - sound: entity.villager.no 0.35 1
 
   a:
-    slot: 20
     name: '<green>Купить'
     lore:
       - '<#F8BEFB><b>┃</b> '
@@ -58,7 +56,6 @@ items:
     on_click: *do_click
 
   c:
-    slot: 24
     name: '<red>Отмена'
     lore:
       - '<#F8BEFB><b>┃</b> '
@@ -69,6 +66,70 @@ items:
       - back: ''
 
   d:
-    slot: 0-19,21,23,25-44
     name: ''
     material: black_stained_glass_pane
+
+  e:
+    name: ''
+    material: purple_stained_glass_pane
+
+# Рамка как в elytrix:menu: сначала «Отмена», затем чаша и крышка, товар и «Купить» — в конце.
+animation:
+  - tick: 0
+    opcodes:
+      - st: c 24
+      - sound: 'block.enchantment_table.use 0.30 1.30'
+  - tick: 1
+    opcodes:
+      - st: e 38,41
+      - sound: 'block.note_block.chime 0.20 0.90'
+  - tick: 2
+    opcodes:
+      - st: e 39,42
+  - tick: 3
+    opcodes:
+      - st: e 37,43
+      - sound: 'block.note_block.chime 0.21 0.97'
+  - tick: 4
+    opcodes:
+      - st: e 36,44
+  - tick: 5
+    opcodes:
+      - st: e 27,35
+      - sound: 'block.note_block.chime 0.23 1.05'
+  - tick: 6
+    opcodes:
+      - st: d 18,26
+      - sound: 'block.note_block.chime 0.25 1.12'
+  - tick: 7
+    opcodes:
+      - st: d 16,17
+  - tick: 8
+    opcodes:
+      - st: d 9,10
+      - sound: 'block.note_block.chime 0.26 1.20'
+  - tick: 9
+    opcodes:
+      - st: d 0,8
+  - tick: 10
+    opcodes:
+      - st: d 1,7
+      - sound: 'block.note_block.chime 0.27 1.28'
+  - tick: 11
+    opcodes:
+      - st: d 2,6
+  - tick: 12
+    opcodes:
+      - st: d 3,5
+      - sound: 'block.note_block.chime 0.28 1.36'
+  - tick: 13
+    opcodes:
+      - st: d 4
+  - tick: 14
+    opcodes:
+      - st: b 22
+      - sound: 'block.note_block.pling 0.27 1.05'
+  - tick: 15
+    opcodes:
+      - st: a 20
+      - sound: 'block.amethyst_block.chime 0.32 1.35'

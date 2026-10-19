@@ -34,7 +34,6 @@ defaults:
 
 items:
   d:
-    slot: 21
     tick_speed: 20
     on_tick: '[update]'
     args:
@@ -93,6 +92,7 @@ items:
                 - '<#F8BEFB><b>┃</b> '
                 - '<gray>● <white>Продлит аренду на <#F8BEFB>1 час'
       - lore:
+          - '<#F8BEFB><b>┃</b> '
           - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>${eco_price_commas}'
           - '<#F8BEFB><b>┃</b> <white>Баланс: <#F8BEFB>$%vault_eco_balance_commas%'
           - '<#F8BEFB><b>┃</b> '
@@ -109,7 +109,6 @@ items:
                 - '<gray>● Оплата монетами'
 
   e:
-    slot: 23
     tick_speed: 20
     on_tick: '[update]'
     name: '<#F8BEFB>Аренда <white>+{slot_count} <gray>· <white>1 час'
@@ -168,6 +167,7 @@ items:
                 - '<#F8BEFB><b>┃</b> '
                 - '<gray>● <white>Продлит аренду на <#F8BEFB>1 час'
       - lore:
+          - '<#F8BEFB><b>┃</b> '
           - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>{pp_price_commas} коинов'
           - '<#F8BEFB><b>┃</b> <white>Баланс: <#F8BEFB>%playerpoints_points% коинов'
           - '<#F8BEFB><b>┃</b> '
@@ -184,7 +184,6 @@ items:
                 - '<gray>● Оплата коинами'
 
   f:
-    slot: 40
     material: red_dye
     name: '<#F8BEFB>Назад'
     lore:
@@ -196,32 +195,70 @@ items:
       - back: ''
 
   b:
-    slot: 1-7,9-20,22,24,25-35,37-39,41-43
     name: ''
     material: black_stained_glass_pane
 
   c:
-    slot: 0,8,36,44
     name: ''
     material: purple_stained_glass_pane
 
-  frame:
-    name: ''
-    material: black_stained_glass_pane
-  accent:
-    name: ''
-    material: purple_stained_glass_pane
-
+# Та же сборка, что и в auc_rent:home — рамка /menu и кнопки по одной.
 animation:
   - tick: 0
     opcodes:
-      - set: frame 21,23
-      - sound: 'block.enchantment_table.use 0.26 1.20'
+      - st: f 40
+      - sound: 'block.enchantment_table.use 0.30 1.30'
+  - tick: 1
+    opcodes:
+      - st: c 38,41
+      - sound: 'block.note_block.chime 0.20 0.90'
   - tick: 2
     opcodes:
-      - remove: 21
-      - sound: 'block.note_block.chime 0.20 1.05'
+      - st: c 39,42
+  - tick: 3
+    opcodes:
+      - st: c 37,43
+      - sound: 'block.note_block.chime 0.21 0.97'
   - tick: 4
     opcodes:
-      - remove: 23
-      - sound: 'block.amethyst_block.chime 0.28 1.40'
+      - st: c 36,44
+  - tick: 5
+    opcodes:
+      - st: c 27,35
+      - sound: 'block.note_block.chime 0.23 1.05'
+  - tick: 6
+    opcodes:
+      - st: b 18,26
+      - sound: 'block.note_block.chime 0.25 1.12'
+  - tick: 7
+    opcodes:
+      - st: b 16,17
+  - tick: 8
+    opcodes:
+      - st: b 9,10
+      - sound: 'block.note_block.chime 0.26 1.20'
+  - tick: 9
+    opcodes:
+      - st: b 0,8
+  - tick: 10
+    opcodes:
+      - st: b 1,7
+      - sound: 'block.note_block.chime 0.27 1.28'
+  - tick: 11
+    opcodes:
+      - st: b 2,6
+  - tick: 12
+    opcodes:
+      - st: b 3,5
+      - sound: 'block.note_block.chime 0.28 1.36'
+  - tick: 13
+    opcodes:
+      - st: b 4
+  - tick: 14
+    opcodes:
+      - st: d 21
+      - sound: 'block.note_block.pling 0.27 1.05'
+  - tick: 15
+    opcodes:
+      - st: e 23
+      - sound: 'block.amethyst_block.chime 0.32 1.35'
