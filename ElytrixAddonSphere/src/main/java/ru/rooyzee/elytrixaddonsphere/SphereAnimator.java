@@ -61,6 +61,10 @@ public class SphereAnimator extends AbstractAnimation {
     private final Particle ambientParticle;
     /** Частица, из которой собран сам вихрь (режим VORTEX). */
     private final Particle vortexParticle;
+    /** Частицы удара булавы: порыв (GUST_EMITTER_*), GUST и белый дым. */
+    private final Particle maceParticle;
+    private final Particle gustParticle;
+    private final Particle smokeParticle;
     private final Particle.DustOptions dustOptions;
 
     private final List<VirtualEntity> activeItems = new ArrayList<>();
@@ -172,6 +176,9 @@ public class SphereAnimator extends AbstractAnimation {
         this.breezeParticle = parseParticle(this.config.breezeParticle, Particle.CLOUD);
         this.ambientParticle = parseParticle(this.config.ambientParticle, Particle.CLOUD);
         this.vortexParticle = parseParticle(this.config.vortexParticle, Particle.CLOUD);
+        this.maceParticle = parseParticle(this.config.maceParticle, Particle.CLOUD);
+        this.gustParticle = parseParticle(this.config.gustParticle, Particle.CLOUD);
+        this.smokeParticle = parseParticle(this.config.smokeParticle, Particle.CLOUD);
 
         this.dustOptions = new Particle.DustOptions(
                 Color.fromRGB(
@@ -468,7 +475,7 @@ public class SphereAnimator extends AbstractAnimation {
             double y = maceFromY + (maceToY - maceFromY) * p;
             moveTo(maceItem, new Vec3d(center.x, y, center.z));
             if (maceTicks > 0 && ((int) (maceT * maceTicks)) % 2 == 0) {
-                fxHit(Particle.FIREWORK, new Vec3d(center.x, y + 1.1D, center.z), 0, 0.0D, 0.0D, 0.0D, 0.0D);
+                fxHit(smokeParticle, new Vec3d(center.x, y + 1.1D, center.z), 0, 0.0D, 0.05D, 0.0D, 0.0D);
             }
             return;
         }
@@ -529,7 +536,7 @@ public class SphereAnimator extends AbstractAnimation {
 
         for (int i = 0; i < points; i++) {
             double a = 2.0D * Math.PI * i / points;
-            fxHit(trailParticle, new Vec3d(
+            fxHit(gustParticle, new Vec3d(
                     center.x + Math.cos(a) * r,
                     y,
                     center.z + Math.sin(a) * r
@@ -709,14 +716,13 @@ public class SphereAnimator extends AbstractAnimation {
             ((VirtualPlayer) maceItem).playAnimation(EntityAnimation.SWING_MAIN_ARM);
         } catch (Throwable ignored) {
         }
-        // вихрь «получает урон»: звёзды, сердечки урона, пыль и дым
+        // частицы булавы: порыв ветра (как у mace smash), взмах и пыль
         Vec3d chest = hit.add(0.0D, 1.0D, 0.0D);
-        fxHit(Particle.DAMAGE_INDICATOR, chest.add(0.0D, 0.7D, 0.0D), 7, 0.45D, 0.35D, 0.45D, 0.0D);
-        fxHit(Particle.CRIT, chest, 22, 0.5D, 0.45D, 0.5D, 0.15D);
-        fxHit(itemParticle, hit, 14, 0.45D, 0.3D, 0.45D, 0.0D);
-        fxHit(Particle.FIREWORK, hit, 6, 0.5D, 0.4D, 0.5D, 0.05D);
-        fxHit(Particle.EXPLOSION, hit, 1, 0.3D, 0.2D, 0.3D, 0.0D);
+        fxHit(maceParticle, chest, 1, 0.0D, 0.0D, 0.0D, 0.0D);
+        fxHit(gustParticle, chest, 6, 0.35D, 0.3D, 0.35D, 0.05D);
+        fxHit(smokeParticle, hit, 8, 0.35D, 0.25D, 0.35D, 0.02D);
         fxHit(Particle.SWEEP_ATTACK, hit, 3, 0.8D, 0.2D, 0.8D, 0.0D);
+        fxHit(itemParticle, hit, 8, 0.4D, 0.3D, 0.4D, 0.0D);
         sound(hit, Sound.ENTITY_GENERIC_EXPLODE, 1.0F, 1.6F);
         sound(hit, Sound.BLOCK_AMETHYST_BLOCK_CHIME, 0.8F, 0.6F);
         sound(hit, parseSound(config.timings.hurtSound, Sound.ENTITY_BREEZE_JUMP), 1.0F, 0.85F);
@@ -796,10 +802,10 @@ public class SphereAnimator extends AbstractAnimation {
 
         sound(impact, impactSound, 1.0F, 0.85F);
         sound(impact, Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.0F, 1.2F);
-        fxHit(itemParticle, impact, 16, 0.6D, 0.5D, 0.6D, 0.0D);
-        fxHit(Particle.FIREWORK, impact, 8, 0.7D, 0.5D, 0.7D, 0.05D);
-        fxHit(Particle.EXPLOSION, impact, 1, 0.4D, 0.3D, 0.4D, 0.0D);
-        fxHit(Particle.CRIT, impact, 10, 0.5D, 0.4D, 0.5D, 0.1D);
+        fxHit(maceParticle, impact, 1, 0.0D, 0.0D, 0.0D, 0.0D);
+        fxHit(gustParticle, impact, 8, 0.7D, 0.4D, 0.7D, 0.05D);
+        fxHit(smokeParticle, impact, 10, 0.6D, 0.35D, 0.6D, 0.02D);
+        fxHit(itemParticle, impact, 10, 0.6D, 0.5D, 0.6D, 0.0D);
         puff(2);
 
         // если булавы нет — призы падают именно здесь
@@ -1160,6 +1166,9 @@ public class SphereAnimator extends AbstractAnimation {
         final boolean breeze;
         final boolean vortexMode;
         final String vortexParticle;
+        final String maceParticle;
+        final String gustParticle;
+        final String smokeParticle;
         final int vortexEvery;
         final double vortexRadius;
         final double breezeSpin;
@@ -1197,10 +1206,13 @@ public class SphereAnimator extends AbstractAnimation {
             this.breeze = getBool(c, "breeze", true);
             this.vortexMode = getStr(c, "breezeMode", "BREEZE").trim().equalsIgnoreCase("VORTEX");
             this.vortexParticle = getStr(c, "vortexParticle", "WHITE_SMOKE");
+            this.maceParticle = getStr(c, "maceParticle", "GUST_EMITTER_LARGE");
+            this.gustParticle = getStr(c, "gustParticle", "GUST");
+            this.smokeParticle = getStr(c, "smokeParticle", "WHITE_SMOKE");
             this.vortexEvery = (int) clamp(get(c, "vortexEvery", 3), 1, 20);
             this.vortexRadius = clamp(get(c, "vortexRadius", 0.55D), 0.1D, 2.0D);
             this.breezeSpin = clamp(get(c, "breezeSpin", 6.0D), 0.0D, 30.0D);
-            this.breezeRise = clamp(get(c, "breezeRise", 1.6D), 0.0D, 6.0D);
+            this.breezeRise = clamp(get(c, "breezeRise", 2.4D), 0.0D, 6.0D);
             this.breezeHeight = clamp(get(c, "breezeHeight", -0.45D), -2.0D, 2.0D);
             this.breezeParticle = getStr(c, "breezeParticle", "CLOUD");
             this.ambientParticle = getStr(c, "ambientParticle", "WHITE_SMOKE");
@@ -1256,7 +1268,7 @@ public class SphereAnimator extends AbstractAnimation {
             this.ascentSteps = (int) clamp(get(c, "ascentSteps", 8), 2, 15);
             this.ascentGap = (int) clamp(get(c, "ascentGap", 2), 1, 5);
             this.orbitTicks = (int) clamp(get(c, "orbitTicks", 75), 20, 1200);
-            this.breezeUpTicks = (int) clamp(get(c, "breezeUpTicks", 14), 2, 200);
+            this.breezeUpTicks = (int) clamp(get(c, "breezeUpTicks", 20), 2, 200);
             this.breezeHoverTicks = (int) clamp(get(c, "breezeHoverTicks", 6), 0, 100);
             this.maceFallTicks = (int) clamp(get(c, "maceFallTicks", 8), 2, 100);
             this.breezeDownTicks = (int) clamp(get(c, "breezeDownTicks", 4), 2, 200);

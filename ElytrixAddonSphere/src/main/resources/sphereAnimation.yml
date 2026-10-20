@@ -45,9 +45,9 @@ settings:
 
   # Частиц специально немного. FIREWORK и EXPLOSION Minecraft рисует даже
   # при настройке «Частицы: Меньше» и «Минимум», END_ROD/REDSTONE — нет.
-  # След кольца: FIREWORK (всегда виден), END_ROD (белые искры),
-  # ELECTRIC_SPARK (голубые), REDSTONE (красится цветом ниже).
-  particleVector: "FIREWORK"
+  # След кольца (атмосферная группа): SMOKE, CLOUD, END_ROD, REDSTONE.
+  # FIREWORK/CRIT не ставим — они похожи на снежинки.
+  particleVector: "SMOKE"
 
   # Частицы взрыва в момент удара (REDSTONE красится цветом ниже)
   particleItems: "REDSTONE"
@@ -70,6 +70,14 @@ settings:
   # VORTEX — без моба: вихрь рисуется только спиралью частиц (см. vortex*).
   breezeMode: "BREEZE"
 
+  # Частицы удара булавы (как у mace smash):
+  #   maceParticle — большой порыв ветра (GUST_EMITTER_LARGE, 1.21+)
+  #   gustParticle — GUST (порывы)
+  #   smokeParticle — WHITE_SMOKE (1.21.4) / CLOUD
+  maceParticle: "GUST_EMITTER_LARGE"
+  gustParticle: "GUST"
+  smokeParticle: "WHITE_SMOKE"
+
   # Частица, из которой собран вихрь (WHITE_SMOKE — 1.21.4, CLOUD, END_ROD)
   vortexParticle: "WHITE_SMOKE"
 
@@ -88,7 +96,7 @@ settings:
   breezeSpin: 6.0
 
   # На сколько блоков Вихрь подлетает перед ударом (0 – 6)
-  breezeRise: 1.6
+  breezeRise: 2.4
 
   # Смещение Вихря по высоте от центра кейса (-2.0 – 2.0)
   # -0.45 = стоит на верхней грани блока кейса
@@ -131,8 +139,8 @@ settings:
     # Длительность основной фазы вращения (20 – 1200)
     orbitTicks: 80
 
-    # Плавный подъём Вихря (2 – 200), 14 = 0.7 секунды
-    breezeUpTicks: 14
+    # Плавный подъём Вихря (2 – 200), 20 = 1 секунда
+    breezeUpTicks: 20
 
     # Сколько тиков Вихрь замирает наверху перед ударом (0 – 100)
     breezeHoverTicks: 6
