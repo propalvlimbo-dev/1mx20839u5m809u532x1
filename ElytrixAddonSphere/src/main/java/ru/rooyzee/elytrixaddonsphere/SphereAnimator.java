@@ -105,7 +105,6 @@ public class SphereAnimator extends AbstractAnimation {
     private volatile float breezeYaw;
 
     /** Кольцо частиц, расходящееся от места удара. */
-    private volatile int waveTicks;
 
     /** Падение призов после удара булавы. */
     private volatile boolean fallingActive;
@@ -358,7 +357,6 @@ public class SphereAnimator extends AbstractAnimation {
             driveBreeze();
             driveMace();
             driveFalling();
-            driveWave();
             driveWinner();
         } catch (Throwable ignored) {
             // анимация не должна падать из-за одной ошибки в тике
@@ -518,31 +516,6 @@ public class SphereAnimator extends AbstractAnimation {
         }
     }
 
-    /** Запускает расходящееся кольцо частиц. */
-    private void spawnWave() {
-        waveTicks = 4;
-    }
-
-    /** Расходящееся кольцо частиц после удара. */
-    private void driveWave() {
-        if (waveTicks <= 0) return;
-
-        waveTicks--;
-        double p = 1.0D - waveTicks / 4.0D;
-        double r = 0.35D + 3.1D * p;
-        double y = center.y + config.height + 0.45D * (1.0D - p);
-        int points = 4;
-
-        for (int i = 0; i < points; i++) {
-            double a = 2.0D * Math.PI * i / points;
-            fxHit(gustParticle, new Vec3d(
-                    center.x + Math.cos(a) * r,
-                    y,
-                    center.z + Math.sin(a) * r
-            ), 0, 0.0D, 0.0D, 0.0D, 0.0D);
-        }
-    }
-
     private void driveWinner() {
         VirtualEntity we = winnerEntityRef;
         if (!winnerOrbit || we == null) return;
@@ -640,41 +613,39 @@ public class SphereAnimator extends AbstractAnimation {
     // ── взлёт, булава и удар ────────────────────────────────────────────────
 
     /**
-     * Подъём → короткое замирание наверху → резкий удар булавы.
-     * Подъём стартует сразу и тормозит к верхней точке (ease-out).
+     * Подъём и удар одним движением: булава стартует так, чтобы врезаться
+     * ровно в верхней точке. Удар обрывает подъём — Вихрь не висит и не ждёт.
      */
     private void riseAndStrike(int winnerIdx) throws InterruptedException {
         boolean vortex = hasVortex();
         int up = (vortex && config.breezeRise > 0.0D) ? Math.max(2, config.timings.breezeUpTicks) : 0;
-        int hover = up > 0 ? Math.max(0, config.timings.breezeHoverTicks) : 0;
+        int fall = config.mace ? Math.max(2, config.timings.maceFallTicks) : 0;
+        int total = Math.max(up, fall);
+        if (total <= 0) return;
 
         if (up > 0) {
             breezeSpinTarget = Math.min(4.5D, config.breezeSpin * 1.1D);
             targetSpeed = config.rotationSpeed * 1.25D;
             sound(breezePos(curElevation), Sound.ENTITY_ENDERMAN_TELEPORT, 0.9F, 0.75F);
+        }
 
-            for (int t = 1; t <= up; t++) {
-                double p = (double) t / up;
-                // ease-out: бодрый старт, мягкое торможение у верхней точки
+        int maceStartTick = Math.max(1, total - fall + 1);
+        for (int t = 1; t <= total; t++) {
+            if (up > 0) {
+                double p = Math.min(1.0D, (double) t / up);
+                // ease-out: бодрый старт, мягкое торможение к верхней точке
                 double e = 1.0D - Math.pow(1.0D - p, 3.0D);
                 curElevation = config.breezeRise * e;
                 targetElevation = curElevation;
                 if (t % 2 == 0) swirlColumn(1);
-                sleepTicks(1L);
             }
-            curElevation = config.breezeRise;
-            targetElevation = config.breezeRise;
-
-            sound(breezePos(curElevation), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.0F, 1.5F);
-            burst(breezePos(curElevation).add(0.0D, 1.0D, 0.0D), 3);
-
-            // замирает наверху — и в это время сверху летит булава
-            sleepTicks(hover);
+            if (fall > 0 && t == maceStartTick) beginMaceFall();
+            sleepTicks(1L);
         }
 
-        if (config.mace) {
-            beginMaceFall();
-            sleepTicks(Math.max(2, config.timings.maceFallTicks));
+        if (up > 0) {
+            curElevation = config.breezeRise;
+            targetElevation = config.breezeRise;
         }
 
         landMace(winnerIdx);
@@ -736,11 +707,8 @@ public class SphereAnimator extends AbstractAnimation {
         // частицы булавы — немного, только по делу
         Vec3d chest = hit.add(0.0D, 1.0D, 0.0D);
         fxHit(maceParticle, chest, 1, 0.0D, 0.0D, 0.0D, 0.0D);
-        fxHit(gustParticle, chest, 1, 0.3D, 0.25D, 0.3D, 0.05D);
-        fxHit(smokeParticle, hit, 1, 0.3D, 0.2D, 0.3D, 0.02D);
         fxHit(Particle.SWEEP_ATTACK, hit, 1, 0.8D, 0.2D, 0.8D, 0.0D);
         sound(hit, Sound.ENTITY_GENERIC_EXPLODE, 1.0F, 1.6F);
-        sound(hit, Sound.BLOCK_AMETHYST_BLOCK_CHIME, 0.8F, 0.6F);
         sound(hit, parseSound(config.timings.hurtSound, Sound.ENTITY_BREEZE_JUMP), 1.0F, 0.85F);
 
         // вихрь дёргается от урона, пока падает
@@ -817,15 +785,11 @@ public class SphereAnimator extends AbstractAnimation {
         Vec3d impact = breezePos(0.0D).add(0.0D, 0.7D, 0.0D);
 
         sound(impact, impactSound, 1.0F, 0.85F);
-        sound(impact, Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.0F, 1.2F);
         fxHit(maceParticle, impact, 1, 0.0D, 0.0D, 0.0D, 0.0D);
-        fxHit(gustParticle, impact, 1, 0.6D, 0.35D, 0.6D, 0.05D);
-        fxHit(smokeParticle, impact, 1, 0.5D, 0.3D, 0.5D, 0.02D);
 
         // если булавы нет — призы падают именно здесь
         dropOthers(winnerIdx);
 
-        spawnWave();
         sleepTicks(2);
 
         // страховка: если что-то осталось в кольце — убираем (кроме выигрыша)
@@ -953,7 +917,6 @@ public class SphereAnimator extends AbstractAnimation {
         winnerOrbit = false;
         breezeSpin = false;
         maceActive = false;
-        waveTicks = 0;
         maceHold = 0;
         shakeTicks = 0;
         fallingActive = false;
@@ -1016,7 +979,7 @@ public class SphereAnimator extends AbstractAnimation {
     }
 
     private void burst(Vec3d pos, int count) {
-        fxHit(itemParticle, pos, Math.max(3, count / 2), 0.6D, 0.6D, 0.6D, 0.0D);
+        fxHit(itemParticle, pos, Math.max(1, count / 2), 0.6D, 0.6D, 0.6D, 0.0D);
     }
 
     /** Атмосферные частицы (вихрь, следы, дым). */
