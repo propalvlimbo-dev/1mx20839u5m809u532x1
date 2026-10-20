@@ -7,12 +7,14 @@ import dev.by1337.bc.prize.Prize;
 import dev.by1337.bc.prize.PrizeSelector;
 import dev.by1337.bc.task.AsyncTask;
 import dev.by1337.bc.yaml.CashedYamlContext;
+import dev.by1337.virtualentity.api.entity.EntityAnimation;
 import dev.by1337.virtualentity.api.entity.EquipmentSlot;
 import dev.by1337.virtualentity.api.task.TickTask;
 import dev.by1337.virtualentity.api.virtual.VirtualEntity;
 import dev.by1337.virtualentity.api.virtual.decoration.VirtualArmorStand;
 import dev.by1337.virtualentity.api.virtual.item.VirtualItem;
 import dev.by1337.virtualentity.api.virtual.monster.breeze.VirtualBreeze;
+import dev.by1337.virtualentity.api.virtual.player.VirtualPlayer;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -74,14 +76,6 @@ public class SphereAnimator extends AbstractAnimation {
     private VirtualEntity winnerItem;
     private VirtualEntity maceItem;
 
-    /** Искры вокруг Вихря — предметы, видны при любых настройках частиц. */
-    private final List<VirtualEntity> sparks = new ArrayList<>();
-    private int sparkPerRing = 1;
-
-    /** Разлетающиеся искры в момент удара. */
-    private final List<VirtualEntity> shockItems = new ArrayList<>();
-    private double[] shockAngles = new double[0];
-
     // ── состояние, которое читает/пишет тик-таск ────────────────────────────
     private volatile boolean ringActive;
     private volatile double targetRadius;
@@ -97,21 +91,14 @@ public class SphereAnimator extends AbstractAnimation {
     private volatile double breezeSpinTarget;
     private volatile float breezeYaw;
 
-    private volatile boolean sparkActive;
-    private volatile double sparkAngle;
-    private volatile double sparkSpeedScale = 1.0D;
-    private volatile double sparkSpeedTarget = 1.0D;
-    private volatile double sparkRadiusScale = 1.0D;
-    private volatile double sparkRadiusTarget = 1.0D;
+    /** Кольцо частиц, расходящееся от места удара. */
+    private volatile int waveTicks;
 
     private volatile boolean maceActive;
     private volatile double maceT;
     private volatile double maceFromY;
     private volatile double maceToY;
     private volatile int maceTicks = 8;
-
-    private volatile boolean shockActive;
-    private volatile double shockT;
 
     private volatile boolean winnerOrbit;
     private volatile double winnerAngle;
@@ -189,7 +176,6 @@ public class SphereAnimator extends AbstractAnimation {
         try {
             spawnBreeze();
             spawnClock();
-            spawnSparks();
             ascent(count, winnerIdx);
             orbitPhase();
 
@@ -321,9 +307,8 @@ public class SphereAnimator extends AbstractAnimation {
             }
 
             driveBreeze();
-            driveSparks();
             driveMace();
-            driveShock();
+            driveWave();
             driveWinner();
         } catch (Throwable ignored) {
             // анимация не должна падать из-за одной ошибки в тике
@@ -374,35 +359,18 @@ public class SphereAnimator extends AbstractAnimation {
         if (++puffTicks % 3 == 0) {
             puff(1);
         }
-    }
 
-    /** Искры: два кольца пакетных предметов, крутятся в разные стороны. */
-    private void driveSparks() {
-        if (!sparkActive || sparks.isEmpty()) return;
-
-        sparkSpeedScale += (sparkSpeedTarget - sparkSpeedScale) * 0.10D;
-        sparkRadiusScale += (sparkRadiusTarget - sparkRadiusScale) * 0.10D;
-        sparkAngle = (sparkAngle + config.sparkSpeed * sparkSpeedScale) % 360.0D;
-
-        int n = Math.max(1, sparkPerRing);
-        double baseY = center.y + config.breezeHeight + curElevation;
-
-        for (int i = 0; i < sparks.size(); i++) {
-            int ring = i / n;
-            int idx = i % n;
-            double dir = ring == 0 ? 1.0D : -1.0D;
-
-            double ang = Math.toRadians(sparkAngle * dir + 360.0D * idx / (double) n);
-            double radius = config.sparkRadius * sparkRadiusScale * (ring == 0 ? 1.0D : 0.62D);
-            double y = baseY
-                    + config.sparkHeight * (ring == 0 ? 1.0D : 0.55D)
-                    + 0.16D * Math.sin(Math.toRadians(sparkAngle * 2.0D * dir + idx * 37.0D));
-
-            moveTo(sparks.get(i), new Vec3d(
-                    center.x + Math.cos(ang) * radius,
-                    y,
-                    center.z + Math.sin(ang) * radius
-            ));
+        // винтовая дорожка частиц вокруг Вихря
+        if (puffTicks % 2 == 0) {
+            double baseY = center.y + config.breezeHeight + curElevation;
+            for (int i = 0; i < 3; i++) {
+                double a = Math.toRadians(breezeYaw * 2.0D + i * 120.0D);
+                fx(Particle.END_ROD, new Vec3d(
+                        center.x + Math.cos(a) * 0.8D,
+                        baseY + 0.35D + i * 0.28D,
+                        center.z + Math.sin(a) * 0.8D
+                ), 0, 0.0D, 0.0D, 0.0D, 0.0D);
+            }
         }
     }
 
@@ -416,28 +384,28 @@ public class SphereAnimator extends AbstractAnimation {
         fx(Particle.END_ROD, new Vec3d(center.x, y + 0.4D, center.z), 1, 0.04D, 0.04D, 0.04D, 0.0D);
     }
 
-    private void driveShock() {
-        if (!shockActive || shockItems.isEmpty()) return;
+    /** Запускает расходящееся кольцо частиц. */
+    private void spawnWave() {
+        waveTicks = 10;
+    }
 
-        shockT = Math.min(1.0D, shockT + 1.0D / 12.0D);
-        double r = 0.4D + 3.2D * shockT;
-        double y = center.y + config.height + 0.6D * (1.0D - shockT);
+    /** Расходящееся кольцо частиц после удара. */
+    private void driveWave() {
+        if (waveTicks <= 0) return;
 
-        for (int i = 0; i < shockItems.size() && i < shockAngles.length; i++) {
-            double a = shockAngles[i];
-            moveTo(shockItems.get(i), new Vec3d(
+        waveTicks--;
+        double p = 1.0D - waveTicks / 10.0D;
+        double r = 0.35D + 3.1D * p;
+        double y = center.y + config.height + 0.45D * (1.0D - p);
+        int points = 16;
+
+        for (int i = 0; i < points; i++) {
+            double a = 2.0D * Math.PI * i / points;
+            fx(trailParticle, new Vec3d(
                     center.x + Math.cos(a) * r,
                     y,
                     center.z + Math.sin(a) * r
-            ));
-        }
-
-        if (shockT >= 1.0D) {
-            for (VirtualEntity e : new ArrayList<>(shockItems)) {
-                removeAndForget(e);
-            }
-            shockItems.clear();
-            shockActive = false;
+            ), 0, 0.0D, 0.0D, 0.0D, 0.0D);
         }
     }
 
@@ -450,12 +418,10 @@ public class SphereAnimator extends AbstractAnimation {
         winnerY += ((center.y + config.breezeHeight + 1.15D) - winnerY) * 0.22D;
 
         double rad = Math.toRadians(winnerAngle);
-        double bob = 0.09D * Math.sin(Math.toRadians(winnerPhase));
-        winnerPhase += 6.0D;
 
         Vec3d pos = new Vec3d(
                 center.x + Math.cos(rad) * winnerRadius,
-                winnerY + bob,
+                winnerY,
                 center.z + Math.sin(rad) * winnerRadius
         );
         moveTo(we, pos);
@@ -540,8 +506,6 @@ public class SphereAnimator extends AbstractAnimation {
     private void breezeUp() throws InterruptedException {
         if (breezeEntity == null || config.breezeRise <= 0.0D) return;
 
-        sparkSpeedTarget = 2.2D;
-        sparkRadiusTarget = 0.58D;
         breezeSpinTarget = Math.min(9.0D, config.breezeSpin * 1.35D);
         targetSpeed = config.rotationSpeed * 1.45D;
 
@@ -564,31 +528,42 @@ public class SphereAnimator extends AbstractAnimation {
     }
 
     /** Сверху падает булава и бьёт Вихря. */
+    /** Сверху прыгает виртуальный игрок с булавой и бьёт Вихря. */
     private void maceStrike() throws InterruptedException {
         if (!config.mace) return;
 
-        Material mat = material(config.maceMaterial, Material.IRON_AXE);
-        VirtualItem mace = null;
+        VirtualPlayer attacker = null;
         try {
-            mace = VirtualItem.create();
-            mace.setItem(new ItemStack(mat));
-            mace.setNoGravity(true);
-            mace.setNoMotion();
-            mace.setPos(new Vec3d(center.x, center.y + config.breezeHeight + curElevation + config.maceHeight, center.z));
-            trackEntity(mace);
-            activeItems.add(mace);
+            attacker = VirtualPlayer.create();
+            attacker.setName(config.maceName);
+            attacker.setListed(false);
+            attacker.setCustomNameVisible(false);
+            attacker.setSilent(true);
+            attacker.setNoGravity(true);
+            attacker.setNoMotion();
+            attacker.setEquipment(EquipmentSlot.MAINHAND,
+                    new ItemStack(material(config.maceMaterial, Material.IRON_AXE)));
+            attacker.setPos(new Vec3d(
+                    center.x,
+                    center.y + config.breezeHeight + curElevation + config.maceHeight,
+                    center.z
+            ));
+            attacker.setYaw(0.0F);
+            attacker.setPitch(45.0F);
+            trackEntity(attacker);
+            activeItems.add(attacker);
         } catch (Throwable t) {
-            mace = null;
+            attacker = null;
         }
 
-        if (mace == null) {
+        if (attacker == null) {
             sleepTicks(4);
             return;
         }
 
-        maceItem = mace;
+        maceItem = attacker;
         maceFromY = center.y + config.breezeHeight + curElevation + config.maceHeight;
-        maceToY = center.y + config.breezeHeight + curElevation + 1.15D;
+        maceToY = center.y + config.breezeHeight + curElevation + 0.05D;
         maceTicks = Math.max(2, config.timings.maceFallTicks);
         maceT = 0.0D;
         maceActive = true;
@@ -597,16 +572,25 @@ public class SphereAnimator extends AbstractAnimation {
 
         sleepTicks(maceTicks);
 
-        // удар булавы по Вихрю
+        // удар: замах рукой, звук, частицы
         maceActive = false;
         Vec3d hit = new Vec3d(center.x, maceToY, center.z);
+        try {
+            ((VirtualPlayer) maceItem).playAnimation(EntityAnimation.SWING_MAIN_ARM);
+        } catch (Throwable ignored) {
+        }
         burst(hit, 45);
-        fx(Particle.SWEEP_ATTACK, hit, 6, 0.7D, 0.2D, 0.7D, 0.0D);
+        fx(Particle.SWEEP_ATTACK, hit, 8, 0.8D, 0.2D, 0.8D, 0.0D);
+        fx(Particle.CRIT, hit, 20, 0.5D, 0.3D, 0.5D, 0.1D);
         sound(hit, Sound.ENTITY_GENERIC_EXPLODE, 1.0F, 1.6F);
         sound(hit, Sound.BLOCK_AMETHYST_BLOCK_CHIME, 0.8F, 0.6F);
+
+        // «зависает» на мгновение после удара и исчезает
+        sleepTicks(5);
+        poof(hit);
         removeAndForget(maceItem);
         maceItem = null;
-        sleepTicks(2);
+        sleepTicks(1);
     }
 
     /** От удара булавы Вихрь резко падает. */
@@ -635,12 +619,9 @@ public class SphereAnimator extends AbstractAnimation {
         sound(impact, Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.0F, 1.2F);
         burst(impact, 70);
         fx(Particle.SWEEP_ATTACK, impact, 10, 1.1D, 0.3D, 1.1D, 0.0D);
-        scatterRing(14);
         puff(12);
 
-        // искры возвращаются в обычный ритм
-        sparkSpeedTarget = 1.0D;
-        sparkRadiusTarget = 1.0D;
+        spawnWave();
         sleepTicks(2);
 
         // остальные призы разлетаются в стороны и исчезают
@@ -706,60 +687,6 @@ public class SphereAnimator extends AbstractAnimation {
     }
 
     // ── искры и разлёт ──────────────────────────────────────────────────────
-
-    private void spawnSparks() {
-        if (!config.sparks || config.sparkCount <= 0) return;
-
-        Material mat = material(config.sparkMaterial, Material.GLOWSTONE_DUST);
-        sparkPerRing = config.sparkCount;
-
-        try {
-            for (int ring = 0; ring < 2; ring++) {
-                for (int i = 0; i < sparkPerRing; i++) {
-                    VirtualItem spark = VirtualItem.create();
-                    spark.setItem(new ItemStack(mat));
-                    spark.setNoGravity(true);
-                    spark.setNoMotion();
-                    spark.setPos(breezePos(0.0D));
-                    trackEntity(spark);
-                    activeItems.add(spark);
-                    sparks.add(spark);
-                }
-            }
-        } catch (Throwable ignored) {
-            // без искр анимация всё равно работает
-        }
-        sparkActive = !sparks.isEmpty();
-    }
-
-    /** Разлетающиеся искры в момент удара — видны и без частиц. */
-    private void scatterRing(int count) {
-        shockItems.clear();
-        Material mat = material(config.shockMaterial, Material.GLOWSTONE_DUST);
-        List<Double> angles = new ArrayList<>();
-
-        for (int i = 0; i < count; i++) {
-            try {
-                VirtualItem spark = VirtualItem.create();
-                spark.setItem(new ItemStack(mat));
-                spark.setNoGravity(true);
-                spark.setNoMotion();
-                spark.setPos(center);
-                trackEntity(spark);
-                activeItems.add(spark);
-                shockItems.add(spark);
-                angles.add(2.0D * Math.PI * i / count);
-            } catch (Throwable ignored) {
-            }
-        }
-
-        shockAngles = new double[angles.size()];
-        for (int i = 0; i < shockAngles.length; i++) {
-            shockAngles[i] = angles.get(i);
-        }
-        shockT = 0.0D;
-        shockActive = !shockItems.isEmpty();
-    }
 
     // ── сущности ────────────────────────────────────────────────────────────
 
@@ -827,9 +754,8 @@ public class SphereAnimator extends AbstractAnimation {
         ringActive = false;
         winnerOrbit = false;
         breezeSpin = false;
-        sparkActive = false;
         maceActive = false;
-        shockActive = false;
+        waveTicks = 0;
         winnerEntityRef = null;
         winnerNameRef = null;
         winnerItem = null;
@@ -848,8 +774,6 @@ public class SphereAnimator extends AbstractAnimation {
         ringNames.clear();
         entryFrom.clear();
         entryT.clear();
-        sparks.clear();
-        shockItems.clear();
         synchronized (posLock) {
             lastPos.clear();
         }
@@ -974,15 +898,9 @@ public class SphereAnimator extends AbstractAnimation {
         final double bobAmplitude;
         final double bobSpeed;
         final double dropHeight;
-        final boolean sparks;
-        final int sparkCount;
-        final double sparkRadius;
-        final double sparkSpeed;
-        final double sparkHeight;
-        final String sparkMaterial;
-        final String shockMaterial;
         final boolean mace;
         final String maceMaterial;
+        final String maceName;
         final double maceHeight;
         final Timings timings;
 
@@ -1005,18 +923,12 @@ public class SphereAnimator extends AbstractAnimation {
             this.breezeParticle = getStr(c, "breezeParticle", "CLOUD");
             this.winnerOrbitRadius = clamp(get(c, "winnerOrbitRadius", 1.05D), 0.0D, 4.0D);
             this.winnerOrbitSpeed = clamp(get(c, "winnerOrbitSpeed", 8.0D), 0.0D, 20.0D);
-            this.bobAmplitude = clamp(get(c, "bobAmplitude", 0.45D), 0.0D, 1.2D);
+            this.bobAmplitude = clamp(get(c, "bobAmplitude", 0.0D), 0.0D, 1.2D);
             this.bobSpeed = clamp(get(c, "bobSpeed", 0.13D), 0.0D, 0.6D);
             this.dropHeight = clamp(get(c, "dropHeight", 5.0D), 0.0D, 12.0D);
-            this.sparks = getBool(c, "sparks", true);
-            this.sparkCount = (int) clamp(get(c, "sparkCount", 8), 0, 24);
-            this.sparkRadius = clamp(get(c, "sparkRadius", 1.15D), 0.0D, 3.0D);
-            this.sparkSpeed = clamp(get(c, "sparkSpeed", 18.0D), 0.0D, 90.0D);
-            this.sparkHeight = clamp(get(c, "sparkHeight", 0.9D), 0.0D, 3.0D);
-            this.sparkMaterial = getStr(c, "sparkMaterial", "GLOWSTONE_DUST");
-            this.shockMaterial = getStr(c, "shockMaterial", "GLOWSTONE_DUST");
             this.mace = getBool(c, "mace", true);
             this.maceMaterial = getStr(c, "maceMaterial", "MACE");
+            this.maceName = getStr(c, "maceName", "Mace");
             this.maceHeight = clamp(get(c, "maceHeight", 7.0D), 1.0D, 20.0D);
             this.timings = new Timings(c);
         }
