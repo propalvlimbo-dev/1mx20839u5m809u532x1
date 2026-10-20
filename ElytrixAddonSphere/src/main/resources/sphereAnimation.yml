@@ -41,6 +41,14 @@ settings:
   # Частицы взрыва в момент удара (REDSTONE красится цветом ниже)
   particleItems: "REDSTONE"
 
+  # Атмосферная частица (появилась в 1.21.4). Одна штука раз в ambientEvery
+  # тиков у Вихря — совсем чуть-чуть. Варианты: WHITE_SMOKE,
+  # TRIAL_SPAWNER_DETECTION, OMINOUS_SPAWNING, GUST, CLOUD.
+  ambientParticle: "WHITE_SMOKE"
+
+  # Как часто пускать атмосферную частицу, в тиках (0 = выключить)
+  ambientEvery: 14
+
   # Цвет частиц REDSTONE (RGB)
   red: 255
   green: 105

@@ -57,6 +57,8 @@ public class SphereAnimator extends AbstractAnimation {
     private final Particle trailParticle;
     private final Particle itemParticle;
     private final Particle breezeParticle;
+    /** Лёгкая атмосферная частица (1.21.4+), парсится по имени с фолбэком. */
+    private final Particle ambientParticle;
     private final Particle.DustOptions dustOptions;
 
     private final List<VirtualEntity> activeItems = new ArrayList<>();
@@ -163,6 +165,7 @@ public class SphereAnimator extends AbstractAnimation {
         this.trailParticle = parseParticle(this.config.particleVector, Particle.REDSTONE);
         this.itemParticle = parseParticle(this.config.particleItems, Particle.REDSTONE);
         this.breezeParticle = parseParticle(this.config.breezeParticle, Particle.CLOUD);
+        this.ambientParticle = parseParticle(this.config.ambientParticle, Particle.CLOUD);
 
         this.dustOptions = new Particle.DustOptions(
                 Color.fromRGB(
@@ -322,7 +325,7 @@ public class SphereAnimator extends AbstractAnimation {
 
             driveRing();
 
-            if (ringActive && curSpeed > 1.0D && (++trailTick % 5 == 0)) {
+            if (ringActive && curSpeed > 1.0D && (++trailTick % 8 == 0)) {
                 drawRingTrail();
             }
 
@@ -377,12 +380,23 @@ public class SphereAnimator extends AbstractAnimation {
             breezeEntity.setPos(breezePos(curElevation));
             breezeEntity.setYaw(breezeYaw);
         }
-        if (++puffTicks % 6 == 0) {
+        if (++puffTicks % 10 == 0) {
             puff(1);
         }
 
+        // атмосфера: одна лёгкая частица раз в несколько тиков
+        if (config.ambientEvery > 0 && puffTicks % config.ambientEvery == 0) {
+            double aa = Math.toRadians(breezeYaw + RANDOM.nextInt(360));
+            double rr = 0.7D + RANDOM.nextDouble() * 0.6D;
+            fx(ambientParticle, new Vec3d(
+                    center.x + Math.cos(aa) * rr,
+                    center.y + config.breezeHeight + curElevation + 0.4D + RANDOM.nextDouble() * 0.9D,
+                    center.z + Math.sin(aa) * rr
+            ), 0, 0.05D, 0.15D, 0.05D, 0.0D);
+        }
+
         // редкая винтовая искра вокруг Вихря (видна и при «Частицы: Меньше»)
-        if (puffTicks % 3 == 0) {
+        if (puffTicks % 5 == 0) {
             double baseY = center.y + config.breezeHeight + curElevation;
             double a = Math.toRadians(breezeYaw * 2.0D);
             fx(Particle.FIREWORK, new Vec3d(
@@ -433,7 +447,7 @@ public class SphereAnimator extends AbstractAnimation {
 
         if (fallingP >= 1.0D) {
             for (int i = 0; i < fallingItems.size(); i++) {
-                if (i % 3 == 0) poof(fallingItems.get(i).getPos());
+                if (i % 5 == 0) fx(trailParticle, fallingItems.get(i).getPos(), 1, 0.2D, 0.2D, 0.2D, 0.0D);
                 removeAndForget(fallingItems.get(i));
                 if (i < fallingNames.size()) {
                     removeAndForget(fallingNames.get(i));
@@ -459,11 +473,11 @@ public class SphereAnimator extends AbstractAnimation {
         double p = 1.0D - waveTicks / 8.0D;
         double r = 0.35D + 3.1D * p;
         double y = center.y + config.height + 0.45D * (1.0D - p);
-        int points = 10;
+        int points = 7;
 
         for (int i = 0; i < points; i++) {
             double a = 2.0D * Math.PI * i / points;
-            fx(i % 2 == 0 ? Particle.FIREWORK : trailParticle, new Vec3d(
+            fx(trailParticle, new Vec3d(
                     center.x + Math.cos(a) * r,
                     y,
                     center.z + Math.sin(a) * r
@@ -579,14 +593,14 @@ public class SphereAnimator extends AbstractAnimation {
             double e = 1.0D - Math.pow(1.0D - p, 3.0D);
             curElevation = config.breezeRise * e;
             targetElevation = curElevation;
-            swirlColumn(2);
+            if (t % 2 == 0) swirlColumn(1);
             sleepTicks(1L);
         }
         curElevation = config.breezeRise;
         targetElevation = config.breezeRise;
 
         sound(breezePos(curElevation), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.0F, 1.5F);
-        burst(breezePos(curElevation).add(0.0D, 1.0D, 0.0D), 18);
+        burst(breezePos(curElevation).add(0.0D, 1.0D, 0.0D), 8);
     }
 
     /** Сверху падает булава и бьёт Вихря. */
@@ -642,10 +656,10 @@ public class SphereAnimator extends AbstractAnimation {
             ((VirtualPlayer) maceItem).playAnimation(EntityAnimation.SWING_MAIN_ARM);
         } catch (Throwable ignored) {
         }
-        fx(itemParticle, hit, 18, 0.5D, 0.3D, 0.5D, 0.0D);
-        fx(Particle.FIREWORK, hit, 8, 0.5D, 0.4D, 0.5D, 0.05D);
-        fx(Particle.EXPLOSION, hit, 2, 0.3D, 0.2D, 0.3D, 0.0D);
-        fx(Particle.SWEEP_ATTACK, hit, 3, 0.8D, 0.2D, 0.8D, 0.0D);
+        fx(itemParticle, hit, 8, 0.5D, 0.3D, 0.5D, 0.0D);
+        fx(Particle.FIREWORK, hit, 4, 0.5D, 0.4D, 0.5D, 0.05D);
+        fx(Particle.EXPLOSION, hit, 1, 0.3D, 0.2D, 0.3D, 0.0D);
+        fx(Particle.SWEEP_ATTACK, hit, 2, 0.8D, 0.2D, 0.8D, 0.0D);
         sound(hit, Sound.ENTITY_GENERIC_EXPLODE, 1.0F, 1.6F);
         sound(hit, Sound.BLOCK_AMETHYST_BLOCK_CHIME, 0.8F, 0.6F);
 
@@ -684,7 +698,7 @@ public class SphereAnimator extends AbstractAnimation {
             fallingPos.add(new Vec3d(pos.x, pos.y, pos.z));
             fallingNames.add(i < ringNames.size() ? ringNames.get(i) : null);
 
-            if (i % 3 == 0) poof(pos);
+            if (i % 5 == 0) fx(trailParticle, pos, 1, 0.2D, 0.2D, 0.2D, 0.0D);
 
             ringItems.set(i, null);
             if (i < ringNames.size()) ringNames.set(i, null);
@@ -721,10 +735,10 @@ public class SphereAnimator extends AbstractAnimation {
 
         sound(impact, impactSound, 1.0F, 0.85F);
         sound(impact, Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.0F, 1.2F);
-        fx(itemParticle, impact, 28, 0.6D, 0.5D, 0.6D, 0.0D);
-        fx(Particle.FIREWORK, impact, 10, 0.7D, 0.5D, 0.7D, 0.05D);
-        fx(Particle.EXPLOSION, impact, 2, 0.4D, 0.3D, 0.4D, 0.0D);
-        puff(6);
+        fx(itemParticle, impact, 12, 0.6D, 0.5D, 0.6D, 0.0D);
+        fx(Particle.FIREWORK, impact, 6, 0.7D, 0.5D, 0.7D, 0.05D);
+        fx(Particle.EXPLOSION, impact, 1, 0.4D, 0.3D, 0.4D, 0.0D);
+        puff(2);
 
         // если булавы нет — призы падают именно здесь
         dropOthers(winnerIdx);
@@ -776,7 +790,7 @@ public class SphereAnimator extends AbstractAnimation {
         }
         winnerSpeed = config.winnerOrbitSpeed;
         playSound(center, winSound, 0.8F, 1.0F);
-        burst(winnerItem.getPos() == null ? center : winnerItem.getPos(), 18);
+        burst(winnerItem.getPos() == null ? center : winnerItem.getPos(), 8);
         sleepTicks(Math.max(10, ticks - 10));
     }
 
@@ -917,10 +931,7 @@ public class SphereAnimator extends AbstractAnimation {
     }
 
     private void burst(Vec3d pos, int count) {
-        fx(itemParticle, pos, Math.max(4, count / 3), 0.6D, 0.6D, 0.6D, 0.0D);
-        if (count >= 20) {
-            fx(Particle.EXPLOSION, pos, 2, 0.4D, 0.3D, 0.4D, 0.0D);
-        }
+        fx(itemParticle, pos, Math.max(3, count / 2), 0.6D, 0.6D, 0.6D, 0.0D);
     }
 
     private void fx(Particle particle, Vec3d pos, int count, double ox, double oy, double oz, double extra) {
@@ -1073,6 +1084,8 @@ public class SphereAnimator extends AbstractAnimation {
         final double breezeRise;
         final double breezeHeight;
         final String breezeParticle;
+        final String ambientParticle;
+        final int ambientEvery;
         final double winnerOrbitRadius;
         final double winnerOrbitSpeed;
         final double bobAmplitude;
@@ -1101,6 +1114,8 @@ public class SphereAnimator extends AbstractAnimation {
             this.breezeRise = clamp(get(c, "breezeRise", 1.6D), 0.0D, 6.0D);
             this.breezeHeight = clamp(get(c, "breezeHeight", -0.45D), -2.0D, 2.0D);
             this.breezeParticle = getStr(c, "breezeParticle", "CLOUD");
+            this.ambientParticle = getStr(c, "ambientParticle", "WHITE_SMOKE");
+            this.ambientEvery = (int) clamp(get(c, "ambientEvery", 14), 0, 200);
             this.winnerOrbitRadius = clamp(get(c, "winnerOrbitRadius", 1.05D), 0.0D, 4.0D);
             this.winnerOrbitSpeed = clamp(get(c, "winnerOrbitSpeed", 8.0D), 0.0D, 20.0D);
             this.bobAmplitude = clamp(get(c, "bobAmplitude", 0.0D), 0.0D, 1.2D);
