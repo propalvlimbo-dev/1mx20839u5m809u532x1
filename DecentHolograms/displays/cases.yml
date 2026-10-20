@@ -1,5 +1,6 @@
 # DecentHolograms 2.10+ — голограмма нового типа (display entity)
 # Переделано из классической голограммы: cases.yml
+# Вариант с большим фоном-квадратом (строки добиты пробелами).
 # Текст 1:1, иконка — отдельный файл cases_icon.yml.
 type: TEXT
 location:
@@ -23,7 +24,7 @@ attributes:
       red: 8
       green: 8
       blue: 12
-      alpha: 0
+      alpha: 150
   text-shadow:
     value-type: boolean
     value: true
@@ -53,8 +54,8 @@ attributes:
       z: 0.0
 pages:
   - lines:
-      - '&#F8BEFB&lКЕЙСЫ'
-      - ''
+      - '                          &#F8BEFB&lКЕЙСЫ                           '
+      - '                                                            '
       - '&fИспытайте удачу и выигрывайте &#F8BEFBценные призы'
-      - ''
-      - '&7● &fПокупка ключей: &#F8BEFBelytrix.pw'
+      - '                                                            '
+      - '            &7● &fПокупка ключей: &#F8BEFBelytrix.pw            '
