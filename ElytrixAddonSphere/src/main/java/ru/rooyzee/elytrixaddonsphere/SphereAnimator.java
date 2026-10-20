@@ -1153,7 +1153,7 @@ public class SphereAnimator extends AbstractAnimation {
             this.green = (int) clamp(get(c, "green", 105), 0, 255);
             this.blue = (int) clamp(get(c, "blue", 180), 0, 255);
             this.breeze = getBool(c, "breeze", true);
-            this.vortexMode = getStr(c, "breezeMode", "VORTEX").trim().equalsIgnoreCase("VORTEX");
+            this.vortexMode = getStr(c, "breezeMode", "BREEZE").trim().equalsIgnoreCase("VORTEX");
             this.vortexParticle = getStr(c, "vortexParticle", "WHITE_SMOKE");
             this.vortexEvery = (int) clamp(get(c, "vortexEvery", 3), 1, 20);
             this.vortexRadius = clamp(get(c, "vortexRadius", 0.55D), 0.1D, 2.0D);
