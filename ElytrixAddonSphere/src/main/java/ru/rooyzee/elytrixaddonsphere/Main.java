@@ -8,7 +8,9 @@ import org.by1337.blib.util.SpacedNameKey;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.logging.Level;
 
 public final class Main extends AbstractAddon {
@@ -16,6 +18,8 @@ public final class Main extends AbstractAddon {
     public static final String ANIMATION_KEY = "elytrix:sphere";
     private static final String RESOURCE_NAME = "sphereAnimation.yml";
     private static final String TARGET_DIR = "animations/sphere";
+    /** Версия конфига: если в файле другая — он уходит в .old и создаётся свежий. */
+    private static final String CONFIG_VERSION = "1.37";
 
     @Override
     public void onEnable() {
@@ -36,8 +40,16 @@ public final class Main extends AbstractAddon {
             Files.createDirectories(dir.toPath());
 
             File targetFile = new File(dir, RESOURCE_NAME);
+
             if (targetFile.exists()) {
-                return;
+                String current = new String(Files.readAllBytes(targetFile.toPath()), StandardCharsets.UTF_8);
+                if (current.contains("configVersion: \"" + CONFIG_VERSION + "\"")) {
+                    return; // конфиг актуальный
+                }
+                File backup = new File(dir, "sphereAnimation.old.yml");
+                Files.move(targetFile.toPath(), backup.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                plugin.getLogger().info("Старый конфиг сохранён как " + backup.getName()
+                        + ", создаю новый " + CONFIG_VERSION);
             }
 
             try (InputStream in = getResource(RESOURCE_NAME)) {
