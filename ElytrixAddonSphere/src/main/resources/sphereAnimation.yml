@@ -114,7 +114,7 @@ settings:
     ascentGap: 2
 
     # Длительность основной фазы вращения (20 – 1200)
-    orbitTicks: 100
+    orbitTicks: 80
 
     # Быстрый взлёт Вихря (2 – 200), 8 = 0.4 секунды
     breezeUpTicks: 8
