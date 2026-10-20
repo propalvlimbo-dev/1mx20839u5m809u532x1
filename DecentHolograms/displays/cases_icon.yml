@@ -1,7 +1,7 @@
 # DecentHolograms 2.10+ — голограмма нового типа (display entity)
 # Переделано из классической голограммы: cases.yml
 # Иконка (строка chest) из старой голограммы, текст — в cases.yml.
-item: 'CHEST'
+item: 'minecraft:chest'
 type: ITEM
 location:
   world: 'spawn'

@@ -1,7 +1,7 @@
 # DecentHolograms 2.10+ — голограмма нового типа (display entity)
 # Переделано из классической голограммы: don1.yml
 # Иконка (строка gold_block) из старой голограммы, текст — в don1.yml.
-item: 'GOLD_BLOCK'
+item: 'minecraft:gold_block'
 type: ITEM
 location:
   world: 'spawn'

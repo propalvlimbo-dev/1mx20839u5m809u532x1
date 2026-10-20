@@ -1,7 +1,7 @@
 # DecentHolograms 2.10+ — голограмма нового типа (display entity)
 # Переделано из классической голограммы: hello.yml
 # Иконка (строка book) из старой голограммы, текст — в hello.yml.
-item: 'BOOK'
+item: 'minecraft:book'
 type: ITEM
 location:
   world: 'spawn'

@@ -194,7 +194,7 @@ def convert(path, out_dir, stats):
     for item in items:
         icon_name = name + '_icon'
         fname = os.path.join(out_dir, icon_name + '.yml')
-        material = item['value'].upper().replace('MINECRAFT:', '')
+        material = 'minecraft:' + item['value'].lower().replace('minecraft:', '')
         note = '# Иконка (строка %s) из старой голограммы, текст — в %s.yml.\n' % (
             item['value'], name)
         body = HEADER.format(source=name + '.yml', note=note,

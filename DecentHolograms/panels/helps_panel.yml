@@ -1,7 +1,7 @@
 # DecentHolograms 2.10+ — панель (BLOCK) под голограммой helps
 # Большой квадрат за текстом. Удалить файл — панели не будет.
 type: BLOCK
-block: 'BLACK_CONCRETE'
+block: 'minecraft:black_concrete'
 location:
   world: spawn
   x: -10.444
@@ -27,5 +27,5 @@ attributes:
     value-type: vector3f
     value:
       x: -2.39
-      y: -4.49
+      y: -4.09
       z: -0.06

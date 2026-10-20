@@ -1,7 +1,7 @@
 # DecentHolograms 2.10+ — панель (BLOCK) под голограммой addvk
 # Большой квадрат за текстом. Удалить файл — панели не будет.
 type: BLOCK
-block: 'BLACK_CONCRETE'
+block: 'minecraft:black_concrete'
 location:
   world: spawn
   x: 82.500
@@ -27,5 +27,5 @@ attributes:
     value-type: vector3f
     value:
       x: -3.30
-      y: -4.65
+      y: -4.55
       z: -0.06

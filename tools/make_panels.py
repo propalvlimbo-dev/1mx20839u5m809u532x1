@@ -66,7 +66,7 @@ def convert(src, out):
     body = '''# DecentHolograms 2.10+ — панель (BLOCK) под голограммой {name}
 # Большой квадрат за текстом. Удалить файл — панели не будет.
 type: BLOCK
-block: 'BLACK_CONCRETE'
+block: 'minecraft:black_concrete'
 location:
   world: {world}
   x: {x}

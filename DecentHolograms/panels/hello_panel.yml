@@ -1,7 +1,7 @@
 # DecentHolograms 2.10+ — панель (BLOCK) под голограммой hello
 # Большой квадрат за текстом. Удалить файл — панели не будет.
 type: BLOCK
-block: 'BLACK_CONCRETE'
+block: 'minecraft:black_concrete'
 location:
   world: spawn
   x: 11.408
@@ -27,5 +27,5 @@ attributes:
     value-type: vector3f
     value:
       x: -2.49
-      y: -4.11
+      y: -3.96
       z: -0.06
