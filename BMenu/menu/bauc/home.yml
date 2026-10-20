@@ -271,14 +271,14 @@ items:
   frame:
     slot: 9,17,18,26,27,35,36,44
     name: ''
-    material: dirt
+    material: iron_chain
   accent:
     slot: 0-8
     name: ''
     material: purple_stained_glass_pane
   info:
     slot: 47
-    material: oak_leaves
+    material: paper
     name: '<#F8BEFB>Как выставлять лоты'
     lore:
       - '<#F8BEFB><b>┃</b> '
@@ -295,40 +295,39 @@ items:
     all_flags: true
   cover:
     name: ''
-    material: dirt
+    material: iron_chain
 
 animation:
-  # Земляная завеса: при открытии сетка лотов засыпана землёй, затем она
-  # снимается слой за слоем снизу вверх — как раскопки. Земля лежит в слое 3,
-  # поверх лотов (они в слое 2). Звуки — родная группа gravel, её использует
-  # сам блок земли в 1.21.4.
+  # Цепная клетка: при открытии сетка лотов закована в цепи, затем они
+  # снимаются ряд за рядом снизу вверх. Цепи лежат в слое 3, поверх лотов
+  # (они в слое 2). Звуки — родная группа block.chain.* (1.21.11).
   # Кадр 1 повторяет установку: при открытии LotsMenu.generate() чистит слой 3.
   - tick: 0
     opcodes:
       - cmd: '[layer] 3 set cover 10-16,19-25,28-34,37-43'
-      - sound: 'block.gravel.place 0.45 1.10'
+      - sound: 'block.chain.place 0.50 1.10'
   - tick: 1
     opcodes:
       - cmd: '[layer] 3 set cover 10-16,19-25,28-34,37-43'
   - tick: 3
     opcodes:
       - cmd: '[layer] 3 remove 37-43'
-      - sound: 'block.gravel.break 0.55 1.05'
+      - sound: 'block.chain.break 0.55 1.05'
   - tick: 6
     opcodes:
       - cmd: '[layer] 3 remove 28-34'
-      - sound: 'block.gravel.break 0.60 1.15'
+      - sound: 'block.chain.break 0.60 1.15'
   - tick: 9
     opcodes:
       - cmd: '[layer] 3 remove 19-25'
-      - sound: 'block.gravel.break 0.65 1.25'
+      - sound: 'block.chain.break 0.65 1.25'
   - tick: 12
     opcodes:
       - cmd: '[layer] 3 remove 10-16'
-      - sound: 'block.gravel.break 0.70 1.35'
+      - sound: 'block.chain.break 0.70 1.35'
   - tick: 14
     opcodes:
-      - sound: 'block.gravel.fall 0.45 1.20'
+      - sound: 'block.chain.fall 0.45 1.20'
   - tick: 16
     opcodes:
       - sound: 'block.amethyst_block.chime 0.30 1.45'
