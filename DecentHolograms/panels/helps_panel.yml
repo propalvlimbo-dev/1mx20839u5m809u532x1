@@ -1,0 +1,31 @@
+# DecentHolograms 2.10+ — панель (BLOCK) под голограммой helps
+# Большой квадрат за текстом. Удалить файл — панели не будет.
+type: BLOCK
+block: 'BLACK_CONCRETE'
+location:
+  world: spawn
+  x: -10.444
+  y: 60.000
+  z: 0.535
+  yaw: 0.0
+  pitch: 0.0
+settings:
+  enabled: true
+  display-range: 48
+  update-interval: 20
+attributes:
+  billboard:
+    value-type: billboard_constraints
+    value: CENTER
+  scale:
+    value-type: vector3f
+    value:
+      x: 4.78
+      y: 4.78
+      z: 0.05
+  translation:
+    value-type: vector3f
+    value:
+      x: -2.39
+      y: -4.49
+      z: -0.06

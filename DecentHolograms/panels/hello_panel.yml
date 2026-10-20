@@ -1,0 +1,31 @@
+# DecentHolograms 2.10+ — панель (BLOCK) под голограммой hello
+# Большой квадрат за текстом. Удалить файл — панели не будет.
+type: BLOCK
+block: 'BLACK_CONCRETE'
+location:
+  world: spawn
+  x: 11.408
+  y: 59.400
+  z: 0.437
+  yaw: 0.0
+  pitch: 0.0
+settings:
+  enabled: true
+  display-range: 48
+  update-interval: 20
+attributes:
+  billboard:
+    value-type: billboard_constraints
+    value: CENTER
+  scale:
+    value-type: vector3f
+    value:
+      x: 4.98
+      y: 4.98
+      z: 0.05
+  translation:
+    value-type: vector3f
+    value:
+      x: -2.49
+      y: -4.11
+      z: -0.06
