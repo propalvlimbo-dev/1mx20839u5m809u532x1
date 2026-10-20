@@ -1,0 +1,165 @@
+cooldown: 3600
+permission_required: true
+auto_armor: true
+items:
+  1:
+    id: IRON_SWORD
+    name: '&fНабор &7sᴛᴀʀᴛ'
+    enchants:
+      - SHARPNESS;1
+      - UNBREAKING;1
+    preview_slot: 0
+  2:
+    id: IRON_SHOVEL
+    enchants:
+      - UNBREAKING;1
+    preview_slot: 1
+  3:
+    id: IRON_AXE
+    enchants:
+      - UNBREAKING;1
+    preview_slot: 2
+  4:
+    id: IRON_PICKAXE
+    enchants:
+      - UNBREAKING;1
+    preview_slot: 3
+  5:
+    id: BOW
+    name: '&fНабор &7sᴛᴀʀᴛ'
+    enchants:
+      - POWER;1
+      - UNBREAKING;1
+    preview_slot: 4
+  6:
+    id: GOLDEN_APPLE
+    amount: 4
+    preview_slot: 5
+  7:
+    id: ENDER_PEARL
+    amount: 8
+    preview_slot: 6
+  8:
+    id: CHORUS_FRUIT
+    amount: 16
+    preview_slot: 7
+  9:
+    id: SHIELD
+    banner_data:
+      base_color: LIGHT_GRAY
+    preview_slot: 8
+  10:
+    id: LIGHT_GRAY_WOOL
+    amount: 16
+    preview_slot: 9
+  11:
+    id: LIGHT_GRAY_CONCRETE
+    amount: 16
+    preview_slot: 10
+  12:
+    id: OAK_LOG
+    amount: 8
+    preview_slot: 11
+  13:
+    id: BIRCH_LOG
+    amount: 8
+    preview_slot: 12
+  14:
+    id: BRICKS
+    amount: 16
+    preview_slot: 13
+  15:
+    id: LIGHT_GRAY_STAINED_GLASS
+    amount: 8
+    preview_slot: 14
+  16:
+    id: LIGHT_GRAY_WOOL
+    amount: 8
+    preview_slot: 15
+  17:
+    id: ARROW
+    amount: 8
+    preview_slot: 16
+  18:
+    id: REDSTONE
+    amount: 16
+    preview_slot: 17
+  19:
+    id: LEVER
+    preview_slot: 18
+  20:
+    id: STICKY_PISTON
+    amount: 2
+    preview_slot: 19
+  21:
+    id: STONE_PRESSURE_PLATE
+    preview_slot: 20
+  22:
+    id: DIAMOND_BOOTS
+    name: '&fНабор &7sᴛᴀʀᴛ'
+    enchants:
+      - PROTECTION;1
+      - UNBREAKING;1
+    preview_slot: 36
+  23:
+    id: IRON_LEGGINGS
+    name: '&fНабор &7sᴛᴀʀᴛ'
+    enchants:
+      - PROTECTION;1
+      - UNBREAKING;1
+    preview_slot: 37
+  24:
+    id: IRON_CHESTPLATE
+    name: '&fНабор &7sᴛᴀʀᴛ'
+    enchants:
+      - PROTECTION;1
+      - UNBREAKING;1
+    preview_slot: 38
+  25:
+    id: DIAMOND_HELMET
+    name: '&fНабор &7sᴛᴀʀᴛ'
+    enchants:
+      - PROTECTION;1
+      - UNBREAKING;1
+    preview_slot: 39
+actions:
+  claim:
+    1:
+      action: 'title: 10;35;20;#F8BEFBНабор &fsᴛᴀʀᴛ;&7получен'
+    2:
+      action: 'playsound: ENTITY_EXPERIENCE_ORB_PICKUP;1;1.2'
+  error:
+    1:
+      action: 'playsound: BLOCK_NOTE_BLOCK_BASS;1;0.8'
+    2:
+      action: 'actionbar: &7Набор &cнедоступен;60'
+display:
+  default:
+    id: COAL_ORE
+    name: '&fНабор &7sᴛᴀʀᴛ'
+    lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &aМожно получить'
+      - '#F8BEFB&l┃ &fПредметов: &f25'
+      - '#F8BEFB&l┃ &fПерезарядка: &f1 ч'
+      - '#F8BEFB&l┃ '
+      - '&7● &fВзять набор &7(ЛКМ)'
+      - '&7● &fПосмотреть набор &7(ПКМ)'
+  no_permission:
+    id: BARRIER
+    name: '&fНабор &7sᴛᴀʀᴛ'
+    lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &cНет доступа'
+      - '#F8BEFB&l┃ &fПредметов: &f25'
+      - '#F8BEFB&l┃ '
+      - '&7● &fПосмотреть набор &7(ПКМ)'
+  cooldown:
+    id: COAL_ORE
+    name: '&fНабор &7sᴛᴀʀᴛ'
+    lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &eПерезарядка'
+      - '#F8BEFB&l┃ &fОсталось: &f%time%'
+      - '#F8BEFB&l┃ '
+      - '&7● &fПосмотреть набор &7(ПКМ)'

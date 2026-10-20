@@ -1,0 +1,205 @@
+cooldown: 86400
+permission_required: true
+auto_armor: true
+items:
+  1:
+    id: DIAMOND_SWORD
+    enchants:
+      - SHARPNESS;4
+      - FIRE_ASPECT;1
+      - UNBREAKING;3
+    preview_slot: 0
+  2:
+    id: DIAMOND_PICKAXE
+    enchants:
+      - EFFICIENCY;4
+      - UNBREAKING;2
+    preview_slot: 1
+  3:
+    id: DIAMOND_AXE
+    enchants:
+      - EFFICIENCY;4
+      - UNBREAKING;2
+    preview_slot: 2
+  4:
+    id: DIAMOND_SHOVEL
+    enchants:
+      - EFFICIENCY;4
+      - UNBREAKING;2
+    preview_slot: 3
+  5:
+    id: BOW
+    enchants:
+      - POWER;4
+      - UNBREAKING;2
+    preview_slot: 4
+  6:
+    id: GOLDEN_APPLE
+    amount: 28
+    preview_slot: 5
+  7:
+    id: COOKED_BEEF
+    amount: 64
+    preview_slot: 6
+  8:
+    id: CHORUS_FRUIT
+    amount: 64
+    preview_slot: 7
+  9:
+    id: ARROW
+    amount: 64
+    preview_slot: 8
+  10:
+    id: POTION
+    amount: 2
+    potion_data:
+      type: STRONG_SWIFTNESS
+      upgraded: true
+      extended: false
+    preview_slot: 9
+  11:
+    id: POTION
+    amount: 2
+    potion_data:
+      type: FIRE_RESISTANCE
+      upgraded: false
+      extended: false
+    preview_slot: 10
+  12:
+    id: POTION
+    amount: 2
+    potion_data:
+      type: STRONG_STRENGTH
+      upgraded: true
+      extended: false
+    preview_slot: 11
+  13:
+    id: ENDER_PEARL
+    amount: 16
+    preview_slot: 12
+  14:
+    id: ENDER_PEARL
+    amount: 16
+    preview_slot: 13
+  15:
+    id: TOTEM_OF_UNDYING
+    preview_slot: 14
+  16:
+    id: TOTEM_OF_UNDYING
+    preview_slot: 15
+  17:
+    id: TOTEM_OF_UNDYING
+    preview_slot: 16
+  18:
+    id: TOTEM_OF_UNDYING
+    preview_slot: 17
+  19:
+    id: EXPERIENCE_BOTTLE
+    amount: 64
+    preview_slot: 18
+  20:
+    id: EXPERIENCE_BOTTLE
+    amount: 64
+    preview_slot: 19
+  21:
+    id: EXPERIENCE_BOTTLE
+    amount: 48
+    preview_slot: 20
+  22:
+    id: ENCHANTED_BOOK
+    book_enchants:
+      - SHARPNESS;5
+    preview_slot: 21
+  23:
+    id: BIRCH_LOG
+    amount: 64
+    preview_slot: 22
+  24:
+    id: GOLDEN_CARROT
+    amount: 32
+    preview_slot: 23
+  25:
+    id: GOLD_INGOT
+    amount: 64
+    preview_slot: 24
+  26:
+    id: IRON_INGOT
+    amount: 64
+    preview_slot: 25
+  27:
+    id: DIAMOND
+    amount: 16
+    preview_slot: 26
+  28:
+    id: COAL
+    amount: 32
+    preview_slot: 27
+  29:
+    id: NETHERITE_SCRAP
+    amount: 2
+    preview_slot: 28
+  30:
+    id: DIAMOND_HELMET
+    enchants:
+      - PROTECTION;3
+      - UNBREAKING;3
+    preview_slot: 36
+  31:
+    id: DIAMOND_CHESTPLATE
+    enchants:
+      - PROTECTION;4
+      - UNBREAKING;3
+    preview_slot: 37
+  32:
+    id: DIAMOND_LEGGINGS
+    enchants:
+      - PROTECTION;4
+      - UNBREAKING;3
+    preview_slot: 38
+  33:
+    id: DIAMOND_BOOTS
+    enchants:
+      - PROTECTION;3
+      - UNBREAKING;3
+    preview_slot: 39
+actions:
+  claim:
+    1:
+      action: 'title: 10;35;20;#F8BEFBНабор &fɪᴍᴍᴏʀᴛᴀʟ;&7получен'
+    2:
+      action: 'playsound: ITEM_TOTEM_USE;1;1.2'
+  error:
+    1:
+      action: 'playsound: BLOCK_NOTE_BLOCK_BASS;1;0.8'
+    2:
+      action: 'actionbar: &7Набор &cнедоступен;60'
+display:
+  default:
+    id: RED_SHULKER_BOX
+    name: '&fНабор &x&F&F&3&0&3&0&lɪ&x&F&F&3&A&3&A&lᴍ&x&F&F&4&4&4&4&lᴍ&x&F&F&4&E&4&E&lᴏ&x&F&F&5&7&5&7&lʀ&x&F&F&6&1&6&1&lᴛ&x&F&F&6&B&6&B&lᴀ&x&F&F&7&5&7&5&lʟ'
+    lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &aМожно получить'
+      - '#F8BEFB&l┃ &fПредметов: &f33'
+      - '#F8BEFB&l┃ &fПерезарядка: &f1 дн'
+      - '#F8BEFB&l┃ '
+      - '&7● &fВзять набор &7(ЛКМ)'
+      - '&7● &fПосмотреть набор &7(ПКМ)'
+  no_permission:
+    id: BARRIER
+    name: '&fНабор &x&F&F&3&0&3&0&lɪ&x&F&F&3&A&3&A&lᴍ&x&F&F&4&4&4&4&lᴍ&x&F&F&4&E&4&E&lᴏ&x&F&F&5&7&5&7&lʀ&x&F&F&6&1&6&1&lᴛ&x&F&F&6&B&6&B&lᴀ&x&F&F&7&5&7&5&lʟ'
+    lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &cНет доступа'
+      - '#F8BEFB&l┃ &fПредметов: &f33'
+      - '#F8BEFB&l┃ '
+      - '&7● &fПосмотреть набор &7(ПКМ)'
+  cooldown:
+    id: RED_SHULKER_BOX
+    name: '&fНабор &x&F&F&3&0&3&0&lɪ&x&F&F&3&A&3&A&lᴍ&x&F&F&4&4&4&4&lᴍ&x&F&F&4&E&4&E&lᴏ&x&F&F&5&7&5&7&lʀ&x&F&F&6&1&6&1&lᴛ&x&F&F&6&B&6&B&lᴀ&x&F&F&7&5&7&5&lʟ'
+    lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &eПерезарядка'
+      - '#F8BEFB&l┃ &fОсталось: &f%time%'
+      - '#F8BEFB&l┃ '
+      - '&7● &fПосмотреть набор &7(ПКМ)'

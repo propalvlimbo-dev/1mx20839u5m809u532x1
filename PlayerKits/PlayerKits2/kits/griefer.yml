@@ -1,0 +1,161 @@
+cooldown: 86400
+permission_required: true
+auto_armor: true
+items:
+  1:
+    id: DIAMOND_SWORD
+    enchants:
+      - FIRE_ASPECT;1
+      - SHARPNESS;3
+      - UNBREAKING;2
+    preview_slot: 0
+  2:
+    id: DIAMOND_SHOVEL
+    enchants:
+      - EFFICIENCY;3
+      - UNBREAKING;2
+    preview_slot: 1
+  3:
+    id: DIAMOND_AXE
+    enchants:
+      - EFFICIENCY;3
+      - UNBREAKING;2
+    preview_slot: 2
+  4:
+    id: DIAMOND_PICKAXE
+    enchants:
+      - EFFICIENCY;3
+      - UNBREAKING;2
+    preview_slot: 3
+  5:
+    id: BOW
+    enchants:
+      - POWER;3
+      - UNBREAKING;2
+    preview_slot: 4
+  6:
+    id: GOLDEN_APPLE
+    amount: 16
+    preview_slot: 5
+  7:
+    id: ENDER_PEARL
+    amount: 16
+    preview_slot: 6
+  8:
+    id: CHORUS_FRUIT
+    amount: 64
+    preview_slot: 7
+  9:
+    id: TOTEM_OF_UNDYING
+    preview_slot: 8
+  10:
+    id: BIRCH_LOG
+    amount: 16
+    preview_slot: 9
+  11:
+    id: RED_WOOL
+    amount: 32
+    preview_slot: 10
+  12:
+    id: RED_CONCRETE
+    amount: 32
+    preview_slot: 11
+  13:
+    id: RED_STAINED_GLASS
+    amount: 32
+    preview_slot: 12
+  14:
+    id: OAK_LOG
+    amount: 32
+    preview_slot: 13
+  15:
+    id: TOTEM_OF_UNDYING
+    preview_slot: 18
+  16:
+    id: EXPERIENCE_BOTTLE
+    amount: 24
+    preview_slot: 19
+  17:
+    id: COOKED_BEEF
+    amount: 64
+    preview_slot: 20
+  18:
+    id: SHIELD
+    enchants:
+      - UNBREAKING;2
+    banner_data:
+      base_color: ORANGE
+    preview_slot: 21
+  19:
+    id: ARROW
+    amount: 64
+    preview_slot: 22
+  20:
+    id: DIAMOND_BOOTS
+    enchants:
+      - PROTECTION;3
+      - FIRE_PROTECTION;1
+      - UNBREAKING;2
+    preview_slot: 36
+  21:
+    id: DIAMOND_LEGGINGS
+    enchants:
+      - PROTECTION;3
+      - FIRE_PROTECTION;1
+      - UNBREAKING;2
+    preview_slot: 37
+  22:
+    id: DIAMOND_CHESTPLATE
+    enchants:
+      - PROTECTION;3
+      - FIRE_PROTECTION;1
+      - UNBREAKING;2
+    preview_slot: 38
+  23:
+    id: DIAMOND_HELMET
+    enchants:
+      - PROTECTION;3
+      - FIRE_PROTECTION;1
+      - UNBREAKING;2
+    preview_slot: 39
+actions:
+  claim:
+    1:
+      action: 'title: 10;35;20;#F8BEFBНабор &fɢʀɪᴇꜰᴇʀ;&7получен'
+    2:
+      action: 'playsound: ENTITY_PLAYER_LEVELUP;1;1.0'
+  error:
+    1:
+      action: 'playsound: BLOCK_NOTE_BLOCK_BASS;1;0.8'
+    2:
+      action: 'actionbar: &7Набор &cнедоступен;60'
+display:
+  default:
+    id: RED_SHULKER_BOX
+    name: '&fНабор &x&F&F&9&1&9&1&lɢ&x&F&F&9&9&9&9&lʀ&x&F&F&A&1&A&1&lɪ&x&F&F&A&A&A&A&lᴇ&x&F&F&B&2&B&2&lꜰ&x&F&F&B&A&B&A&lᴇ&x&F&F&C&2&C&2&lʀ'
+    lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &aМожно получить'
+      - '#F8BEFB&l┃ &fПредметов: &f23'
+      - '#F8BEFB&l┃ &fПерезарядка: &f1 дн'
+      - '#F8BEFB&l┃ '
+      - '&7● &fВзять набор &7(ЛКМ)'
+      - '&7● &fПосмотреть набор &7(ПКМ)'
+  no_permission:
+    id: BARRIER
+    name: '&fНабор &x&F&F&9&1&9&1&lɢ&x&F&F&9&9&9&9&lʀ&x&F&F&A&1&A&1&lɪ&x&F&F&A&A&A&A&lᴇ&x&F&F&B&2&B&2&lꜰ&x&F&F&B&A&B&A&lᴇ&x&F&F&C&2&C&2&lʀ'
+    lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &cНет доступа'
+      - '#F8BEFB&l┃ &fПредметов: &f23'
+      - '#F8BEFB&l┃ '
+      - '&7● &fПосмотреть набор &7(ПКМ)'
+  cooldown:
+    id: RED_SHULKER_BOX
+    name: '&fНабор &x&F&F&9&1&9&1&lɢ&x&F&F&9&9&9&9&lʀ&x&F&F&A&1&A&1&lɪ&x&F&F&A&A&A&A&lᴇ&x&F&F&B&2&B&2&lꜰ&x&F&F&B&A&B&A&lᴇ&x&F&F&C&2&C&2&lʀ'
+    lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &eПерезарядка'
+      - '#F8BEFB&l┃ &fОсталось: &f%time%'
+      - '#F8BEFB&l┃ '
+      - '&7● &fПосмотреть набор &7(ПКМ)'

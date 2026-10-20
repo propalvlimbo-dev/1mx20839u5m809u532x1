@@ -1,0 +1,232 @@
+cooldown: 259200
+permission_required: true
+items:
+  1:
+    id: POTION
+    amount: 3
+    potion_data:
+      type: LONG_FIRE_RESISTANCE
+      upgraded: false
+      extended: true
+    preview_slot: 0
+  2:
+    id: POTION
+    amount: 3
+    potion_data:
+      type: STRONG_SWIFTNESS
+      upgraded: true
+      extended: false
+    preview_slot: 1
+  3:
+    id: POTION
+    amount: 3
+    potion_data:
+      type: STRONG_STRENGTH
+      upgraded: true
+      extended: false
+    preview_slot: 2
+  4:
+    id: GOLDEN_APPLE
+    amount: 64
+    preview_slot: 3
+  5:
+    id: EXPERIENCE_BOTTLE
+    amount: 64
+    preview_slot: 4
+  6:
+    id: EXPERIENCE_BOTTLE
+    amount: 64
+    preview_slot: 5
+  7:
+    id: EXPERIENCE_BOTTLE
+    amount: 64
+    preview_slot: 6
+  8:
+    id: SHULKER_BOX
+    preview_slot: 7
+  9:
+    id: SHULKER_BOX
+    preview_slot: 8
+  10:
+    id: SHULKER_BOX
+    preview_slot: 9
+  11:
+    id: SHULKER_BOX
+    preview_slot: 10
+  12:
+    id: ENCHANTED_GOLDEN_APPLE
+    amount: 4
+    preview_slot: 11
+  13:
+    id: GOLDEN_APPLE
+    amount: 64
+    preview_slot: 12
+  14:
+    id: ENCHANTED_BOOK
+    book_enchants:
+      - PROTECTION;4
+    preview_slot: 13
+  15:
+    id: ENCHANTED_BOOK
+    book_enchants:
+      - PROTECTION;4
+    preview_slot: 14
+  16:
+    id: ENCHANTED_BOOK
+    book_enchants:
+      - PROTECTION;4
+    preview_slot: 15
+  17:
+    id: ENCHANTED_BOOK
+    book_enchants:
+      - PROTECTION;4
+    preview_slot: 16
+  18:
+    id: ENCHANTED_BOOK
+    book_enchants:
+      - SHARPNESS;5
+    preview_slot: 17
+  19:
+    id: ENCHANTED_BOOK
+    book_enchants:
+      - SHARPNESS;5
+    preview_slot: 18
+  20:
+    id: EXPERIENCE_BOTTLE
+    amount: 64
+    preview_slot: 19
+  21:
+    id: EXPERIENCE_BOTTLE
+    amount: 64
+    preview_slot: 20
+  22:
+    id: EXPERIENCE_BOTTLE
+    amount: 64
+    preview_slot: 21
+  23:
+    id: SPAWNER
+    preview_slot: 22
+  24:
+    id: ELYTRA
+    name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BЭ&x&F&5&B&E&F&Bл&x&F&2&B&E&F&Bи&x&E&F&B&F&F&Bт&x&E&C&B&F&F&Bр&x&E&9&B&F&F&Bа &x&E&6&B&F&F&BБ&x&E&3&B&F&F&Bо&x&E&0&C&0&F&Bг&x&D&D&C&0&F&Bа&x&D&A&C&0&F&Bт&x&D&7&C&0&F&Bы&x&D&4&C&0&F&Bр&x&D&1&C&0&F&Bя &x&F&8&B&E&F&B»'
+    preview_slot: 23
+  25:
+    id: PLAYER_HEAD
+    name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BШ&x&F&4&B&E&F&Bа&x&F&0&B&F&F&Bр &x&E&C&B&F&F&BН&x&E&8&B&F&F&Bо&x&E&4&B&F&F&Bв&x&E&0&C&0&F&Bи&x&D&C&C&0&F&Bч&x&D&8&C&0&F&Bк&x&D&4&C&0&F&Bа &x&F&8&B&E&F&B»'
+    lore:
+      - '&x&F&8&B&E&F&B&l┃ '
+      - '&x&F&8&B&E&F&B&l┃ &fЭффект: &x&F&8&B&E&F&BСила II'
+      - '&x&F&8&B&E&F&B&l┃ &fЭффект: &x&F&8&B&E&F&BСопротивление I'
+      - '&x&F&8&B&E&F&B&l┃ &fЭффект: &x&F&8&B&E&F&BОгнестойкость I'
+      - '&x&F&8&B&E&F&B&l┃ '
+    skull_data:
+      texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTQ1ZmQyYzM3MzZhZjRiZDI4MTEyOTY2NjFlMGNiNDliYWIyY2ZhNjVmNWM5ZTU5OGFhNDNiZWJmYTFlYTM2OCJ9fX0=
+    preview_slot: 24
+  26:
+    id: TOTEM_OF_UNDYING
+    name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BТ&x&F&4&B&E&F&Bо&x&F&0&B&F&F&Bт&x&E&C&B&F&F&Bе&x&E&8&B&F&F&Bм &x&E&4&B&F&F&Bд&x&E&0&C&0&F&Bо&x&D&C&C&0&F&Bк&x&D&8&C&0&F&Bт&x&D&4&C&0&F&Bо&x&D&0&C&0&F&Bр&x&C&C&C&1&F&Bа &x&F&8&B&E&F&B»'
+    lore:
+      - '&x&F&8&B&E&F&B&l┃ '
+      - '&x&F&8&B&E&F&B&l┃ &fУсловие: &x&F&8&B&E&F&BВ левой руке'
+      - '&x&F&8&B&E&F&B&l┃ &fБонус: &x&F&8&B&E&F&B+4 к макс. здоровью'
+      - '&x&F&8&B&E&F&B&l┃ '
+    enchants:
+      - FEATHER_FALLING;6
+    item_flags:
+      - HIDE_ENCHANTS
+      - HIDE_ATTRIBUTES
+    attributes:
+      - MAX_HEALTH;ADD_NUMBER;4.0;elytrix:max_health;offhand
+    preview_slot: 25
+  27:
+    id: TOTEM_OF_UNDYING
+    name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BТ&x&F&4&B&E&F&Bо&x&F&0&B&F&F&Bт&x&E&C&B&F&F&Bе&x&E&8&B&F&F&Bм &x&E&4&B&F&F&Bк&x&E&0&C&0&F&Bи&x&D&C&C&0&F&Bл&x&D&8&C&0&F&Bл&x&D&4&C&0&F&Bе&x&D&0&C&0&F&Bр&x&C&C&C&1&F&Bа &x&F&8&B&E&F&B»'
+    lore:
+      - '&x&F&8&B&E&F&B&l┃ '
+      - '&x&F&8&B&E&F&B&l┃ &fУсловие: &x&F&8&B&E&F&BВ левой руке'
+      - '&x&F&8&B&E&F&B&l┃ &fБонус: &x&F&8&B&E&F&B+4 к урону'
+      - '&x&F&8&B&E&F&B&l┃ '
+    enchants:
+      - FEATHER_FALLING;6
+    item_flags:
+      - HIDE_ENCHANTS
+      - HIDE_ATTRIBUTES
+    attributes:
+      - ATTACK_DAMAGE;ADD_NUMBER;4.0;elytrix:attack_damage;offhand
+    preview_slot: 26
+  28:
+    id: CHICKEN_SPAWN_EGG
+    preview_slot: 27
+  29:
+    id: PIG_SPAWN_EGG
+    preview_slot: 28
+  30:
+    id: POTION
+    amount: 6
+    name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BЗ&x&F&4&B&E&F&Bе&x&F&0&B&F&F&Bл&x&E&C&B&F&F&Bь&x&E&8&B&F&F&Bе &x&E&4&B&F&F&BВ&x&E&0&C&0&F&Bо&x&D&C&C&0&F&Bй&x&D&8&C&0&F&Bн&x&D&4&C&0&F&Bы &x&F&8&B&E&F&B»'
+    potion_data:
+      type: WATER
+      upgraded: false
+      extended: false
+      effects:
+        - STRENGTH;1;1800
+        - SPEED;1;1800
+        - FIRE_RESISTANCE;0;9600
+      color: 13103616
+    preview_slot: 29
+  31:
+    id: PLAYER_HEAD
+    name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BШ&x&F&4&B&E&F&Bа&x&F&0&B&F&F&Bр &x&E&C&B&F&F&BН&x&E&8&B&F&F&Bо&x&E&4&B&F&F&Bв&x&E&0&C&0&F&Bи&x&D&C&C&0&F&Bч&x&D&8&C&0&F&Bк&x&D&4&C&0&F&Bа &x&F&8&B&E&F&B»'
+    lore:
+      - '&x&F&8&B&E&F&B&l┃ '
+      - '&x&F&8&B&E&F&B&l┃ &fЭффект: &x&F&8&B&E&F&BСила II'
+      - '&x&F&8&B&E&F&B&l┃ &fЭффект: &x&F&8&B&E&F&BСопротивление I'
+      - '&x&F&8&B&E&F&B&l┃ &fЭффект: &x&F&8&B&E&F&BОгнестойкость I'
+      - '&x&F&8&B&E&F&B&l┃ '
+    skull_data:
+      texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTQ1ZmQyYzM3MzZhZjRiZDI4MTEyOTY2NjFlMGNiNDliYWIyY2ZhNjVmNWM5ZTU5OGFhNDNiZWJmYTFlYTM2OCJ9fX0=
+    offhand: true
+    preview_slot: 30
+actions:
+  claim:
+    1:
+      action: 'title: 10;35;20;#F8BEFBНабор &fᴘʟᴜs;&7получен'
+    2:
+      action: 'playsound: UI_TOAST_CHALLENGE_COMPLETE;1;1.0'
+    3:
+      action: 'firework: colors:AQUA,BLUE type:BALL fade:WHITE power:0'
+  error:
+    1:
+      action: 'playsound: BLOCK_NOTE_BLOCK_BASS;1;0.8'
+    2:
+      action: 'actionbar: &7Набор &cнедоступен;60'
+display:
+  default:
+    id: BROWN_DYE
+    name: '&fНабор &x&F&4&5&F&0&9&lᴘʟᴜs'
+    lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &aМожно получить'
+      - '#F8BEFB&l┃ &fПредметов: &f31'
+      - '#F8BEFB&l┃ &fПерезарядка: &f3 дн'
+      - '#F8BEFB&l┃ '
+      - '&7● &fВзять набор &7(ЛКМ)'
+      - '&7● &fПосмотреть набор &7(ПКМ)'
+  no_permission:
+    id: BARRIER
+    name: '&fНабор &x&F&4&5&F&0&9&lᴘʟᴜs'
+    lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &cНет доступа'
+      - '#F8BEFB&l┃ &fПредметов: &f31'
+      - '#F8BEFB&l┃ '
+      - '&7● &fПосмотреть набор &7(ПКМ)'
+  cooldown:
+    id: BROWN_DYE
+    name: '&fНабор &x&F&4&5&F&0&9&lᴘʟᴜs'
+    lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &eПерезарядка'
+      - '#F8BEFB&l┃ &fОсталось: &f%time%'
+      - '#F8BEFB&l┃ '
+      - '&7● &fПосмотреть набор &7(ПКМ)'
