@@ -1,0 +1,67 @@
+# DecentHolograms 2.10+ — голограмма нового типа (display entity)
+# Переделано из классической голограммы: helps.yml
+# Текст 1:1, иконка — отдельный файл helps_icon.yml.
+type: TEXT
+location:
+  world: 'spawn'
+  x: -10.444
+  y: 60.000
+  z: 0.535
+  yaw: 0.0
+  pitch: 0.0
+settings:
+  enabled: true
+  display-range: 48
+  update-interval: 20
+attributes:
+  billboard:
+    value-type: billboard_constraints
+    value: CENTER
+  background-color:
+    value-type: rgba
+    value:
+      red: 8
+      green: 8
+      blue: 12
+      alpha: 0
+  text-shadow:
+    value-type: boolean
+    value: true
+  see-through:
+    value-type: boolean
+    value: false
+  alignment:
+    value-type: text_alignment
+    value: CENTER
+  line-width:
+    value-type: integer
+    value: 1000
+  text-opacity:
+    value-type: integer
+    value: 255
+  scale:
+    value-type: vector3f
+    value:
+      x: 1.0
+      y: 1.0
+      z: 1.0
+  translation:
+    value-type: vector3f
+    value:
+      x: 0.0
+      y: -3.10
+      z: 0.0
+pages:
+  - lines:
+      - '&#F8BEFB&lКОМАНДЫ СЕРВЕРА'
+      - ''
+      - '&7● &fГлавное меню: &#F8BEFB/menu'
+      - '&7● &fСлучайный телепорт: &#F8BEFB/rtp'
+      - '&7● &fТорговая площадка: &#F8BEFB/ah'
+      - '&7● &fСписок варпов: &#F8BEFB/warps'
+      - '&7● &fМагазин предметов: &#F8BEFB/shop'
+      - '&7● &fСкупщик ресурсов: &#F8BEFB/seller'
+      - '&7● &fБесплатные награды: &#F8BEFB/salary'
+      - '&7● &fПривилегии сервера: &#F8BEFB/donate'
+      - ''
+      - '&7● &fНаш сайт: &#F8BEFBelytrix.pw'

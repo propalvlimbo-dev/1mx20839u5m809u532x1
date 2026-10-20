@@ -1,16 +1,17 @@
 # DecentHolograms 2.10+ — голограмма нового типа (display entity)
-# Поставить на нужное место:  /dh displays movehere kits
+# Переделано из классической голограммы: cases.yml
+# Текст 1:1, иконка — отдельный файл cases_icon.yml.
 type: TEXT
 location:
-  world: world
-  x: 0.0
-  y: 100.0
-  z: 0.0
+  world: 'spawn'
+  x: 41.611
+  y: 52.900
+  z: 0.564
   yaw: 0.0
   pitch: 0.0
 settings:
   enabled: true
-  display-range: 48.0
+  display-range: 48
   update-interval: 20
 attributes:
   billboard:
@@ -34,7 +35,7 @@ attributes:
     value: CENTER
   line-width:
     value-type: integer
-    value: 400
+    value: 1000
   text-opacity:
     value-type: integer
     value: 255
@@ -44,11 +45,16 @@ attributes:
       x: 1.0
       y: 1.0
       z: 1.0
+  translation:
+    value-type: vector3f
+    value:
+      x: 0.0
+      y: -1.00
+      z: 0.0
 pages:
   - lines:
-      - '&f☁ <#F8BEFB>Наборы</#E8FFF0>'
-      - '&8▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪'
-      - '&f12 наборов &7— &fот старта до доната'
-      - '&7Статус и перезарядка видны в меню'
-      - '&8▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪'
-      - '&7Открыть&8: &f/kit'
+      - '&#F8BEFB&lКЕЙСЫ'
+      - ''
+      - '&fИспытайте удачу и выигрывайте &#F8BEFBценные призы'
+      - ''
+      - '&7● &fПокупка ключей: &#F8BEFBelytrix.pw'

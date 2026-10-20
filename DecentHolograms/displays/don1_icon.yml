@@ -1,0 +1,35 @@
+# DecentHolograms 2.10+ — голограмма нового типа (display entity)
+# Переделано из классической голограммы: don1.yml
+# Иконка (строка gold_block) из старой голограммы, текст — в don1.yml.
+item: 'GOLD_BLOCK'
+type: ITEM
+location:
+  world: 'spawn'
+  x: 0.392
+  y: 61.400
+  z: -10.550
+  yaw: 0.0
+  pitch: 0.0
+settings:
+  enabled: true
+  display-range: 48
+  update-interval: 20
+attributes:
+  billboard:
+    value-type: billboard_constraints
+    value: CENTER
+  display-type:
+    value-type: item_display_type
+    value: FIXED
+  scale:
+    value-type: vector3f
+    value:
+      x: 1.0
+      y: 1.0
+      z: 1.0
+  translation:
+    value-type: vector3f
+    value:
+      x: 0.0
+      y: -4.70
+      z: 0.0
