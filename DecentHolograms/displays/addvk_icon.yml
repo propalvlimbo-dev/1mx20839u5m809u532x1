@@ -30,6 +30,6 @@ attributes:
   translation:
     value-type: vector3f
     value:
-      x: -1.20
+      x: -3.50
       y: -0.90
-      z: 0.45
+      z: 0.05

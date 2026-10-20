@@ -1,31 +1,32 @@
-# Готовые команды — скопируй в консоль (или в игру), по одной
+# Высота: три числа в translation = X Y Z
+#   X — влево(-)/вправо(+) от точки привязки
+#   Y — ВЫСОТА: вниз(-)/вверх(+)
+#   Z — назад(-)/вперёд(+)
+#
+# Пример: -3.5  -0.56  0.05
+#            X      Y     Z
 
-# 1. help больше не смотрит в одну сторону
-/dh displays attribute helps billboard VERTICAL
+# цель целиком ниже/выше:
+/dh displays attribute don translation 0 -4.73 0
+/dh displays attribute don translation 0 -5.20 0
 
-# 2. Иконки сбоку (слева от текста, вынесены вперёд)
-/dh displays attribute cases_icon translation -1.2 -0.56 0.45
-/dh displays attribute hello_icon translation -1.2 -1.48 0.45
-/dh displays attribute addvk_icon translation -1.2 -0.90 0.45
+# иконка сбоку (твоё идеальное значение)
+/dh displays attribute cases_icon translation -3.5 -0.56 0.05
+/dh displays attribute hello_icon translation -3.5 -1.48 0.05
+/dh displays attribute addvk_icon translation -3.5 -0.90 0.05
 
-# 3. don / don1 ниже к земле
-/dh displays attribute don  translation 0 -4.73 0
-/dh displays attribute don1 translation 0 -4.73 0
+# иконки под текстом
 /dh displays attribute don_icon  translation 0 -5.28 0
 /dh displays attribute don1_icon translation 0 -5.28 0
+/dh displays attribute helps_icon translation 0 -3.60 0
 
-# 4. Размеры: ключ и книга мельче
+# help больше не смотрит в одну сторону
+/dh displays attribute helps billboard VERTICAL
+
+# размер
 /dh displays attribute cases_icon scale 0.5
 /dh displays attribute hello_icon scale 0.6
 
-# ------------------------------------------------------------------
-# Проверка (просто посмотреть текущее значение):
-/dh displays attribute helps billboard
-/dh displays attribute cases_icon translation
+# проверить текущее значение
+/dh displays attribute don translation
 /dh displays list
-
-# Если /dh displays attribute ... пишет "unknown display" — значит
-# displays вообще не загрузились, смотри консоль после /dh reload.
-#
-# Эти команды сами сохраняют изменения в plugins/DecentHolograms/displays/*.yml,
-# перезапуск сервера не нужен.

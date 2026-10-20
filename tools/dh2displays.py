@@ -213,9 +213,9 @@ def convert(path, out_dir, stats):
     icon_z = 0.0
     if name in SIDE:
         # сбоку: слева от текста (alignment LEFT — текст растёт вправо от якоря)
-        icon_x = -1.20
+        icon_x = -3.50
         icon_y = text_bottom_val + (len(texts) * LINE_H) / 2.0
-        icon_z = 0.45
+        icon_z = 0.05
 
     for item in items:
         icon_name = name + '_icon'
