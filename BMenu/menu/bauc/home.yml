@@ -276,10 +276,23 @@ items:
     slot: 0-8
     name: ''
     material: purple_stained_glass_pane
-  gap:
+  info:
     slot: 47
-    name: ''
-    material: dirt
+    material: oak_leaves
+    name: '<#F8BEFB>Как выставлять лоты'
+    lore:
+      - '<#F8BEFB><b>┃</b> '
+      - '<#F8BEFB><b>┃</b> <white>Возьми предмет в руку'
+      - '<#F8BEFB><b>┃</b> <white>и напиши: <#F8BEFB>/ah sell 1000'
+      - '<#F8BEFB><b>┃</b> <white>1000 — цена в монетах'
+      - '<#F8BEFB><b>┃</b> '
+      - '<#F8BEFB><b>┃</b> <white>Несколько сразу:'
+      - '<#F8BEFB><b>┃</b> <#F8BEFB>/ah sellgui 1000'
+      - '<#F8BEFB><b>┃</b> '
+      - '<gray>● <white>Поиск: <#F8BEFB>/ah search алмаз'
+      - '<gray>● <white>Аренда слотов: <#F8BEFB>/ah rent'
+      - '<gray>● <white>Лот висит: <#F8BEFB>1 день'
+    all_flags: true
   cover:
     name: ''
     material: dirt

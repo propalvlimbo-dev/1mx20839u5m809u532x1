@@ -25,6 +25,7 @@ COL = {
     'purple_bundle': ((140, 70, 200), (112, 55, 165)),
     'music_disc_mellohi': ((230, 120, 180), (200, 95, 155)),
     'gray_dye': ((120, 120, 120), (98, 98, 98)),
+    'oak_leaves': ((74, 122, 52), (56, 98, 40)),
 }
 
 def slots(s):
@@ -69,15 +70,18 @@ def matrix(upto):
 
 def draw(m, title, note):
     cell, pad, top = 46, 12, 58
-    img = Image.new('RGB', (9 * cell + pad * 2, 5 * cell + top + pad), (20, 17, 22))
+    img = Image.new('RGB', (9 * cell + pad * 2, 6 * cell + top + pad), (20, 17, 22))
     d = ImageDraw.Draw(img)
     d.text((pad, 12), title, font=ImageFont.truetype(FB, 17), fill=(248, 190, 251))
     d.text((pad, 34), note, font=ImageFont.truetype(F, 11), fill=(150, 143, 150))
     f = ImageFont.truetype(F, 11)
-    for i in range(45):
+    for i in range(54):
         r, c = divmod(i, 9)
         x, y = pad + c * cell, top + r * cell
         mat, key = m[i]
+        if mat is None:
+            d.text((x + cell / 2, y + cell / 2), str(i), font=f, anchor='mm', fill=(70, 66, 72))
+            continue
         if mat == '__lot__':
             bg, edge = (42, 48, 66), (62, 70, 92)
         else:
@@ -88,6 +92,12 @@ def draw(m, title, note):
                 for dx in range(6, cell - 8, 7):
                     if (dx * 7 + dy * 13 + i) % 3:
                         d.point((x + dx, y + dy), fill=(110, 78, 52))
+        elif mat == 'oak_leaves':
+            d.rectangle([x + 8, y + 8, x + cell - 9, y + cell - 12], fill=(64, 108, 46))
+            for dy in range(10, cell - 13, 5):
+                for dx in range(10, cell - 11, 5):
+                    if (dx * 5 + dy * 7 + i) % 4 == 0:
+                        d.point((x + dx, y + dy), fill=(92, 140, 66))
         elif mat == '__lot__':
             d.text((x + cell / 2, y + cell / 2), 'лот', font=f, anchor='mm', fill=(160, 168, 190))
         d.text((x + cell / 2, y + cell - 9), str(i), font=f, anchor='mm', fill=(238, 232, 228))
