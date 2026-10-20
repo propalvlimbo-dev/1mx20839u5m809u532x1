@@ -974,7 +974,7 @@ public class SphereAnimator extends AbstractAnimation {
     }
 
     private void fx(Particle particle, Vec3d pos, int count, double ox, double oy, double oz, double extra) {
-        if (pos == null) return;
+        if (!config.particles || pos == null) return;
         try {
             if (isRedstone(particle)) {
                 spawnParticle(particle, pos, count, ox, oy, oz, extra, dustOptions);
@@ -1118,6 +1118,7 @@ public class SphereAnimator extends AbstractAnimation {
         final int red;
         final int green;
         final int blue;
+        final boolean particles;
         final boolean breeze;
         final boolean vortexMode;
         final String vortexParticle;
@@ -1152,6 +1153,7 @@ public class SphereAnimator extends AbstractAnimation {
             this.red = (int) clamp(get(c, "red", 255), 0, 255);
             this.green = (int) clamp(get(c, "green", 105), 0, 255);
             this.blue = (int) clamp(get(c, "blue", 180), 0, 255);
+            this.particles = getBool(c, "particles", false);
             this.breeze = getBool(c, "breeze", true);
             this.vortexMode = getStr(c, "breezeMode", "BREEZE").trim().equalsIgnoreCase("VORTEX");
             this.vortexParticle = getStr(c, "vortexParticle", "WHITE_SMOKE");
