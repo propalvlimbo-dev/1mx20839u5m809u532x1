@@ -48,8 +48,8 @@ items:
           - '!has auc.boost.squid'
         lore:
           - '<#F8BEFB><b>┃</b> '
-          - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>${eco_price_commas}'
-          - '<#F8BEFB><b>┃</b> <white>Баланс: <#F8BEFB>$%vault_eco_balance_commas%'
+          - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>⛂{eco_price_commas}'
+          - '<#F8BEFB><b>┃</b> <white>Баланс: <#F8BEFB>⛂%vault_eco_balance_commas%'
           - '<#F8BEFB><b>┃</b> '
           - '<gray>● <white>Доступно с привилегией «Сквид»'
         on_click:
@@ -59,8 +59,8 @@ items:
         enchanted: true
         lore:
           - '<#F8BEFB><b>┃</b> '
-          - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>${eco_price_commas}'
-          - '<#F8BEFB><b>┃</b> <white>Баланс: <#F8BEFB>$%vault_eco_balance_commas%'
+          - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>⛂{eco_price_commas}'
+          - '<#F8BEFB><b>┃</b> <white>Баланс: <#F8BEFB>⛂%vault_eco_balance_commas%'
           - '<#F8BEFB><b>┃</b> '
           - '<red>● Достигнут лимит аренды'
           - '<gray>● {eco_limit} / {eco_limit} ч.'
@@ -71,8 +71,8 @@ items:
         enchanted: true
         lore:
           - '<#F8BEFB><b>┃</b> '
-          - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>${eco_price_commas}'
-          - '<#F8BEFB><b>┃</b> <white>Баланс: <#F8BEFB>$%vault_eco_balance_commas%'
+          - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>⛂{eco_price_commas}'
+          - '<#F8BEFB><b>┃</b> <white>Баланс: <#F8BEFB>⛂%vault_eco_balance_commas%'
           - '<#F8BEFB><b>┃</b> '
           - '<green>● Аренда активна'
           - '<gray>● Истекает: <#F8BEFB>{expiry}'
@@ -84,8 +84,8 @@ items:
               <<+: *eco_confirm_open
               lore:
                 - '<#F8BEFB><b>┃</b> '
-                - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>${eco_price_commas}'
-                - '<#F8BEFB><b>┃</b> <white>Баланс: <#F8BEFB>$%vault_eco_balance_commas%'
+                - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>⛂{eco_price_commas}'
+                - '<#F8BEFB><b>┃</b> <white>Баланс: <#F8BEFB>⛂%vault_eco_balance_commas%'
                 - '<#F8BEFB><b>┃</b> '
                 - '<green>● Аренда активна'
                 - '<gray>● Истекает: <#F8BEFB>{expiry}'
@@ -93,8 +93,8 @@ items:
                 - '<gray>● <white>Продлит аренду на <#F8BEFB>1 час'
       - lore:
           - '<#F8BEFB><b>┃</b> '
-          - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>${eco_price_commas}'
-          - '<#F8BEFB><b>┃</b> <white>Баланс: <#F8BEFB>$%vault_eco_balance_commas%'
+          - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>⛂{eco_price_commas}'
+          - '<#F8BEFB><b>┃</b> <white>Баланс: <#F8BEFB>⛂%vault_eco_balance_commas%'
           - '<#F8BEFB><b>┃</b> '
           - '<gray>● <white>Нажмите, чтобы арендовать'
         on_click:
@@ -102,8 +102,8 @@ items:
               <<+: *eco_confirm_open
               lore:
                 - '<#F8BEFB><b>┃</b> '
-                - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>${eco_price_commas}'
-                - '<#F8BEFB><b>┃</b> <white>Баланс: <#F8BEFB>$%vault_eco_balance_commas%'
+                - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>⛂{eco_price_commas}'
+                - '<#F8BEFB><b>┃</b> <white>Баланс: <#F8BEFB>⛂%vault_eco_balance_commas%'
                 - '<#F8BEFB><b>┃</b> '
                 - '<gray>● <white>Аренда на <#F8BEFB>1 час'
                 - '<gray>● Оплата монетами'
@@ -123,8 +123,8 @@ items:
           - '!has auc.boost.squid'
         lore:
           - '<#F8BEFB><b>┃</b> '
-          - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>{pp_price_commas} коинов'
-          - '<#F8BEFB><b>┃</b> <white>Баланс: <#F8BEFB>%playerpoints_points% коинов'
+          - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>₡{pp_price_commas}'
+          - '<#F8BEFB><b>┃</b> <white>Баланс: <#F8BEFB>₡%playerpoints_points%'
           - '<#F8BEFB><b>┃</b> '
           - '<gray>● <white>Доступно с привилегией «Сквид»'
         on_click:
@@ -134,8 +134,8 @@ items:
         enchanted: true
         lore:
           - '<#F8BEFB><b>┃</b> '
-          - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>{pp_price_commas} коинов'
-          - '<#F8BEFB><b>┃</b> <white>Баланс: <#F8BEFB>%playerpoints_points% коинов'
+          - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>₡{pp_price_commas}'
+          - '<#F8BEFB><b>┃</b> <white>Баланс: <#F8BEFB>₡%playerpoints_points%'
           - '<#F8BEFB><b>┃</b> '
           - '<red>● Достигнут лимит аренды'
           - '<gray>● {pp_limit} / {pp_limit} ч.'
@@ -146,8 +146,8 @@ items:
         enchanted: true
         lore:
           - '<#F8BEFB><b>┃</b> '
-          - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>{pp_price_commas} коинов'
-          - '<#F8BEFB><b>┃</b> <white>Баланс: <#F8BEFB>%playerpoints_points% коинов'
+          - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>₡{pp_price_commas}'
+          - '<#F8BEFB><b>┃</b> <white>Баланс: <#F8BEFB>₡%playerpoints_points%'
           - '<#F8BEFB><b>┃</b> '
           - '<green>● Аренда активна'
           - '<gray>● Истекает: <#F8BEFB>{expiry}'
@@ -159,8 +159,8 @@ items:
               <<+: *pp_confirm_open
               lore:
                 - '<#F8BEFB><b>┃</b> '
-                - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>{pp_price_commas} коинов'
-                - '<#F8BEFB><b>┃</b> <white>Баланс: <#F8BEFB>%playerpoints_points% коинов'
+                - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>₡{pp_price_commas}'
+                - '<#F8BEFB><b>┃</b> <white>Баланс: <#F8BEFB>₡%playerpoints_points%'
                 - '<#F8BEFB><b>┃</b> '
                 - '<green>● Аренда активна'
                 - '<gray>● Истекает: <#F8BEFB>{expiry}'
@@ -168,8 +168,8 @@ items:
                 - '<gray>● <white>Продлит аренду на <#F8BEFB>1 час'
       - lore:
           - '<#F8BEFB><b>┃</b> '
-          - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>{pp_price_commas} коинов'
-          - '<#F8BEFB><b>┃</b> <white>Баланс: <#F8BEFB>%playerpoints_points% коинов'
+          - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>₡{pp_price_commas}'
+          - '<#F8BEFB><b>┃</b> <white>Баланс: <#F8BEFB>₡%playerpoints_points%'
           - '<#F8BEFB><b>┃</b> '
           - '<gray>● <white>Нажмите, чтобы арендовать'
         on_click:
@@ -177,8 +177,8 @@ items:
               <<+: *pp_confirm_open
               lore:
                 - '<#F8BEFB><b>┃</b> '
-                - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>{pp_price_commas} коинов'
-                - '<#F8BEFB><b>┃</b> <white>Баланс: <#F8BEFB>%playerpoints_points% коинов'
+                - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>₡{pp_price_commas}'
+                - '<#F8BEFB><b>┃</b> <white>Баланс: <#F8BEFB>₡%playerpoints_points%'
                 - '<#F8BEFB><b>┃</b> '
                 - '<gray>● <white>Аренда на <#F8BEFB>1 час'
                 - '<gray>● Оплата коинами'
