@@ -59,6 +59,8 @@ public class SphereAnimator extends AbstractAnimation {
     private final Particle breezeParticle;
     /** Лёгкая атмосферная частица (1.21.4+), парсится по имени с фолбэком. */
     private final Particle ambientParticle;
+    /** Частица, из которой собран сам вихрь (режим VORTEX). */
+    private final Particle vortexParticle;
     private final Particle.DustOptions dustOptions;
 
     private final List<VirtualEntity> activeItems = new ArrayList<>();
@@ -166,6 +168,7 @@ public class SphereAnimator extends AbstractAnimation {
         this.itemParticle = parseParticle(this.config.particleItems, Particle.REDSTONE);
         this.breezeParticle = parseParticle(this.config.breezeParticle, Particle.CLOUD);
         this.ambientParticle = parseParticle(this.config.ambientParticle, Particle.CLOUD);
+        this.vortexParticle = parseParticle(this.config.vortexParticle, Particle.CLOUD);
 
         this.dustOptions = new Particle.DustOptions(
                 Color.fromRGB(
@@ -236,6 +239,17 @@ public class SphereAnimator extends AbstractAnimation {
     // ── Вихрь ───────────────────────────────────────────────────────────────
 
     private void spawnBreeze() {
+        if (config.vortexMode) {
+            // без моба: вихрь рисуется частицами, у моба Breeze есть
+            // собственный снежный «аура», который плагином не отключить
+            breezeEntity = null;
+            breezeYaw = 0.0F;
+            breezeSpinSpeed = 0.0D;
+            breezeSpinTarget = config.breezeSpin;
+            breezeSpin = true;
+            return;
+        }
+
         if (!config.breeze) return;
         try {
             VirtualBreeze breeze = VirtualBreeze.create();
@@ -259,13 +273,17 @@ public class SphereAnimator extends AbstractAnimation {
         }
     }
 
+    /** Есть ли что анимировать: моб Breeze или вихрь из частиц. */
+    private boolean hasVortex() {
+        return breezeEntity != null || config.vortexMode;
+    }
+
     private Vec3d breezePos(double rise) {
         return new Vec3d(center.x, center.y + config.breezeHeight + rise, center.z);
     }
 
     private void puff(int count) {
-        if (breezeEntity == null) return;
-        Vec3d pos = breezeEntity.getPos();
+        Vec3d pos = breezeEntity == null ? null : breezeEntity.getPos();
         if (pos == null) pos = breezePos(curElevation);
         fx(breezeParticle, pos.add(0.0D, 0.9D, 0.0D), count, 0.45D, 0.7D, 0.45D, 0.02D);
     }
@@ -379,10 +397,17 @@ public class SphereAnimator extends AbstractAnimation {
         if (breezeEntity != null) {
             breezeEntity.setPos(breezePos(curElevation));
             breezeEntity.setYaw(breezeYaw);
+            if (puffTicks % 10 == 0) {
+                puff(1);
+            }
+        } else {
+            // сам вихрь: спираль из частиц, плотность настраивается
+            int every = Math.max(1, config.vortexEvery);
+            if (puffTicks % every == 0) {
+                spawnVortexParticle();
+            }
         }
-        if (++puffTicks % 10 == 0) {
-            puff(1);
-        }
+        puffTicks++;
 
         // атмосфера: одна лёгкая частица раз в несколько тиков
         if (config.ambientEvery > 0 && puffTicks % config.ambientEvery == 0) {
@@ -396,7 +421,7 @@ public class SphereAnimator extends AbstractAnimation {
         }
 
         // редкая винтовая искра вокруг Вихря (видна и при «Частицы: Меньше»)
-        if (puffTicks % 5 == 0) {
+        if (breezeEntity != null && puffTicks % 5 == 0) {
             double baseY = center.y + config.breezeHeight + curElevation;
             double a = Math.toRadians(breezeYaw * 2.0D);
             fx(Particle.FIREWORK, new Vec3d(
@@ -405,6 +430,20 @@ public class SphereAnimator extends AbstractAnimation {
                     center.z + Math.sin(a) * 0.8D
             ), 0, 0.0D, 0.0D, 0.0D, 0.0D);
         }
+    }
+
+    /** Одна частица спирали вихря: крутится, гуляет по высоте вверх-вниз. */
+    private void spawnVortexParticle() {
+        double a = Math.toRadians(breezeYaw * 3.0D);
+        double r = config.vortexRadius;
+        double baseY = center.y + config.breezeHeight + curElevation;
+        double h = 0.55D * (1.0D + Math.sin(Math.toRadians(breezeYaw * 1.6D)));
+
+        fx(vortexParticle, new Vec3d(
+                center.x + Math.cos(a) * r,
+                baseY + 0.25D + h,
+                center.z + Math.sin(a) * r
+        ), 0, 0.03D, 0.12D, 0.03D, 0.0D);
     }
 
     private void driveMace() {
@@ -580,7 +619,7 @@ public class SphereAnimator extends AbstractAnimation {
 
     /** Эпичный подлёт: искры сжимаются и раскручиваются, столб частиц, звук. */
     private void breezeUp() throws InterruptedException {
-        if (breezeEntity == null || config.breezeRise <= 0.0D) return;
+        if (!hasVortex() || config.breezeRise <= 0.0D) return;
 
         breezeSpinTarget = Math.min(9.0D, config.breezeSpin * 1.35D);
         targetSpeed = config.rotationSpeed * 1.45D;
@@ -713,7 +752,7 @@ public class SphereAnimator extends AbstractAnimation {
 
     /** От удара булавы Вихрь резко падает. */
     private void breezeSlam() throws InterruptedException {
-        if (breezeEntity == null) return;
+        if (!hasVortex()) return;
 
         // резкий удар о землю: ускорение вниз (ease-in)
         int ticks = Math.max(2, config.timings.breezeDownTicks);
@@ -795,7 +834,7 @@ public class SphereAnimator extends AbstractAnimation {
     }
 
     private void breezeOutro() throws InterruptedException {
-        if (breezeEntity == null || config.timings.breezeStayTicks <= 0) return;
+        if (!hasVortex() || config.timings.breezeStayTicks <= 0) return;
         breezeSpinTarget = config.breezeSpin * 0.6D;
         sleepTicks(config.timings.breezeStayTicks);
     }
@@ -1080,6 +1119,10 @@ public class SphereAnimator extends AbstractAnimation {
         final int green;
         final int blue;
         final boolean breeze;
+        final boolean vortexMode;
+        final String vortexParticle;
+        final int vortexEvery;
+        final double vortexRadius;
         final double breezeSpin;
         final double breezeRise;
         final double breezeHeight;
@@ -1110,6 +1153,10 @@ public class SphereAnimator extends AbstractAnimation {
             this.green = (int) clamp(get(c, "green", 105), 0, 255);
             this.blue = (int) clamp(get(c, "blue", 180), 0, 255);
             this.breeze = getBool(c, "breeze", true);
+            this.vortexMode = getStr(c, "breezeMode", "VORTEX").trim().equalsIgnoreCase("VORTEX");
+            this.vortexParticle = getStr(c, "vortexParticle", "WHITE_SMOKE");
+            this.vortexEvery = (int) clamp(get(c, "vortexEvery", 3), 1, 20);
+            this.vortexRadius = clamp(get(c, "vortexRadius", 0.55D), 0.1D, 2.0D);
             this.breezeSpin = clamp(get(c, "breezeSpin", 6.0D), 0.0D, 30.0D);
             this.breezeRise = clamp(get(c, "breezeRise", 1.6D), 0.0D, 6.0D);
             this.breezeHeight = clamp(get(c, "breezeHeight", -0.45D), -2.0D, 2.0D);
