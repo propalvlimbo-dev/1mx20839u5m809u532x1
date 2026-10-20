@@ -63,6 +63,11 @@ public class SphereAnimator extends AbstractAnimation {
     private final Map<VirtualEntity, Vec3d> lastPos = new IdentityHashMap<>();
     private final Object posLock = new Object();
 
+    /** Призы, которые после удара булавы резко падают вниз. */
+    private final List<VirtualEntity> fallingItems = new ArrayList<>();
+    private final List<VirtualEntity> fallingNames = new ArrayList<>();
+    private final List<Vec3d> fallingPos = new ArrayList<>();
+
     /** Кольцо призов (крутится вокруг Вихря). */
     private final List<VirtualEntity> ringItems = new ArrayList<>();
     private final List<VirtualEntity> ringNames = new ArrayList<>();
@@ -94,6 +99,16 @@ public class SphereAnimator extends AbstractAnimation {
     /** Кольцо частиц, расходящееся от места удара. */
     private volatile int waveTicks;
 
+    /** Падение призов после удара булавы. */
+    private volatile boolean fallingActive;
+    private volatile double fallingP;
+
+    /** Сколько ещё тиков игрок с булавой стоит после удара. */
+    private volatile int maceHold;
+
+    /** Призы уже уронили (чтобы не уронить дважды). */
+    private volatile boolean othersDropped;
+
     private volatile boolean maceActive;
     private volatile double maceT;
     private volatile double maceFromY;
@@ -109,6 +124,10 @@ public class SphereAnimator extends AbstractAnimation {
     private volatile double winnerY;
     private volatile VirtualEntity winnerEntityRef;
     private volatile VirtualEntity winnerNameRef;
+
+    /** Кэш скина: [value, signature]. Подтягивается один раз в фоне. */
+    private static volatile String[] skinCache;
+    private static volatile boolean skinLoading;
 
     private volatile int puffTicks;
     private volatile int trailTick;
@@ -174,6 +193,7 @@ public class SphereAnimator extends AbstractAnimation {
         }
 
         try {
+            prefetchSkin(config.maceName);
             spawnBreeze();
             spawnClock();
             ascent(count, winnerIdx);
@@ -182,7 +202,7 @@ public class SphereAnimator extends AbstractAnimation {
             // Вихрь подлетает, замирает — сверху падает булава и бьёт его
             breezeUp();
             sleepTicks(config.timings.breezeHoverTicks);
-            maceStrike();
+            maceStrike(winnerIdx);
             breezeSlam();
             onImpact(winnerIdx);
 
@@ -302,12 +322,13 @@ public class SphereAnimator extends AbstractAnimation {
 
             driveRing();
 
-            if (ringActive && curSpeed > 1.0D && (++trailTick % 2 == 0)) {
+            if (ringActive && curSpeed > 1.0D && (++trailTick % 5 == 0)) {
                 drawRingTrail();
             }
 
             driveBreeze();
             driveMace();
+            driveFalling();
             driveWave();
             driveWinner();
         } catch (Throwable ignored) {
@@ -356,37 +377,78 @@ public class SphereAnimator extends AbstractAnimation {
             breezeEntity.setPos(breezePos(curElevation));
             breezeEntity.setYaw(breezeYaw);
         }
-        if (++puffTicks % 3 == 0) {
+        if (++puffTicks % 6 == 0) {
             puff(1);
         }
 
-        // винтовая дорожка частиц вокруг Вихря
-        if (puffTicks % 2 == 0) {
+        // редкая винтовая искра вокруг Вихря (видна и при «Частицы: Меньше»)
+        if (puffTicks % 3 == 0) {
             double baseY = center.y + config.breezeHeight + curElevation;
-            for (int i = 0; i < 3; i++) {
-                double a = Math.toRadians(breezeYaw * 2.0D + i * 120.0D);
-                fx(Particle.END_ROD, new Vec3d(
-                        center.x + Math.cos(a) * 0.8D,
-                        baseY + 0.35D + i * 0.28D,
-                        center.z + Math.sin(a) * 0.8D
-                ), 0, 0.0D, 0.0D, 0.0D, 0.0D);
-            }
+            double a = Math.toRadians(breezeYaw * 2.0D);
+            fx(Particle.FIREWORK, new Vec3d(
+                    center.x + Math.cos(a) * 0.8D,
+                    baseY + 0.6D + 0.25D * Math.sin(Math.toRadians(breezeYaw)),
+                    center.z + Math.sin(a) * 0.8D
+            ), 0, 0.0D, 0.0D, 0.0D, 0.0D);
         }
     }
 
     private void driveMace() {
-        if (!maceActive || maceItem == null) return;
+        if (maceItem == null) return;
 
-        maceT = Math.min(1.0D, maceT + 1.0D / Math.max(1, maceTicks));
-        double p = maceT * maceT; // ускорение к земле
-        double y = maceFromY + (maceToY - maceFromY) * p;
-        moveTo(maceItem, new Vec3d(center.x, y, center.z));
-        fx(Particle.END_ROD, new Vec3d(center.x, y + 0.4D, center.z), 1, 0.04D, 0.04D, 0.04D, 0.0D);
+        if (maceActive) {
+            maceT = Math.min(1.0D, maceT + 1.0D / Math.max(1, maceTicks));
+            double p = maceT * maceT; // ускорение к земле
+            double y = maceFromY + (maceToY - maceFromY) * p;
+            moveTo(maceItem, new Vec3d(center.x, y, center.z));
+            if (maceTicks > 0 && ((int) (maceT * maceTicks)) % 2 == 0) {
+                fx(Particle.FIREWORK, new Vec3d(center.x, y + 1.1D, center.z), 0, 0.0D, 0.0D, 0.0D, 0.0D);
+            }
+            return;
+        }
+
+        // после удара игрок ещё мгновение стоит и исчезает
+        if (maceHold > 0 && --maceHold == 0) {
+            poof(maceItem.getPos());
+            removeAndForget(maceItem);
+            maceItem = null;
+        }
+    }
+
+    /** Резкое падение всех призов, кроме выигрыша. */
+    private void driveFalling() {
+        if (!fallingActive || fallingItems.isEmpty()) return;
+
+        fallingP = Math.min(1.0D, fallingP + 1.0D / 6.0D);
+        double dy = -1.4D * fallingP * fallingP - 0.3D * fallingP;
+
+        for (int i = 0; i < fallingItems.size(); i++) {
+            Vec3d start = fallingPos.get(i);
+            Vec3d pos = new Vec3d(start.x, start.y + dy, start.z);
+            moveTo(fallingItems.get(i), pos);
+            if (i < fallingNames.size() && fallingNames.get(i) != null) {
+                moveTo(fallingNames.get(i), pos.add(0.0D, config.nameOffset, 0.0D));
+            }
+        }
+
+        if (fallingP >= 1.0D) {
+            for (int i = 0; i < fallingItems.size(); i++) {
+                if (i % 3 == 0) poof(fallingItems.get(i).getPos());
+                removeAndForget(fallingItems.get(i));
+                if (i < fallingNames.size()) {
+                    removeAndForget(fallingNames.get(i));
+                }
+            }
+            fallingItems.clear();
+            fallingNames.clear();
+            fallingPos.clear();
+            fallingActive = false;
+        }
     }
 
     /** Запускает расходящееся кольцо частиц. */
     private void spawnWave() {
-        waveTicks = 10;
+        waveTicks = 8;
     }
 
     /** Расходящееся кольцо частиц после удара. */
@@ -394,14 +456,14 @@ public class SphereAnimator extends AbstractAnimation {
         if (waveTicks <= 0) return;
 
         waveTicks--;
-        double p = 1.0D - waveTicks / 10.0D;
+        double p = 1.0D - waveTicks / 8.0D;
         double r = 0.35D + 3.1D * p;
         double y = center.y + config.height + 0.45D * (1.0D - p);
-        int points = 16;
+        int points = 10;
 
         for (int i = 0; i < points; i++) {
             double a = 2.0D * Math.PI * i / points;
-            fx(trailParticle, new Vec3d(
+            fx(i % 2 == 0 ? Particle.FIREWORK : trailParticle, new Vec3d(
                     center.x + Math.cos(a) * r,
                     y,
                     center.z + Math.sin(a) * r
@@ -517,19 +579,19 @@ public class SphereAnimator extends AbstractAnimation {
             double e = 1.0D - Math.pow(1.0D - p, 3.0D);
             curElevation = config.breezeRise * e;
             targetElevation = curElevation;
-            swirlColumn(4);
+            swirlColumn(2);
             sleepTicks(1L);
         }
         curElevation = config.breezeRise;
         targetElevation = config.breezeRise;
 
         sound(breezePos(curElevation), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.0F, 1.5F);
-        burst(breezePos(curElevation).add(0.0D, 1.0D, 0.0D), 30);
+        burst(breezePos(curElevation).add(0.0D, 1.0D, 0.0D), 18);
     }
 
     /** Сверху падает булава и бьёт Вихря. */
     /** Сверху прыгает виртуальный игрок с булавой и бьёт Вихря. */
-    private void maceStrike() throws InterruptedException {
+    private void maceStrike(int winnerIdx) throws InterruptedException {
         if (!config.mace) return;
 
         VirtualPlayer attacker = null;
@@ -550,6 +612,7 @@ public class SphereAnimator extends AbstractAnimation {
             ));
             attacker.setYaw(0.0F);
             attacker.setPitch(45.0F);
+            applySkin(attacker);
             trackEntity(attacker);
             activeItems.add(attacker);
         } catch (Throwable t) {
@@ -579,18 +642,59 @@ public class SphereAnimator extends AbstractAnimation {
             ((VirtualPlayer) maceItem).playAnimation(EntityAnimation.SWING_MAIN_ARM);
         } catch (Throwable ignored) {
         }
-        burst(hit, 45);
-        fx(Particle.SWEEP_ATTACK, hit, 8, 0.8D, 0.2D, 0.8D, 0.0D);
-        fx(Particle.CRIT, hit, 20, 0.5D, 0.3D, 0.5D, 0.1D);
+        fx(itemParticle, hit, 18, 0.5D, 0.3D, 0.5D, 0.0D);
+        fx(Particle.FIREWORK, hit, 8, 0.5D, 0.4D, 0.5D, 0.05D);
+        fx(Particle.EXPLOSION, hit, 2, 0.3D, 0.2D, 0.3D, 0.0D);
+        fx(Particle.SWEEP_ATTACK, hit, 3, 0.8D, 0.2D, 0.8D, 0.0D);
         sound(hit, Sound.ENTITY_GENERIC_EXPLODE, 1.0F, 1.6F);
         sound(hit, Sound.BLOCK_AMETHYST_BLOCK_CHIME, 0.8F, 0.6F);
 
-        // «зависает» на мгновение после удара и исчезает
-        sleepTicks(5);
-        poof(hit);
-        removeAndForget(maceItem);
-        maceItem = null;
-        sleepTicks(1);
+        // все призы, кроме выигрыша, резко падают вниз
+        dropOthers(winnerIdx);
+
+        // игрок исчезает через пару тиков, а Вихрь падает сразу
+        maceHold = 4;
+    }
+
+    /** Ставит на игрока скин (значение/подпись подтягиваются один раз). */
+    private void applySkin(VirtualPlayer player) {
+        try {
+            String[] skin = skinCache;
+            if (skin != null && skin.length == 2) {
+                player.setTexture(skin[0], skin[1]);
+            }
+        } catch (Throwable ignored) {
+        }
+    }
+
+    /** Резко уронить все призы, кроме выигрыша. */
+    private void dropOthers(int winnerIdx) {
+        if (othersDropped) return;
+        othersDropped = true;
+
+        for (int i = 0; i < ringItems.size(); i++) {
+            if (i == winnerIdx) continue;
+            VirtualEntity item = ringItems.get(i);
+            if (item == null) continue;
+
+            Vec3d pos = item.getPos();
+            if (pos == null) pos = ringPos(slots[i]);
+
+            fallingItems.add(item);
+            fallingPos.add(new Vec3d(pos.x, pos.y, pos.z));
+            fallingNames.add(i < ringNames.size() ? ringNames.get(i) : null);
+
+            if (i % 3 == 0) poof(pos);
+
+            ringItems.set(i, null);
+            if (i < ringNames.size()) ringNames.set(i, null);
+        }
+
+        if (!fallingItems.isEmpty()) {
+            fallingP = 0.0D;
+            fallingActive = true;
+            sound(center, Sound.ENTITY_ENDERMAN_TELEPORT, 0.5F, 0.55F);
+        }
     }
 
     /** От удара булавы Вихрь резко падает. */
@@ -617,26 +721,22 @@ public class SphereAnimator extends AbstractAnimation {
 
         sound(impact, impactSound, 1.0F, 0.85F);
         sound(impact, Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.0F, 1.2F);
-        burst(impact, 70);
-        fx(Particle.SWEEP_ATTACK, impact, 10, 1.1D, 0.3D, 1.1D, 0.0D);
-        puff(12);
+        fx(itemParticle, impact, 28, 0.6D, 0.5D, 0.6D, 0.0D);
+        fx(Particle.FIREWORK, impact, 10, 0.7D, 0.5D, 0.7D, 0.05D);
+        fx(Particle.EXPLOSION, impact, 2, 0.4D, 0.3D, 0.4D, 0.0D);
+        puff(6);
+
+        // если булавы нет — призы падают именно здесь
+        dropOthers(winnerIdx);
 
         spawnWave();
         sleepTicks(2);
 
-        // остальные призы разлетаются в стороны и исчезают
+        // страховка: если что-то осталось в кольце — убираем (кроме выигрыша)
         for (int i = 0; i < ringItems.size(); i++) {
-            if (i == winnerIdx) continue;
-            VirtualEntity item = ringItems.get(i);
-            if (item == null) continue;
-            Vec3d from = item.getPos();
-            if (from != null) poof(from);
-            removeAndForget(item);
+            if (i == winnerIdx || ringItems.get(i) == null) continue;
+            removeAndForget(ringItems.get(i));
             ringItems.set(i, null);
-            if (i < ringNames.size() && ringNames.get(i) != null) {
-                removeAndForget(ringNames.get(i));
-                ringNames.set(i, null);
-            }
         }
 
         ringActive = false;
@@ -676,7 +776,7 @@ public class SphereAnimator extends AbstractAnimation {
         }
         winnerSpeed = config.winnerOrbitSpeed;
         playSound(center, winSound, 0.8F, 1.0F);
-        burst(winnerItem.getPos() == null ? center : winnerItem.getPos(), 35);
+        burst(winnerItem.getPos() == null ? center : winnerItem.getPos(), 18);
         sleepTicks(Math.max(10, ticks - 10));
     }
 
@@ -756,6 +856,9 @@ public class SphereAnimator extends AbstractAnimation {
         breezeSpin = false;
         maceActive = false;
         waveTicks = 0;
+        maceHold = 0;
+        fallingActive = false;
+        othersDropped = false;
         winnerEntityRef = null;
         winnerNameRef = null;
         winnerItem = null;
@@ -772,6 +875,9 @@ public class SphereAnimator extends AbstractAnimation {
         activeItems.clear();
         ringItems.clear();
         ringNames.clear();
+        fallingItems.clear();
+        fallingNames.clear();
+        fallingPos.clear();
         entryFrom.clear();
         entryT.clear();
         synchronized (posLock) {
@@ -807,12 +913,14 @@ public class SphereAnimator extends AbstractAnimation {
 
     private void poof(Vec3d pos) {
         if (pos == null) return;
-        fx(trailParticle, pos, 8, 0.25D, 0.25D, 0.25D, 0.0D);
+        fx(trailParticle, pos, 2, 0.2D, 0.2D, 0.2D, 0.0D);
     }
 
     private void burst(Vec3d pos, int count) {
-        fx(itemParticle, pos, count, 0.6D, 0.6D, 0.6D, 0.0D);
-        fx(breezeParticle, pos, count / 2, 0.5D, 0.4D, 0.5D, 0.03D);
+        fx(itemParticle, pos, Math.max(4, count / 3), 0.6D, 0.6D, 0.6D, 0.0D);
+        if (count >= 20) {
+            fx(Particle.EXPLOSION, pos, 2, 0.4D, 0.3D, 0.4D, 0.0D);
+        }
     }
 
     private void fx(Particle particle, Vec3d pos, int count, double ox, double oy, double oz, double extra) {
@@ -833,6 +941,78 @@ public class SphereAnimator extends AbstractAnimation {
             playSound(pos, sound, volume, pitch);
         } catch (Throwable ignored) {
         }
+    }
+
+    // ── скин игрока ─────────────────────────────────────────────────────────
+
+    /** Асинхронно подтягивает скин ника (Mojang API) — один раз на сервер. */
+    private static void prefetchSkin(String name) {
+        if (name == null || name.trim().isEmpty()) return;
+        if (skinCache != null || skinLoading) return;
+        skinLoading = true;
+
+        Thread thread = new Thread(() -> {
+            try {
+                skinCache = lookupSkin(name.trim());
+            } catch (Throwable ignored) {
+            }
+        }, "ElytrixSkin");
+        thread.setDaemon(true);
+        thread.start();
+    }
+
+    private static String[] lookupSkin(String name) {
+        String uuid = null;
+        try {
+            String json = http("https://api.mojang.com/users/profiles/minecraft/" + name);
+            String id = jsonField(json, "id");
+            if (id != null && !id.isEmpty()) uuid = id;
+        } catch (Throwable ignored) {
+        }
+        if (uuid == null) return null;
+
+        try {
+            String json = http("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid + "?unsigned=false");
+            String value = jsonField(json, "value");
+            String signature = jsonField(json, "signature");
+            if (value != null && signature != null) {
+                return new String[]{value, signature};
+            }
+        } catch (Throwable ignored) {
+        }
+        return null;
+    }
+
+    private static String http(String url) throws Exception {
+        java.net.HttpURLConnection con = (java.net.HttpURLConnection) new java.net.URL(url).openConnection();
+        con.setConnectTimeout(3000);
+        con.setReadTimeout(3000);
+        con.setRequestProperty("User-Agent", "ElytrixAddonSphere");
+        try (java.io.InputStream in = con.getInputStream()) {
+            java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+            byte[] buf = new byte[4096];
+            int read;
+            while ((read = in.read(buf)) > 0) {
+                out.write(buf, 0, read);
+            }
+            return new String(out.toByteArray(), java.nio.charset.StandardCharsets.UTF_8);
+        } finally {
+            con.disconnect();
+        }
+    }
+
+    /** Достаёт строковое значение поля из простого JSON. */
+    private static String jsonField(String json, String field) {
+        if (json == null) return null;
+        int key = json.indexOf("\"" + field + "\"");
+        if (key < 0) return null;
+        int colon = json.indexOf(':', key + field.length());
+        if (colon < 0) return null;
+        int q1 = json.indexOf('"', colon + 1);
+        if (q1 < 0) return null;
+        int q2 = json.indexOf('"', q1 + 1);
+        if (q2 < 0) return null;
+        return json.substring(q1 + 1, q2);
     }
 
     // ── утилиты ─────────────────────────────────────────────────────────────
@@ -911,7 +1091,7 @@ public class SphereAnimator extends AbstractAnimation {
             this.height = clamp(get(c, "height", 0.35D), 0.0D, 4.0D);
             this.standMode = !getStr(c, "displayMode", "STAND").trim().equalsIgnoreCase("ITEM");
             this.nameOffset = clamp(get(c, "nameOffset", 1.15D), 0.0D, 3.0D);
-            this.particleVector = getStr(c, "particleVector", "REDSTONE");
+            this.particleVector = getStr(c, "particleVector", "FIREWORK");
             this.particleItems = getStr(c, "particleItems", "REDSTONE");
             this.red = (int) clamp(get(c, "red", 255), 0, 255);
             this.green = (int) clamp(get(c, "green", 105), 0, 255);
@@ -928,7 +1108,7 @@ public class SphereAnimator extends AbstractAnimation {
             this.dropHeight = clamp(get(c, "dropHeight", 5.0D), 0.0D, 12.0D);
             this.mace = getBool(c, "mace", true);
             this.maceMaterial = getStr(c, "maceMaterial", "MACE");
-            this.maceName = getStr(c, "maceName", "Mace");
+            this.maceName = getStr(c, "maceName", "rooyzee");
             this.maceHeight = clamp(get(c, "maceHeight", 7.0D), 1.0D, 20.0D);
             this.timings = new Timings(c);
         }

@@ -32,9 +32,11 @@ settings:
   dropHeight: 5.0
 
   # ── Частицы ──────────────────────────────────────────────────────────────
-  # След кольца. END_ROD — белые искры, ELECTRIC_SPARK — голубые,
-  # REDSTONE — красится цветом ниже.
-  particleVector: "END_ROD"
+  # Частиц специально немного. FIREWORK и EXPLOSION Minecraft рисует даже
+  # при настройке «Частицы: Меньше» и «Минимум», END_ROD/REDSTONE — нет.
+  # След кольца: FIREWORK (всегда виден), END_ROD (белые искры),
+  # ELECTRIC_SPARK (голубые), REDSTONE (красится цветом ниже).
+  particleVector: "FIREWORK"
 
   # Частицы взрыва в момент удара (REDSTONE красится цветом ниже)
   particleItems: "REDSTONE"
@@ -71,8 +73,9 @@ settings:
   # Предмет в руке (minecraft id или имя Material)
   maceMaterial: "MACE"
 
-  # Ник виртуального игрока (1–16 символов, буквы/цифры/подчёркивание)
-  maceName: "Mace"
+  # Ник виртуального игрока (1–16 символов). Скин подтягивается с Mojang
+  # один раз при первом запуске анимации; без интернета будет стандартный.
+  maceName: "rooyzee"
 
   # С какой высоты над Вихрем он прыгает (1 – 20)
   maceHeight: 7.0
