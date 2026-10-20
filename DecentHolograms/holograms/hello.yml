@@ -1,0 +1,32 @@
+location: spawn:11.408:59.400:0.437
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: false
+pages:
+- lines:
+  - content: '&#F8BEFB&lИНФОРМАЦИЯ'
+    height: 0.3
+  - content: ''
+    height: 0.2
+  - content: '&fРежим: &#F8BEFBГриферский №1'
+    height: 0.3
+  - content: ''
+    height: 0.2
+  - content: '&7● &fГлавное меню: &#F8BEFB/menu'
+    height: 0.3
+  - content: '&7● &fДонат-услуги: &#F8BEFB/donate'
+    height: 0.3
+  - content: '&7● &fБесплатные бонусы: &#F8BEFB/free'
+    height: 0.3
+  - content: ''
+    height: 0.2
+  - content: '&7● &fНаш сайт: &#F8BEFBelytrix.pw'
+    height: 0.3
+  - content: '&7● &fTelegram канал: &#229ED9t.me/elytrix_ru'
+    height: 0.3
+  - content: '#ICON:book'
+    height: 0.6
+  actions: {}

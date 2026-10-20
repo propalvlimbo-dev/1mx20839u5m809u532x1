@@ -1,0 +1,36 @@
+location: spawn:-10.444:60.000:0.535
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: false
+pages:
+- lines:
+  - content: '&#F8BEFB&lКОМАНДЫ СЕРВЕРА'
+    height: 0.3
+  - content: ''
+    height: 0.2
+  - content: '&7● &fГлавное меню: &#F8BEFB/menu'
+    height: 0.3
+  - content: '&7● &fСлучайный телепорт: &#F8BEFB/rtp'
+    height: 0.3
+  - content: '&7● &fТорговая площадка: &#F8BEFB/ah'
+    height: 0.3
+  - content: '&7● &fСписок варпов: &#F8BEFB/warps'
+    height: 0.3
+  - content: '&7● &fМагазин предметов: &#F8BEFB/shop'
+    height: 0.3
+  - content: '&7● &fСкупщик ресурсов: &#F8BEFB/seller'
+    height: 0.3
+  - content: '&7● &fБесплатные награды: &#F8BEFB/salary'
+    height: 0.3
+  - content: '&7● &fПривилегии сервера: &#F8BEFB/donate'
+    height: 0.3
+  - content: ''
+    height: 0.2
+  - content: '&7● &fНаш сайт: &#F8BEFBelytrix.pw'
+    height: 0.3
+  - content: '#ICON:book'
+    height: 0.6
+  actions: {}

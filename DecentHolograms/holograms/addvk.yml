@@ -1,0 +1,26 @@
+location: spawn:82.5:53.500:-25.5
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: false
+pages:
+- lines:
+  - content: '&#F8BEFB&lБЕЗОПАСНОСТЬ'
+    height: 0.3
+  - content: ''
+    height: 0.2
+  - content: '&fПривяжите аккаунт к &#4B97FFТелеграмму &fдля защиты'
+    height: 0.3
+  - content: '&fи получите &#F8BEFBценный бонус &fна сервере'
+    height: 0.3
+  - content: ''
+    height: 0.2
+  - content: '&7● &fПривязка аккаунта: &#F8BEFB/linktg'
+    height: 0.3
+  - content: '&7● &fБот ТГ: &#4B97FFt.me/ElytrixBot'
+    height: 0.3
+  - content: '&7● &fПароль можно сменить в боте!'
+    height: 0.3
+  actions: {}
