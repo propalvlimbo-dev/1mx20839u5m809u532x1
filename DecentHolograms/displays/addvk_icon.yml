@@ -1,0 +1,35 @@
+# DecentHolograms 2.10+ — голограмма нового типа (display entity)
+# Переделано из классической голограммы: addvk.yml
+# Иконка под текстом, текст — в addvk.yml.
+item: 'minecraft:shield'
+type: ITEM
+location:
+  world: 'spawn'
+  x: 82.500
+  y: 53.500
+  z: -25.500
+  yaw: 0.0
+  pitch: 0.0
+settings:
+  enabled: true
+  display-range: 48
+  update-interval: 20
+attributes:
+  billboard:
+    value-type: billboard_constraints
+    value: VERTICAL
+  display-type:
+    value-type: item_display_type
+    value: FIXED
+  scale:
+    value-type: vector3f
+    value:
+      x: 0.9
+      y: 0.9
+      z: 0.9
+  translation:
+    value-type: vector3f
+    value:
+      x: 0.0
+      y: -2.35
+      z: 0.0

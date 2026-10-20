@@ -1,6 +1,6 @@
 # DecentHolograms 2.10+ — голограмма нового типа (display entity)
 # Переделано из классической голограммы: don.yml
-# Иконка (строка gold_block) из старой голограммы, текст — в don.yml.
+# Иконка под текстом, текст — в don.yml.
 item: 'minecraft:heavy_core'
 type: ITEM
 location:
@@ -24,9 +24,9 @@ attributes:
   scale:
     value-type: vector3f
     value:
-      x: 0.9
-      y: 0.9
-      z: 0.9
+      x: 0.8
+      y: 0.8
+      z: 0.8
   translation:
     value-type: vector3f
     value:

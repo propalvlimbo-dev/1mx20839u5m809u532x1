@@ -1,6 +1,6 @@
 # DecentHolograms 2.10+ — голограмма нового типа (display entity)
 # Переделано из классической голограммы: helps.yml
-# Иконка (строка book) из старой голограммы, текст — в helps.yml.
+# Иконка под текстом, текст — в helps.yml.
 item: 'minecraft:command_block'
 type: ITEM
 location:
@@ -8,7 +8,7 @@ location:
   x: -10.444
   y: 60.000
   z: 0.535
-  yaw: 180.0
+  yaw: 90.0
   pitch: 0.0
 settings:
   enabled: true
@@ -24,9 +24,9 @@ attributes:
   scale:
     value-type: vector3f
     value:
-      x: 0.9
-      y: 0.9
-      z: 0.9
+      x: 0.7
+      y: 0.7
+      z: 0.7
   translation:
     value-type: vector3f
     value:

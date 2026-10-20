@@ -1,6 +1,6 @@
 # DecentHolograms 2.10+ — голограмма нового типа (display entity)
 # Переделано из классической голограммы: addvk.yml
-# Текст 1:1 из старой голограммы.
+# Текст 1:1, иконка — отдельный файл addvk_icon.yml.
 type: TEXT
 location:
   world: 'spawn'
@@ -16,7 +16,7 @@ settings:
 attributes:
   billboard:
     value-type: billboard_constraints
-    value: FIXED
+    value: VERTICAL
   background-color:
     value-type: rgba
     value:

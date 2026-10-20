@@ -28,16 +28,19 @@ SKIP_RE = re.compile(r'^#(ENTITY|EMPTY)\b', re.IGNORECASE)
 # шаг строк у text_display: 9 пикселей шрифта = 0.225 блока
 LINE_H = 0.225
 # голограммы, которые не должны поворачиваться за игроком
-STATIC = {'addvk', 'helps'}
+STATIC = {'helps'}
 # FIXED-голограммы при yaw 0 смотрят в +Z; helps развернуть
 FLIP = {'helps'}
+# helps (статика) разворачиваем на 90°: 0 = юг, 90 = запад, 180 = север, 270 = восток
+HELP_YAW = 90.0
 # предметы 1.21+ под голограммами: имя -> (material, scale)
 ICONS = {
-    'cases': ('minecraft:ominous_trial_key', 1.4),
-    'don':   ('minecraft:heavy_core', 0.9),
-    'don1':  ('minecraft:resin_block', 0.9),
-    'hello': ('minecraft:knowledge_book', 1.4),
-    'helps': ('minecraft:command_block', 0.9),
+    'addvk': ('minecraft:shield', 0.9),
+    'cases': ('minecraft:ominous_trial_key', 0.6),
+    'don':   ('minecraft:heavy_core', 0.8),
+    'don1':  ('minecraft:resin_block', 0.8),
+    'hello': ('minecraft:knowledge_book', 0.7),
+    'helps': ('minecraft:command_block', 0.7),
 }
 
 HEADER = '''# DecentHolograms 2.10+ — голограмма нового типа (display entity)
@@ -169,6 +172,9 @@ def convert(path, out_dir, stats):
             texts.append({'content': content, 'y': offset})
         offset += height
 
+    if name in ICONS and not items:
+        items.append({'kind': 'ICON', 'value': ICONS[name][0], 'y': 0.0, 'height': 0.3})
+
     if not texts and not items:
         stats['empty'].append(name)
         return
@@ -185,7 +191,7 @@ def convert(path, out_dir, stats):
         body = HEADER.format(source=name + '.yml', note=note,
                              extra='', dtype='TEXT', world=q(loc['world']),
                              x='%.3f' % loc['x'], y='%.3f' % loc['y'], z='%.3f' % loc['z'],
-                             yaw='%.1f' % (180.0 if name in FLIP else 0.0),
+                             yaw='%.1f' % (HELP_YAW if name in FLIP else 0.0),
                              enabled=enabled, range=rng, interval=interval)
         billboard = 'FIXED' if name in STATIC else 'VERTICAL'
         body += (TEXT_ATTRS.replace('{ty}', '%.2f' % text_bottom)
@@ -206,13 +212,12 @@ def convert(path, out_dir, stats):
         icon_scale = 1.2
         if name in ICONS:
             material, icon_scale = ICONS[name]
-        note = '# Иконка (строка %s) из старой голограммы, текст — в %s.yml.\n' % (
-            item['value'], name)
+        note = ('# Иконка под текстом, текст — в %s.yml.\n' % name)
         body = HEADER.format(source=name + '.yml', note=note,
                              extra="item: %s\n" % q(material), dtype='ITEM',
                              world=q(loc['world']), x='%.3f' % loc['x'],
                              y='%.3f' % loc['y'], z='%.3f' % loc['z'],
-                             yaw='%.1f' % (180.0 if name in FLIP else 0.0),
+                             yaw='%.1f' % (HELP_YAW if name in FLIP else 0.0),
                              enabled=enabled, range=rng, interval=interval)
         body += (ITEM_ATTRS.replace('{ty}', '%.2f' % icon_y)
                             .replace('{s}', '%.1f' % icon_scale))
