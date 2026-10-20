@@ -31,6 +31,14 @@ LINE_H = 0.225
 STATIC = {'addvk', 'helps'}
 # FIXED-голограммы при yaw 0 смотрят в +Z; helps развернуть
 FLIP = {'helps'}
+# предметы 1.21+ под голограммами: имя -> (material, scale)
+ICONS = {
+    'cases': ('minecraft:ominous_trial_key', 1.4),
+    'don':   ('minecraft:heavy_core', 0.9),
+    'don1':  ('minecraft:resin_block', 0.9),
+    'hello': ('minecraft:knowledge_book', 1.4),
+    'helps': ('minecraft:command_block', 0.9),
+}
 
 HEADER = '''# DecentHolograms 2.10+ — голограмма нового типа (display entity)
 # Переделано из классической голограммы: {source}
@@ -97,9 +105,9 @@ ITEM_ATTRS = '''  billboard:
   scale:
     value-type: vector3f
     value:
-      x: 1.2
-      y: 1.2
-      z: 1.2
+      x: {s}
+      y: {s}
+      z: {s}
   translation:
     value-type: vector3f
     value:
@@ -195,6 +203,9 @@ def convert(path, out_dir, stats):
         icon_name = name + '_icon'
         fname = os.path.join(out_dir, icon_name + '.yml')
         material = 'minecraft:' + item['value'].lower().replace('minecraft:', '')
+        icon_scale = 1.2
+        if name in ICONS:
+            material, icon_scale = ICONS[name]
         note = '# Иконка (строка %s) из старой голограммы, текст — в %s.yml.\n' % (
             item['value'], name)
         body = HEADER.format(source=name + '.yml', note=note,
@@ -203,7 +214,8 @@ def convert(path, out_dir, stats):
                              y='%.3f' % loc['y'], z='%.3f' % loc['z'],
                              yaw='%.1f' % (180.0 if name in FLIP else 0.0),
                              enabled=enabled, range=rng, interval=interval)
-        body += ITEM_ATTRS.replace('{ty}', '%.2f' % icon_y)
+        body += (ITEM_ATTRS.replace('{ty}', '%.2f' % icon_y)
+                            .replace('{s}', '%.1f' % icon_scale))
         open(fname, 'w', encoding='utf-8', newline='').write(body)
         written.append(os.path.basename(fname))
         stats['items'].append((icon_name, material, icon_y))
