@@ -156,6 +156,15 @@ powershell -ExecutionPolicy Bypass -File .\tools\fix-bcases-menu.ps1 -DryRun    
 - Плейсхолдеры `{price}`, `{seller_name}`, `{expires}`, `{current_page}`, `{max_page}`, `{has_next_page}`, `%bauctionv2_*%`, `%playerpoints_points%`, `%vault_eco_balance_commas%`.
 - Логика аренды: те же цены, пермишены `auc.boost.rent*`, лимиты 6/12 ч, условие `squid_only`, команды снятия денег.
 
+## Слоты и права
+
+Лимит лотов считает BAuctionV2 по `slots:` в `BAuctionV2/config.yml`:
+`max(select_max) + сумма(add_slots)`. Без прав — 0 слотов, поэтому
+`bauc.default` должен быть у группы `default` в LuckPerms.
+
+Подробно (отличия от BAuction v1, команды `/lp`, свои тарифы, аренда) —
+`BAuctionV2/ПРАВА-И-СЛОТЫ.md`.
+
 ## Как откатить
 
 ```bash
