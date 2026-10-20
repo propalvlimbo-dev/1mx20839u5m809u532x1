@@ -520,7 +520,7 @@ public class SphereAnimator extends AbstractAnimation {
 
     /** Запускает расходящееся кольцо частиц. */
     private void spawnWave() {
-        waveTicks = 8;
+        waveTicks = 4;
     }
 
     /** Расходящееся кольцо частиц после удара. */
@@ -528,10 +528,10 @@ public class SphereAnimator extends AbstractAnimation {
         if (waveTicks <= 0) return;
 
         waveTicks--;
-        double p = 1.0D - waveTicks / 8.0D;
+        double p = 1.0D - waveTicks / 4.0D;
         double r = 0.35D + 3.1D * p;
         double y = center.y + config.height + 0.45D * (1.0D - p);
-        int points = 7;
+        int points = 4;
 
         for (int i = 0; i < points; i++) {
             double a = 2.0D * Math.PI * i / points;
@@ -666,7 +666,7 @@ public class SphereAnimator extends AbstractAnimation {
             targetElevation = config.breezeRise;
 
             sound(breezePos(curElevation), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.0F, 1.5F);
-            burst(breezePos(curElevation).add(0.0D, 1.0D, 0.0D), 5);
+            burst(breezePos(curElevation).add(0.0D, 1.0D, 0.0D), 3);
 
             // замирает наверху — и в это время сверху летит булава
             sleepTicks(hover);
@@ -736,10 +736,9 @@ public class SphereAnimator extends AbstractAnimation {
         // частицы булавы — немного, только по делу
         Vec3d chest = hit.add(0.0D, 1.0D, 0.0D);
         fxHit(maceParticle, chest, 1, 0.0D, 0.0D, 0.0D, 0.0D);
-        fxHit(gustParticle, chest, 3, 0.35D, 0.3D, 0.35D, 0.05D);
-        fxHit(smokeParticle, hit, 4, 0.35D, 0.25D, 0.35D, 0.02D);
+        fxHit(gustParticle, chest, 1, 0.3D, 0.25D, 0.3D, 0.05D);
+        fxHit(smokeParticle, hit, 1, 0.3D, 0.2D, 0.3D, 0.02D);
         fxHit(Particle.SWEEP_ATTACK, hit, 1, 0.8D, 0.2D, 0.8D, 0.0D);
-        fxHit(itemParticle, hit, 4, 0.4D, 0.3D, 0.4D, 0.0D);
         sound(hit, Sound.ENTITY_GENERIC_EXPLODE, 1.0F, 1.6F);
         sound(hit, Sound.BLOCK_AMETHYST_BLOCK_CHIME, 0.8F, 0.6F);
         sound(hit, parseSound(config.timings.hurtSound, Sound.ENTITY_BREEZE_JUMP), 1.0F, 0.85F);
@@ -820,10 +819,8 @@ public class SphereAnimator extends AbstractAnimation {
         sound(impact, impactSound, 1.0F, 0.85F);
         sound(impact, Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.0F, 1.2F);
         fxHit(maceParticle, impact, 1, 0.0D, 0.0D, 0.0D, 0.0D);
-        fxHit(gustParticle, impact, 3, 0.7D, 0.4D, 0.7D, 0.05D);
-        fxHit(smokeParticle, impact, 4, 0.6D, 0.35D, 0.6D, 0.02D);
-        fxHit(itemParticle, impact, 4, 0.6D, 0.5D, 0.6D, 0.0D);
-        puff(1);
+        fxHit(gustParticle, impact, 1, 0.6D, 0.35D, 0.6D, 0.05D);
+        fxHit(smokeParticle, impact, 1, 0.5D, 0.3D, 0.5D, 0.02D);
 
         // если булавы нет — призы падают именно здесь
         dropOthers(winnerIdx);
@@ -875,7 +872,7 @@ public class SphereAnimator extends AbstractAnimation {
         }
         winnerSpeed = config.winnerOrbitSpeed;
         playSound(center, winSound, 0.8F, 1.0F);
-        burst(winnerItem.getPos() == null ? center : winnerItem.getPos(), 8);
+        burst(winnerItem.getPos() == null ? center : winnerItem.getPos(), 4);
         sleepTicks(Math.max(10, ticks - 10));
     }
 
