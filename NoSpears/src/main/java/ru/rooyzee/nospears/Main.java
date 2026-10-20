@@ -7,6 +7,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntitySpawnEvent;
@@ -17,6 +18,7 @@ import org.bukkit.event.world.LootGenerateEvent;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -60,7 +62,7 @@ public final class Main extends JavaPlugin implements Listener {
         if (!getConfig().getBoolean("block-crafting", true)) return;
         try {
             CraftingInventory inv = event.getInventory();
-            if (isSpear(inv.getResult())) {
+            if (shouldRemove(inv.getResult())) {
                 inv.setResult(null);
             }
         } catch (Throwable ignored) {
@@ -78,7 +80,7 @@ public final class Main extends JavaPlugin implements Listener {
             List<ItemStack> kept = new ArrayList<>(items.size());
             boolean changed = false;
             for (ItemStack item : items) {
-                if (isSpear(item)) {
+                if (shouldRemove(item)) {
                     changed = true;
                 } else {
                     kept.add(item);
@@ -98,7 +100,7 @@ public final class Main extends JavaPlugin implements Listener {
         if (!getConfig().getBoolean("block-item-drop", true)) return;
         try {
             Item item = event.getEntity();
-            if (item != null && isSpear(item.getItemStack())) {
+            if (item != null && shouldRemove(item.getItemStack())) {
                 event.setCancelled(true);
             }
         } catch (Throwable ignored) {
@@ -142,18 +144,18 @@ public final class Main extends JavaPlugin implements Listener {
             PlayerInventory inv = player.getInventory();
             ItemStack[] contents = inv.getContents();
             for (int i = 0; i < contents.length; i++) {
-                if (isSpear(contents[i])) {
+                if (shouldRemove(contents[i])) {
                     inv.setItem(i, null);
                     removed++;
                 }
             }
             EntityEquipment eq = player.getEquipment();
             if (eq != null) {
-                if (isSpear(eq.getItemInMainHand())) {
+                if (shouldRemove(eq.getItemInMainHand())) {
                     eq.setItemInMainHand(null);
                     removed++;
                 }
-                if (isSpear(eq.getItemInOffHand())) {
+                if (shouldRemove(eq.getItemInOffHand())) {
                     eq.setItemInOffHand(null);
                     removed++;
                 }
@@ -187,6 +189,32 @@ public final class Main extends JavaPlugin implements Listener {
     }
 
     // ── утилиты ──────────────────────────────────────────────────────────────
+
+    /**
+     * Убирать ли предмет: копьё или (если включено) книгу с чарами Lunge,
+     * которые появились вместе с копьями в 1.21.11.
+     */
+    private boolean shouldRemove(ItemStack item) {
+        if (isSpear(item)) return true;
+        return getConfig().getBoolean("block-lunge", true) && hasLunge(item);
+    }
+
+    /** Есть ли на предмете зачарование Lunge (1.21.11+, на 1.21.4 не отображается). */
+    @SuppressWarnings("deprecation")
+    private static boolean hasLunge(ItemStack item) {
+        if (item == null) return false;
+        try {
+            ItemMeta meta = item.getItemMeta();
+            if (meta == null) return false;
+            for (Enchantment enchantment : meta.getEnchants().keySet()) {
+                if (enchantment != null && enchantment.getKey().getKey().equalsIgnoreCase("lunge")) {
+                    return true;
+                }
+            }
+        } catch (Throwable ignored) {
+        }
+        return false;
+    }
 
     /** Копьё = любой материал, имя которого заканчивается на _SPEAR. */
     private static boolean isSpear(ItemStack item) {
