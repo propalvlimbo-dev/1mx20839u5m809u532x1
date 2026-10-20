@@ -372,7 +372,7 @@ public class SphereAnimator extends AbstractAnimation {
             VirtualEntity item = ringItems.get(i);
             if (item == null || i >= slots.length) continue;
 
-            Vec3d target = ringPos(slots[i]);
+            Vec3d target = ringPos(i, ringItems.size());
             Vec3d pos = target;
 
             double t = (i < entryT.size() && i < entryFrom.size()) ? entryT.get(i) : 1.0D;
@@ -399,7 +399,8 @@ public class SphereAnimator extends AbstractAnimation {
     private void driveBreeze() {
         if (!breezeSpin) return;
 
-        breezeSpinSpeed += (breezeSpinTarget - breezeSpinSpeed) * 0.15D;
+        breezeSpinSpeed += (breezeSpinTarget - breezeSpinSpeed) * 0.08D;
+        if (breezeSpinSpeed > 5.0D) breezeSpinSpeed = 5.0D;
         breezeYaw = (float) ((breezeYaw + breezeSpinSpeed) % 360.0D);
 
         if (breezeEntity != null) {
@@ -563,13 +564,16 @@ public class SphereAnimator extends AbstractAnimation {
         }
     }
 
-    private Vec3d ringPos(double slot) {
-        // slot уже в радианах (2π·i/count), ringAngle — в градусах
-        double ang = slot + Math.toRadians(ringAngle);
+    private Vec3d ringPos(int index, int total) {
+        // Угол считаем от индекса, а не от массива слотов: призы гарантированно
+        // расходятся по кругу и не могут схлопнуться в одну точку.
+        // Радиус строго из конфига.
+        double ang = (2.0D * Math.PI * index) / Math.max(1, total) + Math.toRadians(ringAngle);
+        double radius = config.radius;
         return new Vec3d(
-                center.x + Math.cos(ang) * curRadius,
+                center.x + Math.cos(ang) * radius,
                 center.y + config.height + curElevation,
-                center.z + Math.sin(ang) * curRadius
+                center.z + Math.sin(ang) * radius
         );
     }
 
@@ -607,7 +611,7 @@ public class SphereAnimator extends AbstractAnimation {
             Prize prize = (i == winnerIdx) ? winner : safePrize();
 
             // своя точка над своим местом в кольце — призы не сбиваются в кучу
-            Vec3d from = ringPos(slots[i]).add(0.0D, config.dropHeight, 0.0D);
+            Vec3d from = ringPos(i, count).add(0.0D, config.dropHeight, 0.0D);
             VirtualEntity item = spawnDisplay(prize, from, (float) Math.toDegrees(slots[i]) - 90.0F);
             ringItems.add(item);
             entryFrom.add(from);
@@ -636,41 +640,41 @@ public class SphereAnimator extends AbstractAnimation {
     // ── взлёт, булава и удар ────────────────────────────────────────────────
 
     /**
-     * Подъём и удар в одном такте: игрок стартует сверху так, чтобы долететь
-     * ровно к верхней точке. Удар обрывает подъём — Вихрь не зависает в воздухе.
+     * Подъём → короткое замирание наверху → резкий удар булавы.
+     * Подъём стартует сразу и тормозит к верхней точке (ease-out).
      */
     private void riseAndStrike(int winnerIdx) throws InterruptedException {
         boolean vortex = hasVortex();
         int up = (vortex && config.breezeRise > 0.0D) ? Math.max(2, config.timings.breezeUpTicks) : 0;
-        int fall = config.mace ? Math.max(2, config.timings.maceFallTicks) : 0;
-        int total = Math.max(up, fall);
-        if (total <= 0) return;
+        int hover = up > 0 ? Math.max(0, config.timings.breezeHoverTicks) : 0;
 
         if (up > 0) {
-            breezeSpinTarget = Math.min(9.0D, config.breezeSpin * 1.35D);
-            targetSpeed = config.rotationSpeed * 1.45D;
+            breezeSpinTarget = Math.min(4.5D, config.breezeSpin * 1.1D);
+            targetSpeed = config.rotationSpeed * 1.25D;
             sound(breezePos(curElevation), Sound.ENTITY_ENDERMAN_TELEPORT, 0.9F, 0.75F);
-        }
 
-        int maceStartTick = Math.max(1, total - fall);
-        for (int t = 1; t <= total; t++) {
-            if (up > 0) {
-                double p = Math.min(1.0D, (double) t / up);
+            for (int t = 1; t <= up; t++) {
+                double p = (double) t / up;
                 // ease-out: бодрый старт, мягкое торможение у верхней точки
                 double e = 1.0D - Math.pow(1.0D - p, 3.0D);
                 curElevation = config.breezeRise * e;
                 targetElevation = curElevation;
+                if (t % 2 == 0) swirlColumn(1);
+                sleepTicks(1L);
             }
-            if (fall > 0 && t == maceStartTick) beginMaceFall();
-            if (up > 0 && t % 2 == 0) swirlColumn(1);
-            sleepTicks(1L);
-        }
-
-        if (up > 0) {
             curElevation = config.breezeRise;
             targetElevation = config.breezeRise;
+
             sound(breezePos(curElevation), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.0F, 1.5F);
-            burst(breezePos(curElevation).add(0.0D, 1.0D, 0.0D), 6);
+            burst(breezePos(curElevation).add(0.0D, 1.0D, 0.0D), 5);
+
+            // замирает наверху — и в это время сверху летит булава
+            sleepTicks(hover);
+        }
+
+        if (config.mace) {
+            beginMaceFall();
+            sleepTicks(Math.max(2, config.timings.maceFallTicks));
         }
 
         landMace(winnerIdx);
@@ -772,7 +776,7 @@ public class SphereAnimator extends AbstractAnimation {
             if (item == null) continue;
 
             Vec3d pos = item.getPos();
-            if (pos == null) pos = ringPos(slots[i]);
+            if (pos == null) pos = ringPos(i, ringItems.size());
 
             fallingItems.add(item);
             fallingPos.add(new Vec3d(pos.x, pos.y, pos.z));
@@ -802,7 +806,7 @@ public class SphereAnimator extends AbstractAnimation {
             double p = (double) t / ticks;
             curElevation = from * (1.0D - p * p);
             targetElevation = curElevation;
-            breezeSpinTarget = Math.min(11.0D, config.breezeSpin * (1.0D + 0.4D * p));
+            breezeSpinTarget = Math.min(4.5D, config.breezeSpin * (1.0D + 0.2D * p));
             sleepTicks(1L);
         }
         curElevation = 0.0D;
@@ -891,8 +895,10 @@ public class SphereAnimator extends AbstractAnimation {
             stand.setSmall(true);
             stand.setNoBasePlate(true);
             stand.setNoGravity(true);
+            // невидимый стенд (не marker!): marker-стенды не рисуют предмет,
+            // поэтому приз вешаем на голову обычного невидимого стенда
             stand.setInvisible(true);
-            stand.setMarker(true);
+            stand.setMarker(false);
             stand.setNoMotion();
             stand.setEquipment(EquipmentSlot.HEAD, prize.itemStack());
             stand.setPos(pos);
