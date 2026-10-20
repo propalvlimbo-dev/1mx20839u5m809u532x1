@@ -1,8 +1,5 @@
 package ru.rooyzee.elytrixaddonsphere;
 
-import blib.com.mojang.datafixers.util.Pair;
-import blib.com.mojang.serialization.Codec;
-import blib.com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.by1337.bc.CaseBlock;
 import dev.by1337.bc.animation.AbstractAnimation;
 import dev.by1337.bc.animation.AnimationContext;
@@ -70,13 +67,7 @@ public class SphereAnimator extends AbstractAnimation {
         this.winner = selected;
         this.center = new Vec3d(this.blockPos).add(0.5D, 0.5D, 0.5D);
 
-        this.config = config.get("settings", v -> {
-            try {
-                return ((Pair<Config, ?>) v.decode(Config.CODEC).getOrThrow()).getFirst();
-            } catch (Throwable t) {
-                return new Config();
-            }
-        }, new Config());
+        this.config = Config.read(config);
 
         this.ringRadius = this.config.radius;
         this.ringCenter = this.center.add(0.0D, this.config.height, 0.0D);
@@ -657,26 +648,6 @@ public class SphereAnimator extends AbstractAnimation {
     }
 
     private static class Config {
-        public static final Codec<Config> CODEC = RecordCodecBuilder.create(i -> i.group(
-                Codec.DOUBLE.optionalFieldOf("radius", 2.5D).forGetter(v -> v.radius),
-                Codec.INT.optionalFieldOf("itemCount", 10).forGetter(v -> v.itemCount),
-                Codec.DOUBLE.optionalFieldOf("rotationSpeed", 7.0D).forGetter(v -> v.rotationSpeed),
-                Codec.DOUBLE.optionalFieldOf("height", 0.35D).forGetter(v -> v.height),
-                Codec.STRING.optionalFieldOf("displayMode", "STAND").forGetter(v -> v.displayMode),
-                Codec.DOUBLE.optionalFieldOf("nameOffset", 1.15D).forGetter(v -> v.nameOffset),
-                Codec.STRING.optionalFieldOf("particleVector", "REDSTONE").forGetter(v -> v.particleVector),
-                Codec.STRING.optionalFieldOf("particleItems", "REDSTONE").forGetter(v -> v.particleItems),
-                Codec.INT.optionalFieldOf("red", 255).forGetter(v -> v.red),
-                Codec.INT.optionalFieldOf("green", 105).forGetter(v -> v.green),
-                Codec.INT.optionalFieldOf("blue", 180).forGetter(v -> v.blue),
-                Codec.BOOL.optionalFieldOf("breeze", true).forGetter(v -> v.breeze),
-                Codec.DOUBLE.optionalFieldOf("breezeSpin", 6.0D).forGetter(v -> v.breezeSpin),
-                Codec.DOUBLE.optionalFieldOf("breezeRise", 2.2D).forGetter(v -> v.breezeRise),
-                Codec.DOUBLE.optionalFieldOf("breezeHeight", -0.45D).forGetter(v -> v.breezeHeight),
-                Codec.STRING.optionalFieldOf("breezeParticle", "CLOUD").forGetter(v -> v.breezeParticle),
-                Timings.CODEC.optionalFieldOf("timings", new Timings()).forGetter(v -> v.timings)
-        ).apply(i, Config::new));
-
         final double radius;
         final int itemCount;
         final double rotationSpeed;
@@ -696,34 +667,45 @@ public class SphereAnimator extends AbstractAnimation {
         final String breezeParticle;
         final Timings timings;
 
-        Config(double radius, int itemCount, double rotationSpeed, double height,
-               String displayMode, double nameOffset, String particleVector, String particleItems,
-               int red, int green, int blue,
-               boolean breeze, double breezeSpin, double breezeRise, double breezeHeight,
-               String breezeParticle, Timings timings) {
-            this.radius = clamp(radius, 0.8D, 6.0D);
-            this.itemCount = (int) clamp(itemCount, 4, 24);
-            this.rotationSpeed = clamp(rotationSpeed, 1.0D, 20.0D);
-            this.height = clamp(height, 0.0D, 4.0D);
-            this.displayMode = displayMode == null ? "STAND" : displayMode;
-            this.standMode = !this.displayMode.trim().equalsIgnoreCase("ITEM");
-            this.nameOffset = clamp(nameOffset, 0.0D, 3.0D);
-            this.particleVector = particleVector == null ? "REDSTONE" : particleVector;
-            this.particleItems = particleItems == null ? "REDSTONE" : particleItems;
-            this.red = red;
-            this.green = green;
-            this.blue = blue;
-            this.breeze = breeze;
-            this.breezeSpin = clamp(breezeSpin, 0.0D, 30.0D);
-            this.breezeRise = clamp(breezeRise, 0.0D, 6.0D);
-            this.breezeHeight = clamp(breezeHeight, -2.0D, 2.0D);
-            this.breezeParticle = breezeParticle == null ? "CLOUD" : breezeParticle;
-            this.timings = timings == null ? new Timings() : timings;
+        private Config(CashedYamlContext c) {
+            this.radius = clamp(get(c, "radius", 2.5D), 0.8D, 6.0D);
+            this.itemCount = (int) clamp(get(c, "itemCount", 10), 4, 24);
+            this.rotationSpeed = clamp(get(c, "rotationSpeed", 7.0D), 1.0D, 20.0D);
+            this.height = clamp(get(c, "height", 0.35D), 0.0D, 4.0D);
+            String mode = getStr(c, "displayMode", "STAND");
+            this.displayMode = mode;
+            this.standMode = !mode.trim().equalsIgnoreCase("ITEM");
+            this.nameOffset = clamp(get(c, "nameOffset", 1.15D), 0.0D, 3.0D);
+            this.particleVector = getStr(c, "particleVector", "REDSTONE");
+            this.particleItems = getStr(c, "particleItems", "REDSTONE");
+            this.red = (int) clamp(get(c, "red", 255), 0, 255);
+            this.green = (int) clamp(get(c, "green", 105), 0, 255);
+            this.blue = (int) clamp(get(c, "blue", 180), 0, 255);
+            this.breeze = getBool(c, "breeze", true);
+            this.breezeSpin = clamp(get(c, "breezeSpin", 6.0D), 0.0D, 30.0D);
+            this.breezeRise = clamp(get(c, "breezeRise", 2.2D), 0.0D, 6.0D);
+            this.breezeHeight = clamp(get(c, "breezeHeight", -0.45D), -2.0D, 2.0D);
+            this.breezeParticle = getStr(c, "breezeParticle", "CLOUD");
+            this.timings = new Timings(c);
         }
 
-        Config() {
-            this(2.5D, 10, 7.0D, 0.35D, "STAND", 1.15D, "REDSTONE", "REDSTONE",
-                    255, 105, 180, true, 6.0D, 2.2D, -0.45D, "CLOUD", new Timings());
+        static Config read(CashedYamlContext ctx) {
+            return new Config(ctx);
+        }
+
+        private static double get(CashedYamlContext c, String key, double def) {
+            Double v = c.get("settings." + key, val -> val.getAsDouble(def), def);
+            return v == null ? def : v;
+        }
+
+        private static String getStr(CashedYamlContext c, String key, String def) {
+            String v = c.get("settings." + key, val -> val.getAsString(def), def);
+            return v == null ? def : v;
+        }
+
+        private static boolean getBool(CashedYamlContext c, String key, boolean def) {
+            Boolean v = c.get("settings." + key, val -> val.getAsBoolean(def), def);
+            return v == null ? def : v;
         }
 
         private static double clamp(double v, double min, double max) {
@@ -732,18 +714,6 @@ public class SphereAnimator extends AbstractAnimation {
     }
 
     private static class Timings {
-        public static final Codec<Timings> CODEC = RecordCodecBuilder.create(i -> i.group(
-                Codec.INT.optionalFieldOf("ascentSteps", 6).forGetter(v -> v.ascentSteps),
-                Codec.INT.optionalFieldOf("ascentGap", 2).forGetter(v -> v.ascentGap),
-                Codec.INT.optionalFieldOf("orbitTicks", 100).forGetter(v -> v.orbitTicks),
-                Codec.INT.optionalFieldOf("riseTicks", 30).forGetter(v -> v.riseTicks),
-                Codec.INT.optionalFieldOf("convergenceTicks", 40).forGetter(v -> v.convergenceTicks),
-                Codec.INT.optionalFieldOf("winnerTicks", 45).forGetter(v -> v.winnerTicks),
-                Codec.INT.optionalFieldOf("breezeStayTicks", 10).forGetter(v -> v.breezeStayTicks),
-                Codec.STRING.optionalFieldOf("spawnSound", "BLOCK_NOTE_BLOCK_PLING").forGetter(v -> v.spawnSound),
-                Codec.STRING.optionalFieldOf("winSound", "ENTITY_PLAYER_LEVELUP").forGetter(v -> v.winSound)
-        ).apply(i, Timings::new));
-
         final int ascentSteps;
         final int ascentGap;
         final int orbitTicks;
@@ -754,21 +724,26 @@ public class SphereAnimator extends AbstractAnimation {
         final String spawnSound;
         final String winSound;
 
-        Timings(int ascentSteps, int ascentGap, int orbitTicks, int riseTicks, int convergenceTicks,
-                int winnerTicks, int breezeStayTicks, String spawnSound, String winSound) {
-            this.ascentSteps = (int) clamp(ascentSteps, 2, 15);
-            this.ascentGap = (int) clamp(ascentGap, 1, 5);
-            this.orbitTicks = (int) clamp(orbitTicks, 20, 1200);
-            this.riseTicks = (int) clamp(riseTicks, 0, 200);
-            this.convergenceTicks = (int) clamp(convergenceTicks, 10, 200);
-            this.winnerTicks = (int) clamp(winnerTicks, 10, 200);
-            this.breezeStayTicks = (int) clamp(breezeStayTicks, 0, 200);
-            this.spawnSound = spawnSound == null ? "BLOCK_NOTE_BLOCK_PLING" : spawnSound;
-            this.winSound = winSound == null ? "ENTITY_PLAYER_LEVELUP" : winSound;
+        Timings(CashedYamlContext c) {
+            this.ascentSteps = (int) clamp(get(c, "ascentSteps", 6), 2, 15);
+            this.ascentGap = (int) clamp(get(c, "ascentGap", 2), 1, 5);
+            this.orbitTicks = (int) clamp(get(c, "orbitTicks", 100), 20, 1200);
+            this.riseTicks = (int) clamp(get(c, "riseTicks", 30), 0, 200);
+            this.convergenceTicks = (int) clamp(get(c, "convergenceTicks", 40), 10, 200);
+            this.winnerTicks = (int) clamp(get(c, "winnerTicks", 45), 10, 200);
+            this.breezeStayTicks = (int) clamp(get(c, "breezeStayTicks", 10), 0, 200);
+            this.spawnSound = str(c, "spawnSound", "BLOCK_NOTE_BLOCK_PLING");
+            this.winSound = str(c, "winSound", "ENTITY_PLAYER_LEVELUP");
         }
 
-        Timings() {
-            this(6, 2, 100, 30, 40, 45, 10, "BLOCK_NOTE_BLOCK_PLING", "ENTITY_PLAYER_LEVELUP");
+        private static double get(CashedYamlContext c, String key, double def) {
+            Double v = c.get("settings.timings." + key, val -> val.getAsDouble(def), def);
+            return v == null ? def : v;
+        }
+
+        private static String str(CashedYamlContext c, String key, String def) {
+            String v = c.get("settings.timings." + key, val -> val.getAsString(def), def);
+            return v == null ? def : v;
         }
 
         private static double clamp(double v, double min, double max) {
