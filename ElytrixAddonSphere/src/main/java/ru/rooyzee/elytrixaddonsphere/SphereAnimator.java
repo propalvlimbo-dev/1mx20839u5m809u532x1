@@ -110,6 +110,9 @@ public class SphereAnimator extends AbstractAnimation {
     /** Сколько ещё тиков игрок с булавой стоит после удара. */
     private volatile int maceHold;
 
+    /** Вихрь «дрожит» от полученного урона. */
+    private volatile int shakeTicks;
+
     /** Призы уже уронили (чтобы не уронить дважды). */
     private volatile boolean othersDropped;
 
@@ -395,7 +398,17 @@ public class SphereAnimator extends AbstractAnimation {
         breezeYaw = (float) ((breezeYaw + breezeSpinSpeed) % 360.0D);
 
         if (breezeEntity != null) {
-            breezeEntity.setPos(breezePos(curElevation));
+            Vec3d bodyPos = breezePos(curElevation);
+            if (shakeTicks > 0) {
+                // вихрь дёргается, будто получил урон
+                shakeTicks--;
+                bodyPos = bodyPos.add(
+                        (RANDOM.nextDouble() - 0.5D) * 0.22D,
+                        (RANDOM.nextDouble() - 0.5D) * 0.16D,
+                        (RANDOM.nextDouble() - 0.5D) * 0.22D
+                );
+            }
+            breezeEntity.setPos(bodyPos);
             breezeEntity.setYaw(breezeYaw);
             if (puffTicks % 10 == 0) {
                 puff(1);
@@ -455,7 +468,7 @@ public class SphereAnimator extends AbstractAnimation {
             double y = maceFromY + (maceToY - maceFromY) * p;
             moveTo(maceItem, new Vec3d(center.x, y, center.z));
             if (maceTicks > 0 && ((int) (maceT * maceTicks)) % 2 == 0) {
-                fx(Particle.FIREWORK, new Vec3d(center.x, y + 1.1D, center.z), 0, 0.0D, 0.0D, 0.0D, 0.0D);
+                fxHit(Particle.FIREWORK, new Vec3d(center.x, y + 1.1D, center.z), 0, 0.0D, 0.0D, 0.0D, 0.0D);
             }
             return;
         }
@@ -516,7 +529,7 @@ public class SphereAnimator extends AbstractAnimation {
 
         for (int i = 0; i < points; i++) {
             double a = 2.0D * Math.PI * i / points;
-            fx(trailParticle, new Vec3d(
+            fxHit(trailParticle, new Vec3d(
                     center.x + Math.cos(a) * r,
                     y,
                     center.z + Math.sin(a) * r
@@ -629,7 +642,8 @@ public class SphereAnimator extends AbstractAnimation {
         int ticks = Math.max(2, config.timings.breezeUpTicks);
         for (int t = 1; t <= ticks; t++) {
             double p = (double) t / ticks;
-            double e = 1.0D - Math.pow(1.0D - p, 3.0D);
+            // smoothstep: мягкий старт, плавное торможение у верхней точки
+            double e = p * p * (3.0D - 2.0D * p);
             curElevation = config.breezeRise * e;
             targetElevation = curElevation;
             if (t % 2 == 0) swirlColumn(1);
@@ -695,12 +709,20 @@ public class SphereAnimator extends AbstractAnimation {
             ((VirtualPlayer) maceItem).playAnimation(EntityAnimation.SWING_MAIN_ARM);
         } catch (Throwable ignored) {
         }
-        fx(itemParticle, hit, 8, 0.5D, 0.3D, 0.5D, 0.0D);
-        fx(Particle.FIREWORK, hit, 4, 0.5D, 0.4D, 0.5D, 0.05D);
-        fx(Particle.EXPLOSION, hit, 1, 0.3D, 0.2D, 0.3D, 0.0D);
-        fx(Particle.SWEEP_ATTACK, hit, 2, 0.8D, 0.2D, 0.8D, 0.0D);
+        // вихрь «получает урон»: звёзды, сердечки урона, пыль и дым
+        Vec3d chest = hit.add(0.0D, 1.0D, 0.0D);
+        fxHit(Particle.DAMAGE_INDICATOR, chest.add(0.0D, 0.7D, 0.0D), 7, 0.45D, 0.35D, 0.45D, 0.0D);
+        fxHit(Particle.CRIT, chest, 22, 0.5D, 0.45D, 0.5D, 0.15D);
+        fxHit(itemParticle, hit, 14, 0.45D, 0.3D, 0.45D, 0.0D);
+        fxHit(Particle.FIREWORK, hit, 6, 0.5D, 0.4D, 0.5D, 0.05D);
+        fxHit(Particle.EXPLOSION, hit, 1, 0.3D, 0.2D, 0.3D, 0.0D);
+        fxHit(Particle.SWEEP_ATTACK, hit, 3, 0.8D, 0.2D, 0.8D, 0.0D);
         sound(hit, Sound.ENTITY_GENERIC_EXPLODE, 1.0F, 1.6F);
         sound(hit, Sound.BLOCK_AMETHYST_BLOCK_CHIME, 0.8F, 0.6F);
+        sound(hit, parseSound(config.timings.hurtSound, Sound.ENTITY_BREEZE_JUMP), 1.0F, 0.85F);
+
+        // вихрь дёргается от урона, пока падает
+        shakeTicks = 8;
 
         // все призы, кроме выигрыша, резко падают вниз
         dropOthers(winnerIdx);
@@ -774,9 +796,10 @@ public class SphereAnimator extends AbstractAnimation {
 
         sound(impact, impactSound, 1.0F, 0.85F);
         sound(impact, Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.0F, 1.2F);
-        fx(itemParticle, impact, 12, 0.6D, 0.5D, 0.6D, 0.0D);
-        fx(Particle.FIREWORK, impact, 6, 0.7D, 0.5D, 0.7D, 0.05D);
-        fx(Particle.EXPLOSION, impact, 1, 0.4D, 0.3D, 0.4D, 0.0D);
+        fxHit(itemParticle, impact, 16, 0.6D, 0.5D, 0.6D, 0.0D);
+        fxHit(Particle.FIREWORK, impact, 8, 0.7D, 0.5D, 0.7D, 0.05D);
+        fxHit(Particle.EXPLOSION, impact, 1, 0.4D, 0.3D, 0.4D, 0.0D);
+        fxHit(Particle.CRIT, impact, 10, 0.5D, 0.4D, 0.5D, 0.1D);
         puff(2);
 
         // если булавы нет — призы падают именно здесь
@@ -910,6 +933,7 @@ public class SphereAnimator extends AbstractAnimation {
         maceActive = false;
         waveTicks = 0;
         maceHold = 0;
+        shakeTicks = 0;
         fallingActive = false;
         othersDropped = false;
         winnerEntityRef = null;
@@ -970,11 +994,23 @@ public class SphereAnimator extends AbstractAnimation {
     }
 
     private void burst(Vec3d pos, int count) {
-        fx(itemParticle, pos, Math.max(3, count / 2), 0.6D, 0.6D, 0.6D, 0.0D);
+        fxHit(itemParticle, pos, Math.max(3, count / 2), 0.6D, 0.6D, 0.6D, 0.0D);
     }
 
+    /** Атмосферные частицы (вихрь, следы, дым). */
     private void fx(Particle particle, Vec3d pos, int count, double ox, double oy, double oz, double extra) {
-        if (!config.particles || pos == null) return;
+        if (!config.particles || !config.particlesAmbient) return;
+        rawFx(particle, pos, count, ox, oy, oz, extra);
+    }
+
+    /** Частицы ударов: булава, приземление, урон. */
+    private void fxHit(Particle particle, Vec3d pos, int count, double ox, double oy, double oz, double extra) {
+        if (!config.particles || !config.particlesImpact) return;
+        rawFx(particle, pos, count, ox, oy, oz, extra);
+    }
+
+    private void rawFx(Particle particle, Vec3d pos, int count, double ox, double oy, double oz, double extra) {
+        if (pos == null) return;
         try {
             if (isRedstone(particle)) {
                 spawnParticle(particle, pos, count, ox, oy, oz, extra, dustOptions);
@@ -1119,6 +1155,8 @@ public class SphereAnimator extends AbstractAnimation {
         final int green;
         final int blue;
         final boolean particles;
+        final boolean particlesAmbient;
+        final boolean particlesImpact;
         final boolean breeze;
         final boolean vortexMode;
         final String vortexParticle;
@@ -1153,7 +1191,9 @@ public class SphereAnimator extends AbstractAnimation {
             this.red = (int) clamp(get(c, "red", 255), 0, 255);
             this.green = (int) clamp(get(c, "green", 105), 0, 255);
             this.blue = (int) clamp(get(c, "blue", 180), 0, 255);
-            this.particles = getBool(c, "particles", false);
+            this.particles = getBool(c, "particles", true);
+            this.particlesAmbient = getBool(c, "particlesAmbient", false);
+            this.particlesImpact = getBool(c, "particlesImpact", true);
             this.breeze = getBool(c, "breeze", true);
             this.vortexMode = getStr(c, "breezeMode", "BREEZE").trim().equalsIgnoreCase("VORTEX");
             this.vortexParticle = getStr(c, "vortexParticle", "WHITE_SMOKE");
@@ -1173,7 +1213,7 @@ public class SphereAnimator extends AbstractAnimation {
             this.mace = getBool(c, "mace", true);
             this.maceMaterial = getStr(c, "maceMaterial", "MACE");
             this.maceName = getStr(c, "maceName", "rooyzee");
-            this.maceHeight = clamp(get(c, "maceHeight", 7.0D), 1.0D, 20.0D);
+            this.maceHeight = clamp(get(c, "maceHeight", 12.0D), 1.0D, 30.0D);
             this.timings = new Timings(c);
         }
 
@@ -1210,12 +1250,13 @@ public class SphereAnimator extends AbstractAnimation {
         final String spawnSound;
         final String winSound;
         final String impactSound;
+        final String hurtSound;
 
         Timings(CashedYamlContext c) {
             this.ascentSteps = (int) clamp(get(c, "ascentSteps", 8), 2, 15);
             this.ascentGap = (int) clamp(get(c, "ascentGap", 2), 1, 5);
             this.orbitTicks = (int) clamp(get(c, "orbitTicks", 75), 20, 1200);
-            this.breezeUpTicks = (int) clamp(get(c, "breezeUpTicks", 8), 2, 200);
+            this.breezeUpTicks = (int) clamp(get(c, "breezeUpTicks", 14), 2, 200);
             this.breezeHoverTicks = (int) clamp(get(c, "breezeHoverTicks", 6), 0, 100);
             this.maceFallTicks = (int) clamp(get(c, "maceFallTicks", 8), 2, 100);
             this.breezeDownTicks = (int) clamp(get(c, "breezeDownTicks", 4), 2, 200);
@@ -1224,6 +1265,7 @@ public class SphereAnimator extends AbstractAnimation {
             this.spawnSound = str(c, "spawnSound", "BLOCK_NOTE_BLOCK_PLING");
             this.winSound = str(c, "winSound", "ENTITY_PLAYER_LEVELUP");
             this.impactSound = str(c, "impactSound", "ENTITY_GENERIC_EXPLODE");
+            this.hurtSound = str(c, "hurtSound", "ENTITY_GENERIC_HURT");
         }
 
         private static double get(CashedYamlContext c, String key, double def) {
