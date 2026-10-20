@@ -111,7 +111,7 @@ open_commands:
     menu: elytrix:cases_wheel
     aliases:
       - wheel
-      - case
+      # - case   ← убрано: /case вёл на рулетку и перебивал /bcases give
 
 # все виды аргуметов
 tab-completer:

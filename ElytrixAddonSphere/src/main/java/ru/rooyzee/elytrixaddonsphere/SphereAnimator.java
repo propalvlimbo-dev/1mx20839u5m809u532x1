@@ -20,7 +20,9 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.by1337.blib.geom.Vec3d;
 
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Locale;
 
 public class SphereAnimator extends AbstractAnimation {
@@ -44,6 +46,11 @@ public class SphereAnimator extends AbstractAnimation {
     private float breezeYaw;
     private double riseOffset;
     private final Particle breezeParticle;
+
+    /** Позиции, которые уже отправлены клиентам — лишние пакеты не шлём. */
+    private final Map<VirtualEntity, Vec3d> lastPos = new IdentityHashMap<>();
+    /** Угол, под которым приз летает вокруг Вихря. */
+    private double winnerOrbitAngle;
 
     private double orbitAngle = 0.0D;
     private double ringRadius;
@@ -111,7 +118,7 @@ public class SphereAnimator extends AbstractAnimation {
             spawnBreeze();
             ascent(count, winnerIdx, slot, items);
             orbit(count, items, slot);
-            rise(count, items, slot);
+            breezeUpDown(count, items, slot);
             converge(count, items, slot);
             showcase(count, winnerIdx, items, slot);
             breezeOutro();
@@ -209,32 +216,73 @@ public class SphereAnimator extends AbstractAnimation {
         spawnParticle(breezeParticle, pos.add(0.0D, 0.9D, 0.0D), count, 0.45D, 0.6D, 0.45D, 0.02D);
     }
 
-    /** Подъём Вихря — круг предметов поднимается вместе с ним. */
-    private void rise(int count, List<VirtualEntity> items, double[] slot) throws InterruptedException {
-        int ticks = config.timings.riseTicks;
-        if (breezeEntity == null || ticks <= 0 || config.breezeRise <= 0.0D) {
-            setRise(config.breezeRise);
+    /**
+     * Вихрь резко взлетает вверх и плавно опускается, кольцо призов летит вместе с ним.
+     */
+    private void breezeUpDown(int count, List<VirtualEntity> items, double[] slot) throws InterruptedException {
+        int up = config.timings.breezeUpTicks;
+        int down = config.timings.breezeDownTicks;
+
+        if (breezeEntity == null || config.breezeRise <= 0.0D || up + down <= 0) {
+            setRise(0.0D);
             return;
         }
 
-        for (int t = 0; t < ticks; t++) {
-            double sm = smoothStep((double) (t + 1) / ticks);
-            setRise(config.breezeRise * sm);
+        // взлёт: резкий старт, мягкое торможение у верхней точки
+        for (int t = 1; t <= up; t++) {
+            double p = (double) t / up;
+            double e = 1.0D - Math.pow(1.0D - p, 3.0D);
+            setRise(config.breezeRise * e);
 
-            spinBreeze(config.breezeSpin);
-            orbitAngle += Math.toRadians(config.rotationSpeed * (1.0D + 0.6D * sm));
+            spinBreeze(config.breezeSpin * (0.6D + 0.9D * p));
+            orbitAngle += Math.toRadians(config.rotationSpeed * (1.0D + 1.1D * p));
 
-            for (int i = 0; i < count; i++) {
-                Vec3d pos = ringPos(i, slot);
-                items.get(i).setPos(pos);
-                if (nameStands[i] != null) {
-                    nameStands[i].setPos(pos.add(0.0D, config.nameOffset, 0.0D));
-                }
-            }
-
+            moveRing(count, items, slot);
             drawItemSwirl(items, slot);
             if (t % 2 == 0) breezePuff(2);
             sleepTicks(1L);
+        }
+
+        // падение: плавное, без рывка
+        for (int t = 1; t <= down; t++) {
+            double p = (double) t / down;
+            double e = 1.0D - smoothStep(p);
+            setRise(config.breezeRise * e);
+
+            spinBreeze(config.breezeSpin * (1.5D - 0.5D * p));
+            orbitAngle += Math.toRadians(config.rotationSpeed * (2.1D - 1.1D * p));
+
+            moveRing(count, items, slot);
+            drawItemSwirl(items, slot);
+            if (t % 2 == 0) breezePuff(1);
+            sleepTicks(1L);
+        }
+
+        setRise(0.0D);
+    }
+
+    /** Двигает сущность только если позиция реально изменилась — меньше пакетов. */
+    private void moveTo(VirtualEntity entity, Vec3d pos) {
+        if (entity == null || pos == null) return;
+        Vec3d prev = lastPos.get(entity);
+        if (prev != null) {
+            double dx = prev.x - pos.x;
+            double dy = prev.y - pos.y;
+            double dz = prev.z - pos.z;
+            if (dx * dx + dy * dy + dz * dz < 2.5e-5D) return;
+        }
+        lastPos.put(entity, pos);
+        entity.setPos(pos);
+    }
+
+    /** Плавно ведёт всё кольцо призов (и их имена) по орбите. */
+    private void moveRing(int count, List<VirtualEntity> items, double[] slot) {
+        for (int i = 0; i < count; i++) {
+            Vec3d pos = ringPos(i, slot);
+            moveTo(items.get(i), pos);
+            if (nameStands[i] != null) {
+                moveTo(nameStands[i], pos.add(0.0D, config.nameOffset, 0.0D));
+            }
         }
     }
 
@@ -321,10 +369,10 @@ public class SphereAnimator extends AbstractAnimation {
                         center.y + y,
                         center.z + Math.sin(ang) * r
                 );
-                spawned[i].setPos(pos);
+                moveTo(spawned[i], pos);
 
                 if (nameStands[i] != null) {
-                    nameStands[i].setPos(pos.add(0.0D, config.nameOffset, 0.0D));
+                    moveTo(nameStands[i], pos.add(0.0D, config.nameOffset, 0.0D));
                 }
             }
             sleepTicks(1L);
@@ -339,18 +387,11 @@ public class SphereAnimator extends AbstractAnimation {
         for (int t = 0; t < ticks; t++) {
             ringRadius = baseRadius * (1.0D - 0.10D * smoothStep((double) t / ticks));
 
-            for (int i = 0; i < count; i++) {
-                Vec3d pos = ringPos(i, slot);
-                items.get(i).setPos(pos);
-
-                if (nameStands[i] != null) {
-                    nameStands[i].setPos(pos.add(0.0D, config.nameOffset, 0.0D));
-                }
-            }
-
+            moveRing(count, items, slot);
             drawItemSwirl(items, slot);
-            spinBreeze(config.breezeSpin);
-            if (t % 2 == 0) breezePuff(2);
+            // плавный разгон вращения Вихря от 0.7 до 1.15 скорости
+            spinBreeze(config.breezeSpin * (0.7D + 0.45D * Math.min(1.0D, (double) t / 20.0D)));
+            if (t % 3 == 0) breezePuff(1);
 
             orbitAngle += speed;
 
@@ -367,18 +408,10 @@ public class SphereAnimator extends AbstractAnimation {
 
             ringRadius = startRadius * (1.0D - 0.5D * sm);
 
-            for (int i = 0; i < count; i++) {
-                Vec3d pos = ringPos(i, slot);
-                items.get(i).setPos(pos);
-
-                if (nameStands[i] != null) {
-                    nameStands[i].setPos(pos.add(0.0D, config.nameOffset, 0.0D));
-                }
-            }
-
+            moveRing(count, items, slot);
             drawItemSwirl(items, slot);
-            spinBreeze(config.breezeSpin * (1.0D + 2.5D * sm));
-            if (t % 2 == 0) breezePuff(3);
+            spinBreeze(config.breezeSpin * (1.0D + 1.6D * sm));
+            if (t % 2 == 0) breezePuff(2);
 
             orbitAngle += Math.toRadians(config.rotationSpeed * (1.0D + 2.2D * sm));
 
@@ -391,10 +424,10 @@ public class SphereAnimator extends AbstractAnimation {
     private void showcase(int count, int winnerIdx, List<VirtualEntity> items, double[] slot) throws InterruptedException {
         int ticks = config.timings.winnerTicks;
 
-        double side = config.breeze && breezeEntity != null ? 0.95D : 0.0D;
-        Vec3d top = ringCenter.add(side, -0.15D, 0.0D);
+        boolean orbitPrize = config.breeze && breezeEntity != null && config.winnerOrbitRadius > 0.0D;
         double displayY = config.standMode ? 1.0D : 0.0D;
-        Vec3d showTop = top.add(0.0D, displayY, 0.0D);
+        double yOff = config.standMode ? 0.0D : -0.15D;
+        Vec3d showTop = ringCenter.add(0.0D, yOff + 0.2D, 0.0D);
 
         List<Integer> order = new ArrayList<>();
         for (int k = 1; k < count; k++) {
@@ -407,6 +440,7 @@ public class SphereAnimator extends AbstractAnimation {
         int revealTick = winnerFly + 1;
 
         Vec3d wStart = ringPos(winnerIdx, slot);
+        winnerOrbitAngle = Math.atan2(wStart.z - ringCenter.z, wStart.x - ringCenter.x);
 
         Vec3d[] startPos = new Vec3d[count];
         double[] dirX = new double[count];
@@ -424,20 +458,42 @@ public class SphereAnimator extends AbstractAnimation {
             for (int idx : order) {
                 if (departedAt[idx] != -1) continue;
                 Vec3d pos = ringPos(idx, slot);
-                items.get(idx).setPos(pos);
+                moveTo(items.get(idx), pos);
 
                 if (nameStands[idx] != null) {
-                    nameStands[idx].setPos(pos.add(0.0D, config.nameOffset, 0.0D));
+                    moveTo(nameStands[idx], pos.add(0.0D, config.nameOffset, 0.0D));
                 }
             }
 
-            if (t <= winnerFly) {
-                double s = smoothStep((double) t / winnerFly);
-                Vec3d wpos = lerpVec(wStart, top, s).add(0.0D, 0.4D * Math.sin(Math.PI * s), 0.0D);
-                winnerItem.setPos(wpos);
+            if (orbitPrize) {
+                double grow = smoothStep(Math.min(1.0D, (double) t / Math.max(1, winnerFly)));
+                winnerOrbitAngle += Math.toRadians(config.winnerOrbitSpeed) * (0.35D + 0.65D * grow);
+
+                double r = config.radius * (1.0D - grow) + config.winnerOrbitRadius * grow;
+                double bob = 0.10D * Math.sin(0.09D * t);
+                Vec3d target = new Vec3d(
+                        ringCenter.x + Math.cos(winnerOrbitAngle) * r,
+                        ringCenter.y + yOff + bob,
+                        ringCenter.z + Math.sin(winnerOrbitAngle) * r
+                );
+
+                if (t <= winnerFly) {
+                    double e = smoothStep((double) t / winnerFly);
+                    moveTo(winnerItem, lerpVec(wStart, target, e).add(0.0D, 0.35D * Math.sin(Math.PI * e), 0.0D));
+                } else {
+                    moveTo(winnerItem, target);
+                }
+
+                if (nameStands[winnerIdx] != null && winnerItem != null) {
+                    moveTo(nameStands[winnerIdx], winnerItem.getPos().add(0.0D, config.nameOffset, 0.0D));
+                }
+            } else if (t <= winnerFly) {
+                double e = smoothStep((double) t / winnerFly);
+                Vec3d wpos = lerpVec(wStart, showTop, e).add(0.0D, 0.4D * Math.sin(Math.PI * e), 0.0D);
+                moveTo(winnerItem, wpos);
 
                 if (nameStands[winnerIdx] != null) {
-                    nameStands[winnerIdx].setPos(wpos.add(0.0D, config.nameOffset, 0.0D));
+                    moveTo(nameStands[winnerIdx], wpos.add(0.0D, config.nameOffset, 0.0D));
                 }
             }
 
@@ -469,10 +525,10 @@ public class SphereAnimator extends AbstractAnimation {
 
                 double e = smoothStep((double) dt / flightTicks);
                 Vec3d pos = startPos[idx].add(dirX[idx] * 1.7D * e, 2.6D * e, dirZ[idx] * 1.7D * e);
-                items.get(idx).setPos(pos);
+                moveTo(items.get(idx), pos);
 
                 if (nameStands[idx] != null) {
-                    nameStands[idx].setPos(pos.add(0.0D, config.nameOffset, 0.0D));
+                    moveTo(nameStands[idx], pos.add(0.0D, config.nameOffset, 0.0D));
                 }
 
                 if (dt == flightTicks) {
@@ -487,19 +543,16 @@ public class SphereAnimator extends AbstractAnimation {
             }
 
             if (t == revealTick) {
-                playSound(top, winSound, 0.8F, 1.0F);
+                playSound(showTop, winSound, 0.8F, 1.0F);
                 burst(showTop);
             }
 
             if (t > revealTick) {
-                int bt = t - revealTick;
-                double ramp = Math.min(1.0D, bt / 6.0D);
-                double bob = 0.1D * Math.sin(0.13D * bt) * ramp;
-                Vec3d wpos = top.add(0.0D, bob, 0.0D);
-                winnerItem.setPos(wpos);
-
-                if (nameStands[winnerIdx] != null) {
-                    nameStands[winnerIdx].setPos(wpos.add(0.0D, config.nameOffset, 0.0D));
+                if (!orbitPrize) {
+                    int bt = t - revealTick;
+                    double ramp = Math.min(1.0D, bt / 6.0D);
+                    double bob = 0.1D * Math.sin(0.13D * bt) * ramp;
+                    moveTo(winnerItem, showTop.add(0.0D, bob, 0.0D));
                 }
                 drawSwirl(showTop);
             }
@@ -521,8 +574,8 @@ public class SphereAnimator extends AbstractAnimation {
     }
 
     private void drawItemSwirl(List<VirtualEntity> items, double[] slot) {
-        if (swirlTick++ % 2 != 0) return;
-        swirlAngle += 0.6D;
+        if (swirlTick++ % 3 != 0) return;
+        swirlAngle += 0.9D;
 
         double baseY = config.standMode ? 1.0D : 0.15D;
 
@@ -530,7 +583,7 @@ public class SphereAnimator extends AbstractAnimation {
             Vec3d pos = items.get(i).getPos();
             if (pos == null) continue;
 
-            for (int k = 0; k < 2; k++) {
+            for (int k = 0; k < 1; k++) {
                 double a = swirlAngle + slot[i] + k * Math.PI;
                 Vec3d point = pos.add(
                         Math.cos(a) * 0.4D,
@@ -623,6 +676,7 @@ public class SphereAnimator extends AbstractAnimation {
             }
         }
         activeItems.clear();
+        lastPos.clear();
     }
 
     private Particle parseParticle(String name, Particle fallback) {
@@ -664,6 +718,8 @@ public class SphereAnimator extends AbstractAnimation {
         final double breezeSpin;
         final double breezeRise;
         final double breezeHeight;
+        final double winnerOrbitRadius;
+        final double winnerOrbitSpeed;
         final String breezeParticle;
         final Timings timings;
 
@@ -682,9 +738,11 @@ public class SphereAnimator extends AbstractAnimation {
             this.green = (int) clamp(get(c, "green", 105), 0, 255);
             this.blue = (int) clamp(get(c, "blue", 180), 0, 255);
             this.breeze = getBool(c, "breeze", true);
-            this.breezeSpin = clamp(get(c, "breezeSpin", 6.0D), 0.0D, 30.0D);
+            this.breezeSpin = clamp(get(c, "breezeSpin", 14.0D), 0.0D, 30.0D);
             this.breezeRise = clamp(get(c, "breezeRise", 2.2D), 0.0D, 6.0D);
             this.breezeHeight = clamp(get(c, "breezeHeight", -0.45D), -2.0D, 2.0D);
+            this.winnerOrbitRadius = clamp(get(c, "winnerOrbitRadius", 1.05D), 0.0D, 4.0D);
+            this.winnerOrbitSpeed = clamp(get(c, "winnerOrbitSpeed", 3.5D), 0.0D, 20.0D);
             this.breezeParticle = getStr(c, "breezeParticle", "CLOUD");
             this.timings = new Timings(c);
         }
@@ -717,7 +775,8 @@ public class SphereAnimator extends AbstractAnimation {
         final int ascentSteps;
         final int ascentGap;
         final int orbitTicks;
-        final int riseTicks;
+        final int breezeUpTicks;
+        final int breezeDownTicks;
         final int convergenceTicks;
         final int winnerTicks;
         final int breezeStayTicks;
@@ -728,7 +787,8 @@ public class SphereAnimator extends AbstractAnimation {
             this.ascentSteps = (int) clamp(get(c, "ascentSteps", 6), 2, 15);
             this.ascentGap = (int) clamp(get(c, "ascentGap", 2), 1, 5);
             this.orbitTicks = (int) clamp(get(c, "orbitTicks", 100), 20, 1200);
-            this.riseTicks = (int) clamp(get(c, "riseTicks", 30), 0, 200);
+            this.breezeUpTicks = (int) clamp(get(c, "breezeUpTicks", get(c, "riseTicks", 8)), 0, 200);
+            this.breezeDownTicks = (int) clamp(get(c, "breezeDownTicks", 22), 0, 200);
             this.convergenceTicks = (int) clamp(get(c, "convergenceTicks", 40), 10, 200);
             this.winnerTicks = (int) clamp(get(c, "winnerTicks", 45), 10, 200);
             this.breezeStayTicks = (int) clamp(get(c, "breezeStayTicks", 10), 0, 200);
