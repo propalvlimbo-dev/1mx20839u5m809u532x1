@@ -32,9 +32,11 @@ STATIC = {'helps'}
 # FIXED-голограммы при yaw 0 смотрят в +Z; helps развернуть
 FLIP = {'helps'}
 # helps (статика) разворачиваем на 90°: 0 = юг, 90 = запад, 180 = север, 270 = восток
-HELP_YAW = -90.0
+HELP_YAW = 90.0
 # опустить голограммы ближе к земле (кейсы и безопасность не трогаем)
-LOWER = {'don': -0.35, 'don1': -0.35, 'hello': -0.35, 'helps': -0.35}
+LOWER = {'don': -0.90, 'don1': -0.90, 'hello': -0.35, 'helps': -0.35}
+# иконка СБОКУ (слева от текста), а не под ним
+SIDE = {'hello', 'cases', 'addvk'}
 # предметы 1.21+ под голограммами: имя -> (material, scale)
 ICONS = {
     'addvk': ('minecraft:shield', 0.9),
@@ -116,7 +118,7 @@ ITEM_ATTRS = '''  billboard:
   translation:
     value-type: vector3f
     value:
-      x: 0.0
+      x: {tx}
       y: {ty}
       z: 0.0
 '''
@@ -205,7 +207,13 @@ def convert(path, out_dir, stats):
         written.append(os.path.basename(fname))
         stats['text'].append((name, len(texts), text_bottom))
 
-    icon_y = -len(texts) * LINE_H - 0.55 + LOWER.get(name, 0.0)
+    text_bottom_val = -len(texts) * LINE_H + LOWER.get(name, 0.0)
+    icon_y = text_bottom_val - 0.55
+    icon_x = 0.0
+    if name in SIDE:
+        # сбоку: слева от текста (alignment LEFT — текст растёт вправо от якоря)
+        icon_x = -0.9
+        icon_y = text_bottom_val + (len(texts) * LINE_H) / 2.0
 
     for item in items:
         icon_name = name + '_icon'
@@ -222,6 +230,7 @@ def convert(path, out_dir, stats):
                              yaw='%.1f' % (HELP_YAW if name in FLIP else 0.0),
                              enabled=enabled, range=rng, interval=interval)
         body += (ITEM_ATTRS.replace('{ty}', '%.2f' % icon_y)
+                            .replace('{tx}', '%.2f' % icon_x)
                             .replace('{s}', '%.1f' % icon_scale))
         open(fname, 'w', encoding='utf-8', newline='').write(body)
         written.append(os.path.basename(fname))

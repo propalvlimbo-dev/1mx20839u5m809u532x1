@@ -49,7 +49,7 @@ attributes:
     value-type: vector3f
     value:
       x: 0.0
-      y: -4.17
+      y: -4.73
       z: 0.0
 pages:
   - lines:

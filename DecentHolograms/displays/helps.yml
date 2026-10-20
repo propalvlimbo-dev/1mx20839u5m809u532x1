@@ -7,7 +7,7 @@ location:
   x: -10.444
   y: 60.000
   z: 0.535
-  yaw: -90.0
+  yaw: 90.0
   pitch: 0.0
 settings:
   enabled: true
