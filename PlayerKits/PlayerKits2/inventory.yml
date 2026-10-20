@@ -2,11 +2,11 @@ inventories:
   main_inventory:
     slots: 54
     title: '#F8BEFB&lНаборы'
-    0-9;11;15;17-20;24-26:
+    0-10;16-18;26:
       item:
         id: GRAY_STAINED_GLASS_PANE
         name: ' '
-    27-29;33-36;38;42;44-48;50-53:
+    27;35-37;43-48;50-53:
       item:
         id: PURPLE_STAINED_GLASS_PANE
         name: ' '
