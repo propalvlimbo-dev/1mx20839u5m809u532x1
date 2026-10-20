@@ -19,7 +19,7 @@ public final class Main extends AbstractAddon {
     private static final String RESOURCE_NAME = "sphereAnimation.yml";
     private static final String TARGET_DIR = "animations/sphere";
     /** Версия конфига: если в файле другая — он уходит в .old и создаётся свежий. */
-    private static final String CONFIG_VERSION = "1.40";
+    private static final String CONFIG_VERSION = "1.41";
 
     @Override
     public void onEnable() {

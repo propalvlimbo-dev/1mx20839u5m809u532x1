@@ -141,6 +141,11 @@ public class SphereAnimator extends AbstractAnimation {
     private static volatile String[] skinCache;
     private static volatile boolean skinLoading;
 
+    /** Время предыдущего тика драйвера: скорость считаем от реального времени. */
+    private volatile long lastDriveNanos;
+    /** Сколько тиков прошло между вызовами (общая величина для кольца и Вихря). */
+    private volatile double lastTickElapsed = 1.0D;
+
     private volatile int puffTicks;
     private volatile int trailTick;
     private volatile double bobTick;
@@ -341,14 +346,25 @@ public class SphereAnimator extends AbstractAnimation {
 
     private void drive() {
         try {
+            // сколько тиков реально прошло с прошлого вызова (0.05 = один тик).
+            // Благодаря этому вращение идёт с постоянной угловой скоростью даже
+            // если тикер дёргается — без «залипаний» и рывков.
+            long now = System.nanoTime();
+            long prev = lastDriveNanos;
+            lastDriveNanos = now;
+            double elapsed = prev == 0L ? 1.0D : (now - prev) / 50_000_000.0D;
+            if (elapsed < 0.0D) elapsed = 0.0D;
+            if (elapsed > 4.0D) elapsed = 4.0D;
+            lastTickElapsed = elapsed;
+
             // плавно подтягиваем текущие значения к целевым
             curRadius += (targetRadius - curRadius) * 0.30D;
             curElevation += (targetElevation - curElevation) * 0.35D;
-            curSpeed += (targetSpeed - curSpeed) * 0.25D;
+            curSpeed += (targetSpeed - curSpeed) * 0.12D;
             bobTick += config.bobSpeed;
 
             if (ringActive) {
-                ringAngle = (ringAngle + curSpeed) % 360.0D;
+                ringAngle = (ringAngle + curSpeed * elapsed) % 360.0D;
             }
 
             driveRing();
@@ -400,9 +416,10 @@ public class SphereAnimator extends AbstractAnimation {
     private void driveBreeze() {
         if (!breezeSpin) return;
 
-        // ровная скорость каждый тик: без разгонов, торможений и рывков
+        // ровная скорость: без разгонов, торможений и рывков
         breezeSpinSpeed = breezeSpinTarget;
-        breezeYaw = (float) ((breezeYaw + breezeSpinSpeed) % 360.0D);
+        double spinElapsed = lastTickElapsed;
+        breezeYaw = (float) ((breezeYaw + breezeSpinSpeed * spinElapsed) % 360.0D);
 
         if (breezeEntity != null) {
             Vec3d bodyPos = breezePos(curElevation);
@@ -580,10 +597,11 @@ public class SphereAnimator extends AbstractAnimation {
     // ── сбор и круг ─────────────────────────────────────────────────────────
 
     private void ascent(int count, int winnerIdx) throws InterruptedException {
+        int gap = config.timings.ascentGap;
         int steps = config.timings.ascentSteps;
 
-        // все призы появляются одновременно сверху и ровным кругом,
-        // затем вместе опускаются каждый на своё место
+        // призы появляются по одному сверху — каждый над своим местом в круге,
+        // и плавно опускается туда (каскад, как было раньше)
         for (int i = 0; i < count; i++) {
             Prize prize = (i == winnerIdx) ? winner : safePrize();
 
@@ -596,11 +614,12 @@ public class SphereAnimator extends AbstractAnimation {
                 winnerItem = item;
             }
             ringNames.add(config.standMode ? spawnNameStand(prize, from) : null);
+
+            playSound(center, spawnSound, 0.3F, 0.9F + 0.4F * ((float) i / count));
+            sleepTicks(gap);
         }
 
-        playSound(center, spawnSound, 0.35F, 1.1F);
-
-        // кольцо включается, призы плавно съезжают на орбиту
+        // кольцо включается, призы доезжают до своих точек по кругу
         ringActive = true;
         targetSpeed = config.rotationSpeed;
         sleepTicks(steps);
@@ -923,6 +942,8 @@ public class SphereAnimator extends AbstractAnimation {
         winnerItem = null;
         maceItem = null;
         clockEntity = null;
+        lastDriveNanos = 0L;
+        lastTickElapsed = 1.0D;
 
         if (breezeEntity != null) {
             removeAndForget(breezeEntity);
