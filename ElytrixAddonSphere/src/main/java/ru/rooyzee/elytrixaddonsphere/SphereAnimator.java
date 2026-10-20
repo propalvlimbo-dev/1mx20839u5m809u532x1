@@ -215,10 +215,8 @@ public class SphereAnimator extends AbstractAnimation {
             ascent(count, winnerIdx);
             orbitPhase();
 
-            // Вихрь подлетает, замирает — сверху падает булава и бьёт его
-            breezeUp();
-            sleepTicks(config.timings.breezeHoverTicks);
-            maceStrike(winnerIdx);
+            // Вихрь взлетает, булава бьёт ровно в верхней точке — удар обрывает подъём
+            riseAndStrike(winnerIdx);
             breezeSlam();
             onImpact(winnerIdx);
 
@@ -637,38 +635,57 @@ public class SphereAnimator extends AbstractAnimation {
 
     // ── взлёт, булава и удар ────────────────────────────────────────────────
 
-    /** Эпичный подлёт: искры сжимаются и раскручиваются, столб частиц, звук. */
-    private void breezeUp() throws InterruptedException {
-        if (!hasVortex() || config.breezeRise <= 0.0D) return;
+    /**
+     * Подъём и удар в одном такте: игрок стартует сверху так, чтобы долететь
+     * ровно к верхней точке. Удар обрывает подъём — Вихрь не зависает в воздухе.
+     */
+    private void riseAndStrike(int winnerIdx) throws InterruptedException {
+        boolean vortex = hasVortex();
+        int up = (vortex && config.breezeRise > 0.0D) ? Math.max(2, config.timings.breezeUpTicks) : 0;
+        int fall = config.mace ? Math.max(2, config.timings.maceFallTicks) : 0;
+        int total = Math.max(up, fall);
+        if (total <= 0) return;
 
-        breezeSpinTarget = Math.min(9.0D, config.breezeSpin * 1.35D);
-        targetSpeed = config.rotationSpeed * 1.45D;
+        if (up > 0) {
+            breezeSpinTarget = Math.min(9.0D, config.breezeSpin * 1.35D);
+            targetSpeed = config.rotationSpeed * 1.45D;
+            sound(breezePos(curElevation), Sound.ENTITY_ENDERMAN_TELEPORT, 0.9F, 0.75F);
+        }
 
-        sound(breezePos(curElevation), Sound.ENTITY_ENDERMAN_TELEPORT, 0.9F, 0.75F);
-
-        int ticks = Math.max(2, config.timings.breezeUpTicks);
-        for (int t = 1; t <= ticks; t++) {
-            double p = (double) t / ticks;
-            // smoothstep: мягкий старт, плавное торможение у верхней точки
-            double e = p * p * (3.0D - 2.0D * p);
-            curElevation = config.breezeRise * e;
-            targetElevation = curElevation;
-            if (t % 2 == 0) swirlColumn(1);
+        int maceStartTick = Math.max(1, total - fall);
+        for (int t = 1; t <= total; t++) {
+            if (up > 0) {
+                double p = Math.min(1.0D, (double) t / up);
+                // ease-out: бодрый старт, мягкое торможение у верхней точки
+                double e = 1.0D - Math.pow(1.0D - p, 3.0D);
+                curElevation = config.breezeRise * e;
+                targetElevation = curElevation;
+            }
+            if (fall > 0 && t == maceStartTick) beginMaceFall();
+            if (up > 0 && t % 2 == 0) swirlColumn(1);
             sleepTicks(1L);
         }
-        curElevation = config.breezeRise;
-        targetElevation = config.breezeRise;
 
-        sound(breezePos(curElevation), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.0F, 1.5F);
-        burst(breezePos(curElevation).add(0.0D, 1.0D, 0.0D), 8);
+        if (up > 0) {
+            curElevation = config.breezeRise;
+            targetElevation = config.breezeRise;
+            sound(breezePos(curElevation), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.0F, 1.5F);
+            burst(breezePos(curElevation).add(0.0D, 1.0D, 0.0D), 6);
+        }
+
+        landMace(winnerIdx);
     }
 
-    /** Сверху падает булава и бьёт Вихря. */
-    /** Сверху прыгает виртуальный игрок с булавой и бьёт Вихря. */
-    private void maceStrike(int winnerIdx) throws InterruptedException {
-        if (!config.mace) return;
+    /** Высота, на которой Вихрь встретит булаву. */
+    private double strikeElevation() {
+        return (hasVortex() && config.breezeRise > 0.0D) ? config.breezeRise : curElevation;
+    }
 
-        VirtualPlayer attacker = null;
+    /** Сверху появляется виртуальный игрок с булавой и падает на Вихря. */
+    private void beginMaceFall() {
+        VirtualPlayer attacker;
+        double landElev = strikeElevation();
+        double fromY = center.y + config.breezeHeight + landElev + config.maceHeight;
         try {
             attacker = VirtualPlayer.create();
             attacker.setName(config.maceName);
@@ -679,50 +696,46 @@ public class SphereAnimator extends AbstractAnimation {
             attacker.setNoMotion();
             attacker.setEquipment(EquipmentSlot.MAINHAND,
                     new ItemStack(material(config.maceMaterial, Material.IRON_AXE)));
-            attacker.setPos(new Vec3d(
-                    center.x,
-                    center.y + config.breezeHeight + curElevation + config.maceHeight,
-                    center.z
-            ));
+            attacker.setPos(new Vec3d(center.x, fromY, center.z));
             attacker.setYaw(0.0F);
             attacker.setPitch(45.0F);
             applySkin(attacker);
             trackEntity(attacker);
             activeItems.add(attacker);
         } catch (Throwable t) {
-            attacker = null;
-        }
-
-        if (attacker == null) {
-            sleepTicks(4);
             return;
         }
 
         maceItem = attacker;
-        maceFromY = center.y + config.breezeHeight + curElevation + config.maceHeight;
-        maceToY = center.y + config.breezeHeight + curElevation + 0.05D;
+        maceFromY = fromY;
+        maceToY = center.y + config.breezeHeight + landElev + 0.05D;
         maceTicks = Math.max(2, config.timings.maceFallTicks);
         maceT = 0.0D;
         maceActive = true;
 
         sound(new Vec3d(center.x, maceFromY, center.z), Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.6F);
+    }
 
-        sleepTicks(maceTicks);
-
-        // удар: замах рукой, звук, частицы
+    /** Удар булавы: замах, немного частиц, Вихрь дрожит и теряет остальные призы. */
+    private void landMace(int winnerIdx) {
         maceActive = false;
+        if (maceItem == null) return;
+
         Vec3d hit = new Vec3d(center.x, maceToY, center.z);
+        // добиваем позицию точно к моменту удара — без «зависания» над Вихрем
+        moveTo(maceItem, hit);
         try {
             ((VirtualPlayer) maceItem).playAnimation(EntityAnimation.SWING_MAIN_ARM);
         } catch (Throwable ignored) {
         }
-        // частицы булавы: порыв ветра (как у mace smash), взмах и пыль
+
+        // частицы булавы — немного, только по делу
         Vec3d chest = hit.add(0.0D, 1.0D, 0.0D);
         fxHit(maceParticle, chest, 1, 0.0D, 0.0D, 0.0D, 0.0D);
-        fxHit(gustParticle, chest, 6, 0.35D, 0.3D, 0.35D, 0.05D);
-        fxHit(smokeParticle, hit, 8, 0.35D, 0.25D, 0.35D, 0.02D);
-        fxHit(Particle.SWEEP_ATTACK, hit, 3, 0.8D, 0.2D, 0.8D, 0.0D);
-        fxHit(itemParticle, hit, 8, 0.4D, 0.3D, 0.4D, 0.0D);
+        fxHit(gustParticle, chest, 3, 0.35D, 0.3D, 0.35D, 0.05D);
+        fxHit(smokeParticle, hit, 4, 0.35D, 0.25D, 0.35D, 0.02D);
+        fxHit(Particle.SWEEP_ATTACK, hit, 1, 0.8D, 0.2D, 0.8D, 0.0D);
+        fxHit(itemParticle, hit, 4, 0.4D, 0.3D, 0.4D, 0.0D);
         sound(hit, Sound.ENTITY_GENERIC_EXPLODE, 1.0F, 1.6F);
         sound(hit, Sound.BLOCK_AMETHYST_BLOCK_CHIME, 0.8F, 0.6F);
         sound(hit, parseSound(config.timings.hurtSound, Sound.ENTITY_BREEZE_JUMP), 1.0F, 0.85F);
@@ -803,10 +816,10 @@ public class SphereAnimator extends AbstractAnimation {
         sound(impact, impactSound, 1.0F, 0.85F);
         sound(impact, Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.0F, 1.2F);
         fxHit(maceParticle, impact, 1, 0.0D, 0.0D, 0.0D, 0.0D);
-        fxHit(gustParticle, impact, 8, 0.7D, 0.4D, 0.7D, 0.05D);
-        fxHit(smokeParticle, impact, 10, 0.6D, 0.35D, 0.6D, 0.02D);
-        fxHit(itemParticle, impact, 10, 0.6D, 0.5D, 0.6D, 0.0D);
-        puff(2);
+        fxHit(gustParticle, impact, 3, 0.7D, 0.4D, 0.7D, 0.05D);
+        fxHit(smokeParticle, impact, 4, 0.6D, 0.35D, 0.6D, 0.02D);
+        fxHit(itemParticle, impact, 4, 0.6D, 0.5D, 0.6D, 0.0D);
+        puff(1);
 
         // если булавы нет — призы падают именно здесь
         dropOthers(winnerIdx);
