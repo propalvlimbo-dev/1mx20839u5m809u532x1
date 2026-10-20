@@ -1,0 +1,305 @@
+holograms:
+  addvk:
+    world: spawn
+    x: 82.5
+    y: 53.5
+    z: -25.5
+    refresh-ticks: 20
+    display-settings: billboard=CENTER|alignment=CENTER|scaleX=1.0|scaleY=1.0|scaleZ=1.0|backgroundColor=0|shadow=true|range=48.0|updateRange=-1.0|lineHeight=0.3|lineWidth=400|facing=0.0|downOrigin=false|unifiedBackground=true
+    pages:
+    - - type: TEXT
+        content: <gradient:#F8BEFB:#89A0FF><bold>БЕЗОПАСНОСТЬ</bold></gradient>
+        height-offset: 0.0
+      - type: TEXT
+        content: <#3A3F52>▬▬▬▬▬▬▬▬▬▬▬▬▬</#3A3F52>
+        height-offset: 0.0
+        anim-type: WAVE
+        anim-color1: 16301819
+        anim-color2: 9019647
+        anim-speed: 3
+      - type: TEXT
+        content: <white>Привяжите аккаунт к <#4B97FF>Телеграмму <white>для защиты
+        height-offset: 0.0
+      - type: TEXT
+        content: <white>и получите <#F8BEFB>ценный бонус <white>на сервере
+        height-offset: 0.0
+      - type: TEXT
+        content: ' '
+        height-offset: 0.0
+      - type: TEXT
+        content: '<gray>● <white>Привязка аккаунта: <#F8BEFB>/linktg'
+        height-offset: 0.0
+      - type: TEXT
+        content: '<gray>● <white>Бот ТГ: <#4B97FF>t.me/ElytrixBot'
+        height-offset: 0.0
+      - type: TEXT
+        content: <gray>● <white>Пароль можно сменить в боте!
+        height-offset: 0.0
+  cases:
+    world: spawn
+    x: 41.611
+    y: 52.9
+    z: 0.564
+    refresh-ticks: 20
+    display-settings: billboard=CENTER|alignment=CENTER|scaleX=1.0|scaleY=1.0|scaleZ=1.0|backgroundColor=0|shadow=true|range=48.0|updateRange=-1.0|lineHeight=0.3|lineWidth=400|facing=0.0|downOrigin=false|unifiedBackground=true
+    pages:
+    - - type: TEXT
+        content: <gradient:#F8BEFB:#89A0FF><bold>КЕЙСЫ</bold></gradient>
+        height-offset: 0.0
+      - type: TEXT
+        content: <#3A3F52>▬▬▬▬▬▬▬▬▬▬▬▬▬</#3A3F52>
+        height-offset: 0.0
+        anim-type: WAVE
+        anim-color1: 16301819
+        anim-color2: 9019647
+        anim-speed: 3
+      - type: TEXT
+        content: <white>Испытайте удачу и выигрывайте <#F8BEFB>ценные призы
+        height-offset: 0.0
+      - type: TEXT
+        content: ' '
+        height-offset: 0.0
+      - type: TEXT
+        content: '<gray>● <white>Покупка ключей: <#F8BEFB>elytrix.pw'
+        height-offset: 0.0
+      - type: ITEM
+        content: CHEST
+        height-offset: 0.0
+        rotation-speed: 1.5
+        bob-amplitude: 0.12
+  don:
+    world: spawn
+    x: 0.528
+    y: 61.4
+    z: 11.462
+    refresh-ticks: 20
+    display-settings: billboard=CENTER|alignment=CENTER|scaleX=1.0|scaleY=1.0|scaleZ=1.0|backgroundColor=0|shadow=true|range=48.0|updateRange=-1.0|lineHeight=0.3|lineWidth=400|facing=0.0|downOrigin=false|unifiedBackground=true
+    pages:
+    - - type: TEXT
+        content: <gradient:#F8BEFB:#89A0FF><bold>ПРИВИЛЕГИИ</bold></gradient>
+        height-offset: 0.0
+      - type: TEXT
+        content: <#3A3F52>▬▬▬▬▬▬▬▬▬▬▬▬▬</#3A3F52>
+        height-offset: 0.0
+        anim-type: WAVE
+        anim-color1: 16301819
+        anim-color2: 9019647
+        anim-speed: 3
+      - type: TEXT
+        content: <gradient:#F8BEFB:#C7D8FF><bold>ЛУЧШАЯ</bold></gradient>
+        height-offset: 0.0
+      - type: TEXT
+        content: <#F8BEFB><bold>⭐ <#F8BEFB><bold>ᴇᴛᴇʀɴɪᴛʏ <white>%player_name% <dark_gray>— <#F8BEFB><bold><underlined>799₽<gray> (Навсегда)
+        height-offset: 0.0
+      - type: TEXT
+        content: ' '
+        height-offset: 0.0
+      - type: TEXT
+        content: <gradient:#F8BEFB:#C7D8FF><bold>УНИКАЛЬНЫЕ</bold></gradient>
+        height-offset: 0.0
+      - type: TEXT
+        content: <#AC72FF><bold>⛈ <#AC72FF><bold>ᴇ<#AF74FF><bold>ʟ<#B376FF><bold>ᴅ<#B678FF><bold>ᴇ<#B97AFF><bold>ʀ <white>%player_name% <dark_gray>— <#AC72FF><bold>699₽ <gray>(Навсегда)
+        height-offset: 0.0
+      - type: TEXT
+        content: <#FF7AFE><bold>⛈ <#FF7AFE><bold>ᴅ<#FF81FB><bold>ʀ<#FF88F7><bold>ᴀ<#FF90F4><bold>ɢ<#FF97F0><bold>ᴏ<#FF9EED><bold>ɴ <white>%player_name% <dark_gray>— <#FF7AFE>429₽ <gray>(Навсегда)
+        height-offset: 0.0
+      - type: TEXT
+        content: <#FF3030><bold>⛈ <#FF3030><bold>ɪ<#FF3A3A><bold>ᴍ<#FF4444><bold>ᴍ<#FF4E4E><bold>ᴏ<#FF5757><bold>ʀ<#FF6161><bold>ᴛ<#FF6B6B><bold>ᴀ<#FF7575><bold>ʟ <white>%player_name% <dark_gray>— <#FF3030>279₽ <gray>(Навсегда)
+        height-offset: 0.0
+      - type: TEXT
+        content: ' '
+        height-offset: 0.0
+      - type: TEXT
+        content: <gradient:#F8BEFB:#C7D8FF><bold>ОБЫЧНЫЕ</bold></gradient>
+        height-offset: 0.0
+      - type: TEXT
+        content: <#96FF91><bold>☁ <#96FF91><bold>ᴡ<#A0FF9D><bold>ɪ<#AAFFA8><bold>ᴛ<#B3FFB4><bold>ʜ<#BDFFBF><bold>ᴇ<#C7FFCB><bold>ʀ <white>%player_name% <dark_gray>— <#96FF91>79₽ <gray>(Навсегда)
+        height-offset: 0.0
+      - type: TEXT
+        content: <#FF9191><bold>☁ <#FF9191><bold>ɢ<#FF9999><bold>ʀ<#FFA1A1><bold>ɪ<#FFAAAA><bold>ᴇ<#FFB2B2><bold>ꜰ<#FFBABA><bold>ᴇ<#FFC2C2><bold>ʀ <white>%player_name% <dark_gray>— <#FF9191>49₽ <gray>(Навсегда)
+        height-offset: 0.0
+      - type: TEXT
+        content: <#89A0FF><bold>☁ <#89A0FF><bold>ᴘ<#99AEFF><bold>ʀ<#A8BCFF><bold>ɪ<#B8CAFF><bold>ᴍ<#C7D8FF><bold>ᴇ <white>%player_name% <dark_gray>— <#89A0FF>29₽ <gray>(Навсегда)
+        height-offset: 0.0
+      - type: TEXT
+        content: <#8D8D8D><bold>☁ <#8D8D8D><bold>ʟ<#969696><bold>ɪ<#9F9F9F><bold>ᴛ<#A8A8A8><bold>ᴇ <white>%player_name% <dark_gray>— <#8D8D8D>19₽ <gray>(Навсегда)
+        height-offset: 0.0
+      - type: TEXT
+        content: ' '
+        height-offset: 0.0
+      - type: TEXT
+        content: '<white>Покупка на сайте: <#F8BEFB>elytrix.pw'
+        height-offset: 0.0
+      - type: ITEM
+        content: GOLD_BLOCK
+        height-offset: 0.0
+        rotation-speed: 1.5
+        bob-amplitude: 0.12
+  don1:
+    world: spawn
+    x: 0.392
+    y: 61.4
+    z: -10.55
+    refresh-ticks: 20
+    display-settings: billboard=CENTER|alignment=CENTER|scaleX=1.0|scaleY=1.0|scaleZ=1.0|backgroundColor=0|shadow=true|range=48.0|updateRange=-1.0|lineHeight=0.3|lineWidth=400|facing=0.0|downOrigin=false|unifiedBackground=true
+    pages:
+    - - type: TEXT
+        content: <gradient:#F8BEFB:#89A0FF><bold>ПРИВИЛЕГИИ</bold></gradient>
+        height-offset: 0.0
+      - type: TEXT
+        content: <#3A3F52>▬▬▬▬▬▬▬▬▬▬▬▬▬</#3A3F52>
+        height-offset: 0.0
+        anim-type: WAVE
+        anim-color1: 16301819
+        anim-color2: 9019647
+        anim-speed: 3
+      - type: TEXT
+        content: <gradient:#F8BEFB:#C7D8FF><bold>ЛУЧШАЯ</bold></gradient>
+        height-offset: 0.0
+      - type: TEXT
+        content: <#F8BEFB><bold>⭐ <#F8BEFB><bold>ᴇᴛᴇʀɴɪᴛʏ <white>%player_name% <dark_gray>— <#F8BEFB><bold><underlined>799₽<gray> (Навсегда)
+        height-offset: 0.0
+      - type: TEXT
+        content: ' '
+        height-offset: 0.0
+      - type: TEXT
+        content: <gradient:#F8BEFB:#C7D8FF><bold>УНИКАЛЬНЫЕ</bold></gradient>
+        height-offset: 0.0
+      - type: TEXT
+        content: <#AC72FF><bold>⛈ <#AC72FF><bold>ᴇ<#AF74FF><bold>ʟ<#B376FF><bold>ᴅ<#B678FF><bold>ᴇ<#B97AFF><bold>ʀ <white>%player_name% <dark_gray>— <#AC72FF><bold>699₽ <gray>(Навсегда)
+        height-offset: 0.0
+      - type: TEXT
+        content: <#FF7AFE><bold>⛈ <#FF7AFE><bold>ᴅ<#FF81FB><bold>ʀ<#FF88F7><bold>ᴀ<#FF90F4><bold>ɢ<#FF97F0><bold>ᴏ<#FF9EED><bold>ɴ <white>%player_name% <dark_gray>— <#FF7AFE>429₽ <gray>(Навсегда)
+        height-offset: 0.0
+      - type: TEXT
+        content: <#FF3030><bold>⛈ <#FF3030><bold>ɪ<#FF3A3A><bold>ᴍ<#FF4444><bold>ᴍ<#FF4E4E><bold>ᴏ<#FF5757><bold>ʀ<#FF6161><bold>ᴛ<#FF6B6B><bold>ᴀ<#FF7575><bold>ʟ <white>%player_name% <dark_gray>— <#FF3030>279₽ <gray>(Навсегда)
+        height-offset: 0.0
+      - type: TEXT
+        content: ' '
+        height-offset: 0.0
+      - type: TEXT
+        content: <gradient:#F8BEFB:#C7D8FF><bold>ОБЫЧНЫЕ</bold></gradient>
+        height-offset: 0.0
+      - type: TEXT
+        content: <#96FF91><bold>☁ <#96FF91><bold>ᴡ<#A0FF9D><bold>ɪ<#AAFFA8><bold>ᴛ<#B3FFB4><bold>ʜ<#BDFFBF><bold>ᴇ<#C7FFCB><bold>ʀ <white>%player_name% <dark_gray>— <#96FF91>79₽ <gray>(Навсегда)
+        height-offset: 0.0
+      - type: TEXT
+        content: <#FF9191><bold>☁ <#FF9191><bold>ɢ<#FF9999><bold>ʀ<#FFA1A1><bold>ɪ<#FFAAAA><bold>ᴇ<#FFB2B2><bold>ꜰ<#FFBABA><bold>ᴇ<#FFC2C2><bold>ʀ <white>%player_name% <dark_gray>— <#FF9191>49₽ <gray>(Навсегда)
+        height-offset: 0.0
+      - type: TEXT
+        content: <#89A0FF><bold>☁ <#89A0FF><bold>ᴘ<#99AEFF><bold>ʀ<#A8BCFF><bold>ɪ<#B8CAFF><bold>ᴍ<#C7D8FF><bold>ᴇ <white>%player_name% <dark_gray>— <#89A0FF>29₽ <gray>(Навсегда)
+        height-offset: 0.0
+      - type: TEXT
+        content: <#8D8D8D><bold>☁ <#8D8D8D><bold>ʟ<#969696><bold>ɪ<#9F9F9F><bold>ᴛ<#A8A8A8><bold>ᴇ <white>%player_name% <dark_gray>— <#8D8D8D>19₽ <gray>(Навсегда)
+        height-offset: 0.0
+      - type: TEXT
+        content: ' '
+        height-offset: 0.0
+      - type: TEXT
+        content: '<white>Покупка на сайте: <#F8BEFB>elytrix.pw'
+        height-offset: 0.0
+      - type: ITEM
+        content: GOLD_BLOCK
+        height-offset: 0.0
+        rotation-speed: 1.5
+        bob-amplitude: 0.12
+  hello:
+    world: spawn
+    x: 11.408
+    y: 59.4
+    z: 0.437
+    refresh-ticks: 20
+    display-settings: billboard=CENTER|alignment=CENTER|scaleX=1.0|scaleY=1.0|scaleZ=1.0|backgroundColor=0|shadow=true|range=48.0|updateRange=-1.0|lineHeight=0.3|lineWidth=400|facing=0.0|downOrigin=false|unifiedBackground=true
+    pages:
+    - - type: TEXT
+        content: <gradient:#F8BEFB:#89A0FF><bold>ИНФОРМАЦИЯ</bold></gradient>
+        height-offset: 0.0
+      - type: TEXT
+        content: <#3A3F52>▬▬▬▬▬▬▬▬▬▬▬▬▬</#3A3F52>
+        height-offset: 0.0
+        anim-type: WAVE
+        anim-color1: 16301819
+        anim-color2: 9019647
+        anim-speed: 3
+      - type: TEXT
+        content: '<white>Режим: <#F8BEFB>Гриферский №1'
+        height-offset: 0.0
+      - type: TEXT
+        content: ' '
+        height-offset: 0.0
+      - type: TEXT
+        content: '<gray>● <white>Главное меню: <#F8BEFB>/menu'
+        height-offset: 0.0
+      - type: TEXT
+        content: '<gray>● <white>Донат-услуги: <#F8BEFB>/donate'
+        height-offset: 0.0
+      - type: TEXT
+        content: '<gray>● <white>Бесплатные бонусы: <#F8BEFB>/free'
+        height-offset: 0.0
+      - type: TEXT
+        content: ' '
+        height-offset: 0.0
+      - type: TEXT
+        content: '<gray>● <white>Наш сайт: <#F8BEFB>elytrix.pw'
+        height-offset: 0.0
+      - type: TEXT
+        content: '<gray>● <white>Telegram канал: <#229ED9>t.me/elytrix_ru'
+        height-offset: 0.0
+      - type: ITEM
+        content: BOOK
+        height-offset: 0.0
+        rotation-speed: 1.5
+        bob-amplitude: 0.12
+  helps:
+    world: spawn
+    x: -10.444
+    y: 60.0
+    z: 0.535
+    refresh-ticks: 20
+    display-settings: billboard=CENTER|alignment=CENTER|scaleX=1.0|scaleY=1.0|scaleZ=1.0|backgroundColor=0|shadow=true|range=48.0|updateRange=-1.0|lineHeight=0.3|lineWidth=400|facing=0.0|downOrigin=false|unifiedBackground=true
+    pages:
+    - - type: TEXT
+        content: <gradient:#F8BEFB:#89A0FF><bold>КОМАНДЫ СЕРВЕРА</bold></gradient>
+        height-offset: 0.0
+      - type: TEXT
+        content: <#3A3F52>▬▬▬▬▬▬▬▬▬▬▬▬▬</#3A3F52>
+        height-offset: 0.0
+        anim-type: WAVE
+        anim-color1: 16301819
+        anim-color2: 9019647
+        anim-speed: 3
+      - type: TEXT
+        content: '<gray>● <white>Главное меню: <#F8BEFB>/menu'
+        height-offset: 0.0
+      - type: TEXT
+        content: '<gray>● <white>Случайный телепорт: <#F8BEFB>/rtp'
+        height-offset: 0.0
+      - type: TEXT
+        content: '<gray>● <white>Торговая площадка: <#F8BEFB>/ah'
+        height-offset: 0.0
+      - type: TEXT
+        content: '<gray>● <white>Список варпов: <#F8BEFB>/warps'
+        height-offset: 0.0
+      - type: TEXT
+        content: '<gray>● <white>Магазин предметов: <#F8BEFB>/shop'
+        height-offset: 0.0
+      - type: TEXT
+        content: '<gray>● <white>Скупщик ресурсов: <#F8BEFB>/seller'
+        height-offset: 0.0
+      - type: TEXT
+        content: '<gray>● <white>Бесплатные награды: <#F8BEFB>/salary'
+        height-offset: 0.0
+      - type: TEXT
+        content: '<gray>● <white>Привилегии сервера: <#F8BEFB>/donate'
+        height-offset: 0.0
+      - type: TEXT
+        content: ' '
+        height-offset: 0.0
+      - type: TEXT
+        content: '<gray>● <white>Наш сайт: <#F8BEFB>elytrix.pw'
+        height-offset: 0.0
+      - type: ITEM
+        content: BOOK
+        height-offset: 0.0
+        rotation-speed: 1.5
+        bob-amplitude: 0.12
