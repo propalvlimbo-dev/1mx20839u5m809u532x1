@@ -93,7 +93,7 @@ tag_appender:
   copper_bulb: '*_copper_bulb'
 
   category_tools: 'pickaxes|hoes|axes|shovels|shears|flint_and_steel'
-  category_weapons: 'swords|spears|trident|mace|bow|crossbow'
+  category_weapons: 'swords|trident|mace|bow|crossbow'
   category_armor: 'totem|elytra|*_helmet|*_chestplate|*_leggings|*_boots'
   category_resources:
     - netherite_ingot
@@ -205,7 +205,6 @@ search:
       "мешок": 'bundles'
       "шалкер пустой": 'empty_shulker_box'
       "меч": 'swords'
-      "копьё": 'spears'
       "топор": 'axes'
       "лопата": 'shovels'
       "кирка": 'pickaxes'
@@ -352,7 +351,6 @@ search:
       "мешок оранжевый": "orange_bundle"
       "спавнер верблюда": "spawner&camel"
       "яйцо верблюда": "camel_spawn_egg"
-      "копьё золотое": "golden_spear"
       "мотыга медная": "copper_hoe"
       "спавнер эндермена": "spawner&enderman"
       "яйцо эндермена": "enderman_spawn_egg"
@@ -410,7 +408,6 @@ search:
       "спавнер паука": "spawner&spider"
       "яйцо паука": "spider_spawn_egg"
       "топор незеритовый": "netherite_axe"
-      "копьё незеритовое": "netherite_spear"
       "слиток медный": "copper_ingot"
       "шалкер оранжевый": "orange_shulker_box"
       "мотыга алмазная": "diamond_hoe"
@@ -426,7 +423,6 @@ search:
       "мотыга каменная": "stone_hoe"
       "спавнер дельфина": "spawner&dolphin"
       "яйцо дельфина": "dolphin_spawn_egg"
-      "копьё деревянное": "wooden_spear"
       "спавнер разбойника": "spawner&pillager"
       "яйцо разбойника": "pillager_spawn_egg"
       "спавнер лавомерки": "spawner&strider"
@@ -455,13 +451,10 @@ search:
       "меч незеритовый": "netherite_sword"
       "лопата алмазная": "diamond_shovel"
       "мешок розовый": "pink_bundle"
-      "копьё железное": "iron_spear"
       "спавнер железного голема": "spawner&iron_golem"
       "яйцо железного голема": "iron_golem_spawn_egg"
       "спавнер хоглина": "spawner&hoglin"
       "яйцо хоглина": "hoglin_spawn_egg"
-      "копьё каменное": "stone_spear"
-      "копьё медное": "copper_spear"
       "топор деревянный": "wooden_axe"
       "мешок чернильный": "ink_sac"
       "слиток золотой": "gold_ingot"
@@ -471,7 +464,6 @@ search:
       "спавнер кролика": "spawner&rabbit"
       "яйцо кролика": "rabbit_spawn_egg"
       "кирка каменная": "stone_pickaxe"
-      "копьё алмазное": "diamond_spear"
       "спавнер лягушки": "spawner&frog"
       "яйцо лягушки": "frog_spawn_egg"
       "спавнер нюхача": "spawner&sniffer"
