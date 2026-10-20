@@ -25,8 +25,8 @@ except ImportError:
 
 ICON_RE = re.compile(r'^#(ICON|HEAD|SMALLHEAD)\s*[:\s]\s*(.+?)\s*$', re.IGNORECASE)
 SKIP_RE = re.compile(r'^#(ENTITY|EMPTY)\b', re.IGNORECASE)
-# средняя высота строки у text_display: 9 пикселей шрифта = 0.225 блока
-LINE_H = 0.25
+# шаг строк у text_display: 9 пикселей шрифта = 0.225 блока
+LINE_H = 0.225
 
 HEADER = '''# DecentHolograms 2.10+ — голограмма нового типа (display entity)
 # Переделано из классической голограммы: {source}
@@ -163,7 +163,9 @@ def convert(path, out_dir, stats):
 
     written = []
     if texts:
-        text_bottom = -(texts[-1]['y'])
+        # текст растёт вверх от точки привязки: чтобы ВЕРХНЯЯ строка осталась
+        # там, где был якорь старой голограммы, опускаем точку на высоту блока
+        text_bottom = -len(texts) * LINE_H
         # текст висит от точки вверх; ставим точку на нижнюю строку блока
         fname = os.path.join(out_dir, name + '.yml')
         note = ('# Текст 1:1, иконка — отдельный файл %s_icon.yml.\n' % name) if items else \
@@ -180,6 +182,8 @@ def convert(path, out_dir, stats):
         written.append(os.path.basename(fname))
         stats['text'].append((name, len(texts), text_bottom))
 
+    icon_y = (text_bottom if texts else 0.0) - 0.35
+
     for item in items:
         icon_name = name + '_icon'
         fname = os.path.join(out_dir, icon_name + '.yml')
@@ -191,10 +195,10 @@ def convert(path, out_dir, stats):
                              world=q(loc['world']), x='%.3f' % loc['x'],
                              y='%.3f' % loc['y'], z='%.3f' % loc['z'],
                              enabled=enabled, range=rng, interval=interval)
-        body += ITEM_ATTRS.replace('{ty}', '%.2f' % (-item['y']))
+        body += ITEM_ATTRS.replace('{ty}', '%.2f' % icon_y)
         open(fname, 'w', encoding='utf-8', newline='').write(body)
         written.append(os.path.basename(fname))
-        stats['items'].append((icon_name, material, -item['y']))
+        stats['items'].append((icon_name, material, icon_y))
 
     print('%-10s -> %s' % (name, ', '.join(written)))
 
