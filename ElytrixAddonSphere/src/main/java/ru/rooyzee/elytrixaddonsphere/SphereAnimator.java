@@ -13,6 +13,7 @@ import dev.by1337.virtualentity.api.entity.EquipmentSlot;
 import dev.by1337.virtualentity.api.virtual.VirtualEntity;
 import dev.by1337.virtualentity.api.virtual.decoration.VirtualArmorStand;
 import dev.by1337.virtualentity.api.virtual.item.VirtualItem;
+import dev.by1337.virtualentity.api.virtual.monster.breeze.VirtualBreeze;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Color;
 import org.bukkit.Particle;
@@ -30,7 +31,7 @@ public class SphereAnimator extends AbstractAnimation {
     private final Prize winner;
     private final Config config;
     private final Vec3d center;
-    private final Vec3d ringCenter;
+    private Vec3d ringCenter;
     private final Sound spawnSound;
     private final Sound winSound;
     private final Particle trailParticle;
@@ -40,6 +41,12 @@ public class SphereAnimator extends AbstractAnimation {
     private final List<VirtualEntity> activeItems = new ArrayList<>();
     private VirtualEntity winnerItem;
     private VirtualEntity[] nameStands;
+
+    /** Вихрь (Breeze) в центре кейса, пакетный моб из VirtualEntityApi. */
+    private VirtualEntity breezeEntity;
+    private float breezeYaw;
+    private double riseOffset;
+    private final Particle breezeParticle;
 
     private double orbitAngle = 0.0D;
     private double ringRadius;
@@ -78,6 +85,7 @@ public class SphereAnimator extends AbstractAnimation {
         this.winSound = parseSound(this.config.timings.winSound, Sound.ENTITY_PLAYER_LEVELUP);
         this.trailParticle = parseParticle(this.config.particleVector, Particle.REDSTONE);
         this.itemParticle = parseParticle(this.config.particleItems, Particle.REDSTONE);
+        this.breezeParticle = parseParticle(this.config.breezeParticle, Particle.CLOUD);
 
         this.dustOptions = new Particle.DustOptions(
                 Color.fromRGB(
@@ -109,10 +117,13 @@ public class SphereAnimator extends AbstractAnimation {
         nameStands = new VirtualEntity[count];
 
         try {
+            spawnBreeze();
             ascent(count, winnerIdx, slot, items);
             orbit(count, items, slot);
+            rise(count, items, slot);
             converge(count, items, slot);
             showcase(count, winnerIdx, items, slot);
+            breezeOutro();
         } finally {
             cleanup();
         }
@@ -161,6 +172,97 @@ public class SphereAnimator extends AbstractAnimation {
         trackEntity(item);
         activeItems.add(item);
         return item;
+    }
+
+    /**
+     * Ставит Вихрь (Breeze) в центр кейса. Пакетный моб — не лагает, не бьётся,
+     * не зависит от чанков и физики.
+     */
+    private void spawnBreeze() {
+        if (!config.breeze) return;
+        try {
+            VirtualBreeze breeze = VirtualBreeze.create();
+            breeze.setNoAi(true);
+            breeze.setSilent(true);
+            breeze.setNoGravity(true);
+            breeze.setNoMotion();
+            breeze.setPos(breezePos(0.0D));
+            breeze.setYaw(0.0F);
+            breeze.setPitch(0.0F);
+            trackEntity(breeze);
+            breezeEntity = breeze;
+            breezeYaw = 0.0F;
+            breezePuff(6);
+        } catch (Throwable t) {
+            // VirtualEntityApi не установлен или версия сервера < 1.20.4
+            breezeEntity = null;
+        }
+    }
+
+    private Vec3d breezePos(double rise) {
+        return new Vec3d(center.x, center.y + config.breezeHeight + rise, center.z);
+    }
+
+    /** Вращение Вихря вокруг своей оси. */
+    private void spinBreeze(double degrees) {
+        if (breezeEntity == null || degrees == 0.0D) return;
+        breezeYaw = (float) ((breezeYaw + degrees) % 360.0D);
+        breezeEntity.setYaw(breezeYaw);
+    }
+
+    /** Частицы вокруг Вихря. */
+    private void breezePuff(int count) {
+        if (breezeEntity == null) return;
+        Vec3d pos = breezeEntity.getPos();
+        if (pos == null) pos = breezePos(riseOffset + 0.9D);
+        spawnParticle(breezeParticle, pos.add(0.0D, 0.9D, 0.0D), count, 0.45D, 0.6D, 0.45D, 0.02D);
+    }
+
+    /** Подъём Вихря — круг предметов поднимается вместе с ним. */
+    private void rise(int count, List<VirtualEntity> items, double[] slot) throws InterruptedException {
+        int ticks = config.timings.riseTicks;
+        if (breezeEntity == null || ticks <= 0 || config.breezeRise <= 0.0D) {
+            setRise(config.breezeRise);
+            return;
+        }
+
+        for (int t = 0; t < ticks; t++) {
+            double sm = smoothStep((double) (t + 1) / ticks);
+            setRise(config.breezeRise * sm);
+
+            spinBreeze(config.breezeSpin);
+            orbitAngle += Math.toRadians(config.rotationSpeed * (1.0D + 0.6D * sm));
+
+            for (int i = 0; i < count; i++) {
+                Vec3d pos = ringPos(i, slot);
+                items.get(i).setPos(pos);
+                if (nameStands[i] != null) {
+                    nameStands[i].setPos(pos.add(0.0D, config.nameOffset, 0.0D));
+                }
+            }
+
+            drawItemSwirl(items, slot);
+            if (t % 2 == 0) breezePuff(2);
+            sleepTicks(1L);
+        }
+    }
+
+    private void setRise(double rise) {
+        riseOffset = rise;
+        ringCenter = center.add(0.0D, config.height + rise, 0.0D);
+        if (breezeEntity != null) {
+            breezeEntity.setPos(breezePos(rise));
+        }
+    }
+
+    /** Пауза после взрыва: Вихрь ещё немного крутится и гаснет. */
+    private void breezeOutro() throws InterruptedException {
+        if (breezeEntity == null || config.timings.breezeStayTicks <= 0) return;
+        for (int t = 0; t < config.timings.breezeStayTicks; t++) {
+            spinBreeze(config.breezeSpin * 0.35D);
+            if (t % 3 == 0) breezePuff(2);
+            sleepTicks(1L);
+        }
     }
 
     private VirtualEntity spawnNameStand(Prize prize, Vec3d pos) {
@@ -256,6 +358,8 @@ public class SphereAnimator extends AbstractAnimation {
             }
 
             drawItemSwirl(items, slot);
+            spinBreeze(config.breezeSpin);
+            if (t % 2 == 0) breezePuff(2);
 
             orbitAngle += speed;
 
@@ -282,6 +386,8 @@ public class SphereAnimator extends AbstractAnimation {
             }
 
             drawItemSwirl(items, slot);
+            spinBreeze(config.breezeSpin * (1.0D + 2.5D * sm));
+            if (t % 2 == 0) breezePuff(3);
 
             orbitAngle += Math.toRadians(config.rotationSpeed * (1.0D + 2.2D * sm));
 
@@ -294,7 +400,8 @@ public class SphereAnimator extends AbstractAnimation {
     private void showcase(int count, int winnerIdx, List<VirtualEntity> items, double[] slot) throws InterruptedException {
         int ticks = config.timings.winnerTicks;
 
-        Vec3d top = ringCenter.add(0.0D, -0.3D, 0.0D);
+        double side = config.breeze && breezeEntity != null ? 0.95D : 0.0D;
+        Vec3d top = ringCenter.add(side, -0.15D, 0.0D);
         double displayY = config.standMode ? 1.0D : 0.0D;
         Vec3d showTop = top.add(0.0D, displayY, 0.0D);
 
@@ -409,13 +516,8 @@ public class SphereAnimator extends AbstractAnimation {
             sleepTicks(1L);
         }
 
-        removeAndForget(winnerItem);
-        winnerItem = null;
-
-        if (nameStands[winnerIdx] != null) {
-            removeAndForget(nameStands[winnerIdx]);
-            nameStands[winnerIdx] = null;
-        }
+        // победитель остаётся висеть возле Вихря до конца анимации,
+        // удаляется в cleanup() — «возле него остаётся только то, что выпало»
     }
 
     private Vec3d ringPos(int i, double[] slot) {
@@ -516,6 +618,13 @@ public class SphereAnimator extends AbstractAnimation {
     }
 
     private void cleanup() {
+        if (breezeEntity != null) {
+            try {
+                removeEntity(breezeEntity);
+            } catch (Throwable ignored) {
+            }
+            breezeEntity = null;
+        }
         for (VirtualEntity item : new ArrayList<>(activeItems)) {
             try {
                 removeEntity(item);
@@ -560,6 +669,11 @@ public class SphereAnimator extends AbstractAnimation {
                 Codec.INT.optionalFieldOf("red", 255).forGetter(v -> v.red),
                 Codec.INT.optionalFieldOf("green", 105).forGetter(v -> v.green),
                 Codec.INT.optionalFieldOf("blue", 180).forGetter(v -> v.blue),
+                Codec.BOOL.optionalFieldOf("breeze", true).forGetter(v -> v.breeze),
+                Codec.DOUBLE.optionalFieldOf("breezeSpin", 6.0D).forGetter(v -> v.breezeSpin),
+                Codec.DOUBLE.optionalFieldOf("breezeRise", 2.2D).forGetter(v -> v.breezeRise),
+                Codec.DOUBLE.optionalFieldOf("breezeHeight", -0.45D).forGetter(v -> v.breezeHeight),
+                Codec.STRING.optionalFieldOf("breezeParticle", "CLOUD").forGetter(v -> v.breezeParticle),
                 Timings.CODEC.optionalFieldOf("timings", new Timings()).forGetter(v -> v.timings)
         ).apply(i, Config::new));
 
@@ -575,11 +689,18 @@ public class SphereAnimator extends AbstractAnimation {
         final int red;
         final int green;
         final int blue;
+        final boolean breeze;
+        final double breezeSpin;
+        final double breezeRise;
+        final double breezeHeight;
+        final String breezeParticle;
         final Timings timings;
 
         Config(double radius, int itemCount, double rotationSpeed, double height,
                String displayMode, double nameOffset, String particleVector, String particleItems,
-               int red, int green, int blue, Timings timings) {
+               int red, int green, int blue,
+               boolean breeze, double breezeSpin, double breezeRise, double breezeHeight,
+               String breezeParticle, Timings timings) {
             this.radius = clamp(radius, 0.8D, 6.0D);
             this.itemCount = (int) clamp(itemCount, 4, 24);
             this.rotationSpeed = clamp(rotationSpeed, 1.0D, 20.0D);
@@ -592,11 +713,17 @@ public class SphereAnimator extends AbstractAnimation {
             this.red = red;
             this.green = green;
             this.blue = blue;
+            this.breeze = breeze;
+            this.breezeSpin = clamp(breezeSpin, 0.0D, 30.0D);
+            this.breezeRise = clamp(breezeRise, 0.0D, 6.0D);
+            this.breezeHeight = clamp(breezeHeight, -2.0D, 2.0D);
+            this.breezeParticle = breezeParticle == null ? "CLOUD" : breezeParticle;
             this.timings = timings == null ? new Timings() : timings;
         }
 
         Config() {
-            this(2.5D, 10, 7.0D, 0.35D, "STAND", 1.15D, "REDSTONE", "REDSTONE", 255, 105, 180, new Timings());
+            this(2.5D, 10, 7.0D, 0.35D, "STAND", 1.15D, "REDSTONE", "REDSTONE",
+                    255, 105, 180, true, 6.0D, 2.2D, -0.45D, "CLOUD", new Timings());
         }
 
         private static double clamp(double v, double min, double max) {
@@ -606,11 +733,13 @@ public class SphereAnimator extends AbstractAnimation {
 
     private static class Timings {
         public static final Codec<Timings> CODEC = RecordCodecBuilder.create(i -> i.group(
-                Codec.INT.optionalFieldOf("ascentSteps", 5).forGetter(v -> v.ascentSteps),
+                Codec.INT.optionalFieldOf("ascentSteps", 6).forGetter(v -> v.ascentSteps),
                 Codec.INT.optionalFieldOf("ascentGap", 2).forGetter(v -> v.ascentGap),
                 Codec.INT.optionalFieldOf("orbitTicks", 100).forGetter(v -> v.orbitTicks),
+                Codec.INT.optionalFieldOf("riseTicks", 30).forGetter(v -> v.riseTicks),
                 Codec.INT.optionalFieldOf("convergenceTicks", 40).forGetter(v -> v.convergenceTicks),
                 Codec.INT.optionalFieldOf("winnerTicks", 45).forGetter(v -> v.winnerTicks),
+                Codec.INT.optionalFieldOf("breezeStayTicks", 10).forGetter(v -> v.breezeStayTicks),
                 Codec.STRING.optionalFieldOf("spawnSound", "BLOCK_NOTE_BLOCK_PLING").forGetter(v -> v.spawnSound),
                 Codec.STRING.optionalFieldOf("winSound", "ENTITY_PLAYER_LEVELUP").forGetter(v -> v.winSound)
         ).apply(i, Timings::new));
@@ -618,24 +747,28 @@ public class SphereAnimator extends AbstractAnimation {
         final int ascentSteps;
         final int ascentGap;
         final int orbitTicks;
+        final int riseTicks;
         final int convergenceTicks;
         final int winnerTicks;
+        final int breezeStayTicks;
         final String spawnSound;
         final String winSound;
 
-        Timings(int ascentSteps, int ascentGap, int orbitTicks, int convergenceTicks, int winnerTicks,
-                String spawnSound, String winSound) {
+        Timings(int ascentSteps, int ascentGap, int orbitTicks, int riseTicks, int convergenceTicks,
+                int winnerTicks, int breezeStayTicks, String spawnSound, String winSound) {
             this.ascentSteps = (int) clamp(ascentSteps, 2, 15);
             this.ascentGap = (int) clamp(ascentGap, 1, 5);
             this.orbitTicks = (int) clamp(orbitTicks, 20, 1200);
+            this.riseTicks = (int) clamp(riseTicks, 0, 200);
             this.convergenceTicks = (int) clamp(convergenceTicks, 10, 200);
             this.winnerTicks = (int) clamp(winnerTicks, 10, 200);
+            this.breezeStayTicks = (int) clamp(breezeStayTicks, 0, 200);
             this.spawnSound = spawnSound == null ? "BLOCK_NOTE_BLOCK_PLING" : spawnSound;
             this.winSound = winSound == null ? "ENTITY_PLAYER_LEVELUP" : winSound;
         }
 
         Timings() {
-            this(5, 2, 100, 40, 45, "BLOCK_NOTE_BLOCK_PLING", "ENTITY_PLAYER_LEVELUP");
+            this(6, 2, 100, 30, 40, 45, 10, "BLOCK_NOTE_BLOCK_PLING", "ENTITY_PLAYER_LEVELUP");
         }
 
         private static double clamp(double v, double min, double max) {
