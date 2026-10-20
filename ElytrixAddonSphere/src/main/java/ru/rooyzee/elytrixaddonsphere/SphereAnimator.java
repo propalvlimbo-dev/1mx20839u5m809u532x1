@@ -83,6 +83,8 @@ public class SphereAnimator extends AbstractAnimation {
     private final List<Vec3d> entryFrom = new ArrayList<>();
     private final List<Double> entryT = new ArrayList<>();
     private double[] slots = new double[0];
+    /** Сколько призов в кольце — фиксируется один раз, чтобы точки не съезжали. */
+    private volatile int ringTotal = 1;
 
     private VirtualEntity breezeEntity;
     private VirtualEntity clockEntity;
@@ -202,6 +204,7 @@ public class SphereAnimator extends AbstractAnimation {
         int count = Math.max(4, Math.min(24, config.itemCount));
         int winnerIdx = RANDOM.nextInt(count);
 
+        ringTotal = count;
         slots = new double[count];
         for (int i = 0; i < count; i++) {
             slots[i] = (2.0D * Math.PI * i) / count;
@@ -370,7 +373,7 @@ public class SphereAnimator extends AbstractAnimation {
             VirtualEntity item = ringItems.get(i);
             if (item == null || i >= slots.length) continue;
 
-            Vec3d target = ringPos(i, ringItems.size());
+            Vec3d target = ringPos(i, ringTotal);
             Vec3d pos = target;
 
             double t = (i < entryT.size() && i < entryFrom.size()) ? entryT.get(i) : 1.0D;
@@ -397,8 +400,8 @@ public class SphereAnimator extends AbstractAnimation {
     private void driveBreeze() {
         if (!breezeSpin) return;
 
-        breezeSpinSpeed += (breezeSpinTarget - breezeSpinSpeed) * 0.08D;
-        if (breezeSpinSpeed > 5.0D) breezeSpinSpeed = 5.0D;
+        // ровная скорость каждый тик: без разгонов, торможений и рывков
+        breezeSpinSpeed = breezeSpinTarget;
         breezeYaw = (float) ((breezeYaw + breezeSpinSpeed) % 360.0D);
 
         if (breezeEntity != null) {
@@ -578,12 +581,12 @@ public class SphereAnimator extends AbstractAnimation {
 
     private void ascent(int count, int winnerIdx) throws InterruptedException {
         int steps = config.timings.ascentSteps;
-        int gap = config.timings.ascentGap;
 
+        // все призы появляются одновременно сверху и ровным кругом,
+        // затем вместе опускаются каждый на своё место
         for (int i = 0; i < count; i++) {
             Prize prize = (i == winnerIdx) ? winner : safePrize();
 
-            // своя точка над своим местом в кольце — призы не сбиваются в кучу
             Vec3d from = ringPos(i, count).add(0.0D, config.dropHeight, 0.0D);
             VirtualEntity item = spawnDisplay(prize, from, (float) Math.toDegrees(slots[i]) - 90.0F);
             ringItems.add(item);
@@ -593,10 +596,9 @@ public class SphereAnimator extends AbstractAnimation {
                 winnerItem = item;
             }
             ringNames.add(config.standMode ? spawnNameStand(prize, from) : null);
-
-            playSound(center, spawnSound, 0.25F, 0.9F + 0.4F * ((float) i / count));
-            sleepTicks(gap);
         }
+
+        playSound(center, spawnSound, 0.35F, 1.1F);
 
         // кольцо включается, призы плавно съезжают на орбиту
         ringActive = true;
@@ -613,8 +615,9 @@ public class SphereAnimator extends AbstractAnimation {
     // ── взлёт, булава и удар ────────────────────────────────────────────────
 
     /**
-     * Подъём и удар одним движением: булава стартует так, чтобы врезаться
-     * ровно в верхней точке. Удар обрывает подъём — Вихрь не висит и не ждёт.
+     * Подъём и удар одним движением. Подъём идёт по ease-in: сначала медленно,
+     * потом всё быстрее. Булава стартует так, чтобы врезаться ровно в верхней
+     * точке — игрок останавливает подъём, Вихрь не висит и не ждёт.
      */
     private void riseAndStrike(int winnerIdx) throws InterruptedException {
         boolean vortex = hasVortex();
@@ -624,8 +627,6 @@ public class SphereAnimator extends AbstractAnimation {
         if (total <= 0) return;
 
         if (up > 0) {
-            breezeSpinTarget = Math.min(4.5D, config.breezeSpin * 1.1D);
-            targetSpeed = config.rotationSpeed * 1.25D;
             sound(breezePos(curElevation), Sound.ENTITY_ENDERMAN_TELEPORT, 0.9F, 0.75F);
         }
 
@@ -633,9 +634,8 @@ public class SphereAnimator extends AbstractAnimation {
         for (int t = 1; t <= total; t++) {
             if (up > 0) {
                 double p = Math.min(1.0D, (double) t / up);
-                // ease-out: бодрый старт, мягкое торможение к верхней точке
-                double e = 1.0D - Math.pow(1.0D - p, 3.0D);
-                curElevation = config.breezeRise * e;
+                // ease-in: медленный старт, разгон к верхней точке
+                curElevation = config.breezeRise * p * p;
                 targetElevation = curElevation;
                 if (t % 2 == 0) swirlColumn(1);
             }
@@ -743,7 +743,7 @@ public class SphereAnimator extends AbstractAnimation {
             if (item == null) continue;
 
             Vec3d pos = item.getPos();
-            if (pos == null) pos = ringPos(i, ringItems.size());
+            if (pos == null) pos = ringPos(i, ringTotal);
 
             fallingItems.add(item);
             fallingPos.add(new Vec3d(pos.x, pos.y, pos.z));
@@ -773,7 +773,6 @@ public class SphereAnimator extends AbstractAnimation {
             double p = (double) t / ticks;
             curElevation = from * (1.0D - p * p);
             targetElevation = curElevation;
-            breezeSpinTarget = Math.min(4.5D, config.breezeSpin * (1.0D + 0.2D * p));
             sleepTicks(1L);
         }
         curElevation = 0.0D;
@@ -820,7 +819,6 @@ public class SphereAnimator extends AbstractAnimation {
             // дальше призом управляет только орбита — из кольца его убираем
             if (winnerIdx < ringItems.size()) ringItems.set(winnerIdx, null);
             if (winnerIdx < ringNames.size()) ringNames.set(winnerIdx, null);
-            breezeSpinTarget = config.breezeSpin * 0.8D;
             winnerOrbit = true;
         }
     }
@@ -842,7 +840,6 @@ public class SphereAnimator extends AbstractAnimation {
 
     private void breezeOutro() throws InterruptedException {
         if (!hasVortex() || config.timings.breezeStayTicks <= 0) return;
-        breezeSpinTarget = config.breezeSpin * 0.6D;
         sleepTicks(config.timings.breezeStayTicks);
     }
 
