@@ -17,19 +17,19 @@ settings:
 attributes:
   billboard:
     value-type: billboard_constraints
-    value: CENTER
+    value: VERTICAL
   display-type:
     value-type: item_display_type
-    value: GUI
+    value: FIXED
   scale:
     value-type: vector3f
     value:
-      x: 1.0
-      y: 1.0
-      z: 1.0
+      x: 1.2
+      y: 1.2
+      z: 1.2
   translation:
     value-type: vector3f
     value:
       x: 0.0
-      y: -4.28
+      y: -4.38
       z: 0.0

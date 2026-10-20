@@ -8,7 +8,7 @@ location:
   x: -10.444
   y: 60.000
   z: 0.535
-  yaw: 0.0
+  yaw: 180.0
   pitch: 0.0
 settings:
   enabled: true
@@ -17,19 +17,19 @@ settings:
 attributes:
   billboard:
     value-type: billboard_constraints
-    value: CENTER
+    value: VERTICAL
   display-type:
     value-type: item_display_type
-    value: GUI
+    value: FIXED
   scale:
     value-type: vector3f
     value:
-      x: 1.0
-      y: 1.0
-      z: 1.0
+      x: 1.2
+      y: 1.2
+      z: 1.2
   translation:
     value-type: vector3f
     value:
       x: 0.0
-      y: -3.15
+      y: -3.25
       z: 0.0

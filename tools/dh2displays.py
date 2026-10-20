@@ -29,6 +29,8 @@ SKIP_RE = re.compile(r'^#(ENTITY|EMPTY)\b', re.IGNORECASE)
 LINE_H = 0.225
 # голограммы, которые не должны поворачиваться за игроком
 STATIC = {'addvk', 'helps'}
+# FIXED-голограммы при yaw 0 смотрят в +Z; helps развернуть
+FLIP = {'helps'}
 
 HEADER = '''# DecentHolograms 2.10+ — голограмма нового типа (display entity)
 # Переделано из классической голограммы: {source}
@@ -38,7 +40,7 @@ location:
   x: {x}
   y: {y}
   z: {z}
-  yaw: 0.0
+  yaw: {yaw}
   pitch: 0.0
 settings:
   enabled: {enabled}
@@ -88,16 +90,16 @@ TEXT_ATTRS = '''  billboard:
 
 ITEM_ATTRS = '''  billboard:
     value-type: billboard_constraints
-    value: CENTER
+    value: VERTICAL
   display-type:
     value-type: item_display_type
-    value: GUI
+    value: FIXED
   scale:
     value-type: vector3f
     value:
-      x: 1.0
-      y: 1.0
-      z: 1.0
+      x: 1.2
+      y: 1.2
+      z: 1.2
   translation:
     value-type: vector3f
     value:
@@ -165,15 +167,17 @@ def convert(path, out_dir, stats):
 
     written = []
     if texts:
-        # у старой голограммы первая строка стояла в точке location, строки шли
-        # вниз; text_display ведёт себя так же, поэтому смещение не нужно
-        text_bottom = 0.0  # верхняя строка = якорь
+        # у text_display текст растёт ВВЕРХ от точки привязки, поэтому опускаем
+        # точку на высоту блока: верхняя строка встанет ровно в якорь старой
+        # голограммы, остальные пойдут вниз
+        text_bottom = -len(texts) * LINE_H
         fname = os.path.join(out_dir, name + '.yml')
         note = ('# Текст 1:1, иконка — отдельный файл %s_icon.yml.\n' % name) if items else \
                '# Текст 1:1 из старой голограммы.\n'
         body = HEADER.format(source=name + '.yml', note=note,
                              extra='', dtype='TEXT', world=q(loc['world']),
                              x='%.3f' % loc['x'], y='%.3f' % loc['y'], z='%.3f' % loc['z'],
+                             yaw='%.1f' % (180.0 if name in FLIP else 0.0),
                              enabled=enabled, range=rng, interval=interval)
         billboard = 'FIXED' if name in STATIC else 'VERTICAL'
         body += (TEXT_ATTRS.replace('{ty}', '%.2f' % text_bottom)
@@ -185,7 +189,7 @@ def convert(path, out_dir, stats):
         written.append(os.path.basename(fname))
         stats['text'].append((name, len(texts), text_bottom))
 
-    icon_y = -len(texts) * LINE_H - 0.45
+    icon_y = -len(texts) * LINE_H - 0.55
 
     for item in items:
         icon_name = name + '_icon'
@@ -197,6 +201,7 @@ def convert(path, out_dir, stats):
                              extra="item: %s\n" % q(material), dtype='ITEM',
                              world=q(loc['world']), x='%.3f' % loc['x'],
                              y='%.3f' % loc['y'], z='%.3f' % loc['z'],
+                             yaw='%.1f' % (180.0 if name in FLIP else 0.0),
                              enabled=enabled, range=rng, interval=interval)
         body += ITEM_ATTRS.replace('{ty}', '%.2f' % icon_y)
         open(fname, 'w', encoding='utf-8', newline='').write(body)
