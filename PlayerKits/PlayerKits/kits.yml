@@ -1,0 +1,2873 @@
+Kits:
+  start:
+    slot: 11
+    display_item: COAL_ORE
+    display_name: '&fНабор &7sᴛᴀʀᴛ'
+    display_lore:
+    - '#F8BEFB&l┃ '
+    - '#F8BEFB&l┃ &fСтатус: &aМожно получить'
+    - '#F8BEFB&l┃ '
+    - '&7● &fВзять набор &7(ЛКМ)'
+    - '&7● &fПосмотреть набор &7(ПКМ)'
+    cooldown: 3600
+    permission: playerkits.kit.start
+    noPermissionsItem:
+      display_item: BARRIER
+      display_name: '&fНабор &7sᴛᴀʀᴛ'
+      display_lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &cНет доступа'
+      - '#F8BEFB&l┃ '
+      - '&7● &fПосмотреть набор &7(ПКМ)'
+    auto_armor: true
+    first_join: true
+    Commands:
+    - kit start
+    Items:
+      '1':
+        id: IRON_SWORD
+        amount: '1'
+        durability: '0'
+        name: '&fНабор &7sᴛᴀʀᴛ'
+        enchants:
+        - DAMAGE_ALL;1
+        - DURABILITY;1
+        unbreakable: 'false'
+        preview_slot: 0
+      '2':
+        id: IRON_SHOVEL
+        amount: '1'
+        durability: '0'
+        enchants:
+        - DURABILITY;1
+        unbreakable: 'false'
+        preview_slot: 1
+      '3':
+        id: IRON_AXE
+        amount: '1'
+        durability: '0'
+        enchants:
+        - DURABILITY;1
+        unbreakable: 'false'
+        preview_slot: 2
+      '4':
+        id: IRON_PICKAXE
+        amount: '1'
+        durability: '0'
+        enchants:
+        - DURABILITY;1
+        unbreakable: 'false'
+        preview_slot: 3
+      '5':
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"test9","score:usage":0};compound
+        id: BOW
+        amount: '1'
+        durability: '0'
+        name: '&fНабор &7sᴛᴀʀᴛ'
+        enchants:
+        - ARROW_DAMAGE;1
+        - DURABILITY;1
+        unbreakable: 'false'
+        preview_slot: 4
+      '6':
+        id: GOLDEN_APPLE
+        amount: '4'
+        durability: '0'
+        preview_slot: 5
+      '7':
+        id: ENDER_PEARL
+        amount: '8'
+        durability: '0'
+        preview_slot: 6
+      '8':
+        id: CHORUS_FRUIT
+        amount: '16'
+        durability: '0'
+        preview_slot: 7
+      '9':
+        banner-pattern: ''
+        banner-color: LIGHT_GRAY_BANNER
+        nbt:
+        - BlockEntityTag;{id:"banner",Base:8};compound
+        id: SHIELD
+        amount: '1'
+        durability: '0'
+        unbreakable: 'false'
+        preview_slot: 8
+      '10':
+        id: LIGHT_GRAY_WOOL
+        amount: '16'
+        durability: '0'
+        preview_slot: 9
+      '11':
+        id: LIGHT_GRAY_CONCRETE
+        amount: '16'
+        durability: '0'
+        preview_slot: 10
+      '12':
+        id: OAK_LOG
+        amount: '8'
+        durability: '0'
+        preview_slot: 11
+      '13':
+        id: BIRCH_LOG
+        amount: '8'
+        durability: '0'
+        preview_slot: 12
+      '14':
+        id: BRICKS
+        amount: '16'
+        durability: '0'
+        preview_slot: 13
+      '15':
+        id: LIGHT_GRAY_STAINED_GLASS
+        amount: '8'
+        durability: '0'
+        preview_slot: 14
+      '16':
+        id: LIGHT_GRAY_WOOL
+        amount: '8'
+        durability: '0'
+        preview_slot: 15
+      '17':
+        id: ARROW
+        amount: '8'
+        durability: '0'
+        preview_slot: 16
+      '18':
+        id: REDSTONE
+        amount: '16'
+        durability: '0'
+        preview_slot: 17
+      '19':
+        id: LEVER
+        amount: '1'
+        durability: '0'
+        preview_slot: 18
+      '20':
+        id: STICKY_PISTON
+        amount: '2'
+        durability: '0'
+        preview_slot: 19
+      '21':
+        id: STONE_PRESSURE_PLATE
+        amount: '1'
+        durability: '0'
+        preview_slot: 20
+      '22':
+        id: DIAMOND_BOOTS
+        amount: '1'
+        durability: '0'
+        name: '&fНабор &7sᴛᴀʀᴛ'
+        enchants:
+        - PROTECTION_ENVIRONMENTAL;1
+        - DURABILITY;1
+        unbreakable: 'false'
+        preview_slot: 36
+      '23':
+        id: IRON_LEGGINGS
+        amount: '1'
+        durability: '0'
+        name: '&fНабор &7sᴛᴀʀᴛ'
+        enchants:
+        - PROTECTION_ENVIRONMENTAL;1
+        - DURABILITY;1
+        unbreakable: 'false'
+        preview_slot: 37
+      '24':
+        id: IRON_CHESTPLATE
+        amount: '1'
+        durability: '0'
+        name: '&fНабор &7sᴛᴀʀᴛ'
+        enchants:
+        - PROTECTION_ENVIRONMENTAL;1
+        - DURABILITY;1
+        unbreakable: 'false'
+        preview_slot: 38
+      '25':
+        id: DIAMOND_HELMET
+        amount: '1'
+        durability: '0'
+        name: '&fНабор &7sᴛᴀʀᴛ'
+        enchants:
+        - PROTECTION_ENVIRONMENTAL;1
+        - DURABILITY;1
+        unbreakable: 'false'
+        preview_slot: 39
+  lite:
+    slot: 12
+    display_item: LIGHT_GRAY_SHULKER_BOX
+    display_name: '&fНабор &x&8&D&8&D&8&D&lʟ&x&9&6&9&6&9&6&lɪ&x&9&F&9&F&9&F&lᴛ&x&A&8&A&8&A&8&lᴇ'
+    display_lore:
+    - '#F8BEFB&l┃ '
+    - '#F8BEFB&l┃ &fСтатус: &aМожно получить'
+    - '#F8BEFB&l┃ '
+    - '&7● &fВзять набор &7(ЛКМ)'
+    - '&7● &fПосмотреть набор &7(ПКМ)'
+    cooldown: 86400
+    permission: playerkits.kit.lite
+    noPermissionsItem:
+      display_item: BARRIER
+      display_name: '&fНабор &x&8&D&8&D&8&D&lʟ&x&9&6&9&6&9&6&lɪ&x&9&F&9&F&9&F&lᴛ&x&A&8&A&8&A&8&lᴇ'
+      display_lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &cНет доступа'
+      - '#F8BEFB&l┃ '
+      - '&7● &fПосмотреть набор &7(ПКМ)'
+    auto_armor: true
+    Commands:
+    - kit lite
+    Items:
+      '1':
+        id: DIAMOND_SWORD
+        amount: '1'
+        durability: '0'
+        enchants:
+        - DAMAGE_ALL;2
+        - DURABILITY;1
+        unbreakable: 'false'
+        preview_slot: 0
+      '2':
+        id: DIAMOND_SHOVEL
+        amount: '1'
+        durability: '0'
+        enchants:
+        - DIG_SPEED;1
+        - DURABILITY;1
+        unbreakable: 'false'
+        preview_slot: 1
+      '3':
+        id: DIAMOND_AXE
+        amount: '1'
+        durability: '0'
+        enchants:
+        - DIG_SPEED;1
+        - DURABILITY;1
+        unbreakable: 'false'
+        preview_slot: 2
+      '4':
+        id: DIAMOND_PICKAXE
+        amount: '1'
+        durability: '0'
+        enchants:
+        - DIG_SPEED;1
+        - DURABILITY;1
+        unbreakable: 'false'
+        preview_slot: 3
+      '5':
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"test9","score:usage":0};compound
+        id: BOW
+        amount: '1'
+        durability: '0'
+        enchants:
+        - ARROW_DAMAGE;2
+        - DURABILITY;1
+        unbreakable: 'false'
+        preview_slot: 4
+      '6':
+        id: GOLDEN_APPLE
+        amount: '12'
+        durability: '0'
+        preview_slot: 5
+      '7':
+        id: ENDER_PEARL
+        amount: '12'
+        durability: '0'
+        preview_slot: 6
+      '8':
+        id: CHORUS_FRUIT
+        amount: '32'
+        durability: '0'
+        preview_slot: 7
+      '9':
+        id: EXPERIENCE_BOTTLE
+        amount: '8'
+        durability: '0'
+        preview_slot: 8
+      '10':
+        id: ARROW
+        amount: '64'
+        durability: '0'
+        preview_slot: 9
+      '11':
+        id: TOTEM_OF_UNDYING
+        amount: '1'
+        durability: '0'
+        preview_slot: 10
+      '12':
+        id: COOKED_BEEF
+        amount: '64'
+        durability: '0'
+        preview_slot: 11
+      '13':
+        id: GRAY_STAINED_GLASS
+        amount: '8'
+        durability: '0'
+        preview_slot: 12
+      '14':
+        id: LIGHT_GRAY_CONCRETE_POWDER
+        amount: '8'
+        durability: '0'
+        preview_slot: 13
+      '15':
+        id: GRAY_GLAZED_TERRACOTTA
+        amount: '8'
+        durability: '0'
+        preview_slot: 14
+      '16':
+        id: LIGHT_GRAY_WOOL
+        amount: '8'
+        durability: '0'
+        preview_slot: 15
+      '17':
+        id: LIGHT_GRAY_BED
+        amount: '1'
+        durability: '0'
+        preview_slot: 16
+      '18':
+        id: IRON_BOOTS
+        amount: '1'
+        durability: '0'
+        enchants:
+        - PROTECTION_ENVIRONMENTAL;2
+        - DURABILITY;1
+        unbreakable: 'false'
+        preview_slot: 36
+      '19':
+        id: IRON_LEGGINGS
+        amount: '1'
+        durability: '0'
+        enchants:
+        - PROTECTION_ENVIRONMENTAL;2
+        - DURABILITY;1
+        unbreakable: 'false'
+        preview_slot: 37
+      '20':
+        id: IRON_CHESTPLATE
+        amount: '1'
+        durability: '0'
+        enchants:
+        - PROTECTION_ENVIRONMENTAL;2
+        - DURABILITY;1
+        unbreakable: 'false'
+        preview_slot: 38
+      '21':
+        id: IRON_HELMET
+        amount: '1'
+        durability: '0'
+        enchants:
+        - PROTECTION_ENVIRONMENTAL;2
+        - DURABILITY;1
+        unbreakable: 'false'
+        preview_slot: 39
+  prime:
+    slot: 13
+    display_item: LIGHT_BLUE_SHULKER_BOX
+    display_name: '&fНабор &x&8&9&A&0&F&F&lᴘ&x&9&9&A&E&F&F&lʀ&x&A&8&B&C&F&F&lɪ&x&B&8&C&A&F&F&lᴍ&x&C&7&D&8&F&F&lᴇ'
+    display_lore:
+    - '#F8BEFB&l┃ '
+    - '#F8BEFB&l┃ &fСтатус: &aМожно получить'
+    - '#F8BEFB&l┃ '
+    - '&7● &fВзять набор &7(ЛКМ)'
+    - '&7● &fПосмотреть набор &7(ПКМ)'
+    cooldown: 86400
+    permission: playerkits.kit.prime
+    noPermissionsItem:
+      display_item: BARRIER
+      display_name: '&fНабор &x&8&9&A&0&F&F&lᴘ&x&9&9&A&E&F&F&lʀ&x&A&8&B&C&F&F&lɪ&x&B&8&C&A&F&F&lᴍ&x&C&7&D&8&F&F&lᴇ'
+      display_lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &cНет доступа'
+      - '#F8BEFB&l┃ '
+      - '&7● &fПосмотреть набор &7(ПКМ)'
+    Commands:
+    - kit prime
+    auto_armor: true
+    Items:
+      '1':
+        id: DIAMOND_SWORD
+        amount: '1'
+        durability: '0'
+        enchants:
+        - DAMAGE_ALL;2
+        - FIRE_ASPECT;1
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 0
+      '2':
+        id: DIAMOND_SHOVEL
+        amount: '1'
+        durability: '0'
+        enchants:
+        - DIG_SPEED;2
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 1
+      '3':
+        id: DIAMOND_AXE
+        amount: '1'
+        durability: '0'
+        enchants:
+        - DIG_SPEED;2
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 2
+      '4':
+        id: DIAMOND_PICKAXE
+        amount: '1'
+        durability: '0'
+        enchants:
+        - DIG_SPEED;2
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 3
+      '5':
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"test9","score:usage":0};compound
+        id: BOW
+        amount: '1'
+        durability: '0'
+        enchants:
+        - ARROW_DAMAGE;2
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 4
+      '6':
+        id: GOLDEN_APPLE
+        amount: '12'
+        durability: '0'
+        preview_slot: 5
+      '7':
+        id: ENDER_PEARL
+        amount: '16'
+        durability: '0'
+        preview_slot: 6
+      '8':
+        id: CHORUS_FRUIT
+        amount: '48'
+        durability: '0'
+        preview_slot: 7
+      '9':
+        id: EXPERIENCE_BOTTLE
+        amount: '16'
+        durability: '0'
+        preview_slot: 8
+      '10':
+        id: LIGHT_BLUE_CONCRETE_POWDER
+        amount: '8'
+        durability: '0'
+        preview_slot: 9
+      '11':
+        id: LIGHT_BLUE_STAINED_GLASS
+        amount: '8'
+        durability: '0'
+        preview_slot: 10
+      '12':
+        id: LIGHT_BLUE_BED
+        amount: '1'
+        durability: '0'
+        preview_slot: 11
+      '13':
+        id: LIGHT_BLUE_WOOL
+        amount: '8'
+        durability: '0'
+        preview_slot: 12
+      '14':
+        id: LIGHT_BLUE_GLAZED_TERRACOTTA
+        amount: '8'
+        durability: '0'
+        preview_slot: 13
+      '15':
+        id: ARROW
+        amount: '64'
+        durability: '0'
+        preview_slot: 14
+      '16':
+        id: TOTEM_OF_UNDYING
+        amount: '1'
+        durability: '0'
+        preview_slot: 15
+      '17':
+        id: COOKED_BEEF
+        amount: '64'
+        durability: '0'
+        preview_slot: 16
+      '18':
+        id: DIAMOND_BOOTS
+        amount: '1'
+        durability: '0'
+        enchants:
+        - PROTECTION_ENVIRONMENTAL;2
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 36
+      '19':
+        id: DIAMOND_LEGGINGS
+        amount: '1'
+        durability: '0'
+        enchants:
+        - PROTECTION_ENVIRONMENTAL;2
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 37
+      '20':
+        id: DIAMOND_CHESTPLATE
+        amount: '1'
+        durability: '0'
+        enchants:
+        - PROTECTION_ENVIRONMENTAL;2
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 38
+      '21':
+        id: DIAMOND_HELMET
+        amount: '1'
+        durability: '0'
+        enchants:
+        - PROTECTION_ENVIRONMENTAL;2
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 39
+  griefer:
+    slot: 14
+    display_item: RED_SHULKER_BOX
+    display_name: '&fНабор &x&F&F&9&1&9&1&lɢ&x&F&F&9&9&9&9&lʀ&x&F&F&A&1&A&1&lɪ&x&F&F&A&A&A&A&lᴇ&x&F&F&B&2&B&2&lꜰ&x&F&F&B&A&B&A&lᴇ&x&F&F&C&2&C&2&lʀ'
+    display_lore:
+    - '#F8BEFB&l┃ '
+    - '#F8BEFB&l┃ &fСтатус: &aМожно получить'
+    - '#F8BEFB&l┃ '
+    - '&7● &fВзять набор &7(ЛКМ)'
+    - '&7● &fПосмотреть набор &7(ПКМ)'
+    cooldown: 86400
+    permission: playerkits.kit.griefer
+    noPermissionsItem:
+      display_item: BARRIER
+      display_name: '&fНабор &x&F&F&9&1&9&1&lɢ&x&F&F&9&9&9&9&lʀ&x&F&F&A&1&A&1&lɪ&x&F&F&A&A&A&A&lᴇ&x&F&F&B&2&B&2&lꜰ&x&F&F&B&A&B&A&lᴇ&x&F&F&C&2&C&2&lʀ'
+      display_lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &cНет доступа'
+      - '#F8BEFB&l┃ '
+      - '&7● &fПосмотреть набор &7(ПКМ)'
+    auto_armor: true
+    one_time: false
+    Commands:
+    - kit griefer
+    Items:
+      '1':
+        id: DIAMOND_SWORD
+        amount: '1'
+        durability: '0'
+        enchants:
+        - FIRE_ASPECT;1
+        - DAMAGE_ALL;3
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 0
+      '2':
+        id: DIAMOND_SHOVEL
+        amount: '1'
+        durability: '0'
+        enchants:
+        - DIG_SPEED;3
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 1
+      '3':
+        id: DIAMOND_AXE
+        amount: '1'
+        durability: '0'
+        enchants:
+        - DIG_SPEED;3
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 2
+      '4':
+        id: DIAMOND_PICKAXE
+        amount: '1'
+        durability: '0'
+        enchants:
+        - DIG_SPEED;3
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 3
+      '5':
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"test9","score:usage":0};compound
+        id: BOW
+        amount: '1'
+        durability: '0'
+        enchants:
+        - ARROW_DAMAGE;3
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 4
+      '6':
+        id: GOLDEN_APPLE
+        amount: '16'
+        durability: '0'
+        preview_slot: 5
+      '7':
+        id: ENDER_PEARL
+        amount: '16'
+        durability: '0'
+        preview_slot: 6
+      '8':
+        id: CHORUS_FRUIT
+        amount: '64'
+        durability: '0'
+        preview_slot: 7
+      '9':
+        id: TOTEM_OF_UNDYING
+        amount: '1'
+        durability: '0'
+        preview_slot: 8
+      '10':
+        id: BIRCH_LOG
+        amount: '16'
+        durability: '0'
+        preview_slot: 9
+      '11':
+        id: RED_WOOL
+        amount: '32'
+        durability: '0'
+        preview_slot: 10
+      '12':
+        id: RED_CONCRETE
+        amount: '32'
+        durability: '0'
+        preview_slot: 11
+      '13':
+        id: RED_STAINED_GLASS
+        amount: '32'
+        durability: '0'
+        preview_slot: 12
+      '14':
+        id: OAK_LOG
+        amount: '32'
+        durability: '0'
+        preview_slot: 13
+      '15':
+        id: TOTEM_OF_UNDYING
+        amount: '1'
+        durability: '0'
+        preview_slot: 18
+      '16':
+        id: EXPERIENCE_BOTTLE
+        amount: '24'
+        durability: '0'
+        preview_slot: 19
+      '17':
+        id: COOKED_BEEF
+        amount: '64'
+        durability: '0'
+        preview_slot: 20
+      '18':
+        banner-pattern: ''
+        banner-color: ORANGE_BANNER
+        nbt:
+        - BlockEntityTag;{id:"banner",Base:1};compound
+        id: SHIELD
+        amount: '1'
+        durability: '0'
+        enchants:
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 21
+      '19':
+        id: ARROW
+        amount: '64'
+        durability: '0'
+        preview_slot: 22
+      '20':
+        id: DIAMOND_BOOTS
+        amount: '1'
+        durability: '0'
+        enchants:
+        - PROTECTION_ENVIRONMENTAL;3
+        - PROTECTION_FIRE;1
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 36
+      '21':
+        id: DIAMOND_LEGGINGS
+        amount: '1'
+        durability: '0'
+        enchants:
+        - PROTECTION_ENVIRONMENTAL;3
+        - PROTECTION_FIRE;1
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 37
+      '22':
+        id: DIAMOND_CHESTPLATE
+        amount: '1'
+        durability: '0'
+        enchants:
+        - PROTECTION_ENVIRONMENTAL;3
+        - PROTECTION_FIRE;1
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 38
+      '23':
+        id: DIAMOND_HELMET
+        amount: '1'
+        durability: '0'
+        enchants:
+        - PROTECTION_ENVIRONMENTAL;3
+        - PROTECTION_FIRE;1
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 39
+  wither:
+    slot: 15
+    display_item: LIME_SHULKER_BOX
+    display_name: '&fНабор &x&9&6&F&F&9&1&lᴡ&x&A&0&F&F&9&D&lɪ&x&A&A&F&F&A&8&lᴛ&x&B&3&F&F&B&4&lʜ&x&B&D&F&F&B&F&lᴇ&x&C&7&F&F&C&B&lʀ'
+    display_lore:
+    - '#F8BEFB&l┃ '
+    - '#F8BEFB&l┃ &fСтатус: &aМожно получить'
+    - '#F8BEFB&l┃ '
+    - '&7● &fВзять набор &7(ЛКМ)'
+    - '&7● &fПосмотреть набор &7(ПКМ)'
+    cooldown: 86400
+    permission: playerkits.kit.wither
+    noPermissionsItem:
+      display_item: BARRIER
+      display_name: '&fНабор &x&9&6&F&F&9&1&lᴡ&x&A&0&F&F&9&D&lɪ&x&A&A&F&F&A&8&lᴛ&x&B&3&F&F&B&4&lʜ&x&B&D&F&F&B&F&lᴇ&x&C&7&F&F&C&B&lʀ'
+      display_lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &cНет доступа'
+      - '#F8BEFB&l┃ '
+      - '&7● &fПосмотреть набор &7(ПКМ)'
+    Commands:
+    - kit wither
+    auto_armor: true
+    Items:
+      '1':
+        id: DIAMOND_SWORD
+        amount: '1'
+        durability: '0'
+        enchants:
+        - DAMAGE_ALL;3
+        - FIRE_ASPECT;1
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 0
+      '2':
+        id: DIAMOND_SHOVEL
+        amount: '1'
+        durability: '0'
+        enchants:
+        - DIG_SPEED;3
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 1
+      '3':
+        id: DIAMOND_AXE
+        amount: '1'
+        durability: '0'
+        enchants:
+        - DIG_SPEED;3
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 2
+      '4':
+        id: DIAMOND_PICKAXE
+        amount: '1'
+        durability: '0'
+        enchants:
+        - DIG_SPEED;3
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 3
+      '5':
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"test9","score:usage":0};compound
+        id: BOW
+        amount: '1'
+        durability: '0'
+        enchants:
+        - ARROW_DAMAGE;3
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 4
+      '6':
+        id: GOLDEN_APPLE
+        amount: '24'
+        durability: '0'
+        preview_slot: 5
+      '7':
+        id: GOLDEN_CARROT
+        amount: '16'
+        durability: '0'
+        preview_slot: 6
+      '8':
+        id: ENDER_PEARL
+        amount: '16'
+        durability: '0'
+        preview_slot: 7
+      '9':
+        id: ARROW
+        amount: '64'
+        durability: '0'
+        preview_slot: 8
+      '10':
+        id: ENDER_PEARL
+        amount: '16'
+        durability: '0'
+        preview_slot: 9
+      '11':
+        id: TOTEM_OF_UNDYING
+        amount: '1'
+        durability: '0'
+        preview_slot: 10
+      '12':
+        id: TOTEM_OF_UNDYING
+        amount: '1'
+        durability: '0'
+        preview_slot: 11
+      '13':
+        id: TOTEM_OF_UNDYING
+        amount: '1'
+        durability: '0'
+        preview_slot: 12
+      '14':
+        id: EXPERIENCE_BOTTLE
+        amount: '64'
+        durability: '0'
+        preview_slot: 13
+      '15':
+        id: EXPERIENCE_BOTTLE
+        amount: '64'
+        durability: '0'
+        preview_slot: 14
+      '16':
+        id: EXPERIENCE_BOTTLE
+        amount: '32'
+        durability: '0'
+        preview_slot: 15
+      '17':
+        potion-type: STRENGTH
+        potion-upgraded: 'false'
+        potion-extended: 'true'
+        id: POTION
+        amount: '2'
+        durability: '0'
+        unbreakable: 'false'
+        preview_slot: 16
+      '18':
+        potion-type: SPEED
+        potion-upgraded: 'false'
+        potion-extended: 'true'
+        id: POTION
+        amount: '2'
+        durability: '0'
+        unbreakable: 'false'
+        preview_slot: 17
+      '19':
+        id: CHORUS_FRUIT
+        amount: '32'
+        durability: '0'
+        preview_slot: 18
+      '20':
+        id: SLIME_BALL
+        amount: '8'
+        durability: '0'
+        preview_slot: 19
+      '21':
+        id: GOLD_INGOT
+        amount: '8'
+        durability: '0'
+        preview_slot: 20
+      '22':
+        id: DIAMOND
+        amount: '16'
+        durability: '0'
+        preview_slot: 21
+      '23':
+        id: IRON_INGOT
+        amount: '48'
+        durability: '0'
+        preview_slot: 22
+      '24':
+        id: SPRUCE_LOG
+        amount: '64'
+        durability: '0'
+        preview_slot: 23
+      '25':
+        book-enchants:
+        - PROTECTION_ENVIRONMENTAL;4
+        id: ENCHANTED_BOOK
+        amount: '1'
+        durability: '0'
+        unbreakable: 'false'
+        preview_slot: 24
+      '26':
+        book-enchants:
+        - PROTECTION_ENVIRONMENTAL;4
+        id: ENCHANTED_BOOK
+        amount: '1'
+        durability: '0'
+        unbreakable: 'false'
+        preview_slot: 25
+      '27':
+        id: SHIELD
+        amount: '1'
+        durability: '0'
+        preview_slot: 26
+      '28':
+        id: DIAMOND_HELMET
+        amount: '1'
+        durability: '0'
+        enchants:
+        - PROTECTION_ENVIRONMENTAL;3
+        - PROTECTION_FIRE;1
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 36
+      '29':
+        id: DIAMOND_CHESTPLATE
+        amount: '1'
+        durability: '0'
+        enchants:
+        - PROTECTION_ENVIRONMENTAL;3
+        - PROTECTION_FIRE;1
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 37
+      '30':
+        id: DIAMOND_LEGGINGS
+        amount: '1'
+        durability: '0'
+        enchants:
+        - PROTECTION_ENVIRONMENTAL;3
+        - PROTECTION_FIRE;1
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 38
+      '31':
+        id: DIAMOND_BOOTS
+        amount: '1'
+        durability: '0'
+        enchants:
+        - PROTECTION_ENVIRONMENTAL;3
+        - PROTECTION_FIRE;1
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 39
+  immortal:
+    slot: 21
+    display_item: RED_SHULKER_BOX
+    display_name: '&fНабор &x&F&F&3&0&3&0&lɪ&x&F&F&3&A&3&A&lᴍ&x&F&F&4&4&4&4&lᴍ&x&F&F&4&E&4&E&lᴏ&x&F&F&5&7&5&7&lʀ&x&F&F&6&1&6&1&lᴛ&x&F&F&6&B&6&B&lᴀ&x&F&F&7&5&7&5&lʟ'
+    display_lore:
+    - '#F8BEFB&l┃ '
+    - '#F8BEFB&l┃ &fСтатус: &aМожно получить'
+    - '#F8BEFB&l┃ '
+    - '&7● &fВзять набор &7(ЛКМ)'
+    - '&7● &fПосмотреть набор &7(ПКМ)'
+    cooldown: 86400
+    permission: playerkits.kit.immortal
+    noPermissionsItem:
+      display_item: BARRIER
+      display_name: '&fНабор &x&F&F&3&0&3&0&lɪ&x&F&F&3&A&3&A&lᴍ&x&F&F&4&4&4&4&lᴍ&x&F&F&4&E&4&E&lᴏ&x&F&F&5&7&5&7&lʀ&x&F&F&6&1&6&1&lᴛ&x&F&F&6&B&6&B&lᴀ&x&F&F&7&5&7&5&lʟ'
+      display_lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &cНет доступа'
+      - '#F8BEFB&l┃ '
+      - '&7● &fПосмотреть набор &7(ПКМ)'
+    auto_armor: true
+    Commands:
+    - kit immortal
+    Items:
+      '1':
+        id: DIAMOND_SWORD
+        amount: '1'
+        durability: '0'
+        enchants:
+        - DAMAGE_ALL;4
+        - FIRE_ASPECT;1
+        - DURABILITY;3
+        unbreakable: 'false'
+        preview_slot: 0
+      '2':
+        id: DIAMOND_PICKAXE
+        amount: '1'
+        durability: '0'
+        enchants:
+        - DIG_SPEED;4
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 1
+      '3':
+        id: DIAMOND_AXE
+        amount: '1'
+        durability: '0'
+        enchants:
+        - DIG_SPEED;4
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 2
+      '4':
+        id: DIAMOND_SHOVEL
+        amount: '1'
+        durability: '0'
+        enchants:
+        - DIG_SPEED;4
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 3
+      '5':
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"test9","score:usage":0};compound
+        id: BOW
+        amount: '1'
+        durability: '0'
+        enchants:
+        - ARROW_DAMAGE;4
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 4
+      '6':
+        id: GOLDEN_APPLE
+        amount: '28'
+        durability: '0'
+        preview_slot: 5
+      '7':
+        id: COOKED_BEEF
+        amount: '64'
+        durability: '0'
+        preview_slot: 6
+      '8':
+        id: CHORUS_FRUIT
+        amount: '64'
+        durability: '0'
+        preview_slot: 7
+      '9':
+        id: ARROW
+        amount: '64'
+        durability: '0'
+        preview_slot: 8
+      '10':
+        potion-type: SPEED
+        potion-upgraded: 'true'
+        potion-extended: 'false'
+        id: POTION
+        amount: '2'
+        durability: '0'
+        unbreakable: 'false'
+        preview_slot: 9
+      '11':
+        potion-type: FIRE_RESISTANCE
+        potion-upgraded: 'false'
+        potion-extended: 'false'
+        id: POTION
+        amount: '2'
+        durability: '0'
+        unbreakable: 'false'
+        preview_slot: 10
+      '12':
+        potion-type: STRENGTH
+        potion-upgraded: 'true'
+        potion-extended: 'false'
+        id: POTION
+        amount: '2'
+        durability: '0'
+        unbreakable: 'false'
+        preview_slot: 11
+      '13':
+        id: ENDER_PEARL
+        amount: '16'
+        durability: '0'
+        preview_slot: 12
+      '14':
+        id: ENDER_PEARL
+        amount: '16'
+        durability: '0'
+        preview_slot: 13
+      '15':
+        id: TOTEM_OF_UNDYING
+        amount: '1'
+        durability: '0'
+        preview_slot: 14
+      '16':
+        id: TOTEM_OF_UNDYING
+        amount: '1'
+        durability: '0'
+        preview_slot: 15
+      '17':
+        id: TOTEM_OF_UNDYING
+        amount: '1'
+        durability: '0'
+        preview_slot: 16
+      '18':
+        id: TOTEM_OF_UNDYING
+        amount: '1'
+        durability: '0'
+        preview_slot: 17
+      '19':
+        id: EXPERIENCE_BOTTLE
+        amount: '64'
+        durability: '0'
+        preview_slot: 18
+      '20':
+        id: EXPERIENCE_BOTTLE
+        amount: '64'
+        durability: '0'
+        preview_slot: 19
+      '21':
+        id: EXPERIENCE_BOTTLE
+        amount: '48'
+        durability: '0'
+        preview_slot: 20
+      '22':
+        book-enchants:
+        - DAMAGE_ALL;5
+        id: ENCHANTED_BOOK
+        amount: '1'
+        durability: '0'
+        unbreakable: 'false'
+        preview_slot: 21
+      '23':
+        id: BIRCH_LOG
+        amount: '64'
+        durability: '0'
+        preview_slot: 22
+      '24':
+        id: GOLDEN_CARROT
+        amount: '32'
+        durability: '0'
+        preview_slot: 23
+      '25':
+        id: GOLD_INGOT
+        amount: '64'
+        durability: '0'
+        preview_slot: 24
+      '26':
+        id: IRON_INGOT
+        amount: '64'
+        durability: '0'
+        preview_slot: 25
+      '27':
+        id: DIAMOND
+        amount: '16'
+        durability: '0'
+        preview_slot: 26
+      '28':
+        id: COAL
+        amount: '32'
+        durability: '0'
+        preview_slot: 27
+      '29':
+        id: NETHERITE_SCRAP
+        amount: '2'
+        durability: '0'
+        preview_slot: 28
+      '30':
+        id: DIAMOND_HELMET
+        amount: '1'
+        durability: '0'
+        enchants:
+        - PROTECTION_ENVIRONMENTAL;3
+        - DURABILITY;3
+        unbreakable: 'false'
+        preview_slot: 36
+      '31':
+        id: DIAMOND_CHESTPLATE
+        amount: '1'
+        durability: '0'
+        enchants:
+        - PROTECTION_ENVIRONMENTAL;4
+        - DURABILITY;3
+        unbreakable: 'false'
+        preview_slot: 37
+      '32':
+        id: DIAMOND_LEGGINGS
+        amount: '1'
+        durability: '0'
+        enchants:
+        - PROTECTION_ENVIRONMENTAL;4
+        - DURABILITY;3
+        unbreakable: 'false'
+        preview_slot: 38
+      '33':
+        id: DIAMOND_BOOTS
+        amount: '1'
+        durability: '0'
+        enchants:
+        - PROTECTION_ENVIRONMENTAL;3
+        - DURABILITY;3
+        unbreakable: 'false'
+        preview_slot: 39
+  dragon:
+    slot: 22
+    display_item: SHULKER_BOX
+    display_name: '&fНабор &x&F&F&7&A&F&E&lᴅ&x&F&F&8&1&F&B&lʀ&x&F&F&8&8&F&7&lᴀ&x&F&F&9&0&F&4&lɢ&x&F&F&9&7&F&0&lᴏ&x&F&F&9&E&E&D&lɴ'
+    display_lore:
+    - '#F8BEFB&l┃ '
+    - '#F8BEFB&l┃ &fСтатус: &aМожно получить'
+    - '#F8BEFB&l┃ '
+    - '&7● &fВзять набор &7(ЛКМ)'
+    - '&7● &fПосмотреть набор &7(ПКМ)'
+    cooldown: 86400
+    permission: playerkits.kit.dragon
+    noPermissionsItem:
+      display_item: BARRIER
+      display_name: '&fНабор &x&F&F&7&A&F&E&lᴅ&x&F&F&8&1&F&B&lʀ&x&F&F&8&8&F&7&lᴀ&x&F&F&9&0&F&4&lɢ&x&F&F&9&7&F&0&lᴏ&x&F&F&9&E&E&D&lɴ'
+      display_lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &cНет доступа'
+      - '#F8BEFB&l┃ '
+      - '&7● &fПосмотреть набор &7(ПКМ)'
+    auto_armor: true
+    Commands:
+    - kit dragon
+    Items:
+      '1':
+        id: DIAMOND_SWORD
+        amount: '1'
+        durability: '0'
+        enchants:
+        - FIRE_ASPECT;2
+        - LOOT_BONUS_MOBS;3
+        - DAMAGE_ALL;5
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 0
+      '2':
+        id: DIAMOND_PICKAXE
+        amount: '1'
+        durability: '0'
+        enchants:
+        - DIG_SPEED;5
+        - LOOT_BONUS_BLOCKS;3
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 1
+      '3':
+        id: DIAMOND_SHOVEL
+        amount: '1'
+        durability: '0'
+        enchants:
+        - DIG_SPEED;5
+        - LOOT_BONUS_BLOCKS;2
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 2
+      '4':
+        id: DIAMOND_AXE
+        amount: '1'
+        durability: '0'
+        enchants:
+        - DIG_SPEED;5
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 3
+      '5':
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"test9","score:usage":0};compound
+        id: BOW
+        amount: '1'
+        durability: '0'
+        enchants:
+        - ARROW_FIRE;1
+        - MENDING;1
+        - ARROW_DAMAGE;5
+        - DURABILITY;2
+        unbreakable: 'false'
+        preview_slot: 4
+      '6':
+        id: GOLDEN_APPLE
+        amount: '48'
+        durability: '0'
+        preview_slot: 5
+      '7':
+        id: COOKED_BEEF
+        amount: '64'
+        durability: '0'
+        preview_slot: 6
+      '8':
+        attributes:
+          GENERIC_MAX_HEALTH:
+            modifiers:
+            - generic.max_health;4.0;ADD_NUMBER;29f6243e-09ad-4a4b-b98e-fd0a3118a624;OFF_HAND
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"totem2","score:usage":1};compound
+        id: TOTEM_OF_UNDYING
+        amount: '1'
+        durability: '0'
+        name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BТ&x&F&4&B&E&F&Bо&x&F&0&B&F&F&Bт&x&E&C&B&F&F&Bе&x&E&8&B&F&F&Bм
+          &x&E&4&B&F&F&Bд&x&E&0&C&0&F&Bо&x&D&C&C&0&F&Bк&x&D&8&C&0&F&Bт&x&D&4&C&0&F&Bо&x&D&0&C&0&F&Bр&x&C&C&C&1&F&Bа
+          &x&F&8&B&E&F&B»'
+        lore:
+        - '&x&F&8&B&E&F&B&l┃ '
+        - '&x&F&8&B&E&F&B&l┃ &fУсловие: &x&F&8&B&E&F&BВ левой руке'
+        - '&x&F&8&B&E&F&B&l┃ &fБонус: &x&F&8&B&E&F&B+4 к макс. здоровью'
+        - '&x&F&8&B&E&F&B&l┃ '
+        enchants:
+        - PROTECTION_FALL;6
+        hide-flags:
+        - HIDE_ENCHANTS
+        - HIDE_ATTRIBUTES
+        unbreakable: 'false'
+        preview_slot: 7
+      '9':
+        id: TOTEM_OF_UNDYING
+        amount: '1'
+        durability: '0'
+        preview_slot: 8
+      '10':
+        id: TOTEM_OF_UNDYING
+        amount: '1'
+        durability: '0'
+        preview_slot: 9
+      '11':
+        id: TOTEM_OF_UNDYING
+        amount: '1'
+        durability: '0'
+        preview_slot: 10
+      '12':
+        id: TOTEM_OF_UNDYING
+        amount: '1'
+        durability: '0'
+        preview_slot: 11
+      '13':
+        id: TOTEM_OF_UNDYING
+        amount: '1'
+        durability: '0'
+        preview_slot: 12
+      '14':
+        id: ENDER_PEARL
+        amount: '16'
+        durability: '0'
+        preview_slot: 13
+      '15':
+        id: ENDER_PEARL
+        amount: '16'
+        durability: '0'
+        preview_slot: 14
+      '16':
+        id: CHORUS_FRUIT
+        amount: '64'
+        durability: '0'
+        preview_slot: 15
+      '17':
+        id: NETHERITE_SCRAP
+        amount: '4'
+        durability: '0'
+        preview_slot: 16
+      '18':
+        id: BOOK
+        amount: '16'
+        durability: '0'
+        preview_slot: 17
+      '19':
+        potion-effects:
+        - INCREASE_DAMAGE;1;1800
+        - SPEED;1;1800
+        - FIRE_RESISTANCE;0;9600
+        potion-color: '13103616'
+        potion-type: WATER
+        potion-upgraded: 'false'
+        potion-extended: 'false'
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"potion_voina","score:usage":1};compound
+        id: POTION
+        amount: '2'
+        durability: '0'
+        name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BЗ&x&F&4&B&E&F&Bе&x&F&0&B&F&F&Bл&x&E&C&B&F&F&Bь&x&E&8&B&F&F&Bе
+          &x&E&4&B&F&F&BВ&x&E&0&C&0&F&Bо&x&D&C&C&0&F&Bй&x&D&8&C&0&F&Bн&x&D&4&C&0&F&Bы
+          &x&F&8&B&E&F&B»'
+        unbreakable: 'false'
+        preview_slot: 18
+      '20':
+        id: DIAMOND
+        amount: '64'
+        durability: '0'
+        preview_slot: 19
+      '21':
+        id: IRON_INGOT
+        amount: '64'
+        durability: '0'
+        preview_slot: 20
+      '22':
+        id: ARROW
+        amount: '64'
+        durability: '0'
+        preview_slot: 21
+      '23':
+        id: EXPERIENCE_BOTTLE
+        amount: '64'
+        durability: '0'
+        preview_slot: 22
+      '24':
+        id: EXPERIENCE_BOTTLE
+        amount: '64'
+        durability: '0'
+        preview_slot: 23
+      '25':
+        id: EXPERIENCE_BOTTLE
+        amount: '64'
+        durability: '0'
+        preview_slot: 24
+      '26':
+        id: GOLD_INGOT
+        amount: '64'
+        durability: '0'
+        preview_slot: 25
+      '27':
+        id: IRON_INGOT
+        amount: '32'
+        durability: '0'
+        preview_slot: 26
+      '28':
+        id: COAL
+        amount: '64'
+        durability: '0'
+        preview_slot: 27
+      '29':
+        id: COAL
+        amount: '64'
+        durability: '0'
+        preview_slot: 28
+      '30':
+        id: GLOWSTONE
+        amount: '64'
+        durability: '0'
+        preview_slot: 29
+      '31':
+        id: NETHERITE_HELMET
+        amount: '1'
+        durability: '0'
+        enchants:
+        - PROTECTION_FIRE;2
+        - PROTECTION_ENVIRONMENTAL;4
+        - OXYGEN;2
+        - DURABILITY;3
+        unbreakable: 'false'
+        preview_slot: 36
+      '32':
+        id: DIAMOND_CHESTPLATE
+        amount: '1'
+        durability: '0'
+        enchants:
+        - PROTECTION_FIRE;1
+        - PROTECTION_ENVIRONMENTAL;4
+        - DURABILITY;3
+        unbreakable: 'false'
+        preview_slot: 37
+      '33':
+        id: DIAMOND_LEGGINGS
+        amount: '1'
+        durability: '0'
+        enchants:
+        - PROTECTION_FIRE;1
+        - PROTECTION_ENVIRONMENTAL;4
+        - DURABILITY;3
+        unbreakable: 'false'
+        preview_slot: 38
+      '34':
+        id: NETHERITE_BOOTS
+        amount: '1'
+        durability: '0'
+        enchants:
+        - PROTECTION_FIRE;2
+        - PROTECTION_ENVIRONMENTAL;4
+        - DURABILITY;3
+        unbreakable: 'false'
+        preview_slot: 39
+  elder:
+    slot: 23
+    display_item: PURPLE_SHULKER_BOX
+    display_name: '&fНабор &x&A&C&7&2&F&F&lᴇ&x&A&F&7&4&F&F&lʟ&x&B&3&7&6&F&F&lᴅ&x&B&6&7&8&F&F&lᴇ&x&B&9&7&A&F&F&lʀ'
+    display_lore:
+    - '#F8BEFB&l┃ '
+    - '#F8BEFB&l┃ &fСтатус: &aМожно получить'
+    - '#F8BEFB&l┃ '
+    - '&7● &fВзять набор &7(ЛКМ)'
+    - '&7● &fПосмотреть набор &7(ПКМ)'
+    cooldown: 86400
+    permission: playerkits.kit.elder
+    noPermissionsItem:
+      display_item: BARRIER
+      display_name: '&fНабор &x&A&C&7&2&F&F&lᴇ&x&A&F&7&4&F&F&lʟ&x&B&3&7&6&F&F&lᴅ&x&B&6&7&8&F&F&lᴇ&x&B&9&7&A&F&F&lʀ'
+      display_lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &cНет доступа'
+      - '#F8BEFB&l┃ '
+      - '&7● &fПосмотреть набор &7(ПКМ)'
+    auto_armor: true
+    Commands:
+    - kit elder
+    Items:
+      '1':
+        id: NETHERITE_SWORD
+        amount: '1'
+        durability: '0'
+        enchants:
+        - FIRE_ASPECT;2
+        - LOOT_BONUS_MOBS;3
+        - DAMAGE_ALL;5
+        - DURABILITY;3
+        unbreakable: 'false'
+        preview_slot: 0
+      '2':
+        id: NETHERITE_PICKAXE
+        amount: '1'
+        durability: '0'
+        enchants:
+        - DIG_SPEED;5
+        - LOOT_BONUS_BLOCKS;3
+        - DURABILITY;3
+        unbreakable: 'false'
+        preview_slot: 1
+      '3':
+        id: NETHERITE_AXE
+        amount: '1'
+        durability: '0'
+        enchants:
+        - DIG_SPEED;5
+        - DURABILITY;3
+        unbreakable: 'false'
+        preview_slot: 2
+      '4':
+        id: NETHERITE_SHOVEL
+        amount: '1'
+        durability: '0'
+        enchants:
+        - DIG_SPEED;5
+        - LOOT_BONUS_BLOCKS;3
+        - DURABILITY;3
+        unbreakable: 'false'
+        preview_slot: 3
+      '5':
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"test9","score:usage":0};compound
+        id: BOW
+        amount: '1'
+        durability: '0'
+        enchants:
+        - ARROW_FIRE;1
+        - MENDING;1
+        - ARROW_DAMAGE;5
+        - DURABILITY;3
+        unbreakable: 'false'
+        preview_slot: 4
+      '6':
+        id: GOLDEN_APPLE
+        amount: '64'
+        durability: '0'
+        preview_slot: 5
+      '7':
+        id: ENCHANTED_GOLDEN_APPLE
+        amount: '1'
+        durability: '0'
+        preview_slot: 6
+      '8':
+        id: GOLDEN_CARROT
+        amount: '64'
+        durability: '0'
+        preview_slot: 7
+      '9':
+        skull-texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTFiNGIyMDE4OWQ5MDJiYzZjM2ZhYmUyM2Q5ZjU3ODY5N2Y1NDRjZjQxNTMxNzc4NzM3NDExODM5M2RhNCJ9fX0=
+        nbt:
+        - customitems-uuid;6da86798-c324-46e2-bee1-1c3968a17b51
+        id: PLAYER_HEAD
+        amount: '1'
+        durability: '3'
+        name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BШ&x&F&4&B&E&F&Bа&x&F&0&B&F&F&Bр &x&E&C&B&F&F&BЗ&x&E&8&B&F&F&Bм&x&E&4&B&F&F&Bе&x&E&0&C&0&F&Bи
+          &x&F&8&B&E&F&B»'
+        lore:
+        - '&x&F&8&B&E&F&B&l┃ '
+        - '&x&F&8&B&E&F&B&l┃ &fЭффект: &x&F&8&B&E&F&BСила II'
+        - '&x&F&8&B&E&F&B&l┃ &fЭффект: &x&F&8&B&E&F&BСкорость I'
+        - '&x&F&8&B&E&F&B&l┃ &fЭффект: &x&F&8&B&E&F&BСопротивление I'
+        - '&x&F&8&B&E&F&B&l┃ &fЭффект: &x&F&8&B&E&F&BОгнестойкость I'
+        - '&x&F&8&B&E&F&B&l┃ '
+        unbreakable: 'false'
+        preview_slot: 8
+      '10':
+        attributes:
+          GENERIC_MAX_HEALTH:
+            modifiers:
+            - generic.max_health;4.0;ADD_NUMBER;29f6243e-09ad-4a4b-b98e-fd0a3118a624;OFF_HAND
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"totem2","score:usage":1};compound
+        id: TOTEM_OF_UNDYING
+        amount: '1'
+        durability: '0'
+        name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BТ&x&F&4&B&E&F&Bо&x&F&0&B&F&F&Bт&x&E&C&B&F&F&Bе&x&E&8&B&F&F&Bм
+          &x&E&4&B&F&F&Bд&x&E&0&C&0&F&Bо&x&D&C&C&0&F&Bк&x&D&8&C&0&F&Bт&x&D&4&C&0&F&Bо&x&D&0&C&0&F&Bр&x&C&C&C&1&F&Bа
+          &x&F&8&B&E&F&B»'
+        lore:
+        - '&x&F&8&B&E&F&B&l┃ '
+        - '&x&F&8&B&E&F&B&l┃ &fУсловие: &x&F&8&B&E&F&BВ левой руке'
+        - '&x&F&8&B&E&F&B&l┃ &fБонус: &x&F&8&B&E&F&B+4 к макс. здоровью'
+        - '&x&F&8&B&E&F&B&l┃ '
+        enchants:
+        - PROTECTION_FALL;6
+        hide-flags:
+        - HIDE_ENCHANTS
+        - HIDE_ATTRIBUTES
+        unbreakable: 'false'
+        preview_slot: 9
+      '11':
+        attributes:
+          GENERIC_MAX_HEALTH:
+            modifiers:
+            - generic.max_health;4.0;ADD_NUMBER;29f6243e-09ad-4a4b-b98e-fd0a3118a624;OFF_HAND
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"totem2","score:usage":1};compound
+        id: TOTEM_OF_UNDYING
+        amount: '1'
+        durability: '0'
+        name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BТ&x&F&4&B&E&F&Bо&x&F&0&B&F&F&Bт&x&E&C&B&F&F&Bе&x&E&8&B&F&F&Bм
+          &x&E&4&B&F&F&Bд&x&E&0&C&0&F&Bо&x&D&C&C&0&F&Bк&x&D&8&C&0&F&Bт&x&D&4&C&0&F&Bо&x&D&0&C&0&F&Bр&x&C&C&C&1&F&Bа
+          &x&F&8&B&E&F&B»'
+        lore:
+        - '&x&F&8&B&E&F&B&l┃ '
+        - '&x&F&8&B&E&F&B&l┃ &fУсловие: &x&F&8&B&E&F&BВ левой руке'
+        - '&x&F&8&B&E&F&B&l┃ &fБонус: &x&F&8&B&E&F&B+4 к макс. здоровью'
+        - '&x&F&8&B&E&F&B&l┃ '
+        enchants:
+        - PROTECTION_FALL;6
+        hide-flags:
+        - HIDE_ENCHANTS
+        - HIDE_ATTRIBUTES
+        unbreakable: 'false'
+        preview_slot: 10
+      '12':
+        id: TOTEM_OF_UNDYING
+        amount: '1'
+        durability: '0'
+        preview_slot: 11
+      '13':
+        id: TOTEM_OF_UNDYING
+        amount: '1'
+        durability: '0'
+        preview_slot: 12
+      '14':
+        id: TOTEM_OF_UNDYING
+        amount: '1'
+        durability: '0'
+        preview_slot: 13
+      '15':
+        id: TOTEM_OF_UNDYING
+        amount: '1'
+        durability: '0'
+        preview_slot: 14
+      '16':
+        id: TOTEM_OF_UNDYING
+        amount: '1'
+        durability: '0'
+        preview_slot: 15
+      '17':
+        id: ENDER_PEARL
+        amount: '16'
+        durability: '0'
+        preview_slot: 16
+      '18':
+        id: ENDER_PEARL
+        amount: '16'
+        durability: '0'
+        preview_slot: 17
+      '19':
+        id: OBSIDIAN
+        amount: '16'
+        durability: '0'
+        preview_slot: 18
+      '20':
+        id: END_CRYSTAL
+        amount: '16'
+        durability: '0'
+        preview_slot: 19
+      '21':
+        potion-effects:
+        - INCREASE_DAMAGE;1;1800
+        - SPEED;1;1800
+        - FIRE_RESISTANCE;0;9600
+        potion-color: '13103616'
+        potion-type: WATER
+        potion-upgraded: 'false'
+        potion-extended: 'false'
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"potion_voina","score:usage":1};compound
+        id: POTION
+        amount: '4'
+        durability: '0'
+        name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BЗ&x&F&4&B&E&F&Bе&x&F&0&B&F&F&Bл&x&E&C&B&F&F&Bь&x&E&8&B&F&F&Bе
+          &x&E&4&B&F&F&BВ&x&E&0&C&0&F&Bо&x&D&C&C&0&F&Bй&x&D&8&C&0&F&Bн&x&D&4&C&0&F&Bы
+          &x&F&8&B&E&F&B»'
+        unbreakable: 'false'
+        preview_slot: 20
+      '22':
+        id: SPIDER_SPAWN_EGG
+        amount: '1'
+        durability: '0'
+        preview_slot: 21
+      '23':
+        id: FURNACE
+        amount: '1'
+        durability: '0'
+        name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BБ&x&F&4&B&E&F&Bы&x&F&0&B&F&F&Bс&x&E&C&B&F&F&Bт&x&E&8&B&F&F&Bр&x&E&4&B&F&F&Bа&x&E&0&C&0&F&Bя
+          &x&D&C&C&0&F&Bп&x&D&8&C&0&F&Bе&x&D&4&C&0&F&Bч&x&D&0&C&0&F&Bк&x&C&C&C&1&F&Bа
+          &x&F&8&B&E&F&B»&5'
+        lore:
+        - '&x&F&8&B&E&F&B&l┃ '
+        - '&x&F&8&B&E&F&B&l┃ &fСкорость плавки: &x&F&8&B&E&F&BВ 2 раза быстрее'
+        - '&x&F&8&B&E&F&B&l┃ '
+        unbreakable: 'false'
+        preview_slot: 22
+      '24':
+        id: COOKED_BEEF
+        amount: '64'
+        durability: '0'
+        preview_slot: 23
+      '25':
+        id: CHORUS_FRUIT
+        amount: '64'
+        durability: '0'
+        preview_slot: 24
+      '26':
+        id: EXPERIENCE_BOTTLE
+        amount: '64'
+        durability: '0'
+        preview_slot: 25
+      '27':
+        id: EXPERIENCE_BOTTLE
+        amount: '32'
+        durability: '0'
+        preview_slot: 26
+      '28':
+        id: ARROW
+        amount: '64'
+        durability: '0'
+        preview_slot: 27
+      '29':
+        id: NETHERITE_HELMET
+        amount: '1'
+        durability: '0'
+        enchants:
+        - PROTECTION_FIRE;2
+        - PROTECTION_ENVIRONMENTAL;4
+        - OXYGEN;2
+        - DURABILITY;3
+        unbreakable: 'false'
+        preview_slot: 36
+      '30':
+        id: NETHERITE_CHESTPLATE
+        amount: '1'
+        durability: '0'
+        enchants:
+        - PROTECTION_FIRE;3
+        - PROTECTION_ENVIRONMENTAL;4
+        - DURABILITY;3
+        unbreakable: 'false'
+        preview_slot: 37
+      '31':
+        id: NETHERITE_LEGGINGS
+        amount: '1'
+        durability: '0'
+        enchants:
+        - PROTECTION_FIRE;3
+        - PROTECTION_ENVIRONMENTAL;4
+        - DURABILITY;3
+        unbreakable: 'false'
+        preview_slot: 38
+      '32':
+        id: NETHERITE_BOOTS
+        amount: '1'
+        durability: '0'
+        enchants:
+        - PROTECTION_FIRE;2
+        - PROTECTION_ENVIRONMENTAL;4
+        - DURABILITY;3
+        unbreakable: 'false'
+        preview_slot: 39
+  eternity:
+    slot: 31
+    display_item: PINK_SHULKER_BOX
+    display_name: '&fНабор &x&F&8&B&E&F&B&lᴇ&x&F&8&B&E&F&B&lᴛ&x&F&8&B&E&F&B&lᴇ&x&F&8&B&E&F&B&lʀ&x&F&8&B&E&F&B&lᴛ&x&F&8&B&E&F&B&lɪ&x&F&8&B&E&F&B&lᴛ&x&F&8&B&E&F&B&lʏ'
+    display_lore:
+    - '#F8BEFB&l┃ '
+    - '#F8BEFB&l┃ &fСтатус: &aМожно получить'
+    - '#F8BEFB&l┃ '
+    - '&7● &fВзять набор &7(ЛКМ)'
+    - '&7● &fПосмотреть набор &7(ПКМ)'
+    cooldown: 86400
+    permission: playerkits.kit.eternity
+    noPermissionsItem:
+      display_item: BARRIER
+      display_name: '&fНабор &x&F&8&B&E&F&B&lᴇ&x&F&8&B&E&F&B&lᴛ&x&F&8&B&E&F&B&lᴇ&x&F&8&B&E&F&B&lʀ&x&F&8&B&E&F&B&lᴛ&x&F&8&B&E&F&B&lɪ&x&F&8&B&E&F&B&lᴛ&x&F&8&B&E&F&B&lʏ'
+      display_lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &cНет доступа'
+      - '#F8BEFB&l┃ '
+      - '&7● &fПосмотреть набор &7(ПКМ)'
+    Commands:
+    - kit eternity
+    Items:
+      '1':
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"shalker5","score:usage":1};compound
+        id: NETHERITE_SWORD
+        amount: '1'
+        durability: '0'
+        name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BМ&x&F&3&B&E&F&Bе&x&E&E&B&F&F&Bч &x&E&9&B&F&F&Bш&x&E&4&B&F&F&Bа&x&D&F&C&0&F&Bл&x&D&A&C&0&F&Bк&x&D&5&C&0&F&Bе&x&D&0&C&0&F&Bр&x&C&B&C&1&F&Bа&x&F&8&B&E&F&B
+          »'
+        enchants:
+        - FIRE_ASPECT;2
+        - MENDING;1
+        - DAMAGE_ALL;6
+        - DURABILITY;4
+        unbreakable: 'false'
+        preview_slot: 0
+      '2':
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"shalker6","score:usage":1};compound
+        id: NETHERITE_PICKAXE
+        amount: '1'
+        durability: '0'
+        name: '&&x&F&8&B&E&F&B« &x&F&8&B&E&F&BК&x&F&3&B&E&F&Bи&x&E&E&B&F&F&Bр&x&E&9&B&F&F&Bк&x&E&4&B&F&F&Bа
+          &x&D&F&C&0&F&Bш&x&D&A&C&0&F&Bа&x&D&5&C&0&F&Bл&x&D&0&C&0&F&Bк&x&C&B&C&1&F&Bе&x&C&6&C&1&F&Bр&x&C&1&C&1&F&Bа&x&F&8&B&E&F&B
+          »'
+        enchants:
+        - DIG_SPEED;6
+        - LOOT_BONUS_BLOCKS;3
+        - MENDING;1
+        - DURABILITY;4
+        unbreakable: 'false'
+        preview_slot: 1
+      '3':
+        id: NETHERITE_AXE
+        amount: '1'
+        durability: '0'
+        enchants:
+        - DIG_SPEED;5
+        - DURABILITY;3
+        unbreakable: 'false'
+        preview_slot: 2
+      '4':
+        id: NETHERITE_SHOVEL
+        amount: '1'
+        durability: '0'
+        enchants:
+        - DIG_SPEED;5
+        - LOOT_BONUS_BLOCKS;3
+        - DURABILITY;3
+        unbreakable: 'false'
+        preview_slot: 3
+      '5':
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"test9","score:usage":0};compound
+        id: BOW
+        amount: '1'
+        durability: '0'
+        enchants:
+        - ARROW_FIRE;1
+        - MENDING;1
+        - ARROW_DAMAGE;5
+        - DURABILITY;3
+        unbreakable: 'false'
+        preview_slot: 4
+      '6':
+        skull-texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjg5MDQyMDgyYmI3YTc2MThiNzg0ZWU3NjA1YTEzNGM1ODgzNGUyMWUzNzRjODg4OTM3MTYxMDU3ZjZjNyJ9fX0=
+        nbt:
+        - customitems-uuid;ae9849c4-dabf-4d2f-ae67-49ba454f2d42
+        id: PLAYER_HEAD
+        amount: '1'
+        durability: '3'
+        name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BШ&x&F&4&B&E&F&Bа&x&F&0&B&F&F&Bр &x&E&C&B&F&F&BС&x&E&8&B&F&F&Bо&x&E&4&B&F&F&Bл&x&E&0&C&0&F&Bн&x&D&C&C&0&F&Bц&x&D&8&C&0&F&Bа
+          &x&F&8&B&E&F&B»'
+        lore:
+        - '&x&F&8&B&E&F&B&l┃ '
+        - '&x&F&8&B&E&F&B&l┃ &fЭффект: &x&F&8&B&E&F&BСила II'
+        - '&x&F&8&B&E&F&B&l┃ &fЭффект: &x&F&8&B&E&F&BСкорость II'
+        - '&x&F&8&B&E&F&B&l┃ &fЭффект: &x&F&8&B&E&F&BСопротивление I'
+        - '&x&F&8&B&E&F&B&l┃ &fЭффект: &x&F&8&B&E&F&BОгнестойкость I'
+        - '&x&F&8&B&E&F&B&l┃ '
+        unbreakable: 'false'
+        preview_slot: 5
+      '7':
+        attributes:
+          GENERIC_ARMOR:
+            modifiers:
+            - generic.armor;3.0;ADD_NUMBER;98109494-62d7-4f66-83c4-a2042411114e;OFF_HAND
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"totem3","score:usage":1};compound
+        id: TOTEM_OF_UNDYING
+        amount: '1'
+        durability: '0'
+        name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BТ&x&F&5&B&E&F&Bо&x&F&2&B&E&F&Bт&x&E&F&B&F&F&Bе&x&E&C&B&F&F&Bм
+          &x&E&9&B&F&F&Bб&x&E&6&B&F&F&Bо&x&E&3&B&F&F&Bг&x&E&0&C&0&F&Bа&x&D&D&C&0&F&Bт&x&D&A&C&0&F&Bы&x&D&7&C&0&F&Bр&x&D&4&C&0&F&Bя
+          &x&F&8&B&E&F&B»'
+        lore:
+        - '&x&F&8&B&E&F&B&l┃ '
+        - '&x&F&8&B&E&F&B&l┃ &fУсловие: &x&F&8&B&E&F&BВ левой руке'
+        - '&x&F&8&B&E&F&B&l┃ &fБонус: &x&F&8&B&E&F&B+3 к броне'
+        - '&x&F&8&B&E&F&B&l┃ '
+        enchants:
+        - PROTECTION_FALL;6
+        hide-flags:
+        - HIDE_ENCHANTS
+        - HIDE_ATTRIBUTES
+        unbreakable: 'false'
+        preview_slot: 6
+      '8':
+        attributes:
+          GENERIC_ARMOR:
+            modifiers:
+            - generic.armor;3.0;ADD_NUMBER;98109494-62d7-4f66-83c4-a2042411114e;OFF_HAND
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"totem3","score:usage":1};compound
+        id: TOTEM_OF_UNDYING
+        amount: '1'
+        durability: '0'
+        name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BТ&x&F&5&B&E&F&Bо&x&F&2&B&E&F&Bт&x&E&F&B&F&F&Bе&x&E&C&B&F&F&Bм
+          &x&E&9&B&F&F&Bб&x&E&6&B&F&F&Bо&x&E&3&B&F&F&Bг&x&E&0&C&0&F&Bа&x&D&D&C&0&F&Bт&x&D&A&C&0&F&Bы&x&D&7&C&0&F&Bр&x&D&4&C&0&F&Bя
+          &x&F&8&B&E&F&B»'
+        lore:
+        - '&x&F&8&B&E&F&B&l┃ '
+        - '&x&F&8&B&E&F&B&l┃ &fУсловие: &x&F&8&B&E&F&BВ левой руке'
+        - '&x&F&8&B&E&F&B&l┃ &fБонус: &x&F&8&B&E&F&B+3 к броне'
+        - '&x&F&8&B&E&F&B&l┃ '
+        enchants:
+        - PROTECTION_FALL;6
+        hide-flags:
+        - HIDE_ENCHANTS
+        - HIDE_ATTRIBUTES
+        unbreakable: 'false'
+        preview_slot: 7
+      '9':
+        attributes:
+          GENERIC_ARMOR:
+            modifiers:
+            - generic.armor;3.0;ADD_NUMBER;98109494-62d7-4f66-83c4-a2042411114e;OFF_HAND
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"totem3","score:usage":1};compound
+        id: TOTEM_OF_UNDYING
+        amount: '1'
+        durability: '0'
+        name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BТ&x&F&5&B&E&F&Bо&x&F&2&B&E&F&Bт&x&E&F&B&F&F&Bе&x&E&C&B&F&F&Bм
+          &x&E&9&B&F&F&Bб&x&E&6&B&F&F&Bо&x&E&3&B&F&F&Bг&x&E&0&C&0&F&Bа&x&D&D&C&0&F&Bт&x&D&A&C&0&F&Bы&x&D&7&C&0&F&Bр&x&D&4&C&0&F&Bя
+          &x&F&8&B&E&F&B»'
+        lore:
+        - '&x&F&8&B&E&F&B&l┃ '
+        - '&x&F&8&B&E&F&B&l┃ &fУсловие: &x&F&8&B&E&F&BВ левой руке'
+        - '&x&F&8&B&E&F&B&l┃ &fБонус: &x&F&8&B&E&F&B+3 к броне'
+        - '&x&F&8&B&E&F&B&l┃ '
+        enchants:
+        - PROTECTION_FALL;6
+        hide-flags:
+        - HIDE_ENCHANTS
+        - HIDE_ATTRIBUTES
+        unbreakable: 'false'
+        preview_slot: 8
+      '10':
+        id: TOTEM_OF_UNDYING
+        amount: '1'
+        durability: '0'
+        preview_slot: 9
+      '11':
+        id: TOTEM_OF_UNDYING
+        amount: '1'
+        durability: '0'
+        preview_slot: 10
+      '12':
+        id: ENDER_PEARL
+        amount: '16'
+        durability: '0'
+        preview_slot: 11
+      '13':
+        id: ENDER_PEARL
+        amount: '16'
+        durability: '0'
+        preview_slot: 12
+      '14':
+        id: ENDER_PEARL
+        amount: '16'
+        durability: '0'
+        preview_slot: 13
+      '15':
+        id: END_CRYSTAL
+        amount: '32'
+        durability: '0'
+        preview_slot: 14
+      '16':
+        id: OBSIDIAN
+        amount: '48'
+        durability: '0'
+        preview_slot: 15
+      '17':
+        potion-effects:
+        - INCREASE_DAMAGE;1;1800
+        - SPEED;1;1800
+        - FIRE_RESISTANCE;0;9600
+        potion-color: '13103616'
+        potion-type: WATER
+        potion-upgraded: 'false'
+        potion-extended: 'false'
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"potion_voina","score:usage":1};compound
+        id: POTION
+        amount: '6'
+        durability: '0'
+        name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BЗ&x&F&4&B&E&F&Bе&x&F&0&B&F&F&Bл&x&E&C&B&F&F&Bь&x&E&8&B&F&F&Bе
+          &x&E&4&B&F&F&BВ&x&E&0&C&0&F&Bо&x&D&C&C&0&F&Bй&x&D&8&C&0&F&Bн&x&D&4&C&0&F&Bы
+          &x&F&8&B&E&F&B»'
+        unbreakable: 'false'
+        preview_slot: 16
+      '18':
+        potion-effects:
+        - SPEED;2;900
+        - FAST_DIGGING;0;3600
+        potion-color: '13513912'
+        potion-type: WATER
+        potion-upgraded: 'false'
+        potion-extended: 'false'
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"potion_lightness","score:usage":1};compound
+        id: POTION
+        amount: '1'
+        durability: '0'
+        name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BЗ&x&F&5&B&E&F&Bе&x&F&2&B&E&F&Bл&x&E&F&B&F&F&Bь&x&E&C&B&F&F&Bе
+          &x&E&9&B&F&F&BЛ&x&E&6&B&F&F&Bё&x&E&3&B&F&F&Bг&x&E&0&C&0&F&Bк&x&D&D&C&0&F&Bо&x&D&A&C&0&F&Bс&x&D&7&C&0&F&Bт&x&D&4&C&0&F&Bи
+          &x&F&8&B&E&F&B»'
+        unbreakable: 'false'
+        preview_slot: 17
+      '19':
+        id: EXPERIENCE_BOTTLE
+        amount: '64'
+        durability: '0'
+        preview_slot: 18
+      '20':
+        id: EXPERIENCE_BOTTLE
+        amount: '64'
+        durability: '0'
+        preview_slot: 19
+      '21':
+        id: GOLDEN_APPLE
+        amount: '64'
+        durability: '0'
+        preview_slot: 20
+      '22':
+        id: ENCHANTED_GOLDEN_APPLE
+        amount: '2'
+        durability: '0'
+        preview_slot: 21
+      '23':
+        id: FURNACE
+        amount: '1'
+        durability: '0'
+        name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BП&x&F&4&B&E&F&Bе&x&F&0&B&F&F&Bч&x&E&C&B&F&F&Bк&x&E&8&B&F&F&Bа
+          &x&E&4&B&F&F&Bд&x&E&0&C&0&F&Bю&x&D&C&C&0&F&Bп&x&D&8&C&0&F&Bе&x&D&4&C&0&F&Bр&x&D&0&C&0&F&Bа
+          &x&F&8&B&E&F&B»&5'
+        lore:
+        - '&x&F&8&B&E&F&B&l┃ '
+        - '&x&F&8&B&E&F&B&l┃ &fЭффективность: &x&F&8&B&E&F&BВ 2 раза больше руды'
+        - '&x&F&8&B&E&F&B&l┃ '
+        unbreakable: 'false'
+        preview_slot: 22
+      '24':
+        id: BREWING_STAND
+        amount: '1'
+        durability: '0'
+        name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BБ&x&F&4&B&E&F&Bы&x&F&0&B&F&F&Bс&x&E&C&B&F&F&Bт&x&E&8&B&F&F&Bр&x&E&4&B&F&F&Bа&x&E&0&C&0&F&Bя
+          &x&D&C&C&0&F&Bз&x&D&8&C&0&F&Bе&x&D&4&C&0&F&Bл&x&D&0&C&0&F&Bь&x&C&C&C&1&F&Bе&x&C&8&C&1&F&Bв&x&C&4&C&1&F&Bа&x&C&0&C&1&F&Bр&x&B&C&C&1&F&Bк&x&B&8&C&1&F&Bа
+          &x&F&8&B&E&F&B»&5'
+        lore:
+        - '&x&F&8&B&E&F&B&l┃ '
+        - '&x&F&8&B&E&F&B&l┃ &fЭкономия: &x&F&8&B&E&F&BВ 2 раза меньше топлива'
+        - '&x&F&8&B&E&F&B&l┃ '
+        unbreakable: 'false'
+        preview_slot: 23
+      '25':
+        id: COOKED_BEEF
+        amount: '64'
+        durability: '0'
+        preview_slot: 24
+      '26':
+        id: GOLDEN_CARROT
+        amount: '64'
+        durability: '0'
+        preview_slot: 25
+      '27':
+        id: CHORUS_FRUIT
+        amount: '64'
+        durability: '0'
+        preview_slot: 26
+      '28':
+        id: ARROW
+        amount: '64'
+        durability: '0'
+        preview_slot: 27
+      '29':
+        potion-effects:
+        - CONFUSION;1;200
+        - POISON;1;200
+        potion-color: '6194613'
+        potion-type: WATER
+        potion-upgraded: 'false'
+        potion-extended: 'false'
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"arrow3","score:usage":1};compound
+        id: TIPPED_ARROW
+        amount: '8'
+        durability: '0'
+        name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BС&x&F&4&B&E&F&Bт&x&F&0&B&F&F&Bр&x&E&C&B&F&F&Bе&x&E&8&B&F&F&Bл&x&E&4&B&F&F&Bа
+          &x&E&0&C&0&F&Bп&x&D&C&C&0&F&Bс&x&D&8&C&0&F&Bи&x&D&4&C&0&F&Bх&x&D&0&C&0&F&Bа
+          &x&F&8&B&E&F&B»'
+        lore:
+        - '&x&F&8&B&E&F&B&l┃ '
+        - '&x&F&8&B&E&F&B&l┃ &fЭффект: &x&F&8&B&E&F&BТошнота II &8(&x&F&8&B&E&F&B0:10&8)'
+        - '&x&F&8&B&E&F&B&l┃ &fЭффект: &x&F&8&B&E&F&BОтравление II &8(&x&F&8&B&E&F&B0:10&8)'
+        - '&x&F&8&B&E&F&B&l┃ '
+        hide-flags:
+        - HIDE_POTION_EFFECTS
+        unbreakable: 'false'
+        preview_slot: 28
+      '30':
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"shalker1","score:usage":1};compound
+        id: NETHERITE_HELMET
+        amount: '1'
+        durability: '0'
+        name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BШ&x&F&3&B&E&F&Bл&x&E&E&B&F&F&Bе&x&E&9&B&F&F&Bм
+          &x&E&4&B&F&F&Bш&x&D&F&C&0&F&Bа&x&D&A&C&0&F&Bл&x&D&5&C&0&F&Bк&x&D&0&C&0&F&Bе&x&C&B&C&1&F&Bр&x&C&6&C&1&F&Bа
+          &x&F&8&B&E&F&B»'
+        enchants:
+        - MENDING;1
+        - PROTECTION_ENVIRONMENTAL;4
+        - OXYGEN;2
+        - DURABILITY;4
+        unbreakable: 'false'
+        preview_slot: 36
+      '31':
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"shalker2","score:usage":1};compound
+        id: NETHERITE_CHESTPLATE
+        amount: '1'
+        durability: '0'
+        name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BН&x&F&5&B&E&F&Bа&x&F&2&B&E&F&Bг&x&E&F&B&F&F&Bр&x&E&C&B&F&F&Bу&x&E&9&B&F&F&Bд&x&E&6&B&F&F&Bн&x&E&3&B&F&F&Bи&x&E&0&C&0&F&Bк
+          &x&D&D&C&0&F&Bш&x&D&A&C&0&F&Bа&x&D&7&C&0&F&Bл&x&D&4&C&0&F&Bк&x&D&1&C&0&F&Bе&x&C&E&C&0&F&Bр&x&C&B&C&1&F&Bа
+          &x&F&8&B&E&F&B»'
+        enchants:
+        - PROTECTION_EXPLOSIONS;4
+        - MENDING;1
+        - PROTECTION_ENVIRONMENTAL;4
+        - DURABILITY;4
+        unbreakable: 'false'
+        preview_slot: 37
+      '32':
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"shalker3","score:usage":1};compound
+        id: NETHERITE_LEGGINGS
+        amount: '1'
+        durability: '0'
+        name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BП&x&F&4&B&E&F&Bо&x&F&0&B&F&F&Bн&x&E&C&B&F&F&Bо&x&E&8&B&F&F&Bж&x&E&4&B&F&F&Bи
+          &x&E&0&C&0&F&Bш&x&D&C&C&0&F&Bа&x&D&8&C&0&F&Bл&x&D&4&C&0&F&Bк&x&D&0&C&0&F&Bе&x&C&C&C&1&F&Bр&x&C&8&C&1&F&Bа
+          &x&F&8&B&E&F&B»'
+        enchants:
+        - PROTECTION_EXPLOSIONS;4
+        - MENDING;1
+        - PROTECTION_ENVIRONMENTAL;4
+        - DURABILITY;4
+        unbreakable: 'false'
+        preview_slot: 38
+      '33':
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"shalker4","score:usage":1};compound
+        id: NETHERITE_BOOTS
+        amount: '1'
+        durability: '0'
+        name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BБ&x&F&4&B&E&F&Bо&x&F&0&B&F&F&Bт&x&E&C&B&F&F&Bи&x&E&8&B&F&F&Bн&x&E&4&B&F&F&Bк&x&E&0&C&0&F&Bи
+          &x&D&C&C&0&F&Bш&x&D&8&C&0&F&Bа&x&D&4&C&0&F&Bл&x&D&0&C&0&F&Bк&x&C&C&C&1&F&Bе&x&C&8&C&1&F&Bр&x&C&4&C&1&F&Bа
+          &x&F&8&B&E&F&B»'
+        enchants:
+        - PROTECTION_EXPLOSIONS;4
+        - DEPTH_STRIDER;3
+        - PROTECTION_FALL;4
+        - MENDING;1
+        - PROTECTION_ENVIRONMENTAL;4
+        - DURABILITY;4
+        unbreakable: 'false'
+        preview_slot: 39
+  plus:
+    slot: 34
+    display_item: brown_dye
+    display_name: '&fНабор &x&F&4&5&F&0&9&lᴘʟᴜs'
+    display_lore:
+    - '#F8BEFB&l┃ '
+    - '#F8BEFB&l┃ &fСтатус: &aМожно получить'
+    - '#F8BEFB&l┃ '
+    - '&7● &fВзять набор &7(ЛКМ)'
+    - '&7● &fПосмотреть набор &7(ПКМ)'
+    cooldown: 259200
+    noPermissionsItem:
+      display_item: BARRIER
+      display_name: '&fНабор &x&F&4&5&F&0&9&lᴘʟᴜs'
+      display_lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &cНет доступа'
+      - '#F8BEFB&l┃ '
+      - '&7● &fПосмотреть набор &7(ПКМ)'
+    permission: playerkits.kit.plus
+    Items:
+      '1':
+        potion-type: FIRE_RESISTANCE
+        potion-upgraded: 'false'
+        potion-extended: 'true'
+        id: POTION
+        amount: '3'
+        durability: '0'
+        unbreakable: 'false'
+        preview_slot: 0
+      '2':
+        potion-type: SPEED
+        potion-upgraded: 'true'
+        potion-extended: 'false'
+        id: POTION
+        amount: '3'
+        durability: '0'
+        unbreakable: 'false'
+        preview_slot: 1
+      '3':
+        potion-type: STRENGTH
+        potion-upgraded: 'true'
+        potion-extended: 'false'
+        id: POTION
+        amount: '3'
+        durability: '0'
+        unbreakable: 'false'
+        preview_slot: 2
+      '4':
+        id: GOLDEN_APPLE
+        amount: '64'
+        durability: '0'
+        preview_slot: 3
+      '5':
+        id: EXPERIENCE_BOTTLE
+        amount: '64'
+        durability: '0'
+        preview_slot: 4
+      '6':
+        id: EXPERIENCE_BOTTLE
+        amount: '64'
+        durability: '0'
+        preview_slot: 5
+      '7':
+        id: EXPERIENCE_BOTTLE
+        amount: '64'
+        durability: '0'
+        preview_slot: 6
+      '8':
+        id: SHULKER_BOX
+        amount: '1'
+        durability: '0'
+        preview_slot: 7
+      '9':
+        id: SHULKER_BOX
+        amount: '1'
+        durability: '0'
+        preview_slot: 8
+      '10':
+        id: SHULKER_BOX
+        amount: '1'
+        durability: '0'
+        preview_slot: 9
+      '11':
+        id: SHULKER_BOX
+        amount: '1'
+        durability: '0'
+        preview_slot: 10
+      '12':
+        id: ENCHANTED_GOLDEN_APPLE
+        amount: '4'
+        durability: '0'
+        preview_slot: 11
+      '13':
+        id: GOLDEN_APPLE
+        amount: '64'
+        durability: '0'
+        preview_slot: 12
+      '14':
+        book-enchants:
+        - PROTECTION_ENVIRONMENTAL;4
+        id: ENCHANTED_BOOK
+        amount: '1'
+        durability: '0'
+        unbreakable: 'false'
+        preview_slot: 13
+      '15':
+        book-enchants:
+        - PROTECTION_ENVIRONMENTAL;4
+        id: ENCHANTED_BOOK
+        amount: '1'
+        durability: '0'
+        unbreakable: 'false'
+        preview_slot: 14
+      '16':
+        book-enchants:
+        - PROTECTION_ENVIRONMENTAL;4
+        id: ENCHANTED_BOOK
+        amount: '1'
+        durability: '0'
+        unbreakable: 'false'
+        preview_slot: 15
+      '17':
+        book-enchants:
+        - PROTECTION_ENVIRONMENTAL;4
+        id: ENCHANTED_BOOK
+        amount: '1'
+        durability: '0'
+        unbreakable: 'false'
+        preview_slot: 16
+      '18':
+        book-enchants:
+        - DAMAGE_ALL;5
+        id: ENCHANTED_BOOK
+        amount: '1'
+        durability: '0'
+        unbreakable: 'false'
+        preview_slot: 17
+      '19':
+        book-enchants:
+        - DAMAGE_ALL;5
+        id: ENCHANTED_BOOK
+        amount: '1'
+        durability: '0'
+        unbreakable: 'false'
+        preview_slot: 18
+      '20':
+        id: EXPERIENCE_BOTTLE
+        amount: '64'
+        durability: '0'
+        preview_slot: 19
+      '21':
+        id: EXPERIENCE_BOTTLE
+        amount: '64'
+        durability: '0'
+        preview_slot: 20
+      '22':
+        id: EXPERIENCE_BOTTLE
+        amount: '64'
+        durability: '0'
+        preview_slot: 21
+      '23':
+        id: SPAWNER
+        amount: '1'
+        durability: '0'
+        preview_slot: 22
+      '24':
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"elytra1","score:usage":1};compound
+        - Unbreakable;true;boolean
+        id: ELYTRA
+        amount: '1'
+        durability: '0'
+        name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BЭ&x&F&5&B&E&F&Bл&x&F&2&B&E&F&Bи&x&E&F&B&F&F&Bт&x&E&C&B&F&F&Bр&x&E&9&B&F&F&Bа
+          &x&E&6&B&F&F&BБ&x&E&3&B&F&F&Bо&x&E&0&C&0&F&Bг&x&D&D&C&0&F&Bа&x&D&A&C&0&F&Bт&x&D&7&C&0&F&Bы&x&D&4&C&0&F&Bр&x&D&1&C&0&F&Bя
+          &x&F&8&B&E&F&B»'
+        unbreakable: 'true'
+        preview_slot: 23
+      '25':
+        skull-texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTQ1ZmQyYzM3MzZhZjRiZDI4MTEyOTY2NjFlMGNiNDliYWIyY2ZhNjVmNWM5ZTU5OGFhNDNiZWJmYTFlYTM2OCJ9fX0=
+        nbt:
+        - customitems-uuid;89cd7e83-935b-4b93-b299-c771e2bd7ca1
+        id: PLAYER_HEAD
+        amount: '1'
+        durability: '3'
+        name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BШ&x&F&4&B&E&F&Bа&x&F&0&B&F&F&Bр &x&E&C&B&F&F&BН&x&E&8&B&F&F&Bо&x&E&4&B&F&F&Bв&x&E&0&C&0&F&Bи&x&D&C&C&0&F&Bч&x&D&8&C&0&F&Bк&x&D&4&C&0&F&Bа
+          &x&F&8&B&E&F&B»'
+        lore:
+        - '&x&F&8&B&E&F&B&l┃ '
+        - '&x&F&8&B&E&F&B&l┃ &fЭффект: &x&F&8&B&E&F&BСила II'
+        - '&x&F&8&B&E&F&B&l┃ &fЭффект: &x&F&8&B&E&F&BСопротивление I'
+        - '&x&F&8&B&E&F&B&l┃ &fЭффект: &x&F&8&B&E&F&BОгнестойкость I'
+        - '&x&F&8&B&E&F&B&l┃ '
+        unbreakable: 'false'
+        preview_slot: 24
+      '26':
+        attributes:
+          GENERIC_MAX_HEALTH:
+            modifiers:
+            - generic.max_health;4.0;ADD_NUMBER;29f6243e-09ad-4a4b-b98e-fd0a3118a624;OFF_HAND
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"totem2","score:usage":1};compound
+        id: TOTEM_OF_UNDYING
+        amount: '1'
+        durability: '0'
+        name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BТ&x&F&4&B&E&F&Bо&x&F&0&B&F&F&Bт&x&E&C&B&F&F&Bе&x&E&8&B&F&F&Bм
+          &x&E&4&B&F&F&Bд&x&E&0&C&0&F&Bо&x&D&C&C&0&F&Bк&x&D&8&C&0&F&Bт&x&D&4&C&0&F&Bо&x&D&0&C&0&F&Bр&x&C&C&C&1&F&Bа
+          &x&F&8&B&E&F&B»'
+        lore:
+        - '&x&F&8&B&E&F&B&l┃ '
+        - '&x&F&8&B&E&F&B&l┃ &fУсловие: &x&F&8&B&E&F&BВ левой руке'
+        - '&x&F&8&B&E&F&B&l┃ &fБонус: &x&F&8&B&E&F&B+4 к макс. здоровью'
+        - '&x&F&8&B&E&F&B&l┃ '
+        enchants:
+        - PROTECTION_FALL;6
+        hide-flags:
+        - HIDE_ENCHANTS
+        - HIDE_ATTRIBUTES
+        unbreakable: 'false'
+        preview_slot: 25
+      '27':
+        attributes:
+          GENERIC_ATTACK_DAMAGE:
+            modifiers:
+            - generic.attack_damage;4.0;ADD_NUMBER;29f6243e-09ad-4a4b-b98e-fd0a3118a624;OFF_HAND
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"totem1","score:usage":1};compound
+        id: TOTEM_OF_UNDYING
+        amount: '1'
+        durability: '0'
+        name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BТ&x&F&4&B&E&F&Bо&x&F&0&B&F&F&Bт&x&E&C&B&F&F&Bе&x&E&8&B&F&F&Bм
+          &x&E&4&B&F&F&Bк&x&E&0&C&0&F&Bи&x&D&C&C&0&F&Bл&x&D&8&C&0&F&Bл&x&D&4&C&0&F&Bе&x&D&0&C&0&F&Bр&x&C&C&C&1&F&Bа
+          &x&F&8&B&E&F&B»'
+        lore:
+        - '&x&F&8&B&E&F&B&l┃ '
+        - '&x&F&8&B&E&F&B&l┃ &fУсловие: &x&F&8&B&E&F&BВ левой руке'
+        - '&x&F&8&B&E&F&B&l┃ &fБонус: &x&F&8&B&E&F&B+4 к урону'
+        - '&x&F&8&B&E&F&B&l┃ '
+        enchants:
+        - PROTECTION_FALL;6
+        hide-flags:
+        - HIDE_ENCHANTS
+        - HIDE_ATTRIBUTES
+        unbreakable: 'false'
+        preview_slot: 26
+      '28':
+        id: CHICKEN_SPAWN_EGG
+        amount: '1'
+        durability: '0'
+        preview_slot: 27
+      '29':
+        id: PIG_SPAWN_EGG
+        amount: '1'
+        durability: '0'
+        preview_slot: 28
+      '30':
+        potion-effects:
+        - INCREASE_DAMAGE;1;1800
+        - SPEED;1;1800
+        - FIRE_RESISTANCE;0;9600
+        potion-color: '13103616'
+        potion-type: WATER
+        potion-upgraded: 'false'
+        potion-extended: 'false'
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"potion_voina","score:usage":1};compound
+        id: POTION
+        amount: '6'
+        durability: '0'
+        name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BЗ&x&F&4&B&E&F&Bе&x&F&0&B&F&F&Bл&x&E&C&B&F&F&Bь&x&E&8&B&F&F&Bе
+          &x&E&4&B&F&F&BВ&x&E&0&C&0&F&Bо&x&D&C&C&0&F&Bй&x&D&8&C&0&F&Bн&x&D&4&C&0&F&Bы
+          &x&F&8&B&E&F&B»'
+        unbreakable: 'false'
+        preview_slot: 29
+      '31':
+        offhand: true
+        skull-texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTQ1ZmQyYzM3MzZhZjRiZDI4MTEyOTY2NjFlMGNiNDliYWIyY2ZhNjVmNWM5ZTU5OGFhNDNiZWJmYTFlYTM2OCJ9fX0=
+        nbt:
+        - customitems-uuid;89cd7e83-935b-4b93-b299-c771e2bd7ca1
+        id: PLAYER_HEAD
+        amount: '1'
+        durability: '3'
+        name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BШ&x&F&4&B&E&F&Bа&x&F&0&B&F&F&Bр &x&E&C&B&F&F&BН&x&E&8&B&F&F&Bо&x&E&4&B&F&F&Bв&x&E&0&C&0&F&Bи&x&D&C&C&0&F&Bч&x&D&8&C&0&F&Bк&x&D&4&C&0&F&Bа
+          &x&F&8&B&E&F&B»'
+        lore:
+        - '&x&F&8&B&E&F&B&l┃ '
+        - '&x&F&8&B&E&F&B&l┃ &fЭффект: &x&F&8&B&E&F&BСила II'
+        - '&x&F&8&B&E&F&B&l┃ &fЭффект: &x&F&8&B&E&F&BСопротивление I'
+        - '&x&F&8&B&E&F&B&l┃ &fЭффект: &x&F&8&B&E&F&BОгнестойкость I'
+        - '&x&F&8&B&E&F&B&l┃ '
+        unbreakable: 'false'
+        preview_slot: 30
+  free:
+    slot: 25
+    display_item: pink_dye
+    display_name: '&fНабор &x&E&8&B&6&F&F&lꜰ&x&E&B&C&3&F&F&lʀ&x&E&F&C&F&F&F&lᴇ&x&F&2&D&C&F&F&lᴇ'
+    display_lore:
+    - '#F8BEFB&l┃ '
+    - '#F8BEFB&l┃ &fСтатус: &aМожно получить'
+    - '#F8BEFB&l┃ '
+    - '&7● &fВзять набор &7(ЛКМ)'
+    - '&7● &fПосмотреть набор &7(ПКМ)'
+    cooldown: 259200
+    noPermissionsItem:
+      display_item: BARRIER
+      display_name: '&fНабор &x&E&8&B&6&F&F&lꜰ&x&E&B&C&3&F&F&lʀ&x&E&F&C&F&F&F&lᴇ&x&F&2&D&C&F&F&lᴇ'
+      display_lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &cНет доступа'
+      - '#F8BEFB&l┃ '
+      - '&7● &fПосмотреть набор &7(ПКМ)'
+    permission: playerkits.kit.free
+    Items:
+      '1':
+        id: DIAMOND_SWORD
+        amount: '1'
+        durability: '0'
+        name: '&fНабор &x&E&8&B&6&F&F&lꜰ&x&E&B&C&3&F&F&lʀ&x&E&F&C&F&F&F&lᴇ&x&F&2&D&C&F&F&lᴇ'
+        enchants:
+        - DAMAGE_ALL;1
+        - DURABILITY;1
+        unbreakable: 'false'
+        preview_slot: 0
+      '2':
+        id: ENDER_PEARL
+        amount: '8'
+        durability: '0'
+        preview_slot: 1
+      '3':
+        id: GOLDEN_APPLE
+        amount: '4'
+        durability: '0'
+        preview_slot: 2
+      '4':
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"test9","score:usage":0};compound
+        id: BOW
+        amount: '1'
+        durability: '0'
+        name: '&fНабор &x&E&8&B&6&F&F&lꜰ&x&E&B&C&3&F&F&lʀ&x&E&F&C&F&F&F&lᴇ&x&F&2&D&C&F&F&lᴇ'
+        enchants:
+        - ARROW_DAMAGE;1
+        - DURABILITY;1
+        unbreakable: 'false'
+        preview_slot: 3
+      '5':
+        id: TOTEM_OF_UNDYING
+        amount: '1'
+        durability: '0'
+        name: '&fНабор &x&E&8&B&6&F&F&lꜰ&x&E&B&C&3&F&F&lʀ&x&E&F&C&F&F&F&lᴇ&x&F&2&D&C&F&F&lᴇ'
+        unbreakable: 'false'
+        preview_slot: 4
+      '6':
+        id: SHIELD
+        amount: '1'
+        durability: '0'
+        preview_slot: 5
+      '7':
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"test10","score:usage":0};compound
+        id: DIAMOND_PICKAXE
+        amount: '1'
+        durability: '0'
+        name: '&fНабор &x&E&8&B&6&F&F&lꜰ&x&E&B&C&3&F&F&lʀ&x&E&F&C&F&F&F&lᴇ&x&F&2&D&C&F&F&lᴇ'
+        enchants:
+        - DIG_SPEED;1
+        - DURABILITY;1
+        unbreakable: 'false'
+        preview_slot: 6
+      '8':
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"test7","score:usage":0};compound
+        id: DIAMOND_AXE
+        amount: '1'
+        durability: '0'
+        name: '&fНабор &x&E&8&B&6&F&F&lꜰ&x&E&B&C&3&F&F&lʀ&x&E&F&C&F&F&F&lᴇ&x&F&2&D&C&F&F&lᴇ'
+        enchants:
+        - DIG_SPEED;1
+        - DURABILITY;1
+        unbreakable: 'false'
+        preview_slot: 7
+      '9':
+        nbt:
+        - PublicBukkitValues;{"executableitems:ei-id":"test6","score:usage":0};compound
+        id: DIAMOND_SHOVEL
+        amount: '1'
+        durability: '0'
+        name: '&fНабор &x&E&8&B&6&F&F&lꜰ&x&E&B&C&3&F&F&lʀ&x&E&F&C&F&F&F&lᴇ&x&F&2&D&C&F&F&lᴇ'
+        enchants:
+        - DIG_SPEED;1
+        - DURABILITY;1
+        unbreakable: 'false'
+        preview_slot: 8
+      '10':
+        id: MAGENTA_WOOL
+        amount: '16'
+        durability: '0'
+        preview_slot: 9
+      '11':
+        id: MAGENTA_CONCRETE
+        amount: '16'
+        durability: '0'
+        preview_slot: 10
+      '12':
+        id: BIRCH_LOG
+        amount: '8'
+        durability: '0'
+        preview_slot: 11
+      '13':
+        id: OAK_LOG
+        amount: '8'
+        durability: '0'
+        preview_slot: 12
+      '14':
+        offhand: true
+        id: BRICKS
+        amount: '16'
+        durability: '0'
+        preview_slot: 13
+      '15':
+        id: COOKED_BEEF
+        amount: '16'
+        durability: '0'
+        preview_slot: 14
+      '16':
+        potion-type: STRENGTH
+        potion-upgraded: 'true'
+        potion-extended: 'false'
+        id: POTION
+        amount: '1'
+        durability: '0'
+        unbreakable: 'false'
+        preview_slot: 15
+      '17':
+        potion-type: SPEED
+        potion-upgraded: 'true'
+        potion-extended: 'false'
+        id: POTION
+        amount: '1'
+        durability: '0'
+        unbreakable: 'false'
+        preview_slot: 16
+      '18':
+        id: EXPERIENCE_BOTTLE
+        amount: '8'
+        durability: '0'
+        preview_slot: 17
+      '19':
+        id: ARROW
+        amount: '16'
+        durability: '0'
+        preview_slot: 18
+      '20':
+        id: MAGENTA_STAINED_GLASS
+        amount: '16'
+        durability: '0'
+        preview_slot: 19
+      '21':
+        id: DIAMOND_HELMET
+        amount: '1'
+        durability: '0'
+        name: '&fНабор &x&E&8&B&6&F&F&lꜰ&x&E&B&C&3&F&F&lʀ&x&E&F&C&F&F&F&lᴇ&x&F&2&D&C&F&F&lᴇ'
+        enchants:
+        - PROTECTION_ENVIRONMENTAL;1
+        - DURABILITY;1
+        unbreakable: 'false'
+        preview_slot: 36
+      '22':
+        id: DIAMOND_CHESTPLATE
+        amount: '1'
+        durability: '0'
+        name: '&fНабор &x&E&8&B&6&F&F&lꜰ&x&E&B&C&3&F&F&lʀ&x&E&F&C&F&F&F&lᴇ&x&F&2&D&C&F&F&lᴇ'
+        enchants:
+        - PROTECTION_ENVIRONMENTAL;1
+        - DURABILITY;1
+        unbreakable: 'false'
+        preview_slot: 37
+      '23':
+        id: DIAMOND_LEGGINGS
+        amount: '1'
+        durability: '0'
+        name: '&fНабор &x&E&8&B&6&F&F&lꜰ&x&E&B&C&3&F&F&lʀ&x&E&F&C&F&F&F&lᴇ&x&F&2&D&C&F&F&lᴇ'
+        enchants:
+        - PROTECTION_ENVIRONMENTAL;1
+        - DURABILITY;1
+        unbreakable: 'false'
+        preview_slot: 38
+      '24':
+        id: DIAMOND_BOOTS
+        amount: '1'
+        durability: '0'
+        name: '&fНабор &x&E&8&B&6&F&F&lꜰ&x&E&B&C&3&F&F&lʀ&x&E&F&C&F&F&F&lᴇ&x&F&2&D&C&F&F&lᴇ'
+        enchants:
+        - PROTECTION_ENVIRONMENTAL;1
+        - DURABILITY;1
+        unbreakable: 'false'
+        preview_slot: 39
+Messages:
+  prefix: '&f☁ #F8BEFBᴇ#F6BEFBʟ#F3BEFBʏ#F1BFFBᴛ#EEBFFBʀ#ECBFFBɪ#E9BFFBx &7» '
+  noPermissions: '&cУ вас недостаточно прав!'
+  commandCreateError: '&cИспользование: #F8BEFB/kit create <название>'
+  commandDeleteError: '&cИспользование: #F8BEFB/kit delete <название>'
+  commandClaimError: '&cИспользование: #F8BEFB/kit claim <набор>'
+  commandGiveError: '&cИспользование: #F8BEFB/kit give <набор> <ник>'
+  commandEditError: '&cИспользование: #F8BEFB/kit edit <набор>'
+  commandPreviewError: '&cИспользование: #F8BEFB/kit preview <набор>'
+  commandOpenError: '&cИспользование: #F8BEFB/kit open <ник> <страница>'
+  kitAlreadyExists: '&cНабор #F8BEFB%name% &cуже существует!'
+  kitDoesNotExists: '&cНабор #F8BEFB%name% &cне существует!'
+  inventoryEmpty: '&cВаш инвентарь пуст! Положите вещи для создания набора.'
+  kitCreated: '&aНабор #F8BEFB%name% &aуспешно создан!'
+  kitRemoved: '&aНабор #F8BEFB%name% &aуспешно удалён!'
+  inventoryName: '#F8BEFB&lНаборы'
+  kitReceived: '&fВы &aуспешно &fполучили набор #F8BEFB%name%&f!'
+  configReload: '&aКонфигурация плагина перезагружена!'
+  seconds: ' сек.'
+  minutes: ' мин.'
+  hours: ' ч.'
+  days: ' дн.'
+  cooldownPlaceholderReady: '&aГотов к получению'
+  cooldownError: '&fПодождите #F8BEFB%time% &fперед повторным получением!'
+  kitNoPermissions: '&cВы не можете получить данный набор!'
+  kitInCooldownLore:
+  - '#F8BEFB&l┃ '
+  - '#F8BEFB&l┃ &fПерезарядка: #F8BEFB%time%'
+  - '#F8BEFB&l┃ '
+  - '&7● &fПосмотреть набор &7(ПКМ)'
+  commandList: '#F8BEFB&lСписок наборов:'
+  commandListKit: '#F8BEFB&l┃ #F8BEFB%number% &7» #F8BEFB%kit%'
+  commandListKitNoPermissions: '#F8BEFB&l┃ #F8BEFB%number% &7» &c%kit% &7(Недоступно)'
+  commandListKitInCooldown: '#F8BEFB&l┃ #F8BEFB%number% &7» &c%kit% &7(Перезарядка:
+    %time%)'
+  commandListKitOneTime: '#F8BEFB&l┃ #F8BEFB%number% &7» #F8BEFB%kit% &7(Одноразовый)'
+  noSpaceError: '&cУ вас недостаточно места в инвентаре!'
+  materialNameError: '&cОшибка в конфиге! Материал %material% неизвестен.'
+  oneTimeError: '&cВы уже получали данный набор!'
+  kitOneTimeLore:
+  - '#F8BEFB&l┃ '
+  - '#F8BEFB&l┃ &fСтатус: &cУже получен'
+  - '#F8BEFB&l┃ '
+  - '&7● &fПосмотреть набор &7(ПКМ)'
+  previewInventoryName: Просмотр набора
+  backItemName: '&7« #F8BEFBНазад &7»'
+  playerNotOnline: '&cИгрок #F8BEFB%player% &cне в сети!'
+  kitGive: '&aНабор #F8BEFB%kit% &aуспешно выдан игроку #F8BEFB%player%&a!'
+  noMoneyError: '&cУ вас недостаточно коинов! #F8BEFB(%current_money%&7/#F8BEFB%required_money%)'
+  moneyInventoryName: '#F8BEFB&lПодтверждение покупки'
+  moneyInventoryYes: '&a&lДА'
+  moneyInventoryNo: '&c&lНЕТ'
+  moneyInventoryConfirmationName: '#F8BEFBПодтверждаете покупку?'
+  moneyInventoryConfirmationLore:
+  - '#F8BEFB&l┃ '
+  - '#F8BEFB&l┃ &fСтоимость: #F8BEFB%price%'
+  - '#F8BEFB&l┃ '
+  kitInventoryOpen: '&fОткрыто меню наборов для игрока #F8BEFB%player%'
+  errorPage: '&cДанная страница недоступна!'
+  commandResetError: '&cИспользование: #F8BEFB/kit reset <набор> <игрок>'
+  kitResetCorrect: '&aКулдаун набора #F8BEFB%kit% &aсброшен для игрока #F8BEFB%player%&a!'
+  kitResetFail: '&cНе удалось сбросить кулдаун набора #F8BEFB%kit% &cдля #F8BEFB%player%'
+  noPreviewError: '&cПросмотр данного набора недоступен!'
+  cantPreviewError: '&cВы не можете посмотреть этот набор!'
+Config:
+  inventorySize: 54
+  previewInventorySize: 54
+  preview_inventory_back_item_slot: 45
+  kit_preview: true
+  kit_preview_back_item: false
+  hide_kits_with_permissions: false
+  close_inventory_on_claim: false
+  drop_items_if_full_inventory: true
+  commands_before_items: false
+  preview_inventory_requires_permission: false
+  kit_error_sound: BLOCK_LAVA_POP;10;0.1
+  kit_claim_sound: ENTITY_PLAYER_LEVELUP;10;1.5
+  kit_page_sound: BLOCK_LAVA_POP;10;1
+  update_notify: false
+  player_data_save_time: 300
+  mysql_database:
+    enabled: false
+    host: localhost
+    port: 3306
+    username: root
+    password: root
+    database: database
+  Inventory:
+    '0':
+      id: BLACK_STAINED_GLASS_PANE
+      name: '&r'
+    '1':
+      id: BLACK_STAINED_GLASS_PANE
+      name: '&r'
+    '2':
+      id: BLACK_STAINED_GLASS_PANE
+      name: '&r'
+    '3':
+      id: BLACK_STAINED_GLASS_PANE
+      name: '&r'
+    '4':
+      id: BLACK_STAINED_GLASS_PANE
+      name: '&r'
+    '5':
+      id: BLACK_STAINED_GLASS_PANE
+      name: '&r'
+    '6':
+      id: BLACK_STAINED_GLASS_PANE
+      name: '&r'
+    '7':
+      id: BLACK_STAINED_GLASS_PANE
+      name: '&r'
+    '8':
+      id: BLACK_STAINED_GLASS_PANE
+      name: '&r'
+    '9':
+      id: BLACK_STAINED_GLASS_PANE
+      name: '&r'
+    '10':
+      id: BLACK_STAINED_GLASS_PANE
+      name: '&r'
+    '16':
+      id: BLACK_STAINED_GLASS_PANE
+      name: '&r'
+    '17':
+      id: BLACK_STAINED_GLASS_PANE
+      name: '&r'
+    '18':
+      id: BLACK_STAINED_GLASS_PANE
+      name: '&r'
+    '26':
+      id: BLACK_STAINED_GLASS_PANE
+      name: '&r'
+    '27':
+      id: PURPLE_STAINED_GLASS_PANE
+      name: '&r'
+    '35':
+      id: PURPLE_STAINED_GLASS_PANE
+      name: '&r'
+    '36':
+      id: PURPLE_STAINED_GLASS_PANE
+      name: '&r'
+    '37':
+      id: PURPLE_STAINED_GLASS_PANE
+      name: '&r'
+    '43':
+      id: PURPLE_STAINED_GLASS_PANE
+      name: '&r'
+    '44':
+      id: PURPLE_STAINED_GLASS_PANE
+      name: '&r'
+    '46':
+      id: PURPLE_STAINED_GLASS_PANE
+      name: '&r'
+    '47':
+      id: PURPLE_STAINED_GLASS_PANE
+      name: '&r'
+    '48':
+      id: PURPLE_STAINED_GLASS_PANE
+      name: '&r'
+    '50':
+      id: PURPLE_STAINED_GLASS_PANE
+      name: '&r'
+    '51':
+      id: PURPLE_STAINED_GLASS_PANE
+      name: '&r'
+    '52':
+      id: PURPLE_STAINED_GLASS_PANE
+      name: '&r'
+    '53':
+      id: PURPLE_STAINED_GLASS_PANE
+      name: '&r'
+    '49':
+      id: PURPLE_STAINED_GLASS_PANE
+      name: '&r'
+    '45':
+      id: PURPLE_STAINED_GLASS_PANE
+      name: '&r'
+  nbt_alternative_data_save: false
+  claim_kit_short_command: false
+  inventory_pages_names:
+    '1': '#F8BEFB&lНаборы'
