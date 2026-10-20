@@ -1,0 +1,44 @@
+cooldown: 259200
+permission_required: true
+auto_armor: true
+actions:
+  claim:
+    1:
+      action: 'title: 10;35;20;#F8BEFBНабор &f#AFFBBE&lᴄ#BAFCC8&lᴜ#C6FDD2&lѕ#D1FDDC&lᴛ#DDFEE6&lᴏ#E8FFF0&lᴍ;&7получен'
+    2:
+      action: 'playsound: BLOCK_END_PORTAL_SPAWN;1;1.2'
+    3:
+      action: 'firework: colors:WHITE,AQUA type:BALL fade:AQUA power:1'
+  error:
+    1:
+      action: 'playsound: BLOCK_NOTE_BLOCK_BASS;1;0.8'
+    2:
+      action: 'actionbar: &7Набор &cнедоступен;60'
+display:
+  default:
+    id: NETHER_STAR
+    name: '#AFFBBE&lᴄ#BAFCC8&lᴜ#C6FDD2&lѕ#D1FDDC&lᴛ#DDFEE6&lᴏ#E8FFF0&lᴍ'
+    lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &aМожно получить'
+      - '#F8BEFB&l┃ &fПерезарядка: &f3 дн'
+      - '#F8BEFB&l┃ '
+      - '&7● &fВзять набор &7(ЛКМ)'
+      - '&7● &fПосмотреть набор &7(ПКМ)'
+  no_permission:
+    id: BARRIER
+    name: '#AFFBBE&lᴄ#BAFCC8&lᴜ#C6FDD2&lѕ#D1FDDC&lᴛ#DDFEE6&lᴏ#E8FFF0&lᴍ'
+    lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &cНет доступа'
+      - '#F8BEFB&l┃ '
+      - '&7● &fПосмотреть набор &7(ПКМ)'
+  cooldown:
+    id: NETHER_STAR
+    name: '#AFFBBE&lᴄ#BAFCC8&lᴜ#C6FDD2&lѕ#D1FDDC&lᴛ#DDFEE6&lᴏ#E8FFF0&lᴍ'
+    lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &eПерезарядка'
+      - '#F8BEFB&l┃ &fОсталось: &f%time%'
+      - '#F8BEFB&l┃ '
+      - '&7● &fПосмотреть набор &7(ПКМ)'

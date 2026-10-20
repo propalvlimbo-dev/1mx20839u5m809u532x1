@@ -2,54 +2,38 @@ inventories:
   main_inventory:
     slots: 54
     title: '#F8BEFB&lНаборы'
-    0-8:
+    0-9;11;15;17-20;24-26:
+      item:
+        id: GRAY_STAINED_GLASS_PANE
+        name: ' '
+    27-29;33-36;38;42;44-48;50-53:
       item:
         id: PURPLE_STAINED_GLASS_PANE
         name: ' '
-    9;17-18;26-27;35-36;44:
-      item:
-        id: IRON_CHAIN
-        name: ' '
-    10;16;19-20;24;28-30;32-33;37-43:
-      item:
-        id: BLACK_STAINED_GLASS_PANE
-        name: ' '
-    '11':
-      type: 'kit: start'
     '12':
-      type: 'kit: lite'
+      type: 'kit: start'
     '13':
-      type: 'kit: prime'
+      type: 'kit: lite'
     '14':
-      type: 'kit: griefer'
-    '15':
-      type: 'kit: wither'
+      type: 'kit: prime'
     '21':
-      type: 'kit: immortal'
+      type: 'kit: griefer'
     '22':
-      type: 'kit: dragon'
+      type: 'kit: wither'
     '23':
-      type: 'kit: elder'
-    '25':
-      type: 'kit: free'
+      type: 'kit: immortal'
+    '30':
+      type: 'kit: dragon'
     '31':
+      type: 'kit: elder'
+    '32':
       type: 'kit: eternity'
-    '34':
+    '39':
+      type: 'kit: free'
+    '40':
       type: 'kit: plus'
-    46-48;50-53:
-      item:
-        id: BLACK_STAINED_GLASS_PANE
-        name: ' '
-    '45':
-      item:
-        id: RED_DYE
-        name: '#F8BEFBЗакрыть'
-        lore:
-          - '#F8BEFB&l┃ '
-          - '#F8BEFB&l┃ &fВернуться в игру'
-          - '#F8BEFB&l┃ '
-      click_actions:
-        - close_inventory
+    '41':
+      type: 'kit: custom'
     '49':
       item:
         id: PAPER
@@ -61,21 +45,29 @@ inventories:
           - '#F8BEFB&l┃ '
           - '#F8BEFB&l┃ &fСтатус виден в лоре набора:'
           - '#F8BEFB&l┃ &7● &aМожно получить'
-          - '#F8BEFB&l┃ &7● &eПерезарядка &7(%time%)'
+          - '#F8BEFB&l┃ &7● &eПерезарядка'
           - '#F8BEFB&l┃ &7● &cНет доступа'
           - '#F8BEFB&l┃ '
           - '&7● &fОткрыть меню наборов: &f/kit'
+      click_actions:
+        - 'playsound: ITEM_BOOK_PAGE_TURN;1;1.2'
   preview_inventory:
     slots: 54
     title: '#F8BEFB&lПросмотр набора'
+    45-48;50-53:
+      item:
+        id: PURPLE_STAINED_GLASS_PANE
+        name: ' '
     '49':
       item:
-        id: ARROW
+        id: BLACK_DYE
         name: '&7« #F8BEFBНазад &7»'
         lore:
           - '#F8BEFB&l┃ '
           - '#F8BEFB&l┃ &fВернуться к списку наборов'
           - '#F8BEFB&l┃ '
+      click_actions:
+        - 'playsound: UI_BUTTON_CLICK;1;1.4'
       open_inventory: previous
   buy_requirements_inventory:
     slots: 27
