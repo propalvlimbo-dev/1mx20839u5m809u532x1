@@ -32,14 +32,16 @@ STATIC = {'helps'}
 # FIXED-голограммы при yaw 0 смотрят в +Z; helps развернуть
 FLIP = {'helps'}
 # helps (статика) разворачиваем на 90°: 0 = юг, 90 = запад, 180 = север, 270 = восток
-HELP_YAW = 90.0
+HELP_YAW = -90.0
+# опустить голограммы ближе к земле (кейсы и безопасность не трогаем)
+LOWER = {'don': -0.35, 'don1': -0.35, 'hello': -0.35, 'helps': -0.35}
 # предметы 1.21+ под голограммами: имя -> (material, scale)
 ICONS = {
     'addvk': ('minecraft:shield', 0.9),
-    'cases': ('minecraft:ominous_trial_key', 0.6),
+    'cases': ('minecraft:ominous_trial_key', 0.5),
     'don':   ('minecraft:heavy_core', 0.8),
     'don1':  ('minecraft:resin_block', 0.8),
-    'hello': ('minecraft:knowledge_book', 0.7),
+    'hello': ('minecraft:knowledge_book', 0.6),
     'helps': ('minecraft:command_block', 0.7),
 }
 
@@ -184,7 +186,7 @@ def convert(path, out_dir, stats):
         # у text_display текст растёт ВВЕРХ от точки привязки, поэтому опускаем
         # точку на высоту блока: верхняя строка встанет ровно в якорь старой
         # голограммы, остальные пойдут вниз
-        text_bottom = -len(texts) * LINE_H
+        text_bottom = -len(texts) * LINE_H + LOWER.get(name, 0.0)
         fname = os.path.join(out_dir, name + '.yml')
         note = ('# Текст 1:1, иконка — отдельный файл %s_icon.yml.\n' % name) if items else \
                '# Текст 1:1 из старой голограммы.\n'
@@ -203,7 +205,7 @@ def convert(path, out_dir, stats):
         written.append(os.path.basename(fname))
         stats['text'].append((name, len(texts), text_bottom))
 
-    icon_y = -len(texts) * LINE_H - 0.55
+    icon_y = -len(texts) * LINE_H - 0.55 + LOWER.get(name, 0.0)
 
     for item in items:
         icon_name = name + '_icon'

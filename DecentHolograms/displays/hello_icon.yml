@@ -24,12 +24,12 @@ attributes:
   scale:
     value-type: vector3f
     value:
-      x: 0.7
-      y: 0.7
-      z: 0.7
+      x: 0.6
+      y: 0.6
+      z: 0.6
   translation:
     value-type: vector3f
     value:
       x: 0.0
-      y: -2.80
+      y: -3.15
       z: 0.0

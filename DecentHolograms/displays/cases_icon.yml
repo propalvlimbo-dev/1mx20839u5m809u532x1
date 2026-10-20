@@ -24,9 +24,9 @@ attributes:
   scale:
     value-type: vector3f
     value:
-      x: 0.6
-      y: 0.6
-      z: 0.6
+      x: 0.5
+      y: 0.5
+      z: 0.5
   translation:
     value-type: vector3f
     value:
