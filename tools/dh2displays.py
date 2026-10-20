@@ -28,9 +28,9 @@ SKIP_RE = re.compile(r'^#(ENTITY|EMPTY)\b', re.IGNORECASE)
 # шаг строк у text_display: 9 пикселей шрифта = 0.225 блока
 LINE_H = 0.225
 # голограммы, которые не должны поворачиваться за игроком
-STATIC = {'helps'}
+STATIC = set()
 # FIXED-голограммы при yaw 0 смотрят в +Z; helps развернуть
-FLIP = {'helps'}
+FLIP = set()
 # helps (статика) разворачиваем на 90°: 0 = юг, 90 = запад, 180 = север, 270 = восток
 HELP_YAW = 90.0
 # опустить голограммы ближе к земле (кейсы и безопасность не трогаем)
@@ -120,7 +120,7 @@ ITEM_ATTRS = '''  billboard:
     value:
       x: {tx}
       y: {ty}
-      z: 0.0
+      z: {tz}
 '''
 
 PAGES = 'pages:\n  - lines:\n'
@@ -210,10 +210,12 @@ def convert(path, out_dir, stats):
     text_bottom_val = -len(texts) * LINE_H + LOWER.get(name, 0.0)
     icon_y = text_bottom_val - 0.55
     icon_x = 0.0
+    icon_z = 0.0
     if name in SIDE:
         # сбоку: слева от текста (alignment LEFT — текст растёт вправо от якоря)
-        icon_x = -0.9
+        icon_x = -1.20
         icon_y = text_bottom_val + (len(texts) * LINE_H) / 2.0
+        icon_z = 0.45
 
     for item in items:
         icon_name = name + '_icon'
@@ -231,6 +233,7 @@ def convert(path, out_dir, stats):
                              enabled=enabled, range=rng, interval=interval)
         body += (ITEM_ATTRS.replace('{ty}', '%.2f' % icon_y)
                             .replace('{tx}', '%.2f' % icon_x)
+                            .replace('{tz}', '%.2f' % icon_z)
                             .replace('{s}', '%.1f' % icon_scale))
         open(fname, 'w', encoding='utf-8', newline='').write(body)
         written.append(os.path.basename(fname))
