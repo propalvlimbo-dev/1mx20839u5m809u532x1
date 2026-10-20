@@ -1,0 +1,73 @@
+# DecentHolograms 2.10+ — голограмма нового типа (display entity)
+# Переделано из классической голограммы: don.yml
+# Вариант с большим фоном-квадратом (строки добиты пробелами).
+# Текст 1:1, иконка — отдельный файл don_icon.yml.
+type: TEXT
+location:
+  world: 'spawn'
+  x: 0.528
+  y: 61.400
+  z: 11.462
+  yaw: 0.0
+  pitch: 0.0
+settings:
+  enabled: true
+  display-range: 48
+  update-interval: 20
+attributes:
+  billboard:
+    value-type: billboard_constraints
+    value: CENTER
+  background-color:
+    value-type: rgba
+    value:
+      red: 8
+      green: 8
+      blue: 12
+      alpha: 150
+  text-shadow:
+    value-type: boolean
+    value: true
+  see-through:
+    value-type: boolean
+    value: false
+  alignment:
+    value-type: text_alignment
+    value: CENTER
+  line-width:
+    value-type: integer
+    value: 1000
+  text-opacity:
+    value-type: integer
+    value: 255
+  scale:
+    value-type: vector3f
+    value:
+      x: 1.0
+      y: 1.0
+      z: 1.0
+  translation:
+    value-type: vector3f
+    value:
+      x: 0.0
+      y: -4.40
+      z: 0.0
+pages:
+  - lines:
+      - '                      &#F8BEFB&lПРИВИЛЕГИИ                       '
+      - '                                                            '
+      - '                         &f&lЛУЧШАЯ                          '
+      - '&#F8BEFB&l⭐ &#F8BEFB&lᴇᴛᴇʀɴɪᴛʏ &f%player_name% &8— &#F8BEFB&l&n799₽&7 (Навсегда)'
+      - '                                                            '
+      - '                      &f&lУНИКАЛЬНЫЕ                       '
+      - '  &#AC72FF&l⛈ &#AC72FF&lᴇ&#AF74FF&lʟ&#B376FF&lᴅ&#B678FF&lᴇ&#B97AFF&lʀ &f%player_name% &8— &#AC72FF&l699₽ &7(Навсегда)  '
+      - ' &#FF7AFE&l⛈ &#FF7AFE&lᴅ&#FF81FB&lʀ&#FF88F7&lᴀ&#FF90F4&lɢ&#FF97F0&lᴏ&#FF9EED&lɴ &f%player_name% &8— &#FF7AFE429₽ &7(Навсегда) '
+      - '&#FF3030&l⛈ &#FF3030&lɪ&#FF3A3A&lᴍ&#FF4444&lᴍ&#FF4E4E&lᴏ&#FF5757&lʀ&#FF6161&lᴛ&#FF6B6B&lᴀ&#FF7575&lʟ &f%player_name% &8— &#FF3030279₽ &7(Навсегда)'
+      - '                                                            '
+      - '                         &f&lОБЫЧНЫЕ                         '
+      - '  &#96FF91&l☁ &#96FF91&lᴡ&#A0FF9D&lɪ&#AAFFA8&lᴛ&#B3FFB4&lʜ&#BDFFBF&lᴇ&#C7FFCB&lʀ &f%player_name% &8— &#96FF9179₽ &7(Навсегда)   '
+      - '  &#FF9191&l☁ &#FF9191&lɢ&#FF9999&lʀ&#FFA1A1&lɪ&#FFAAAA&lᴇ&#FFB2B2&lꜰ&#FFBABA&lᴇ&#FFC2C2&lʀ &f%player_name% &8— &#FF919149₽ &7(Навсегда)  '
+      - '   &#89A0FF&l☁ &#89A0FF&lᴘ&#99AEFF&lʀ&#A8BCFF&lɪ&#B8CAFF&lᴍ&#C7D8FF&lᴇ &f%player_name% &8— &#89A0FF29₽ &7(Навсегда)    '
+      - '    &#8D8D8D&l☁ &#8D8D8D&lʟ&#969696&lɪ&#9F9F9F&lᴛ&#A8A8A8&lᴇ &f%player_name% &8— &#8D8D8D19₽ &7(Навсегда)    '
+      - '                                                            '
+      - '            &fПокупка на сайте: &#F8BEFBelytrix.pw            '
