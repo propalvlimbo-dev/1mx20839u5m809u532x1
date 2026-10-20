@@ -1,4 +1,4 @@
-configVersion: "1.41"
+configVersion: "1.42"
 
 id: sphere
 provider: elytrix:sphere
@@ -44,6 +44,12 @@ settings:
   # Частицы ударов: булава бьёт Вихря (урон, искры, взрыв), приземление,
   # разлёт после падения.
   particlesImpact: true
+
+  # Совместимость со старыми клиентами (ViaVersion + ViaBackwards):
+  # игрокам на 1.21.3 и ниже новые частицы (GUST, WHITE_SMOKE, GUST_EMITTER_*)
+  # автоматически отправляются как CLOUD, чтобы эффект не пропадал.
+  # Клиенты 1.21.4+ получают всё как есть. false = не вмешиваться.
+  compatParticles: true
 
   # Частиц специально немного. FIREWORK и EXPLOSION Minecraft рисует даже
   # при настройке «Частицы: Меньше» и «Минимум», END_ROD/REDSTONE — нет.

@@ -25,11 +25,14 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.by1337.blib.geom.Vec3d;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Анимация кейса «Вихрь».
@@ -136,6 +139,14 @@ public class SphereAnimator extends AbstractAnimation {
     private volatile double winnerY;
     private volatile VirtualEntity winnerEntityRef;
     private volatile VirtualEntity winnerNameRef;
+
+    /** Протокол 1.21.4 — минимальная версия клиента, которая знает новые частицы. */
+    private static final int PROTOCOL_1_21_4 = 769;
+
+    /** Протоколы клиентов (через ViaVersion), чтобы подбирать безопасные частицы. */
+    private static final Map<UUID, Integer> CLIENT_PROTOCOLS = new ConcurrentHashMap<>();
+    private static volatile boolean viaProbed;
+    private static volatile Method viaGetApi;
 
     /** Кэш скина: [value, signature]. Подтягивается один раз в фоне. */
     private static volatile String[] skinCache;
@@ -1013,14 +1024,74 @@ public class SphereAnimator extends AbstractAnimation {
     }
 
     private void rawFx(Particle particle, Vec3d pos, int count, double ox, double oy, double oz, double extra) {
-        if (pos == null) return;
+        if (particle == null || pos == null) return;
         try {
-            if (isRedstone(particle)) {
-                spawnParticle(particle, pos, count, ox, oy, oz, extra, dustOptions);
+            // отправляем каждому зрителю отдельно: у старых клиентов (через Via)
+            // частицы, которых нет в их версии, заменяются на CLOUD
+            forEachViewers(player -> sendFx(player, particle, pos, count, ox, oy, oz, extra));
+        } catch (Throwable ignored) {
+        }
+    }
+
+    private void sendFx(Player player, Particle particle, Vec3d pos, int count,
+                        double ox, double oy, double oz, double extra) {
+        Particle p = particleForClient(player, particle);
+        if (p == null) return;
+        try {
+            if (isRedstone(p)) {
+                player.spawnParticle(p, pos.x, pos.y, pos.z, count, ox, oy, oz, extra, dustOptions);
             } else {
-                spawnParticle(particle, pos, count, ox, oy, oz, extra);
+                player.spawnParticle(p, pos.x, pos.y, pos.z, count, ox, oy, oz, extra);
             }
         } catch (Throwable ignored) {
+        }
+    }
+
+    /** Частица, которую поймёт клиент: для 1.21.3 и ниже новые заменяем на CLOUD. */
+    private Particle particleForClient(Player player, Particle particle) {
+        if (!config.compatParticles || player == null) return particle;
+        if (!isModernParticle(particle)) return particle;
+        int protocol = viaProtocol(player);
+        if (protocol <= 0 || protocol >= PROTOCOL_1_21_4) return particle;
+        return Particle.CLOUD;
+    }
+
+    private boolean isModernParticle(Particle p) {
+        switch (p.name()) {
+            case "GUST":
+            case "SMALL_GUST":
+            case "GUST_EMITTER_SMALL":
+            case "GUST_EMITTER_LARGE":
+            case "WHITE_SMOKE":
+            case "TRIAL_SPAWNER_DETECTION":
+            case "TRIAL_SPAWNER_DETECTION_OMINOUS":
+            case "OMINOUS_SPAWNING":
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    /** Версия протокола клиента через ViaVersion (рефлексия: зависимости нет). */
+    private static int viaProtocol(Player player) {
+        UUID id = player.getUniqueId();
+        Integer cached = CLIENT_PROTOCOLS.get(id);
+        if (cached != null) return cached;
+        try {
+            if (!viaProbed) {
+                viaProbed = true;
+                Class<?> via = Class.forName("com.viaversion.viaversion.api.Via");
+                viaGetApi = via.getMethod("getAPI");
+            }
+            if (viaGetApi == null) return -1;
+            Object api = viaGetApi.invoke(null);
+            Method m = Class.forName("com.viaversion.viaversion.api.ViaAPI")
+                    .getMethod("getPlayerVersion", UUID.class);
+            int version = (int) m.invoke(api, id);
+            CLIENT_PROTOCOLS.put(id, version);
+            return version;
+        } catch (Throwable ignored) {
+            return -1;
         }
     }
 
@@ -1160,6 +1231,7 @@ public class SphereAnimator extends AbstractAnimation {
         final boolean particles;
         final boolean particlesAmbient;
         final boolean particlesImpact;
+        final boolean compatParticles;
         final boolean breeze;
         final boolean vortexMode;
         final String vortexParticle;
@@ -1200,6 +1272,7 @@ public class SphereAnimator extends AbstractAnimation {
             this.particles = getBool(c, "particles", true);
             this.particlesAmbient = getBool(c, "particlesAmbient", false);
             this.particlesImpact = getBool(c, "particlesImpact", true);
+            this.compatParticles = getBool(c, "compatParticles", true);
             this.breeze = getBool(c, "breeze", true);
             this.vortexMode = getStr(c, "breezeMode", "BREEZE").trim().equalsIgnoreCase("VORTEX");
             this.vortexParticle = getStr(c, "vortexParticle", "WHITE_SMOKE");
