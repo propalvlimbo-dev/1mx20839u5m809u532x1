@@ -27,6 +27,8 @@ ICON_RE = re.compile(r'^#(ICON|HEAD|SMALLHEAD)\s*[:\s]\s*(.+?)\s*$', re.IGNORECA
 SKIP_RE = re.compile(r'^#(ENTITY|EMPTY)\b', re.IGNORECASE)
 # шаг строк у text_display: 9 пикселей шрифта = 0.225 блока
 LINE_H = 0.225
+# голограммы, которые не должны поворачиваться за игроком
+STATIC = {'addvk', 'helps'}
 
 HEADER = '''# DecentHolograms 2.10+ — голограмма нового типа (display entity)
 # Переделано из классической голограммы: {source}
@@ -47,7 +49,7 @@ attributes:
 
 TEXT_ATTRS = '''  billboard:
     value-type: billboard_constraints
-    value: CENTER
+    value: {billboard}
   background-color:
     value-type: rgba
     value:
@@ -63,7 +65,7 @@ TEXT_ATTRS = '''  billboard:
     value: false
   alignment:
     value-type: text_alignment
-    value: CENTER
+    value: LEFT
   line-width:
     value-type: integer
     value: 1000
@@ -89,7 +91,7 @@ ITEM_ATTRS = '''  billboard:
     value: CENTER
   display-type:
     value-type: item_display_type
-    value: FIXED
+    value: GUI
   scale:
     value-type: vector3f
     value:
@@ -163,10 +165,9 @@ def convert(path, out_dir, stats):
 
     written = []
     if texts:
-        # текст растёт вверх от точки привязки: чтобы ВЕРХНЯЯ строка осталась
-        # там, где был якорь старой голограммы, опускаем точку на высоту блока
-        text_bottom = -len(texts) * LINE_H
-        # текст висит от точки вверх; ставим точку на нижнюю строку блока
+        # у старой голограммы первая строка стояла в точке location, строки шли
+        # вниз; text_display ведёт себя так же, поэтому смещение не нужно
+        text_bottom = 0.0  # верхняя строка = якорь
         fname = os.path.join(out_dir, name + '.yml')
         note = ('# Текст 1:1, иконка — отдельный файл %s_icon.yml.\n' % name) if items else \
                '# Текст 1:1 из старой голограммы.\n'
@@ -174,7 +175,9 @@ def convert(path, out_dir, stats):
                              extra='', dtype='TEXT', world=q(loc['world']),
                              x='%.3f' % loc['x'], y='%.3f' % loc['y'], z='%.3f' % loc['z'],
                              enabled=enabled, range=rng, interval=interval)
-        body += TEXT_ATTRS.replace('{ty}', '%.2f' % text_bottom)
+        billboard = 'FIXED' if name in STATIC else 'VERTICAL'
+        body += (TEXT_ATTRS.replace('{ty}', '%.2f' % text_bottom)
+                            .replace('{billboard}', billboard))
         body += PAGES
         for t in texts:
             body += '      - ' + q(t['content']) + '\n'
@@ -182,7 +185,7 @@ def convert(path, out_dir, stats):
         written.append(os.path.basename(fname))
         stats['text'].append((name, len(texts), text_bottom))
 
-    icon_y = (text_bottom if texts else 0.0) - 0.35
+    icon_y = -len(texts) * LINE_H - 0.45
 
     for item in items:
         icon_name = name + '_icon'

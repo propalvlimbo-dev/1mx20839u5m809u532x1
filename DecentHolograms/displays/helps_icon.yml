@@ -20,7 +20,7 @@ attributes:
     value: CENTER
   display-type:
     value-type: item_display_type
-    value: FIXED
+    value: GUI
   scale:
     value-type: vector3f
     value:
@@ -31,5 +31,5 @@ attributes:
     value-type: vector3f
     value:
       x: 0.0
-      y: -3.05
+      y: -3.15
       z: 0.0
