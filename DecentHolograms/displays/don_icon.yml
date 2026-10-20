@@ -1,0 +1,35 @@
+# DecentHolograms 2.10+ — голограмма нового типа (display entity)
+# Переделано из классической голограммы: don.yml
+# Иконка под текстом, текст — в don.yml.
+item: 'minecraft:heavy_core'
+type: ITEM
+location:
+  world: 'spawn'
+  x: 0.528
+  y: 61.400
+  z: 11.462
+  yaw: 0.0
+  pitch: 0.0
+settings:
+  enabled: true
+  display-range: 48
+  update-interval: 20
+attributes:
+  billboard:
+    value-type: billboard_constraints
+    value: VERTICAL
+  display-type:
+    value-type: item_display_type
+    value: FIXED
+  scale:
+    value-type: vector3f
+    value:
+      x: 0.8
+      y: 0.8
+      z: 0.8
+  translation:
+    value-type: vector3f
+    value:
+      x: 0.00
+      y: -5.28
+      z: 0.0

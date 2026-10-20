@@ -1,0 +1,57 @@
+type: TEXT
+location:
+  world: spawn
+  x: 41.611
+  y: 52.9
+  z: 0.564
+  yaw: 0.0
+  pitch: 0.0
+settings:
+  enabled: true
+  display-range: 48.0
+  update-interval: 20
+attributes:
+  background-color:
+    value-type: rgba
+    value:
+      red: 8
+      green: 8
+      blue: 12
+      alpha: 0
+  line-width:
+    value-type: integer
+    value: 1000
+  text-shadow:
+    value-type: boolean
+    value: true
+  translation:
+    value-type: vector3f
+    value:
+      x: 0.0
+      y: -1.7300000190734863
+      z: 0.0
+  scale:
+    value-type: vector3f
+    value:
+      x: 1.0
+      y: 1.0
+      z: 1.0
+  see-through:
+    value-type: boolean
+    value: false
+  billboard:
+    value-type: billboard_constraints
+    value: VERTICAL
+  alignment:
+    value-type: text_alignment
+    value: LEFT
+  text-opacity:
+    value-type: integer
+    value: 255
+pages:
+- lines:
+  - '&#F8BEFB&lКЕЙСЫ'
+  - ''
+  - '&fИспытайте удачу и выигрывайте &#F8BEFBценные призы'
+  - ''
+  - '&7● &fПокупка ключей: &#F8BEFBelytrix.pw'
