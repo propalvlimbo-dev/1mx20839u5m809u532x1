@@ -1,6 +1,5 @@
 # DecentHolograms 2.10+ — голограмма нового типа (display entity)
 # Переделано из классической голограммы: hello.yml
-# Вариант с большим фоном-квадратом (строки добиты пробелами).
 # Текст 1:1, иконка — отдельный файл hello_icon.yml.
 type: TEXT
 location:
@@ -24,7 +23,7 @@ attributes:
       red: 8
       green: 8
       blue: 12
-      alpha: 150
+      alpha: 0
   text-shadow:
     value-type: boolean
     value: true
@@ -33,7 +32,7 @@ attributes:
     value: false
   alignment:
     value-type: text_alignment
-    value: CENTER
+    value: LEFT
   line-width:
     value-type: integer
     value: 1000
@@ -54,13 +53,13 @@ attributes:
       z: 0.0
 pages:
   - lines:
-      - '             &#F8BEFB&lИНФОРМАЦИЯ              '
-      - '                                          '
-      - '       &fРежим: &#F8BEFBГриферский №1       '
-      - '                                          '
-      - '      &7● &fГлавное меню: &#F8BEFB/menu       '
-      - '     &7● &fДонат-услуги: &#F8BEFB/donate     '
-      - '   &7● &fБесплатные бонусы: &#F8BEFB/free   '
-      - '                                          '
-      - '       &7● &fНаш сайт: &#F8BEFBelytrix.pw        '
+      - '&#F8BEFB&lИНФОРМАЦИЯ'
+      - ''
+      - '&fРежим: &#F8BEFBГриферский №1'
+      - ''
+      - '&7● &fГлавное меню: &#F8BEFB/menu'
+      - '&7● &fДонат-услуги: &#F8BEFB/donate'
+      - '&7● &fБесплатные бонусы: &#F8BEFB/free'
+      - ''
+      - '&7● &fНаш сайт: &#F8BEFBelytrix.pw'
       - '&7● &fTelegram канал: &#229ED9t.me/elytrix_ru'
