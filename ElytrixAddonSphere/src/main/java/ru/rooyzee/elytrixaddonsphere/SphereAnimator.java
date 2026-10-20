@@ -444,7 +444,7 @@ public class SphereAnimator extends AbstractAnimation {
         if (breezeEntity != null && puffTicks % 5 == 0) {
             double baseY = center.y + config.breezeHeight + curElevation;
             double a = Math.toRadians(breezeYaw * 2.0D);
-            fx(Particle.FIREWORK, new Vec3d(
+            fx(gustParticle, new Vec3d(
                     center.x + Math.cos(a) * 0.8D,
                     baseY + 0.6D + 0.25D * Math.sin(Math.toRadians(breezeYaw)),
                     center.z + Math.sin(a) * 0.8D
