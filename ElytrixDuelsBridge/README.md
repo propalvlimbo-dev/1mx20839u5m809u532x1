@@ -3,14 +3,14 @@
 Мост между **EpicDuels** и **BMenu**: окна плагина подменяются нашими меню
 BMenu — с анимацией сборки, звуками и русским текстом.
 
-- Версия: 1.7.0
+- Версия: 1.7.1
 - Зависимости: `EpicDuels`, `BMenu` (BMenu сам требует `BLib` и `PlaceholderAPI`)
 - Paper 1.21.1–1.21.11, Java 17+ (собрано под 17, сервер 21 подходит)
 - Java-классы EpicDuels не меняются: мост работает через события и рефлексию
   (единственное исключение — `EpicDuels-ElyTriX-3.1.1.jar`: в нём у арены
   появился общий мир, см. «Арены в одном мире»)
 
-## Что нового в 1.7.0
+## Что нового в 1.7.1
 
 - шесть (и сколько угодно) арен в одном уже построенном мире `duel` —
   `/duelx arena create|spawn1|spawn2|ready|list|tp|remove`, миры
@@ -412,7 +412,7 @@ api:
 ## Установка
 
 1. `EpicDuels-ElyTriX-3.1.1.jar` → `plugins/` (заменяет обычный EpicDuels 3.1.x)
-2. `ElytrixDuelsBridge-1.7.0.jar` → `plugins/`
+2. `ElytrixDuelsBridge-1.7.1.jar` → `plugins/`
 3. Папка меню BMenu `elytrix/duel/*.yml` → `plugins/BMenu/menu/elytrix/duel/`
 4. Запустить сервер (или `/reload confirm` — не рекомендуется) и проверить `/duel`.
 5. Если наборы уже были — `/duelx kits reset`, чтобы применить усиленный состав.

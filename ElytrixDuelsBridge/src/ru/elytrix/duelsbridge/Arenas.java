@@ -153,12 +153,16 @@ final class Arenas {
             create(player, name);
             return;
         }
-        if (action.equals("spawn1") || action.equals("точка1")) {
+        if (action.equals("spawn1") || action.equals("setspawn1") || action.equals("точка1")) {
             spawn(player, name, true);
             return;
         }
-        if (action.equals("spawn2") || action.equals("точка2")) {
+        if (action.equals("spawn2") || action.equals("setspawn2") || action.equals("точка2")) {
             spawn(player, name, false);
+            return;
+        }
+        if (action.equals("save") || action.equals("сохранить")) {
+            plugin.msg(player, "&#F8BEFBДуэли &8» &7Точки сохраняются сразу — /save не нужен.");
             return;
         }
         if (action.equals("ready") || action.equals("готово")) {
@@ -176,10 +180,42 @@ final class Arenas {
         help(player);
     }
 
+    /**
+     * Подсказка, если игрок по привычке пишет родные команды EpicDuels
+     * (/duel create, /duel arena setspawn1): в общем мире они не работают.
+     */
+    void hint(Player player, String sub) {
+        String action = sub == null ? "" : sub.toLowerCase(Locale.ROOT);
+        String name = "<имя>";
+        if (action.equals("create") || action.equals("создать")) {
+            plugin.msg(player, "&#F8BEFBДуэли &8» &fСоздать арену: &d/duelx arena create " + name);
+            return;
+        }
+        if (action.equals("spawn1") || action.equals("setspawn1") || action.equals("точка1")) {
+            plugin.msg(player, "&#F8BEFBДуэли &8» &fТочка команды 1: &d/duelx arena spawn1 " + name
+                    + "&7 (стоя в мире " + sharedWorld() + ")");
+            return;
+        }
+        if (action.equals("spawn2") || action.equals("setspawn2") || action.equals("точка2")) {
+            plugin.msg(player, "&#F8BEFBДуэли &8» &fТочка команды 2: &d/duelx arena spawn2 " + name
+                    + "&7 (стоя в мире " + sharedWorld() + ")");
+            return;
+        }
+        if (action.equals("ready") || action.equals("готово")) {
+            plugin.msg(player, "&#F8BEFBДуэли &8» &fВключить арену: &d/duelx arena ready " + name);
+            return;
+        }
+        if (action.equals("save")) {
+            plugin.msg(player, "&#F8BEFBДуэли &8» &7Точки сохраняются сразу, /save не нужен.");
+            return;
+        }
+        help(player);
+    }
+
     private void help(Player player) {
         String world = sharedWorld().isEmpty() ? "не задан" : sharedWorld();
         plugin.msg(player, "&#F8BEFBАрены &8» &fмир: &#F8BEFB" + world);
-        plugin.msg(player, "&7● &f/duelx arena create &d<имя> &7— завести арену");
+        plugin.msg(player, "&7● &f/duelx arena create &d<имя> &7— завести арену (миров не создаёт)");
         plugin.msg(player, "&7● &f/duelx arena spawn1 &d<имя> &7— точка команды 1");
         plugin.msg(player, "&7● &f/duelx arena spawn2 &d<имя> &7— точка команды 2");
         plugin.msg(player, "&7● &f/duelx arena ready &d<имя> &7— включить в ротацию");

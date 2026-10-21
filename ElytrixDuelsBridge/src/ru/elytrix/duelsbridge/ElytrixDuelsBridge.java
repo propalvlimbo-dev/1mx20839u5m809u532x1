@@ -270,6 +270,16 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
                 + " &7· &fОчки: &#F8BEFB" + args.get("score"));
     }
 
+    /** Мир, в котором лежат все арены (пусто — старый режим EpicDuels). */
+    String sharedArenaWorld() {
+        return arenas.sharedWorld();
+    }
+
+    /** Подсказка на родные команды арен EpicDuels (в общем мире не работают). */
+    void arenaHint(Player player, String sub) {
+        arenas.hint(player, sub);
+    }
+
     /** /duelx arena — арены в одном мире. */
     void arenaCommand(Player player, String[] args) {
         arenas.command(player, args);

@@ -7,6 +7,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 public abstract class JavaPlugin implements Plugin {
     public String getName() { return ""; }
+    public boolean isEnabled() { return true; }
     public void onEnable() { }
     public void onDisable() { }
     public void saveDefaultConfig() { }

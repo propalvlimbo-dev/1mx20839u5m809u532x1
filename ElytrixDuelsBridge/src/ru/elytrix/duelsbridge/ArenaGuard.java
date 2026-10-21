@@ -12,6 +12,7 @@ import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 
 /**
  * Правила на боевых копиях арен (arena_instance_*):
@@ -32,6 +33,21 @@ final class ArenaGuard implements Listener {
 
     ArenaGuard(ElytrixDuelsBridge plugin) {
         this.plugin = plugin;
+    }
+
+    /**
+     * Общий мир арен нельзя выгрузить: родная команда /duel arena delete
+     * в этом режиме попыталась бы удалить папку мира duel целиком.
+     */
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onWorldUnload(WorldUnloadEvent event) {
+        if (!plugin.isEnabled()) return;
+        String shared = plugin.sharedArenaWorld();
+        if (shared.isEmpty() || event.getWorld() == null) return;
+        if (!shared.equals(event.getWorld().getName())) return;
+        event.setCancelled(true);
+        plugin.getLogger().warning("Арены: мир \"" + shared
+                + "\" — общий для всех арен, выгружать его нельзя.");
     }
 
     private static boolean arena(String world) {
