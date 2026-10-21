@@ -1,0 +1,65 @@
+language: ru
+
+lobby:
+  world: "spawn"
+  x: 0.0
+  y: 100.0
+  z: 0.0
+  yaw: 0.0
+  pitch: 0.0
+  handle-join: false
+  disable-pvp: false
+  protections:
+    block-break: false
+    block-place: false
+    block-interact: false
+    fall-damage: false
+    void-death: false
+    hunger: false
+    item-pickup: false
+    item-drop: false
+    inventory-movement: false
+    weather: false
+    mob-spawning: false
+    fire-spread: false
+    block-burning: false
+    leaf-decay: false
+    death-messages: false
+
+duel:
+  time-limit-seconds: 300
+  tournament-draw: "sudden-death"
+  sudden-death-seconds: 60
+  countdown-seconds: 3
+  broadcast-results: true
+
+result-commands:
+  winner:
+    - "points give {player} 25"
+    - "eco give {player} 500"
+  loser:
+    - "points give {player} 5"
+
+features:
+  challenges: true
+  matchmaking: true
+  spectating: true
+  rematch: true
+  forfeit: true
+  best-of-n: true
+  own-inventory-duels: true
+  kit-editor: true
+  parties: true
+  team-duels: true
+  tournaments: true
+  leaderboards: true
+
+stats:
+  backend: "local"
+  supabase:
+    url: ""
+    api-key: ""
+    table: "player_stats"
+  firebase:
+    database-url: ""
+    auth-token: ""

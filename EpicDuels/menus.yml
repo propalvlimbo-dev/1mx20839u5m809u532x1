@@ -1,0 +1,111 @@
+menus:
+  main:
+    title: '<#F8BEFB><bold>Дуэли</bold>'
+    size: 27
+    buttons:
+      slot-10:
+        slot: 10
+        material: NETHERITE_SWORD
+        name: '<#F8BEFB><bold>Дуэль</bold>'
+        lore:
+          - '<gray>● <white>Вызвать игрока на бой</white>'
+          - '<gray>● <white>Кит, раунды и карта</white>'
+        visible: true
+      slot-4:
+        slot: 4
+        material: ENDER_EYE
+        name: '<#F8BEFB><bold>Наблюдение</bold>'
+        lore:
+          - '<gray>● <white>Список живых дуэлей</white>'
+        visible: true
+      slot-16:
+        slot: 16
+        material: COMPASS
+        name: '<#F8BEFB><bold>Поиск соперника</bold>'
+        lore:
+          - '<gray>● <white>Очередь по киту</white>'
+          - '<gray>● <white>Бой без вызова</white>'
+        visible: true
+      slot-13:
+        slot: 13
+        material: BOOK
+        name: '<#F8BEFB><bold>Статистика</bold>'
+        lore:
+          - '<gray>● <white>Победы, поражения и процент</white>'
+        visible: true
+      slot-22:
+        slot: 22
+        material: ANVIL
+        name: '<#F8BEFB><bold>Раскладка китов</bold>'
+        lore:
+          - '<gray>● <white>Расставить предметы кита под себя</white>'
+          - '<gray>● <white>Только перестановка, без изменений</white>'
+        visible: true
+  duels:
+    title: '<#F8BEFB><bold>Выбор игрока</bold>'
+    size: 54
+    buttons: {}
+  stats:
+    title: '<#F8BEFB><bold>Статистика</bold>'
+    size: 27
+    buttons: {}
+  matchmaking:
+    title: '<#F8BEFB><bold>Поиск соперника</bold>'
+    size: 54
+    buttons: {}
+  kit-select:
+    title: '<#F8BEFB><bold>Выбор кита</bold>'
+    size: 54
+    buttons: {}
+  rounds-select:
+    title: '<#F8BEFB><bold>Сколько раундов</bold>'
+    size: 27
+    buttons: {}
+  arena-select:
+    title: '<#F8BEFB><bold>Выбор карты</bold>'
+    size: 54
+    buttons: {}
+  kit-edit:
+    title: '<#F8BEFB><bold>Кит: <kit></bold>'
+    size: 54
+    buttons: {}
+  kit-preview:
+    title: '<#F8BEFB><bold>Просмотр: <kit></bold>'
+    size: 54
+    buttons: {}
+  kit-customize:
+    title: '<#F8BEFB><bold>Раскладка: <kit></bold>'
+    size: 54
+    buttons: {}
+  kit-list:
+    title: '<#F8BEFB><bold>Киты</bold>'
+    size: 54
+    buttons: {}
+  kit-editor-list:
+    title: '<#F8BEFB><bold>Раскладка китов</bold>'
+    size: 54
+    buttons: {}
+  arena-list:
+    title: '<#F8BEFB><bold>Арены</bold>'
+    size: 54
+    buttons: {}
+  party-mode:
+    title: '<#F8BEFB><bold>Группа — режим</bold>'
+    size: 27
+    buttons: {}
+  party-team-size:
+    title: '<#F8BEFB><bold>Группа — размер команд</bold>'
+    size: 27
+    buttons: {}
+  party-kit:
+    title: '<#F8BEFB><bold>Группа — кит</bold>'
+    size: 54
+    buttons: {}
+  party-confirm:
+    title: '<#F8BEFB><bold>Группа — подтверждение</bold>'
+    size: 27
+    buttons: {}
+  spectate:
+    title: '<#F8BEFB><bold>Живые дуэли</bold>'
+    size: 54
+    buttons: {}

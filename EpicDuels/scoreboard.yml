@@ -1,0 +1,38 @@
+enabled: true
+update-interval-ticks: 20
+views:
+  lobby:
+    enabled: false
+    title: '<#F8BEFB><bold>ElytriX</bold>'
+    lines:
+      - '<gray>Привет, <white><player>'
+      - ''
+      - '<gray>● <white>Дуэли: <#F8BEFB>/duel'
+  duel:
+    enabled: true
+    title: '<#F8BEFB><bold>Дуэль</bold>'
+    lines:
+      - '<gray>Соперник: <white><opponent>'
+      - '<gray>Кит: <white><kit>'
+      - '<gray>Карта: <white><arena>'
+      - ''
+      - '<gray>Раунд: <#F8BEFB><round> <dark_gray>/ <best_of>'
+      - '<gray>Счёт: <green><score> <dark_gray>: <red><opponent_score>'
+      - '<gray>Осталось: <#F8BEFB><time>'
+  spectator:
+    enabled: true
+    title: '<#F8BEFB><bold>Наблюдение</bold>'
+    lines:
+      - '<gray>Игроки: <white><opponent>'
+      - '<gray>Кит: <white><kit>'
+      - '<gray>Карта: <white><arena>'
+      - '<gray>Счёт: <white><score> <dark_gray>: <opponent_score>'
+      - '<gray>Осталось: <#F8BEFB><time>'
+  queue:
+    enabled: true
+    title: '<#F8BEFB><bold>Поиск соперника</bold>'
+    lines:
+      - '<gray>Игрок: <white><player>'
+      - '<gray>Кит: <#F8BEFB><kit>'
+      - ''
+      - '<gray>Ищем соперника...'
