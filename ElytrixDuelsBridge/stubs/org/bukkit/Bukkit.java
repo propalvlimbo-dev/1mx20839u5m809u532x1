@@ -16,6 +16,8 @@ public final class Bukkit {
     public static Inventory createInventory(InventoryHolder owner, int size, String title) { return null; }
     public static Collection<? extends Player> getOnlinePlayers() { return java.util.Collections.emptyList(); }
     public static Player getPlayerExact(String name) { return null; }
+    public static World getWorld(String name) { return null; }
+    public static java.util.List<World> getWorlds() { return java.util.Collections.emptyList(); }
     public static Player getPlayer(UUID id) { return null; }
     public static OfflinePlayer getOfflinePlayer(UUID id) { return null; }
     public static OfflinePlayer getOfflinePlayer(String name) { return null; }

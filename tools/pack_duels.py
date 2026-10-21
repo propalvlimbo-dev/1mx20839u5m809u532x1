@@ -40,8 +40,8 @@ REPLACE_DIRS = {
 }
 
 ADD = {
-    "downloads/EpicDuels-ElytriX-3.1.0.jar": "plugins/EpicDuels-ElytriX-3.1.0.jar",
-    "downloads/ElytrixDuelsBridge-1.6.0.jar": "plugins/ElytrixDuelsBridge-1.6.0.jar",
+    "downloads/EpicDuels-ElyTriX-3.1.1.jar": "plugins/EpicDuels-ElyTriX-3.1.1.jar",
+    "downloads/ElytrixDuelsBridge-1.7.0.jar": "plugins/ElytrixDuelsBridge-1.7.0.jar",
 }
 
 
@@ -61,8 +61,13 @@ def main() -> int:
                    if not i.is_dir()]
 
     merged: dict[str, bytes] = {name: data for name, _, data in entries}
-    # старые версии jar моста не тащим в архив
+    # старые версии jar моста и форка не тащим в архив
     for name in [n for n in merged if "/plugins/ElytrixDuelsBridge-" in n]:
+        del merged[name]
+    for name in [n for n in merged if "/plugins/epicduels-elytrix-" in n.lower()]:
+        del merged[name]
+    # стоковый EpicDuels больше не кладём: ставится наш билд
+    for name in [n for n in merged if "/plugins/epicduels-3." in n.lower()]:
         del merged[name]
     # удалённые из репозитория меню не должны оставаться в архиве:
     # сверяем папки REPLACE_DIRS с тем, что реально лежит на диске

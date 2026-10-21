@@ -168,6 +168,16 @@ final class Kits {
         return clean;
     }
 
+    /** Русское имя → английский id EpicDuels (для старых сборок). */
+    static String legacyOf(String name) {
+        String canonical = canonical(name);
+        if (canonical == null) return null;
+        for (int index = 0; index < NAMES.length; index++) {
+            if (canonical.equalsIgnoreCase(NAMES[index])) return LEGACY[index];
+        }
+        return null;
+    }
+
     static boolean known(String name) {
         String canonical = canonical(name);
         if (canonical == null) return false;

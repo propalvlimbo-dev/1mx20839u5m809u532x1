@@ -9,6 +9,9 @@ public class Location implements Cloneable {
     public double getZ() { return 0; }
     public float getYaw() { return 0; }
     public float getPitch() { return 0; }
+    public int getBlockX() { return 0; }
+    public int getBlockY() { return 0; }
+    public int getBlockZ() { return 0; }
     public Location clone() { return this; }
     public double distanceSquared(Location other) { return 0; }
     public double distance(Location other) { return 0; }

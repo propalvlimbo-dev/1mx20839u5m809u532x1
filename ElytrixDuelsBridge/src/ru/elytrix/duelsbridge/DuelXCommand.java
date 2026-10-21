@@ -45,7 +45,7 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
     static final List<String> SUBS = Arrays.asList(
             "menu", "main", "stats", "stat", "pick", "target", "team", "kit",
             "kitmenu", "rounds", "queue", "top", "bounds", "confirm", "cancel",
-            "kits", "open");
+            "kits", "open", "arena");
 
     DuelXCommand(ElytrixDuelsBridge plugin) {
         this.plugin = plugin;
@@ -86,6 +86,12 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
             }
             if (sub.equals("stats") || sub.equals("stat")) {
                 plugin.openStats(player);
+                return true;
+            }
+            if (sub.equals("arena")) {
+                String[] rest = new String[Math.max(0, args.length - 1)];
+                System.arraycopy(args, 1, rest, 0, rest.length);
+                plugin.arenaCommand(player, rest);
                 return true;
             }
             if (sub.equals("kitmenu")) {
@@ -216,7 +222,8 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
             return filter(args[0], Arrays.asList("menu", "stats", "pick", "target", "team", "kit",
-                    "kitmenu", "rounds", "queue", "top", "bounds", "confirm", "cancel", "kits", "open"));
+                    "kitmenu", "rounds", "queue", "top", "bounds", "confirm", "cancel", "kits",
+                    "open", "arena"));
         }
         if (args.length == 2) {
             String sub = plugin.lower(args[0]);
@@ -232,6 +239,10 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
             }
             if (sub.equals("kit")) {
                 return filter(args[1], kits());
+            }
+            if (sub.equals("arena")) {
+                return filter(args[1], Arrays.asList("create", "spawn1", "spawn2", "ready",
+                        "list", "remove", "tp"));
             }
             if (sub.equals("target")) {
                 List<String> names = new ArrayList<String>();

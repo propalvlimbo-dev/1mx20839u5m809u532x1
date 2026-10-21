@@ -165,9 +165,69 @@ final class Duels {
         return call(gui(), "getPartyFlowKit", id);
     }
 
+    /**
+     * Кит по любому имени: русскому, английскому или как в kits.yml.
+     * Null — такого кита нет.
+     */
+    Object kitOf(String name) {
+        if (name == null) return null;
+        Object manager = manager("getKitManager");
+        if (manager == null) return null;
+        String clean = name.trim();
+        String[] tries = new String[]{
+                clean,
+                Kits.canonical(clean),
+                Kits.legacyOf(clean)
+        };
+        for (String candidate : tries) {
+            if (candidate == null || candidate.isEmpty()) continue;
+            Object kit = call(manager, "getKit", candidate);
+            if (kit != null) return kit;
+        }
+        return null;
+    }
+
+    /** Имя кита так, как оно записано в kits.yml (для сообщений и очереди). */
+    String kitName(String name) {
+        Object kit = kitOf(name);
+        if (kit == null) return null;
+        Object actual = call(kit, "getName");
+        return actual == null ? Kits.canonical(name) : String.valueOf(actual);
+    }
+
     boolean kitExists(String name) {
-        String kit = Kits.canonical(name);
-        return kit != null && call(manager("getKitManager"), "getKit", kit) != null;
+        return kitOf(name) != null;
+    }
+
+    /** Все киты сервера — чтобы подсказать, если игрок выбрал несуществующий. */
+    java.util.List<String> kitNames() {
+        java.util.List<String> out = new java.util.ArrayList<String>();
+        Object value = call(manager("getKitManager"), "getKitNames");
+        if (!(value instanceof java.util.List)) return out;
+        for (Object name : (java.util.List<?>) value) {
+            if (name != null) out.add(String.valueOf(name));
+        }
+        return out;
+    }
+
+    // ------------------------------------------------- очередь самого EpicDuels
+
+    /** Игрок стоит в очереди EpicDuels (её же показывает его прежнее меню). */
+    boolean nativeQueued(UUID id) {
+        Object value = call(manager("getQueueManager"), "isInQueue", id);
+        return value instanceof Boolean && ((Boolean) value).booleanValue();
+    }
+
+    /** Кит, с которым игрок стоит в очереди EpicDuels. */
+    String nativeQueuedKit(UUID id) {
+        Object value = call(manager("getQueueManager"), "getQueuedKit", id);
+        return value == null ? null : String.valueOf(value);
+    }
+
+    /** Убрать игрока из очереди EpicDuels: true — он там был. */
+    boolean nativeLeave(UUID id) {
+        Object value = call(manager("getQueueManager"), "leaveQueue", id);
+        return value instanceof Boolean && ((Boolean) value).booleanValue();
     }
 
     /** Кит, за который сейчас воюет игрок (обычный бой или 2 на 2). */
@@ -208,11 +268,13 @@ final class Duels {
                     "&#F8BEFBДуэли &8» &cБой запускает только пригласивший тиммейта."));
             return false;
         }
-        Object kit = call(manager("getKitManager"), "getKit", kitName);
+        // в потоке лежит русское имя кита («Сумо»), а KitManager знает только
+        // английский id — переводим через kitOf, иначе «Кит не найден»
+        Object kit = kitOf(String.valueOf(kitName));
         if (kit == null) {
             plugin.msg(player, plugin.string("messages.kit-gone",
                     "&#F8BEFBДуэли &8» &cКит &f%kit%&c больше не существует.")
-                    .replace("%kit%", String.valueOf(kitName)));
+                    .replace("%kit%", kitLabel(String.valueOf(kitName))));
             return false;
         }
         Object members = call(party, "getMembers");
@@ -297,10 +359,9 @@ final class Duels {
      * сразу стартуем на случайной арене.
      */
     boolean startQueue1v1(Player first, Player second, String kitName) {
-        String kit = Kits.canonical(kitName);
-        if (first == null || second == null || kit == null) return false;
+        if (first == null || second == null) return false;
         Object arena = randomArena();
-        Object kitObject = call(manager("getKitManager"), "getKit", kit);
+        Object kitObject = kitOf(kitName);
         if (arena == null || kitObject == null) return false;
         Object started = invokeRaw(manager("getDuelManager"), "startDirectDuel",
                 new Class<?>[]{Player.class, Player.class, arena.getClass(), kitObject.getClass(), int.class},
@@ -311,9 +372,9 @@ final class Duels {
     /**
      * Бой 2 на 2 из очереди: составы задаём сами (пары не перемешиваем).
      */
-    boolean startQueue2v2(java.util.List<UUID> teamA, java.util.List<UUID> teamB, String kitName) {
+    boolean startQueue2v2(java.util.List<UUID> teamA, java.util.List<UUID> teamB, String kitArg) {
         if (teamA == null || teamB == null || teamA.size() != 2 || teamB.size() != 2) return false;
-        String kit = Kits.canonical(kitName);
+        String kit = kitName(kitArg);
         if (kit == null) return false;
         java.util.List<UUID> all = new ArrayList<UUID>(teamA);
         all.addAll(teamB);

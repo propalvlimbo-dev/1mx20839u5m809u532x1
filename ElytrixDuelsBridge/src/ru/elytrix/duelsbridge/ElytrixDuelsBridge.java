@@ -64,6 +64,7 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
     private final ArenaRules arenaRules = new ArenaRules(this, duels);
     private final Teams teams = new Teams(this);
     private final Queue queue = new Queue(this);
+    private final Arenas arenas = new Arenas(this, duels);
     /** Оригинальные обработчики /duel из EpicDuels — нужны админам и /duelx. */
     private PluginCommand duelCommand;
     private DuelXCommand bridgeExecutor;
@@ -151,6 +152,11 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
                         "warp", "home", "back"));
                 changed = true;
             }
+            // один общий мир для всех арен: по умолчанию — уже готовый duel
+            if (config.getString("arenas.world") == null) {
+                config.set("arenas.world", Bukkit.getWorld("duel") == null ? "" : "duel");
+                changed = true;
+            }
             if (config.getString("api.tops") == null) {
                 config.set("api.tops", true);
                 config.set("api.tops-interval-seconds", 60);
@@ -169,6 +175,7 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(arenaRules, this);
         getServer().getPluginManager().registerEvents(new Effects(this, duels), this);
         arenaRules.start();
+        arenas.setup();
         Tops.start(this, duels);
         teams.start();
         queue.start();
@@ -261,6 +268,11 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
                 + " &7· &fПоражения: &#F8BEFB" + args.get("losses")
                 + " &7· &fПобед: &#F8BEFB" + args.get("winrate") + "%"
                 + " &7· &fОчки: &#F8BEFB" + args.get("score"));
+    }
+
+    /** /duelx arena — арены в одном мире. */
+    void arenaCommand(Player player, String[] args) {
+        arenas.command(player, args);
     }
 
     /** Окно очереди (выбор кита для 1 на 1). */
@@ -503,8 +515,7 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
                 Bukkit.getScheduler().runTask(this, new Runnable() {
                     @Override
                     public void run() {
-                        String id = menuForOr("MAIN", "elytrix:duel");
-                        menus.open(viewer, id, menuArgs(viewer, id));
+                        openMainMenu(viewer);
                     }
                 });
             }

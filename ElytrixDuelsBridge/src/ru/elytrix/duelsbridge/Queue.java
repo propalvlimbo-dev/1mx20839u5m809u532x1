@@ -69,7 +69,7 @@ final class Queue {
     // ------------------------------------------------------------- состояние
 
     boolean isQueued(UUID id) {
-        return entryOf(id) != null;
+        return entryOf(id) != null || plugin.duels().nativeQueued(id);
     }
 
     Entry entryOf(UUID id) {
@@ -85,7 +85,15 @@ final class Queue {
     java.util.Map<String, String> argsFor(Player player) {
         java.util.Map<String, String> args = new java.util.LinkedHashMap<String, String>();
         Entry entry = entryOf(player.getUniqueId());
-        if (entry == null) return args;
+        if (entry == null) {
+            // игрок стоит в старой очереди самого EpicDuels — показываем её кит
+            String nativeKit = plugin.duels().nativeQueuedKit(player.getUniqueId());
+            if (nativeKit == null) return args;
+            args.put("kit", plugin.duels().kitLabel(nativeKit));
+            args.put("mode", "1 на 1");
+            args.put("waited", "--:--");
+            return args;
+        }
         args.put("kit", entry.kit);
         args.put("mode", entry.team ? (entry.pair() ? "2 на 2, парой" : "2 на 2, рандом") : "1 на 1");
         long seconds = Math.max(0, (System.currentTimeMillis() - entry.joinedAt) / 1000L);
@@ -104,11 +112,9 @@ final class Queue {
                     "&#F8BEFBДуэли &8» &cТы уже в бою."));
             return;
         }
-        String name = Kits.canonical(kit);
-        if (!plugin.duels().kitExists(name)) {
-            plugin.msg(player, msg("messages.kit-unknown",
-                    "&#F8BEFBДуэли &8» &cНеизвестный кит: &f%kit%")
-                    .replace("%kit%", kit == null ? "?" : kit));
+        String name = plugin.duels().kitName(kit);
+        if (name == null) {
+            kitUnknown(player, kit);
             return;
         }
         leave(player, false);
@@ -128,14 +134,13 @@ final class Queue {
                     "&#F8BEFBДуэли &8» &cКто-то из пары уже в бою."));
             return;
         }
-        String name = Kits.canonical(kit);
-        if (!plugin.duels().kitExists(name)) {
-            plugin.msg(owner, msg("messages.kit-unknown",
-                    "&#F8BEFBДуэли &8» &cНеизвестный кит: &f%kit%")
-                    .replace("%kit%", kit == null ? "?" : kit));
+        String name = plugin.duels().kitName(kit);
+        if (name == null) {
+            kitUnknown(owner, kit);
             return;
         }
         leave(owner, false);
+        plugin.duels().nativeLeave(mate.getUniqueId());
         Entry entry = new Entry(owner.getUniqueId(), mate.getUniqueId(), name, true,
                 System.currentTimeMillis());
         synchronized (entries) {
@@ -151,11 +156,20 @@ final class Queue {
     void leave(Player player, boolean notify) {
         if (player == null) return;
         Entry removed = remove(player.getUniqueId());
+        // заодно чистим очередь самого EpicDuels: игрок мог попасть туда
+        // старым меню, и тогда «выйти» отвечало «Ты не в очереди»
+        boolean wasNative = plugin.duels().nativeLeave(player.getUniqueId());
         if (removed == null) {
-            if (notify) {
-                plugin.msg(player, msg("messages.queue-not-in",
-                        "&#F8BEFBДуэли &8» &7Ты не в очереди."));
+            if (!wasNative) {
+                if (notify) {
+                    plugin.msg(player, msg("messages.queue-not-in",
+                            "&#F8BEFBДуэли &8» &7Поиск уже не идёт — очередь пуста."));
+                }
+                return;
             }
+            player.sendActionBar(Text.of(" "));
+            if (notify) plugin.msg(player, msg("messages.queue-left",
+                    "&#F8BEFBДуэли &8» &7Поиск отменён."));
             return;
         }
         clearActionBar(removed);
@@ -191,6 +205,7 @@ final class Queue {
     /** Игрок вышел с сервера: убираем его и сообщаем напарнику. */
     void quit(Player player) {
         UUID id = player.getUniqueId();
+        plugin.duels().nativeLeave(id);
         Entry entry = remove(id);
         if (entry == null) return;
         clearActionBar(entry);
@@ -233,6 +248,7 @@ final class Queue {
                 }
                 if (gone) {
                     iterator.remove();
+                    debug("игрок вышел: " + entry.owner);
                     continue;
                 }
                 boolean fighting = false;
@@ -245,12 +261,14 @@ final class Queue {
                 if (fighting) {
                     iterator.remove();
                     busy.add(entry);
+                    debug("уже в бою: " + entry.owner);
                     continue;
                 }
                 long limit = (entry.team ? teamTimeout() : timeout()) * 1000L;
                 if (now - entry.joinedAt >= limit) {
                     iterator.remove();
                     expired.add(entry);
+                    debug("истекло время: " + entry.owner);
                 }
             }
         }
@@ -383,6 +401,48 @@ final class Queue {
         }
     }
 
+    private void debug(String text) {
+        if (plugin.getConfig().getBoolean("queue.debug", false)) {
+            plugin.getLogger().info("[queue] " + text);
+        }
+    }
+
+    /** Вернуть записи в очередь после неудачного старта. */
+    private void requeue(Entry... back) {
+        synchronized (entries) {
+            for (Entry entry : back) {
+                if (!entries.contains(entry)) entries.add(entry);
+            }
+        }
+    }
+
+    /** Вернуть игроков в очередь одиночками (2 на 2 — по парам не восстановить). */
+    private void requeueIds(List<UUID> ids, String kit, boolean team) {
+        long now = System.currentTimeMillis();
+        synchronized (entries) {
+            for (UUID id : ids) {
+                boolean present = false;
+                for (Entry entry : entries) {
+                    if (entry.has(id)) {
+                        present = true;
+                        break;
+                    }
+                }
+                if (!present) entries.add(new Entry(id, null, kit, team, now));
+            }
+        }
+    }
+
+    /** «Такого кита нет» + подсказка, какие есть. */
+    private void kitUnknown(Player player, String kit) {
+        String text = msg("messages.kit-unknown",
+                "&#F8BEFBДуэли &8» &cКита &f%kit%&c нет на сервере. Есть: &f%list%")
+                .replace("%kit%", kit == null ? "?" : kit);
+        java.util.List<String> names = plugin.duels().kitNames();
+        String list = names.isEmpty() ? "—" : String.join(", ", names);
+        plugin.msg(player, text.replace("%list%", list));
+    }
+
     /** Убрать наш action bar. */
     private void clearActionBar(Entry entry) {
         Component empty = Text.of(" ");
@@ -396,8 +456,9 @@ final class Queue {
         Player a = Bukkit.getPlayer(first.owner);
         Player b = Bukkit.getPlayer(second.owner);
         if (!plugin.duels().startQueue1v1(a, b, first.kit)) {
+            requeue(first, second);
             String text = msg("messages.start-failed",
-                    "&#F8BEFBДуэли &8» &cНе удалось начать бой. Попробуй ещё раз.");
+                    "&#F8BEFBДуэли &8» &cБой не стартовал (нет готовой арены?) — продолжаем искать.");
             plugin.msg(a, text);
             plugin.msg(b, text);
             return;
@@ -441,8 +502,10 @@ final class Queue {
         all.addAll(teamA);
         all.addAll(teamB);
         if (!ok) {
+            // бой не стартовал — возвращаем всех в поиск, чтобы не «выкидывало» из очереди
+            requeueIds(all, kit, true);
             String text = msg("messages.start-failed",
-                    "&#F8BEFBДуэли &8» &cНе удалось начать бой. Попробуй ещё раз.");
+                    "&#F8BEFBДуэли &8» &cБой не стартовал (нет готовой арены?) — продолжаем искать.");
             for (UUID id : all) plugin.msg(Bukkit.getPlayer(id), text);
             return;
         }

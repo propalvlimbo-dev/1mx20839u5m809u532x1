@@ -1,6 +1,6 @@
 # EpicDuels 3.1 — установка под ElytriX
 
-Плагин: **EpicDuels 3.1.0-elytrix** (форк, `EpicDuels-Fork/`), Paper
+Плагин: **EpicDuels 3.1.1-elytrix** (форк, `EpicDuels-Fork/`), Paper
 1.21.1–1.21.11, Java 21. Клиенты 1.21.4 заходят через ViaBackwards, плагин
 от этого не зависит.
 
@@ -18,7 +18,7 @@
 | `lang/messages_ru.yml` | `plugins/EpicDuels/lang/messages_ru.yml` |
 | `КИТЫ.md` | инструкция: 10 китов |
 | `АРЕНЫ.md` | инструкция: перенос арен из мира `duel` |
-| `downloads/EpicDuels-ElytriX-3.1.0.jar` | `plugins/EpicDuels-ElytriX-3.1.0.jar` |
+| `downloads/EpicDuels-ElyTriX-3.1.1.jar` | `plugins/EpicDuels-ElyTriX-3.1.1.jar` |
 
 ## Установка
 

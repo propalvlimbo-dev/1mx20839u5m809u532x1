@@ -2,6 +2,7 @@ package org.bukkit;
 public enum Material {
     PLAYER_HEAD,
     PAPER,
+    GRASS_BLOCK,
     ARROW,
     SHIELD,
     BOW,

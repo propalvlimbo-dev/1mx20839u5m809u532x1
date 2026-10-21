@@ -29,6 +29,17 @@ final class DuelCommandGuard implements CommandExecutor, TabCompleter {
     private static final Set<String> GAMEPLAY = new HashSet<String>(Arrays.asList(
             "accept", "deny", "cancel", "forfeit", "ff", "leave", "rematch", "toggle"));
 
+    /**
+     * Подкоманды, которые ведёт мост. Их обрабатываем и админам: иначе у
+     * владельца сервера «/duel queue leave» уходило в EpicDuels и отвечало
+     * «Ты не в очереди», хотя игрок стоит в нашей.
+     * Остальное (arena, reload, kit…) у админов остаётся родным EpicDuels.
+     */
+    private static final Set<String> OURS = new HashSet<String>(Arrays.asList(
+            "menu", "main", "stats", "stat", "pick", "target", "team", "party", "duo",
+            "kitmenu", "rounds", "queue", "matchmaking", "top", "bounds", "confirm",
+            "cancel", "kits", "open"));
+
     private final ElytrixDuelsBridge plugin;
     private final CommandExecutor original;
     private final TabCompleter completer;
@@ -45,14 +56,14 @@ final class DuelCommandGuard implements CommandExecutor, TabCompleter {
             return original != null && original.onCommand(sender, command, label, args);
         }
         Player player = (Player) sender;
-        if (plugin.isAdmin(player)) {
-            return original != null && original.onCommand(sender, command, label, args);
-        }
         if (args.length == 0 || plugin.lower(args[0]).equals("menu")) {
             plugin.openMainMenu(player);
             return true;
         }
         String sub = plugin.lower(args[0]);
+        if (plugin.isAdmin(player) && !OURS.contains(sub)) {
+            return original != null && original.onCommand(sender, command, label, args);
+        }
         // поиск пары и статистика — наши, с кнопками и подсказками
         if (sub.equals("stats") || sub.equals("stat")) {
             plugin.openStats(player);
