@@ -3,6 +3,7 @@ package ru.elytrix.duelsbridge;
 import java.util.Locale;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryOpenEvent;
@@ -28,8 +29,19 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
     public void onEnable() {
         saveDefaultConfig();
         getServer().getPluginManager().registerEvents(this, this);
-        getCommand("duelx").setExecutor(new DuelXCommand(this));
-        getCommand("duelx").setTabCompleter(new DuelXCommand(this));
+
+        PluginCommand command = getCommand("duelx");
+        if (command != null) {
+            DuelXCommand executor = new DuelXCommand(this);
+            command.setExecutor(executor);
+            command.setTabCompleter(executor);
+        } else {
+            getLogger().warning("Команда /duelx не зарегистрирована: загрузи плагин "
+                    + "перезапуском сервера, а не через PlugMan.");
+        }
+        if (getServer().getPluginManager().getPlugin("BMenu") == null) {
+            getLogger().warning("BMenu не найден: окна EpicDuels будут открываться как есть.");
+        }
         getLogger().info("ElytriX: мосты меню EpicDuels -> BMenu включены");
     }
 
@@ -84,8 +96,12 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
 
     void open(Player player, String menu) {
         if (menu == null || menu.isEmpty()) return;
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+        boolean ok = Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
                 "bmenu open " + menu + " " + player.getName());
+        if (!ok) {
+            getLogger().warning("BMenu не принял команду: bmenu open " + menu
+                    + " " + player.getName() + " (проверь id меню в config.yml)");
+        }
     }
 
     void msg(Player player, String text) {

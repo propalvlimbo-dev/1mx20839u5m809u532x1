@@ -69,6 +69,10 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
                 if (perTeam < 2 || perTeam > 4) return usage(player, "/duelx size <2|3|4>");
                 return partySize(player, perTeam);
             }
+            if (sub.equals("kit")) {
+                if (args.length < 2) return usage(player, "/duelx kit <кит>");
+                return kit(player, args[1]);
+            }
             if (sub.equals("open")) {
                 if (args.length < 2) return usage(player, "/duelx open <menu>");
                 plugin.open(player, args[1]);
@@ -123,7 +127,7 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
     private boolean partyTournament(Player player) throws ReflectiveOperationException {
         if (!feature("tournaments")) return off(player, "Турниры");
         Object gui = gui();
-        Class<?> modeClass = Class.forName("dev.epicduels.model.PartyMode");
+        Class<?> modeClass = secondArg(gui, "setPartyFlowMode");
         Object mode = Enum.valueOf((Class) modeClass, "TOURNAMENT");
         gui.getClass().getMethod("setPartyFlowMode", UUID.class, modeClass)
                 .invoke(gui, player.getUniqueId(), mode);
@@ -136,8 +140,8 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
     private boolean partySize(Player player, int perTeam) throws ReflectiveOperationException {
         Object gui = gui();
         String sizeName = perTeam == 2 ? "TWO_VS_TWO" : perTeam == 3 ? "THREE_VS_THREE" : "FOUR_VS_FOUR";
-        Class<?> sizeClass = Class.forName("dev.epicduels.model.TeamSize");
-        Class<?> modeClass = Class.forName("dev.epicduels.model.PartyMode");
+        Class<?> sizeClass = secondArg(gui, "setPartyFlowTeamSize");
+        Class<?> modeClass = secondArg(gui, "setPartyFlowMode");
         Object size = Enum.valueOf((Class) sizeClass, sizeName);
         Object mode = Enum.valueOf((Class) modeClass, "TEAM_DUEL");
 
@@ -157,6 +161,44 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
         player.closeInventory();
         gui.getClass().getMethod("openPartyKitMenu", Player.class, int.class).invoke(gui, player, 0);
         return true;
+    }
+
+    /**
+     * Кит выбран в нашем меню. Если идёт вызов игрока — открываем выбор
+     * раундов; если это поток группы — сразу подтверждение.
+     */
+    private boolean kit(Player player, String kitName) throws ReflectiveOperationException {
+        Object gui = gui();
+        UUID uuid = player.getUniqueId();
+        Object target = gui.getClass().getMethod("getChallengeTarget", UUID.class).invoke(gui, uuid);
+        player.closeInventory();
+        if (target != null) {
+            gui.getClass().getMethod("openRoundsSelect", Player.class, UUID.class, String.class)
+                    .invoke(gui, player, target, kitName);
+            return true;
+        }
+        Object mode = gui.getClass().getMethod("getPartyFlowMode", UUID.class).invoke(gui, uuid);
+        if (mode == null) {
+            plugin.msg(player, plugin.getConfig().getString("messages.no-challenge",
+                    "&f☁ &dᴇʟʏᴛʀɪx &7» &cСначала выбери игрока и кит."));
+            return true;
+        }
+        gui.getClass().getMethod("setPartyFlowKit", UUID.class, String.class).invoke(gui, uuid, kitName);
+        gui.getClass().getMethod("openPartyConfirmMenu", Player.class).invoke(gui, player);
+        return true;
+    }
+
+    /**
+     * Тип второго аргумента метода — так классы PartyMode/TeamSize берутся
+     * из самого плагина, без Class.forName (у плагинов свои ClassLoader'ы).
+     */
+    private static Class<?> secondArg(Object target, String method) throws NoSuchMethodException {
+        for (java.lang.reflect.Method candidate : target.getClass().getMethods()) {
+            if (candidate.getName().equals(method) && candidate.getParameterCount() == 2) {
+                return candidate.getParameterTypes()[1];
+            }
+        }
+        throw new NoSuchMethodException(method);
     }
 
     private Object party(Player player) throws ReflectiveOperationException {
@@ -183,12 +225,20 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        if (args.length == 1) return filter(args[0], Arrays.asList("rounds", "party", "size", "open"));
+        if (args.length == 1) return filter(args[0], Arrays.asList("rounds", "party", "size", "kit", "open"));
         if (args.length == 2) {
             String sub = plugin.lower(args[0]);
             if (sub.equals("rounds")) return filter(args[1], Arrays.asList("1", "3", "5"));
             if (sub.equals("party")) return filter(args[1], Arrays.asList("team", "tournament"));
             if (sub.equals("size")) return filter(args[1], Arrays.asList("2", "3", "4"));
+            if (sub.equals("kit")) {
+                List<String> kits = plugin.getConfig().getStringList("kits");
+                if (kits == null || kits.isEmpty()) {
+                    kits = Arrays.asList("sword", "nodebuff", "uhc", "sumo", "gapple",
+                            "archer", "mace", "crystal", "pot");
+                }
+                return filter(args[1], kits);
+            }
         }
         return new ArrayList<String>();
     }

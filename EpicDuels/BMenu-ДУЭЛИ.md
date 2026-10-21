@@ -13,7 +13,8 @@ plugins/BMenu/menu/elytrix/duel/
 ├── stats.yml        профиль и топ
 ├── rounds.yml       число раундов: 1 / 3 / 5
 ├── party.yml        групповая дуэль или турнир
-└── party_size.yml   размер команд: 2v2 / 3v3 / 4v4
+├── party_size.yml   размер команд: 2v2 / 3v3 / 4v4
+└── kit.yml          выбор кита (те же 9 китов, что в queue.yml)
 ```
 
 Плюс мост `ElytrixDuelsBridge-1.0.0.jar`: он подменяет окна самого
@@ -141,18 +142,22 @@ EpicDuels на эти меню. Без моста `/duel` показывает �
 | `MAIN` | `elytrix:duel` |
 | `STATS` | `elytrix:duel_stats` |
 | `MATCHMAKING` | `elytrix:duel_queue` |
+| `KIT_SELECT` | `elytrix:duel_kit` |
+| `PARTY_KIT` | `elytrix:duel_kit` |
 | `ROUNDS_SELECT` | `elytrix:duel_rounds` |
 | `PARTY_MODE` | `elytrix:duel_party` |
 | `PARTY_TEAM_SIZE` | `elytrix:duel_party_size` |
 
-Остальные окна (список игроков, киты, арены, наблюдение, пати-кит) остаются
-за плагином: их содержимое зависит от онлайна и настроек, статичным YAML его
-не нарисовать.
+Остаются за плагином только окна с «живым» содержимым: список игроков
+(`DUELS`), арены (`ARENA_SELECT`), наблюдение (`SPECTATE`) и подтверждение
+группы (`PARTY_CONFIRM`). Их список зависит от сервера, статичным меню его
+не показать; они перекрашены через `menus.yml` EpicDuels.
 
 Кнопки новых меню вызывают `/duelx`:
 
 ```
 /duelx rounds <1|3|5>            передать раунды и открыть выбор карты
+/duelx kit <кит>                 выбранный кит → раунды или подтверждение
 /duelx party <team|tournament>   групповая дуэль или турнир
 /duelx size <2|3|4>              размер команд и выбор кита
 /duelx open <menu>               открыть меню BMenu по id

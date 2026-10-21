@@ -183,4 +183,39 @@ open(os.path.join(OUT, "party_size.yml"), "w", encoding="utf-8").write(
     build("duel_party_size", "Размер команд", size_items,
           [("back", 45), ("close", 49), ("2v2", 11), ("3v3", 13), ("4v4", 15)]))
 
+
+# ------------------------------------------------------- выбор кита (вызов)
+KITS = [
+    ("sword", "netherite_sword", "Классика", "меч, броня, гаплы"),
+    ("nodebuff", "splash_potion", "Зелья", "без брони, только зелья"),
+    ("uhc", "golden_apple", "УХК", "гаплы, настойки, лук"),
+    ("sumo", "fishing_rod", "Сумо", "вытолкнуть соперника"),
+    ("gapple", "enchanted_golden_apple", "Гаппли", "только золотые яблоки"),
+    ("archer", "bow", "Лучник", "лук и стрелы"),
+    ("mace", "mace", "Булава", "удар булавой сверху"),
+    ("crystal", "end_crystal", "Кристаллы", "кристаллы и обсидиан"),
+    ("pot", "lingering_potion", "Агрессия", "зелья и меч"),
+]
+KIT_SLOTS = [11, 13, 15, 20, 22, 24, 29, 31, 33]
+
+kit_items = [
+    item("back", 45, "black_dye", T("Назад"),
+         [B0, B + "Вернуться в меню дуэлей", B0, DOT + "Нажмите для возврата"],
+         ["sound: 'ui.button.click 0.4 1.0'", "[open] elytrix:duel"]),
+    item("close", 49, "red_dye", "&7« &cЗакрыть меню &7»",
+         [B0, B + "Выход в игровой мир.", B0, DOT + "Нажмите для закрытия"],
+         ["sound: 'ui.button.click 0.4 1.0'", "[close]"]),
+]
+for idx, (kit_id, material, title, hint) in enumerate(KITS):
+    kit_items.append(item(
+        "kit_" + kit_id, KIT_SLOTS[idx], material, T(title),
+        [B0, B + "Кит: " + H + kit_id, B0, B + "Состав: " + H + hint, B0,
+         DOT + "Нажмите, чтобы выбрать"],
+        [f"sound: 'block.note_block.pling 0.4 {1.05 + idx * 0.05:.2f}'",
+         f"[player] duelx kit {kit_id}"]))
+open(os.path.join(OUT, "kit.yml"), "w", encoding="utf-8").write(
+    build("duel_kit", "Выбор кита", kit_items,
+          [("back", 45), ("close", 49)] +
+          [("kit_" + kit_id, KIT_SLOTS[i]) for i, (kit_id, *_rest) in enumerate(KITS)]))
+
 print("готово:", sorted(os.listdir(OUT)))

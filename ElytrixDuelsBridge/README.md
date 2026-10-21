@@ -20,6 +20,7 @@ BMenu — с анимацией сборки, звуками и русским �
 
 ```
 /duelx rounds <1|3|5>            выбрать раунды  → плагин открывает выбор карты
+/duelx kit <кит>                 кит из нашего меню → раунды или подтверждение
 /duelx party <team|tournament>   режим группы   → выбор размера / кита
 /duelx size <2|3|4>              размер команд  → выбор кита
 /duelx open <menu>               открыть меню BMenu
@@ -35,16 +36,18 @@ openArenaSelect, openPartyTeamSizeMenu, openPartyKitMenu, …) — то же, ч
 |---|---|---|
 | `MAIN` (`/duel`) | `elytrix:duel` | статичное, 4 кнопки |
 | `STATS` | `elytrix:duel_stats` | цифры берём из PlaceholderAPI |
-| `MATCHMAKING` | `elytrix:duel_queue` | состав китов у нас фиксирован |
+| `MATCHMAKING` | `elytrix:duel_queue` |
+| `KIT_SELECT` | `elytrix:duel_kit` |
+| `PARTY_KIT` | `elytrix:duel_kit` | состав китов у нас фиксирован |
 | `ROUNDS_SELECT` | `elytrix:duel_rounds` | 1 / 3 / 5 |
 | `PARTY_MODE` | `elytrix:duel_party` | 2 кнопки |
 | `PARTY_TEAM_SIZE` | `elytrix:duel_party_size` | 2v2 / 3v3 / 4v4 |
 
-Остаются за плагином (содержимое зависит от онлайна и настроек):
+Остаются за плагином (содержимое зависит от сервера):
 
-`DUELS` (список игроков), `KIT_SELECT`, `ARENA_SELECT`, `KIT_LIST`,
-`KIT_EDITOR_LIST`, `ARENA_LIST`, `SPECTATE`, `PARTY_KIT`, `PARTY_CONFIRM`,
-`KIT_EDIT`, `KIT_PREVIEW`, `KIT_CUSTOMIZE`.
+`DUELS` (список игроков), `ARENA_SELECT`, `SPECTATE`, `PARTY_CONFIRM`,
+`KIT_LIST`, `KIT_EDITOR_LIST`, `ARENA_LIST`, `KIT_EDIT`, `KIT_PREVIEW`,
+`KIT_CUSTOMIZE`.
 
 Эти экраны перекрашены через `menus.yml` EpicDuels (названия, лор, слоты,
 заголовки), но их рисует сам плагин: в статичном YAML нельзя вывести список
