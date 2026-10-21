@@ -80,38 +80,38 @@ final class Teams {
     void invite(Player owner, Player target) {
         if (target == null || !target.isOnline()) {
             plugin.msg(owner, pair("messages.team-target-gone",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cИгрок уже вышел."));
+                    "&#F8BEFBДуэли &8» &cИгрок уже вышел."));
             return;
         }
         if (target.getUniqueId().equals(owner.getUniqueId())) {
             plugin.msg(owner, pair("messages.team-self",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cСебя в напарники не взять."));
+                    "&#F8BEFBДуэли &8» &cСебя в напарники не взять."));
             return;
         }
         UUID ownerId = owner.getUniqueId();
         UUID targetId = target.getUniqueId();
         if (paired(ownerId)) {
             plugin.msg(owner, pair("messages.team-already",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cТы уже в паре с &f%name%&c. Сначала выйди из неё.")
+                    "&#F8BEFBДуэли &8» &cТы уже в паре с &f%name%&c. Сначала выйди из неё.")
                     .replace("%name%", name(partnerOf(ownerId))));
             return;
         }
         if (busy(targetId)) {
             plugin.msg(owner, pair("messages.team-target-busy",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &c%name%&c сейчас занят: в бою или в поиске.")
+                    "&#F8BEFBДуэли &8» &c%name%&c сейчас занят: в бою или в поиске.")
                     .replace("%name%", target.getName()));
             return;
         }
         if (paired(targetId)) {
             plugin.msg(owner, pair("messages.team-target-paired",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &c%name%&c уже в паре.")
+                    "&#F8BEFBДуэли &8» &c%name%&c уже в паре.")
                     .replace("%name%", target.getName()));
             return;
         }
         Invite existing = invites.get(targetId);
         if (existing != null && existing.owner.equals(ownerId)) {
             plugin.msg(owner, pair("messages.team-invite-wait",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Ты уже позвал &f%name%&7, ждём ответа.")
+                    "&#F8BEFBДуэли &8» &7Ты уже позвал &f%name%&7, ждём ответа.")
                     .replace("%name%", target.getName()));
             return;
         }
@@ -119,16 +119,16 @@ final class Teams {
         plugin.forgetTarget(ownerId);
 
         plugin.msg(owner, pair("messages.team-invite-sent",
-                "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fПриглашение отправлено: &d%name%&f. "
+                "&#F8BEFBДуэли &8» &fПриглашение отправлено: &d%name%&f. "
                         + "Ждём ответа &f60 с&f.")
                 .replace("%name%", target.getName()));
 
         Component line = Text.of(pair("messages.team-invite-received",
-                "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &d%owner% &fзовёт тебя в пару для боя 2 на 2. ")
+                "&#F8BEFBДуэли &8» &d%owner% &fзовёт тебя в пару для боя 2 на 2. ")
                 .replace("%owner%", owner.getName()));
-        Component accept = Text.button("&a&l[Принять] ", "/duelx team accept " + owner.getName(),
+        Component accept = Text.button("&a[Принять] ", "/duel team accept " + owner.getName(),
                 "Встать в пару с " + owner.getName());
-        Component deny = Text.button("&c&l[Отклонить]", "/duelx team deny " + owner.getName(),
+        Component deny = Text.button("&c[Отклонить]", "/duel team deny " + owner.getName(),
                 "Отказаться от приглашения");
         Text.send(target, line.append(accept).append(deny));
     }
@@ -137,7 +137,7 @@ final class Teams {
     void randomInvite(Player owner) {
         if (paired(owner.getUniqueId())) {
             plugin.msg(owner, pair("messages.team-already",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cТы уже в паре с &f%name%&c. Сначала выйди из неё.")
+                    "&#F8BEFBДуэли &8» &cТы уже в паре с &f%name%&c. Сначала выйди из неё.")
                     .replace("%name%", name(partnerOf(owner.getUniqueId()))));
             return;
         }
@@ -155,7 +155,7 @@ final class Teams {
         }
         if (candidates.isEmpty()) {
             plugin.msg(owner, pair("messages.team-no-random",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cСвободных игроков нет — попробуй через минуту."));
+                    "&#F8BEFBДуэли &8» &cСвободных игроков нет — попробуй через минуту."));
             return;
         }
         Collections.shuffle(candidates);
@@ -169,29 +169,29 @@ final class Teams {
         if (pending != null && expectedOwner != null && !expectedOwner.isEmpty()
                 && !pending.ownerName.equalsIgnoreCase(expectedOwner)) {
             plugin.msg(invitee, pair("messages.team-invite-stale",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Это приглашение уже неактуально."));
+                    "&#F8BEFBДуэли &8» &7Это приглашение уже неактуально."));
             return;
         }
         Invite invite = invites.remove(id);
         if (invite == null) {
             plugin.msg(invitee, pair("messages.team-none",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cТебя никто не приглашал (или приглашение истекло)."));
+                    "&#F8BEFBДуэли &8» &cТебя никто не приглашал (или приглашение истекло)."));
             return;
         }
         Player owner = Bukkit.getPlayer(invite.owner);
         if (owner == null || !owner.isOnline()) {
             plugin.msg(invitee, pair("messages.team-owner-gone",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &c%name%&c уже вышел.").replace("%name%", invite.ownerName));
+                    "&#F8BEFBДуэли &8» &c%name%&c уже вышел.").replace("%name%", invite.ownerName));
             return;
         }
         if (busy(id) || busy(invite.owner)) {
             plugin.msg(invitee, pair("messages.team-busy",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cКто-то уже в бою или в поиске."));
+                    "&#F8BEFBДуэли &8» &cКто-то уже в бою или в поиске."));
             return;
         }
         if (paired(id) || paired(invite.owner)) {
             plugin.msg(invitee, pair("messages.team-paired",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cУ кого-то уже есть пара."));
+                    "&#F8BEFBДуэли &8» &cУ кого-то уже есть пара."));
             return;
         }
         partner.put(id, invite.owner);
@@ -199,15 +199,15 @@ final class Teams {
         invites.remove(invite.owner);
 
         String text = pair("messages.team-ready",
-                "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fПара собрана: &d%a% &f+ &d%b%&f.")
+                "&#F8BEFBДуэли &8» &fПара собрана: &d%a% &f+ &d%b%&f.")
                 .replace("%a%", owner.getName()).replace("%b%", invitee.getName());
         plugin.msg(owner, text);
         plugin.msg(invitee, text);
 
         Component more = Text.of(pair("messages.team-next",
-                "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Дальше выбери кит — встанем в очередь парой. "));
-        Component kit = Text.button("&d&l[Выбрать кит]", "/duelx kitmenu", "Открыть выбор кита");
-        Component out = Text.button(" &7[Выйти из пары]", "/duelx team leave", "Разорвать пару");
+                "&#F8BEFBДуэли &8» &7Дальше выбери кит — встанем в очередь парой. "));
+        Component kit = Text.button("&d[Выбрать кит]", "/duel kitmenu", "Открыть выбор кита");
+        Component out = Text.button(" &7[Выйти из пары]", "/duel team leave", "Разорвать пару");
         Text.send(owner, more.append(kit).append(out));
         Text.send(invitee, more.append(kit).append(out));
     }
@@ -217,15 +217,15 @@ final class Teams {
         Invite invite = invites.remove(invitee.getUniqueId());
         if (invite == null) {
             plugin.msg(invitee, pair("messages.team-none",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cТебя никто не приглашал (или приглашение истекло)."));
+                    "&#F8BEFBДуэли &8» &cТебя никто не приглашал (или приглашение истекло)."));
             return;
         }
         plugin.msg(invitee, pair("messages.team-denied-self",
-                "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Приглашение отклонено."));
+                "&#F8BEFBДуэли &8» &7Приглашение отклонено."));
         Player owner = Bukkit.getPlayer(invite.owner);
         if (owner != null) {
             plugin.msg(owner, pair("messages.team-denied",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &c%name%&c отклонил приглашение.")
+                    "&#F8BEFBДуэли &8» &c%name%&c отклонил приглашение.")
                     .replace("%name%", invitee.getName()));
         }
     }
@@ -236,17 +236,17 @@ final class Teams {
         UUID other = partner.remove(id);
         if (other == null) {
             plugin.msg(player, pair("messages.team-not-paired",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Ты не в паре."));
+                    "&#F8BEFBДуэли &8» &7Ты не в паре."));
             return;
         }
         partner.remove(other);
         plugin.queue().leave(player);
         plugin.msg(player, pair("messages.team-left",
-                "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Ты вышел из пары."));
+                "&#F8BEFBДуэли &8» &7Ты вышел из пары."));
         Player partnerPlayer = Bukkit.getPlayer(other);
         if (partnerPlayer != null) {
             plugin.msg(partnerPlayer, pair("messages.team-partner-left",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &f%name% &7вышел из пары.")
+                    "&#F8BEFBДуэли &8» &f%name% &7вышел из пары.")
                     .replace("%name%", player.getName()));
         }
     }
@@ -265,7 +265,7 @@ final class Teams {
         Player partnerPlayer = Bukkit.getPlayer(other);
         if (partnerPlayer != null) {
             plugin.msg(partnerPlayer, pair("messages.team-partner-left",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &f%name% &7вышел из пары.")
+                    "&#F8BEFBДуэли &8» &f%name% &7вышел из пары.")
                     .replace("%name%", player.getName()));
         }
     }
@@ -286,12 +286,12 @@ final class Teams {
                     Player invitee = Bukkit.getPlayer(entry.getKey());
                     if (owner != null) {
                         plugin.msg(owner, pair("messages.team-expired",
-                                "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Приглашение для &f%name%&7 истекло.")
+                                "&#F8BEFBДуэли &8» &7Приглашение для &f%name%&7 истекло.")
                                 .replace("%name%", invitee == null ? "?" : invitee.getName()));
                     }
                     if (invitee != null) {
                         plugin.msg(invitee, pair("messages.team-expired-self",
-                                "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Приглашение от &f%name%&7 истекло.")
+                                "&#F8BEFBДуэли &8» &7Приглашение от &f%name%&7 истекло.")
                                 .replace("%name%", invite.ownerName));
                     }
                 }

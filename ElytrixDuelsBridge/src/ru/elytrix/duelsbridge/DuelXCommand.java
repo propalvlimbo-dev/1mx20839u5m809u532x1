@@ -37,8 +37,23 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
 
     private final ElytrixDuelsBridge plugin;
 
+    /**
+     * Подкоманды, которые доступны и как /duelx ..., и как /duel ...
+     * Игроку в чате показываем вторую форму: /duel виден клиенту,
+     * поэтому ванильного «команда не распознана» не бывает.
+     */
+    static final List<String> SUBS = Arrays.asList(
+            "menu", "main", "stats", "stat", "pick", "target", "team", "kit",
+            "kitmenu", "rounds", "queue", "top", "bounds", "confirm", "cancel",
+            "kits", "open");
+
     DuelXCommand(ElytrixDuelsBridge plugin) {
         this.plugin = plugin;
+    }
+
+    /** Выполнить подкоманду из /duel (без отдельной регистрации команды). */
+    boolean run(Player player, String[] args) {
+        return onCommand(player, null, "duelx", args);
     }
 
     @Override
@@ -59,7 +74,7 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
                 Player target = Bukkit.getPlayerExact(args[1]);
                 if (target == null) {
                     plugin.msg(player, plugin.string("messages.player-gone",
-                            "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cИгрок уже вышел."));
+                            "&#F8BEFBДуэли &8» &cИгрок уже вышел."));
                     return true;
                 }
                 plugin.requestDuel(player, target);
@@ -163,14 +178,14 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
             }
         } catch (Throwable error) {
             plugin.getLogger().warning("duelx " + sub + ": " + error);
-            plugin.msg(player, "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНе удалось продолжить: " + error.getClass().getSimpleName());
+            plugin.msg(player, "&#F8BEFBДуэли &8» &cНе удалось продолжить: " + error.getClass().getSimpleName());
             return true;
         }
         return usage(player, "/duelx <pick|target|team|kit|rounds|queue|top|bounds|kits|confirm|cancel|open>");
     }
 
     private boolean usage(Player player, String text) {
-        plugin.msg(player, "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fИспользование: &#F8BEFB" + text);
+        plugin.msg(player, "&#F8BEFBДуэли &8» &fИспользование: &#F8BEFB" + text);
         return true;
     }
 
@@ -183,7 +198,7 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
         Object kit = Duels.call(gui, "getChallengeKit", uuid);
         if (target == null || kit == null) {
             plugin.msg(player, plugin.string("messages.no-challenge",
-                    "&f☁ &dᴇʟʏᴛʀɪx &7» &cСначала выбери игрока и кит."));
+                    "&#F8BEFBДуэли &8» &cСначала выбери игрока и кит."));
             return true;
         }
         Duels.call(gui, "setChallengeRounds", uuid, bestOf);

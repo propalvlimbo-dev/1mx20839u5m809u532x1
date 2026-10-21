@@ -69,7 +69,7 @@ result-commands:
 `menus.yml`, `scoreboard.yml` и `lang/messages_ru.yml` переписаны под стиль
 ElytriX:
 
-- префикс `☁ ᴇʟʏᴛʀɪx »`, акцент `#F8BEFB`, разделители `gray` / `dark_gray`;
+- префикс `Дуэли »`, акцент `#F8BEFB`, разделители `gray` / `dark_gray`;
 - лор: `┃` — данные, `●` — действие;
 - успех `green`, ошибка `red`;
 - заголовки меню `#F8BEFB`, жирные;

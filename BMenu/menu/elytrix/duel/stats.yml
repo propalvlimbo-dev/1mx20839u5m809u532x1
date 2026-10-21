@@ -3,6 +3,12 @@ provider: default
 type: chest
 size: 54
 title: "&#F8BEFB&lСтатистика"
+args:
+  wins: "0"
+  losses: "0"
+  winrate: "0"
+  score: "0"
+
 items:
   wins:
     material: emerald

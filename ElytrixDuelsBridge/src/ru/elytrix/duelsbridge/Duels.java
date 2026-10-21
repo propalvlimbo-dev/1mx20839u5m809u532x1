@@ -170,6 +170,15 @@ final class Duels {
         return kit != null && call(manager("getKitManager"), "getKit", kit) != null;
     }
 
+    /** Кит, за который сейчас воюет игрок (обычный бой или 2 на 2). */
+    String kitNameOf(UUID id) {
+        Object duel = call(manager("getDuelManager"), "getDuel", id);
+        if (duel == null) duel = call(manager("getTeamDuelManager"), "getTeamDuelOf", id);
+        if (duel == null) return null;
+        Object kit = call(duel, "getKitName");
+        return kit == null ? null : String.valueOf(kit);
+    }
+
     /** Подпись кита для сообщений: русское имя, если оно известно. */
     String kitLabel(String name) {
         String kit = Kits.canonical(name);
@@ -184,25 +193,25 @@ final class Duels {
         Object party = partyOf(id);
         if (mode == null || kitName == null || party == null) {
             plugin.msg(player, plugin.string("messages.missing-data",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cДанные боя потерялись, начни заново."));
+                    "&#F8BEFBДуэли &8» &cДанные боя потерялись, начни заново."));
             return false;
         }
         boolean tournament = "TOURNAMENT".equals(String.valueOf(mode));
         if (!feature(tournament ? "tournaments" : "team-duels")) {
             plugin.msg(player, plugin.string("messages.feature-off",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cВыключено на сервере: &f%name%")
+                    "&#F8BEFBДуэли &8» &cВыключено на сервере: &f%name%")
                     .replace("%name%", tournament ? "Турниры" : "Бои 2 на 2"));
             return false;
         }
         if (!isOwner(party, id)) {
             plugin.msg(player, plugin.string("messages.owner-only",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cБой запускает только пригласивший тиммейта."));
+                    "&#F8BEFBДуэли &8» &cБой запускает только пригласивший тиммейта."));
             return false;
         }
         Object kit = call(manager("getKitManager"), "getKit", kitName);
         if (kit == null) {
             plugin.msg(player, plugin.string("messages.kit-gone",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cКит &f%kit%&c больше не существует.")
+                    "&#F8BEFBДуэли &8» &cКит &f%kit%&c больше не существует.")
                     .replace("%kit%", String.valueOf(kitName)));
             return false;
         }
@@ -211,7 +220,7 @@ final class Duels {
             for (Object member : (List<?>) members) {
                 if (member instanceof UUID && busy((UUID) member)) {
                     plugin.msg(player, plugin.string("messages.member-busy",
-                            "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cКто-то из пары уже в бою."));
+                            "&#F8BEFBДуэли &8» &cКто-то из пары уже в бою."));
                     return false;
                 }
             }
@@ -224,13 +233,13 @@ final class Duels {
             Object size = flowSizeValue(id);
             if (size == null) {
                 plugin.msg(player, plugin.string("messages.no-team-size",
-                        "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cСначала выбери размер команд."));
+                        "&#F8BEFBДуэли &8» &cСначала выбери размер команд."));
                 return false;
             }
             Object arenas = call(manager("getArenaManager"), "getReadyArenas");
             if (!(arenas instanceof List) || ((List<?>) arenas).isEmpty()) {
                 plugin.msg(player, plugin.string("messages.no-arenas",
-                        "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНет готовых арен — сообщи администратору."));
+                        "&#F8BEFBДуэли &8» &cНет готовых арен — сообщи администратору."));
                 return false;
             }
             List<?> list = (List<?>) arenas;
@@ -242,7 +251,7 @@ final class Duels {
         }
         if (!ok) {
             plugin.msg(player, plugin.string("messages.start-failed",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНе удалось начать бой. Попробуй ещё раз."));
+                    "&#F8BEFBДуэли &8» &cНе удалось начать бой. Попробуй ещё раз."));
             return false;
         }
         clearFlow(id);
@@ -258,13 +267,13 @@ final class Duels {
         if (call(gui(), "getChallengeTarget", id) == null
                 || call(gui(), "getChallengeKit", id) == null) {
             plugin.msg(player, plugin.string("messages.no-challenge",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cСначала выбери игрока и кит."));
+                    "&#F8BEFBДуэли &8» &cСначала выбери игрока и кит."));
             return false;
         }
         Object arenas = call(manager("getArenaManager"), "getReadyArenas");
         if (!(arenas instanceof List) || ((List<?>) arenas).isEmpty()) {
             plugin.msg(player, plugin.string("messages.no-arenas",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНет готовых арен — сообщи администратору."));
+                    "&#F8BEFBДуэли &8» &cНет готовых арен — сообщи администратору."));
             return false;
         }
         List<?> ready = (List<?>) arenas;

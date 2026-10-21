@@ -213,55 +213,65 @@ final class Kits {
     private static ItemStack[] contents(String name) {
         if (name.equals("sword")) {
             return new ItemStack[]{
-                    boost(boost(item(Material.NETHERITE_SWORD, 1), "SHARPNESS", 3), "UNBREAKING", 3),
-                    item(Material.GOLDEN_APPLE, 3)};
+                    boost(boost(item(Material.NETHERITE_SWORD, 1), "SHARPNESS", 4), "UNBREAKING", 3),
+                    item(Material.GOLDEN_APPLE, 5),
+                    item(Material.ENDER_PEARL, 8)};
         }
         if (name.equals("uhc")) {
             return new ItemStack[]{
-                    boost(item(Material.DIAMOND_SWORD, 1), "SHARPNESS", 2),
-                    boost(item(Material.BOW, 1), "POWER", 2),
-                    item(Material.ARROW, 16),
-                    item(Material.GOLDEN_APPLE, 3)};
+                    boost(item(Material.DIAMOND_SWORD, 1), "SHARPNESS", 3),
+                    boost(item(Material.BOW, 1), "POWER", 3),
+                    item(Material.ARROW, 24),
+                    item(Material.GOLDEN_APPLE, 4),
+                    item(Material.ENDER_PEARL, 6)};
         }
         if (name.equals("gapple")) {
             return new ItemStack[]{
-                    boost(item(Material.DIAMOND_SWORD, 1), "SHARPNESS", 2),
-                    item(Material.GOLDEN_APPLE, 8)};
+                    boost(item(Material.DIAMOND_SWORD, 1), "SHARPNESS", 3),
+                    item(Material.GOLDEN_APPLE, 12),
+                    item(Material.ENDER_PEARL, 6)};
         }
         if (name.equals("sumo")) {
-            return new ItemStack[0];
+            return new ItemStack[]{item(Material.ENDER_PEARL, 2)};
         }
         if (name.equals("archer")) {
             return new ItemStack[]{
-                    boost(boost(item(Material.BOW, 1), "POWER", 3), "PUNCH", 1),
-                    item(Material.ARROW, 32),
-                    boost(item(Material.STONE_SWORD, 1), "SHARPNESS", 1)};
+                    boost(boost(item(Material.BOW, 1), "POWER", 4), "PUNCH", 1),
+                    item(Material.ARROW, 48),
+                    boost(item(Material.STONE_SWORD, 1), "SHARPNESS", 2),
+                    item(Material.ENDER_PEARL, 8)};
         }
         if (name.equals("mace")) {
             return new ItemStack[]{
-                    boost(boost(item(Material.MACE, 1), "DENSITY", 3), "UNBREAKING", 2),
-                    item(Material.WIND_CHARGE, 8),
-                    item(Material.GOLDEN_APPLE, 2)};
+                    boost(boost(item(Material.MACE, 1), "DENSITY", 4), "UNBREAKING", 3),
+                    item(Material.WIND_CHARGE, 16),
+                    item(Material.GOLDEN_APPLE, 3),
+                    item(Material.ENDER_PEARL, 6)};
         }
         if (name.equals("axe")) {
             return new ItemStack[]{
-                    boost(item(Material.NETHERITE_AXE, 1), "SHARPNESS", 2),
-                    item(Material.GOLDEN_APPLE, 2)};
+                    boost(item(Material.NETHERITE_AXE, 1), "SHARPNESS", 3),
+                    item(Material.GOLDEN_APPLE, 3),
+                    item(Material.ENDER_PEARL, 8)};
         }
         if (name.equals("trident")) {
             return new ItemStack[]{
-                    boost(boost(item(Material.TRIDENT, 1), "IMPALING", 3), "UNBREAKING", 2),
-                    item(Material.GOLDEN_APPLE, 2)};
+                    boost(boost(item(Material.TRIDENT, 1), "IMPALING", 4), "UNBREAKING", 3),
+                    item(Material.GOLDEN_APPLE, 3),
+                    item(Material.ENDER_PEARL, 8)};
         }
         if (name.equals("crossbow")) {
             return new ItemStack[]{
-                    boost(boost(item(Material.CROSSBOW, 1), "QUICK_CHARGE", 2), "MULTISHOT", 1),
-                    item(Material.ARROW, 32),
-                    boost(item(Material.STONE_SWORD, 1), "SHARPNESS", 1)};
+                    boost(boost(item(Material.CROSSBOW, 1), "QUICK_CHARGE", 3), "MULTISHOT", 1),
+                    item(Material.ARROW, 48),
+                    boost(item(Material.STONE_SWORD, 1), "SHARPNESS", 2),
+                    item(Material.ENDER_PEARL, 6)};
         }
         return new ItemStack[]{
-                boost(boost(item(Material.NETHERITE_SWORD, 1), "SHARPNESS", 3), "UNBREAKING", 3),
-                item(Material.GOLDEN_APPLE, 4)};
+                boost(boost(item(Material.NETHERITE_SWORD, 1), "SHARPNESS", 4), "UNBREAKING", 3),
+                item(Material.GOLDEN_APPLE, 6),
+                item(Material.ENDER_PEARL, 8),
+                item(Material.TOTEM_OF_UNDYING, 1)};
     }
 
     private static ItemStack[] armor(String name) {
@@ -270,26 +280,27 @@ final class Kits {
         }
         if (name.equals("gapple")) {
             return armor(Material.DIAMOND_BOOTS, Material.DIAMOND_LEGGINGS,
-                    Material.DIAMOND_CHESTPLATE, Material.DIAMOND_HELMET, "PROTECTION", 2);
+                    Material.DIAMOND_CHESTPLATE, Material.DIAMOND_HELMET, "PROTECTION", 3);
         }
         if (name.equals("archer")) {
             return armor(Material.LEATHER_BOOTS, Material.LEATHER_LEGGINGS,
-                    Material.LEATHER_CHESTPLATE, Material.LEATHER_HELMET, "PROTECTION", 1);
+                    Material.LEATHER_CHESTPLATE, Material.LEATHER_HELMET, "PROTECTION", 2);
         }
         if (name.equals("crossbow")) {
             return armor(Material.CHAINMAIL_BOOTS, Material.CHAINMAIL_LEGGINGS,
-                    Material.CHAINMAIL_CHESTPLATE, Material.CHAINMAIL_HELMET, "PROTECTION", 1);
+                    Material.CHAINMAIL_CHESTPLATE, Material.CHAINMAIL_HELMET, "PROTECTION", 2);
         }
         if (name.equals("netherite")) {
             return armor(Material.NETHERITE_BOOTS, Material.NETHERITE_LEGGINGS,
-                    Material.NETHERITE_CHESTPLATE, Material.NETHERITE_HELMET, "PROTECTION", 2);
+                    Material.NETHERITE_CHESTPLATE, Material.NETHERITE_HELMET, "PROTECTION", 3);
         }
         return armor(Material.IRON_BOOTS, Material.IRON_LEGGINGS,
-                Material.IRON_CHESTPLATE, Material.IRON_HELMET, "PROTECTION", 1);
+                Material.IRON_CHESTPLATE, Material.IRON_HELMET, "PROTECTION", 2);
     }
 
     private static ItemStack offhand(String name) {
         if (name.equals("axe")) return item(Material.SHIELD, 1);
+        if (name.equals("netherite")) return item(Material.TOTEM_OF_UNDYING, 1);
         return null;
     }
 }

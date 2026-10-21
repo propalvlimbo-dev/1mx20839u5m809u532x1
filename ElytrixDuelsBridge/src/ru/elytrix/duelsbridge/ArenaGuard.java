@@ -83,6 +83,6 @@ final class ArenaGuard implements Listener {
         if (last != null && now - last < WARN_DELAY_MS) return;
         warned.put(id, now);
         plugin.msg(player, plugin.string("messages.arena-no-build",
-                "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНа арене нельзя ставить блоки."));
+                "&#F8BEFBДуэли &8» &cНа арене нельзя ставить блоки."));
     }
 }

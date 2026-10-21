@@ -9,6 +9,8 @@ public enum Material {
     TRIDENT,
     MACE,
     WIND_CHARGE,
+    ENDER_PEARL,
+    TOTEM_OF_UNDYING,
     FISHING_ROD,
     GOLDEN_APPLE,
     ENCHANTED_GOLDEN_APPLE,

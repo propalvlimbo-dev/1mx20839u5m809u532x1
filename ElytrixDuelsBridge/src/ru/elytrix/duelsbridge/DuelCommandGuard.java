@@ -65,19 +65,23 @@ final class DuelCommandGuard implements CommandExecutor, TabCompleter {
             return true;
         }
         if (sub.equals("team") || sub.equals("party") || sub.equals("duo")) {
+            // /duel team accept <ник>, deny, leave — то же, что кнопки в чате
+            if (args.length > 1) return plugin.runBridge(player, args);
             plugin.pickTeam(player);
             return true;
         }
         if (GAMEPLAY.contains(sub) && original != null) {
             return original.onCommand(sender, command, label, args);
         }
+        // остальные наши подкоманды (kitmenu, top, bounds, rounds, confirm…)
+        if (plugin.runBridge(player, args)) return true;
         Player target = Bukkit.getPlayerExact(args[0]);
         if (target != null) {
             plugin.requestDuel(player, target);
             return true;
         }
         plugin.msg(player, plugin.string("messages.duel-usage",
-                "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fДоступно: &f/duel &7и &f/duel ник"));
+                "&#F8BEFBДуэли &8» &fДоступно: &f/duel &7и &f/duel ник"));
         return true;
     }
 

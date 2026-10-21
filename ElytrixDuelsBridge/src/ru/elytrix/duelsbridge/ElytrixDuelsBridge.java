@@ -66,6 +66,7 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
     private final Queue queue = new Queue(this);
     /** Оригинальные обработчики /duel из EpicDuels — нужны админам и /duelx. */
     private PluginCommand duelCommand;
+    private DuelXCommand bridgeExecutor;
     private CommandExecutor duelExecutor;
     private TabCompleter duelCompleter;
     /** Кого игрок выбрал в своём окне (до выбора кита). */
@@ -150,6 +151,13 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
                         "warp", "home", "back"));
                 changed = true;
             }
+            if (config.getString("api.tops") == null) {
+                config.set("api.tops", true);
+                config.set("api.tops-interval-seconds", 60);
+                config.set("api.tops-size", 10);
+                config.set("api.tops-file", "tops.json");
+                changed = true;
+            }
             if (changed) saveConfig();
         } catch (RuntimeException error) {
             getLogger().warning("Не удалось обновить config.yml: " + error);
@@ -159,7 +167,9 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new ArenaGuard(this), this);
         getServer().getPluginManager().registerEvents(new CommandGuard(this), this);
         getServer().getPluginManager().registerEvents(arenaRules, this);
+        getServer().getPluginManager().registerEvents(new Effects(this, duels), this);
         arenaRules.start();
+        Tops.start(this, duels);
         teams.start();
         queue.start();
         hijackDuel();
@@ -167,6 +177,7 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         PluginCommand command = getCommand("duelx");
         if (command != null) {
             DuelXCommand executor = new DuelXCommand(this);
+            bridgeExecutor = executor;
             command.setExecutor(executor);
             command.setTabCompleter(executor);
         } else {
@@ -231,18 +242,25 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
     /** Окно «Ищем бой»: кит, режим, сколько ждём и кнопка отмены. */
     void openQueueWait(Player player) {
         String id = menuForOr("QUEUE_WAIT", "elytrix:duel_queue_wait");
-        if (menus.open(player, id, queue.argsFor(player))) return;
+        if (menus.openMenu(player, id, queue.argsFor(player)) != Menus.FAILED) return;
         // меню ещё не установлено — хотя бы кнопка в чате
         Component line = Text.of(string("messages.queue-wait-hint",
-                "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fТы в поиске. "));
-        Text.send(player, line.append(Text.button("&c&l[Отменить поиск]",
-                "/duelx queue leave", "Больше не искать")));
+                "&#F8BEFBДуэли &8» &fТы в поиске. "));
+        Text.send(player, line.append(Text.button("&c[Отменить поиск]",
+                "/duel queue leave", "Больше не искать")));
     }
 
     /** Статистика: числа подставляем сами, без PlaceholderAPI. */
     void openStats(Player player) {
+        Map<String, String> args = duels.stats(player.getUniqueId());
         String id = menuForOr("STATS", "elytrix:duel_stats");
-        menus.open(player, id, duels.stats(player.getUniqueId()));
+        if (menus.openMenu(player, id, args) == Menus.WITH_ARGS) return;
+        // BMenu не принял значения (старая версия) — показываем цифры в чате,
+        // чтобы вместо {wins} игрок не видел фигурные скобки
+        msg(player, "&#F8BEFBДуэли &8» &fПобеды: &#F8BEFB" + args.get("wins")
+                + " &7· &fПоражения: &#F8BEFB" + args.get("losses")
+                + " &7· &fПобед: &#F8BEFB" + args.get("winrate") + "%"
+                + " &7· &fОчки: &#F8BEFB" + args.get("score"));
     }
 
     /** Окно очереди (выбор кита для 1 на 1). */
@@ -251,10 +269,17 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         menus.open(player, id, menuArgs(player, id));
     }
 
+    /** Передать подкоманду нашему же /duelx, но через видимую клиенту /duel. */
+    boolean runBridge(Player player, String[] args) {
+        if (bridgeExecutor == null || args == null || args.length == 0) return false;
+        if (!DuelXCommand.SUBS.contains(lower(args[0]))) return false;
+        return bridgeExecutor.run(player, args);
+    }
+
     /** Выполнить подкоманду EpicDuels напрямую, минуя наш фильтр. */
     void runOriginal(Player player, String... args) {
         if (duelExecutor == null || duelCommand == null) {
-            msg(player, "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cEpicDuels не отвечает — перезапусти сервер.");
+            msg(player, "&#F8BEFBДуэли &8» &cEpicDuels не отвечает — перезапусти сервер.");
             return;
         }
         duelExecutor.onCommand(player, duelCommand, "duel", args);
@@ -328,7 +353,7 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
                 @Override
                 public void run() {
                     msg(player, string("messages.group-removed",
-                            "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fКомандные дуэли теперь в &f/duels&f: "
+                            "&#F8BEFBДуэли &8» &fКомандные дуэли теперь в &f/duels&f: "
                                     + "&f«Бои 2 на 2»"));
                     String id = menuForOr("MAIN", "elytrix:duel");
                     menus.open(player, id, menuArgs(player, id));
@@ -446,12 +471,12 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         if (picked == null) return;
         Player target = Bukkit.getPlayer(picked);
         if (target == null) {
-            msg(player, string("messages.player-gone", "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cИгрок уже вышел."));
+            msg(player, string("messages.player-gone", "&#F8BEFBДуэли &8» &cИгрок уже вышел."));
             PlayerPicker.open(this, player, picker.mode(), picker.page());
             return;
         }
         if (duels.busy(picked)) {
-            msg(player, string("messages.target-busy", "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &c%name%&c сейчас в бою.")
+            msg(player, string("messages.target-busy", "&#F8BEFBДуэли &8» &c%name%&c сейчас в бою.")
                     .replace("%name%", target.getName()));
             return;
         }
@@ -510,10 +535,10 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         ArenaRules.Bounds bounds = arenaRules.resolve(player);
         if (bounds == null) {
             msg(player, string("messages.arena-no-duel",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cТы не в бою."));
+                    "&#F8BEFBДуэли &8» &cТы не в бою."));
             return;
         }
-        msg(player, "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fАрена: &f" + bounds.world);
+        msg(player, "&#F8BEFBДуэли &8» &fАрена: &f" + bounds.world);
         msg(player, "&7  центр: &f" + round(bounds.centerX) + " " + round(bounds.centerZ)
                 + " &7| радиус: &f" + round(bounds.radius));
         msg(player, "&7  высота: &f" + round(bounds.baseY) + " + " + round(bounds.maxY - bounds.baseY)
@@ -529,22 +554,22 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         int created = kits.install(reset);
         if (created < 0) {
             msg(player, string("messages.kits-failed",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНе удалось: EpicDuels не отдал KitManager."));
+                    "&#F8BEFBДуэли &8» &cНе удалось: EpicDuels не отдал KitManager."));
             return;
         }
         msg(player, string("messages.kits-ready",
-                "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fНаборов готово: &f%count%")
+                "&#F8BEFBДуэли &8» &fНаборов готово: &f%count%")
                 .replace("%count%", String.valueOf(created)));
     }
 
     /** Выбран соперник: запоминаем и сразу показываем выбор кита. */
     void requestDuel(Player player, Player target) {
         if (target.getUniqueId().equals(player.getUniqueId())) {
-            msg(player, string("messages.self", "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНельзя вызвать самого себя."));
+            msg(player, string("messages.self", "&#F8BEFBДуэли &8» &cНельзя вызвать самого себя."));
             return;
         }
         if (duels.busy(target.getUniqueId())) {
-            msg(player, string("messages.target-busy", "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &c%name%&c сейчас в бою.")
+            msg(player, string("messages.target-busy", "&#F8BEFBДуэли &8» &c%name%&c сейчас в бою.")
                     .replace("%name%", target.getName()));
             return;
         }
@@ -562,7 +587,7 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
     void startTeam(Player owner, Player teammate) {
         if (!duels.feature("team-duels")) {
             msg(owner, string("messages.feature-off",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cВыключено на сервере: &f%name%")
+                    "&#F8BEFBДуэли &8» &cВыключено на сервере: &f%name%")
                     .replace("%name%", "Бои 2 на 2"));
             return;
         }
@@ -574,7 +599,7 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
     void pickTeam(Player player) {
         if (!duels.feature("team-duels")) {
             msg(player, string("messages.feature-off",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cВыключено на сервере: &f%name%")
+                    "&#F8BEFBДуэли &8» &cВыключено на сервере: &f%name%")
                     .replace("%name%", "Бои 2 на 2"));
             return;
         }
@@ -582,11 +607,11 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         if (teams.paired(id)) {
             // pairLine уже с никами, поэтому подставляем вручную
             Component line = Text.of(string("messages.team-status",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fТвоя пара: &d%pair%&f. ")
+                    "&#F8BEFBДуэли &8» &fТвоя пара: &d%pair%&f. ")
                     .replace("%pair%", teams.pairLine(id)));
-            Component kit = Text.button("&d&l[Выбрать кит] ", "/duelx kitmenu",
+            Component kit = Text.button("&d[Выбрать кит] ", "/duel kitmenu",
                     "Открыть выбор кита и встать в очередь");
-            Component out = Text.button("&c[Выйти из пары]", "/duelx team leave", "Разорвать пару");
+            Component out = Text.button("&c[Выйти из пары]", "/duel team leave", "Разорвать пару");
             Text.send(player, line.append(kit).append(out));
             return;
         }
@@ -597,7 +622,7 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
     void pickTeamRandom(Player player) {
         if (!duels.feature("team-duels")) {
             msg(player, string("messages.feature-off",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cВыключено на сервере: &f%name%")
+                    "&#F8BEFBДуэли &8» &cВыключено на сервере: &f%name%")
                     .replace("%name%", "Бои 2 на 2"));
             return;
         }
@@ -649,7 +674,7 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         String kit = Kits.canonical(kitName);
         if (!duels.kitExists(kit)) {
             msg(player, string("messages.kit-gone",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cКит &f%kit%&c не найден.")
+                    "&#F8BEFBДуэли &8» &cКит &f%kit%&c не найден.")
                     .replace("%kit%", String.valueOf(kitName)));
             return;
         }
@@ -671,7 +696,7 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         if ("TEAM_PAIR".equals(intent)) {
             if (!duels.feature("team-duels")) {
                 msg(player, string("messages.feature-off",
-                        "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cВыключено на сервере: &f%name%")
+                        "&#F8BEFBДуэли &8» &cВыключено на сервере: &f%name%")
                         .replace("%name%", "Бои 2 на 2"));
                 return;
             }
@@ -679,7 +704,7 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
             Player partner = mate == null ? null : Bukkit.getPlayer(mate);
             if (partner == null || !partner.isOnline()) {
                 msg(player, string("messages.team-partner-gone",
-                        "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНапарник вышел — найди нового."));
+                        "&#F8BEFBДуэли &8» &cНапарник вышел — найди нового."));
                 return;
             }
             queue.joinPair(player, partner, kit);
@@ -700,7 +725,7 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
             return;
         }
         msg(player, string("messages.no-target",
-                "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cСначала выбери соперника: &f/duel ник"));
+                "&#F8BEFBДуэли &8» &cСначала выбери соперника: &f/duel ник"));
     }
 
     /** Подтверждение боя: пара идёт в очередь, остальное — старый поток EpicDuels. */
@@ -773,7 +798,7 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         duels.clearFlow(player.getUniqueId());
         player.closeInventory();
         msg(player, string("messages.cancelled",
-                "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Отменено."));
+                "&#F8BEFBДуэли &8» &7Отменено."));
     }
 
     String menuForOr(String type, String fallback) {
@@ -848,7 +873,7 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
     }
 
     void messageTargetGone(Player player) {
-        msg(player, string("messages.player-gone", "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cИгрок уже вышел."));
+        msg(player, string("messages.player-gone", "&#F8BEFBДуэли &8» &cИгрок уже вышел."));
     }
 
     static Map<String, String> emptyArgs() {

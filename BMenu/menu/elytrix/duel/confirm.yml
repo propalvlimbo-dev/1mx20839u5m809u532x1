@@ -3,6 +3,12 @@ provider: default
 type: chest
 size: 54
 title: "&#F8BEFB&lПодтверждение"
+args:
+  mode: "1 на 1"
+  size: "2"
+  kit: "—"
+  action: "Нажмите, чтобы начать"
+
 items:
   confirm:
     material: lime_dye

@@ -40,11 +40,13 @@ final class PlayerPicker implements InventoryHolder {
         }
     }
 
+    /** Без рамки из стёкол: головы занимают всю верхнюю часть окна. */
     private static final int[] ITEM_SLOTS = {
-            10, 11, 12, 13, 14, 15, 16,
-            19, 20, 21, 22, 23, 24, 25,
-            28, 29, 30, 31, 32, 33, 34,
-            37, 38, 39, 40, 41, 42, 43
+            0, 1, 2, 3, 4, 5, 6, 7, 8,
+            9, 10, 11, 12, 13, 14, 15, 16, 17,
+            18, 19, 20, 21, 22, 23, 24, 25, 26,
+            27, 28, 29, 30, 31, 32, 33, 34, 35,
+            36, 37, 38, 39, 40, 41, 42, 43, 44
     };
     private static final int PREV = 45;
     private static final int RANDOM = 48;
@@ -102,15 +104,6 @@ final class PlayerPicker implements InventoryHolder {
         PlayerPicker holder = new PlayerPicker(mode, page, pages);
         Inventory inventory = Bukkit.createInventory(holder, SIZE, "\u00A77\u00AB \u00A7d" + mode.title + " \u00A77\u00BB");
         holder.inventory = inventory;
-
-        ItemStack purple = pane(Material.PURPLE_STAINED_GLASS_PANE, "\u00A7r");
-        ItemStack black = pane(Material.BLACK_STAINED_GLASS_PANE, "\u00A7r");
-        for (int slot = 0; slot < SIZE; slot++) {
-            inventory.setItem(slot, black);
-        }
-        for (int slot : new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 17, 18, 26, 27, 35, 36, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53}) {
-            inventory.setItem(slot, purple);
-        }
 
         int start = page * perPage;
         for (int i = 0; i < perPage && start + i < online.size(); i++) {

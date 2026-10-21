@@ -101,11 +101,18 @@ final class Queue {
         UUID id = player.getUniqueId();
         if (plugin.duels().busy(id)) {
             plugin.msg(player, msg("messages.queue-you-busy",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cТы уже в бою."));
+                    "&#F8BEFBДуэли &8» &cТы уже в бою."));
+            return;
+        }
+        String name = Kits.canonical(kit);
+        if (!plugin.duels().kitExists(name)) {
+            plugin.msg(player, msg("messages.kit-unknown",
+                    "&#F8BEFBДуэли &8» &cНеизвестный кит: &f%kit%")
+                    .replace("%kit%", kit == null ? "?" : kit));
             return;
         }
         leave(player, false);
-        Entry entry = new Entry(id, null, kit, team, System.currentTimeMillis());
+        Entry entry = new Entry(id, null, name, team, System.currentTimeMillis());
         synchronized (entries) {
             entries.add(entry);
         }
@@ -118,11 +125,18 @@ final class Queue {
         if (owner == null || mate == null) return;
         if (plugin.duels().busy(owner.getUniqueId()) || plugin.duels().busy(mate.getUniqueId())) {
             plugin.msg(owner, msg("messages.queue-pair-busy",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cКто-то из пары уже в бою."));
+                    "&#F8BEFBДуэли &8» &cКто-то из пары уже в бою."));
+            return;
+        }
+        String name = Kits.canonical(kit);
+        if (!plugin.duels().kitExists(name)) {
+            plugin.msg(owner, msg("messages.kit-unknown",
+                    "&#F8BEFBДуэли &8» &cНеизвестный кит: &f%kit%")
+                    .replace("%kit%", kit == null ? "?" : kit));
             return;
         }
         leave(owner, false);
-        Entry entry = new Entry(owner.getUniqueId(), mate.getUniqueId(), kit, true,
+        Entry entry = new Entry(owner.getUniqueId(), mate.getUniqueId(), name, true,
                 System.currentTimeMillis());
         synchronized (entries) {
             entries.add(entry);
@@ -140,13 +154,14 @@ final class Queue {
         if (removed == null) {
             if (notify) {
                 plugin.msg(player, msg("messages.queue-not-in",
-                        "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Ты не в очереди."));
+                        "&#F8BEFBДуэли &8» &7Ты не в очереди."));
             }
             return;
         }
+        clearActionBar(removed);
         if (!notify) return;
         String text = msg("messages.queue-left",
-                "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Поиск отменён.");
+                "&#F8BEFBДуэли &8» &7Поиск отменён.");
         for (UUID id : removed.members()) plugin.msg(Bukkit.getPlayer(id), text);
     }
 
@@ -178,10 +193,11 @@ final class Queue {
         UUID id = player.getUniqueId();
         Entry entry = remove(id);
         if (entry == null) return;
+        clearActionBar(entry);
         for (UUID member : entry.members()) {
             if (member.equals(id)) continue;
             plugin.msg(Bukkit.getPlayer(member), msg("messages.queue-mate-left",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Поиск отменён: напарник вышел."));
+                    "&#F8BEFBДуэли &8» &7Поиск отменён: напарник вышел."));
         }
     }
 
@@ -200,6 +216,7 @@ final class Queue {
     /** Убираем тех, кто уже не может искать: вышел, в бою, вне пары, опоздал. */
     private void validate() {
         long now = System.currentTimeMillis();
+        actionBars(now);
         List<Entry> expired = new ArrayList<Entry>();
         List<Entry> busy = new ArrayList<Entry>();
         synchronized (entries) {
@@ -238,13 +255,15 @@ final class Queue {
             }
         }
         for (Entry entry : busy) {
+            clearActionBar(entry);
             String text = msg("messages.queue-busy",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Поиск отменён: ты уже в бою.");
+                    "&#F8BEFBДуэли &8» &7Поиск отменён: ты уже в бою.");
             for (UUID id : entry.members()) plugin.msg(Bukkit.getPlayer(id), text);
         }
         for (Entry entry : expired) {
+            clearActionBar(entry);
             String text = msg("messages.queue-timeout",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Соперник не нашёлся за &f%minutes%&7 мин — поиск отменён.")
+                    "&#F8BEFBДуэли &8» &7Соперник не нашёлся за &f%minutes%&7 мин — поиск отменён.")
                     .replace("%minutes%", String.valueOf(Math.max(1,
                             (entry.team ? teamTimeout() : timeout()) / 60)));
             for (UUID id : entry.members()) plugin.msg(Bukkit.getPlayer(id), text);
@@ -331,24 +350,60 @@ final class Queue {
                 if (!entries.contains(entry)) return false;
             }
             for (Entry entry : taken) entries.remove(entry);
+            for (Entry entry : taken) {
+                Component empty = Text.of(" ");
+                for (UUID id : entry.members()) {
+                    Player player = Bukkit.getPlayer(id);
+                    if (player != null) player.sendActionBar(empty);
+                }
+            }
             return true;
         }
     }
 
     // ---------------------------------------------------------------- старт
 
+    /** Action bar внизу экрана: кит, режим и сколько уже ищем. */
+    private void actionBars(long now) {
+        if (!plugin.getConfig().getBoolean("queue.action-bar", true)) return;
+        String pattern = msg("messages.queue-actionbar",
+                "&#F8BEFBПоиск &8» &f%kit% &7· &f%time%");
+        synchronized (entries) {
+            for (Entry entry : entries) {
+                long seconds = Math.max(0, (now - entry.joinedAt) / 1000L);
+                String time = (seconds / 60) + ":" + (seconds % 60 < 10 ? "0" : "") + (seconds % 60);
+                String text = pattern.replace("%kit%", entry.kit).replace("%time%", time)
+                        .replace("%mode%", entry.team ? "2 на 2" : "1 на 1");
+                Component line = Text.of(text);
+                for (UUID id : entry.members()) {
+                    Player player = Bukkit.getPlayer(id);
+                    if (player != null) player.sendActionBar(line);
+                }
+            }
+        }
+    }
+
+    /** Убрать наш action bar. */
+    private void clearActionBar(Entry entry) {
+        Component empty = Text.of(" ");
+        for (UUID id : entry.members()) {
+            Player player = Bukkit.getPlayer(id);
+            if (player != null) player.sendActionBar(empty);
+        }
+    }
+
     private void start1v1(Entry first, Entry second) {
         Player a = Bukkit.getPlayer(first.owner);
         Player b = Bukkit.getPlayer(second.owner);
         if (!plugin.duels().startQueue1v1(a, b, first.kit)) {
             String text = msg("messages.start-failed",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНе удалось начать бой. Попробуй ещё раз.");
+                    "&#F8BEFBДуэли &8» &cНе удалось начать бой. Попробуй ещё раз.");
             plugin.msg(a, text);
             plugin.msg(b, text);
             return;
         }
         String pattern = msg("messages.queue-found-1v1",
-                "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fСоперник найден: &d%name%&f. Кит &d%kit%&f.");
+                "&#F8BEFBДуэли &8» &fСоперник найден: &d%name%&f. Кит &d%kit%&f.");
         plugin.msg(a, pattern.replace("%name%", name(second.owner)).replace("%kit%", first.kit));
         plugin.msg(b, pattern.replace("%name%", name(first.owner)).replace("%kit%", first.kit));
     }
@@ -387,12 +442,12 @@ final class Queue {
         all.addAll(teamB);
         if (!ok) {
             String text = msg("messages.start-failed",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНе удалось начать бой. Попробуй ещё раз.");
+                    "&#F8BEFBДуэли &8» &cНе удалось начать бой. Попробуй ещё раз.");
             for (UUID id : all) plugin.msg(Bukkit.getPlayer(id), text);
             return;
         }
         String text = msg("messages.queue-found-2v2",
-                "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fПара найдена: &d%a% + %b% &fпротив &d%c% + %d%&f.")
+                "&#F8BEFBДуэли &8» &fПара найдена: &d%a% + %b% &fпротив &d%c% + %d%&f.")
                 .replace("%a%", name(teamA.get(0)))
                 .replace("%b%", name(teamA.get(1)))
                 .replace("%c%", name(teamB.get(0)))
@@ -411,25 +466,25 @@ final class Queue {
         String hover;
         if (!entry.team) {
             text = msg("messages.queue-joined-1v1",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fИщем соперника &7(кит &f%kit%&7)&f. ")
+                    "&#F8BEFBДуэли &8» &fИщем соперника &7(кит &f%kit%&7)&f. ")
                     .replace("%kit%", entry.kit);
-            button = "&c&l[Выйти]";
-            command = "/duelx queue leave";
+            button = "&c[Выйти]";
+            command = "/duel queue leave";
             hover = "Больше не искать";
         } else if (entry.pair()) {
             text = msg("messages.queue-joined-2v2",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fИщем вторую пару &7(кит &f%kit%&7)&f. ")
+                    "&#F8BEFBДуэли &8» &fИщем вторую пару &7(кит &f%kit%&7)&f. ")
                     .replace("%kit%", entry.kit);
-            button = "&c&l[Выйти]";
-            command = "/duelx queue leave";
+            button = "&c[Выйти]";
+            command = "/duel queue leave";
             hover = "Отменить поиск";
         } else {
             text = msg("messages.queue-joined-solo2v2",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fИщем напарника и вторую пару "
+                    "&#F8BEFBДуэли &8» &fИщем напарника и вторую пару "
                             + "&7(кит &f%kit%&7)&f. ")
                     .replace("%kit%", entry.kit);
-            button = "&c&l[Выйти]";
-            command = "/duelx queue leave";
+            button = "&c[Выйти]";
+            command = "/duel queue leave";
             hover = "Отменить поиск";
         }
         Component line = Text.of(text).append(Text.button(button, command, hover));
@@ -447,23 +502,23 @@ final class Queue {
         String command;
         if (!entry.team) {
             text = msg("messages.queue-broadcast-1v1",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &d%player% &fищет бой 1 на 1: кит &d%kit%&f. ")
+                    "&#F8BEFBДуэли &8» &d%player% &fищет бой 1 на 1: кит &d%kit%&f. ")
                     .replace("%player%", owner.getName()).replace("%kit%", entry.kit);
-            button = "&f&l[Встать в очередь]";
-            command = "/duelx queue " + entry.kit;
+            button = "&f[Встать в очередь]";
+            command = "/duel queue " + entry.kit;
         } else if (entry.pair()) {
             text = msg("messages.queue-broadcast-2v2",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &d%player% &fищет вторую пару 2 на 2: "
+                    "&#F8BEFBДуэли &8» &d%player% &fищет вторую пару 2 на 2: "
                             + "кит &d%kit%&f. ")
                     .replace("%player%", owner.getName()).replace("%kit%", entry.kit);
-            button = "&f&l[Встать в очередь]";
-            command = "/duelx queue team " + entry.kit;
+            button = "&f[Встать в очередь]";
+            command = "/duel queue team " + entry.kit;
         } else {
             text = msg("messages.queue-broadcast-solo2v2",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &d%player% &fищет пару 2 на 2: кит &d%kit%&f. ")
+                    "&#F8BEFBДуэли &8» &d%player% &fищет пару 2 на 2: кит &d%kit%&f. ")
                     .replace("%player%", owner.getName()).replace("%kit%", entry.kit);
-            button = "&f&l[Присоединиться]";
-            command = "/duelx queue team " + entry.kit;
+            button = "&f[Присоединиться]";
+            command = "/duel queue team " + entry.kit;
         }
         Component line = Text.of(text).append(Text.button(button, command, "Нажми, чтобы встать в очередь"));
         for (Player online : Bukkit.getOnlinePlayers()) {

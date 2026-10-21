@@ -206,13 +206,13 @@ final class ArenaRules implements Listener {
 
         if (to.getY() > bounds.maxY) {
             event.setTo(event.getFrom());
-            warn(player, "messages.arena-height", "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cВыше &f%block%&c блоков не подняться.",
+            warn(player, "messages.arena-height", "&#F8BEFBДуэли &8» &cВыше &f%block%&c блоков не подняться.",
                     String.valueOf((int) Math.round(maxHeight())));
             return;
         }
         if (to.getY() < bounds.minY || !bounds.horizontal(to)) {
             event.setTo(event.getFrom());
-            warn(player, "messages.arena-bounds", "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cЭто край арены.", null);
+            warn(player, "messages.arena-bounds", "&#F8BEFBДуэли &8» &cЭто край арены.", null);
         }
     }
 
@@ -232,7 +232,7 @@ final class ArenaRules implements Listener {
         if (!bounds.world.equals(to.getWorld().getName())) {
             if (!leaveEnabled()) return;
             event.setCancelled(true);
-            warn(player, "messages.arena-leave", "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cИз боя телепортом не выйти.", null);
+            warn(player, "messages.arena-leave", "&#F8BEFBДуэли &8» &cИз боя телепортом не выйти.", null);
             return;
         }
 
@@ -242,9 +242,9 @@ final class ArenaRules implements Listener {
                 event.setCancelled(true);
                 if (pearl) {
                     warn(player, "messages.pearl-blocked",
-                            "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cПёрл туда не сработает: за ареной или слишком высоко.", null);
+                            "&#F8BEFBДуэли &8» &cПёрл туда не сработает: за ареной или слишком высоко.", null);
                 } else {
-                    warn(player, "messages.arena-bounds", "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cЭто край арены.", null);
+                    warn(player, "messages.arena-bounds", "&#F8BEFBДуэли &8» &cЭто край арены.", null);
                 }
             }
         }
@@ -264,7 +264,7 @@ final class ArenaRules implements Listener {
         if (resolve(player) == null) return;
         event.setCancelled(true);
         warn(player, "messages.arena-command",
-                "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cВо время боя эта команда недоступна.", null);
+                "&#F8BEFBДуэли &8» &cВо время боя эта команда недоступна.", null);
     }
 
     private Set<String> blocked() {

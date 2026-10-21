@@ -75,7 +75,7 @@ final class CommandGuard implements Listener {
         if (!blocked().contains(command)) return;
         event.setCancelled(true);
         plugin.msg(player, plugin.string("messages.command-blocked",
-                "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНеизвестная команда."));
+                "&#F8BEFBДуэли &8» &cНеизвестная команда."));
     }
 
     @EventHandler
