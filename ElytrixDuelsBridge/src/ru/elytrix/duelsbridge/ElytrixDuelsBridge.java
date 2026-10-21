@@ -113,6 +113,29 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
                     changed = true;
                 }
             }
+            if (config.getString("command-guard.enabled") == null) {
+                config.set("command-guard.enabled", true);
+                config.set("command-guard.duel-menu", true);
+                config.set("command-guard.hide-tab", true);
+                config.set("command-guard.admin-permission", "epicduels.admin");
+                config.set("command-guard.bypass-permission", "elytrix.guard.bypass");
+                config.set("command-guard.blocked", Arrays.asList(
+                        "plugins", "pl", "version", "ver", "about", "icanhasbukkit", "help"));
+                config.set("command-guard.hidden", Arrays.asList(
+                        "plugins", "pl", "version", "ver", "about", "icanhasbukkit", "help",
+                        "bmenu", "epicduels", "duelx", "dx", "party", "p"));
+                changed = true;
+            }
+            if (config.getString("kits.auto-install") == null) {
+                config.set("kits.auto-install", true);
+                config.set("kits.names", Arrays.asList(Kits.NAMES));
+                changed = true;
+            }
+            if (config.getString("protection.block-place") == null) {
+                config.set("protection.block-place", true);
+                config.set("protection.explosions", true);
+                changed = true;
+            }
             if (changed) saveConfig();
         } catch (RuntimeException error) {
             getLogger().warning("Не удалось обновить config.yml: " + error);
