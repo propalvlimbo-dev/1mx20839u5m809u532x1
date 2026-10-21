@@ -1,0 +1,144 @@
+id: elytrix:duel_stats
+provider: default
+type: chest
+size: 54
+title: "&#F8BEFB&lСтатистика"
+items:
+  back:
+    slot: 45
+    material: black_dye
+    name: "&7« &#F8BEFBНазад &7»"
+    lore:
+      - "&#F8BEFB&l┃ "
+      - "&#F8BEFB&l┃ &fВернуться в меню дуэлей"
+      - "&#F8BEFB&l┃ "
+      - "&7● &fНажмите для возврата"
+    on_click:
+      - sound: 'ui.button.click 0.4 1.0'
+      - "[open] elytrix:duel"
+  close:
+    slot: 49
+    material: red_dye
+    name: "&7« &cЗакрыть меню &7»"
+    lore:
+      - "&#F8BEFB&l┃ "
+      - "&#F8BEFB&l┃ &fВыход в игровой мир."
+      - "&#F8BEFB&l┃ "
+      - "&7● &fНажмите для закрытия"
+    on_click:
+      - sound: 'ui.button.click 0.4 1.0'
+      - "[close]"
+  wins:
+    slot: 11
+    material: emerald
+    name: "&7« &#F8BEFBПобеды &7»"
+    lore:
+      - "&#F8BEFB&l┃ "
+      - "&#F8BEFB&l┃ &fВсего: &#F8BEFB%epicduels_wins%"
+      - "&#F8BEFB&l┃ "
+      - "&7● &fРастёт за каждый выигранный бой"
+  losses:
+    slot: 13
+    material: redstone
+    name: "&7« &#F8BEFBПоражения &7»"
+    lore:
+      - "&#F8BEFB&l┃ "
+      - "&#F8BEFB&l┃ &fВсего: &#F8BEFB%epicduels_losses%"
+      - "&#F8BEFB&l┃ "
+      - "&7● &fНе влияет на очередь"
+  winrate:
+    slot: 15
+    material: gold_ingot
+    name: "&7« &#F8BEFBПроцент побед &7»"
+    lore:
+      - "&#F8BEFB&l┃ "
+      - "&#F8BEFB&l┃ &fПобеды: &#F8BEFB%epicduels_winrate%%"
+      - "&#F8BEFB&l┃ "
+      - "&7● &fСчитается по всем дуэлям"
+  score:
+    slot: 29
+    material: nether_star
+    name: "&7« &#F8BEFBОчки &7»"
+    lore:
+      - "&#F8BEFB&l┃ "
+      - "&#F8BEFB&l┃ &fРейтинг: &#F8BEFB%epicduels_score%"
+      - "&#F8BEFB&l┃ "
+      - "&7● &fРастёт с каждой победой"
+  top:
+    slot: 31
+    material: book
+    name: "&7« &#F8BEFBТоп игроков &7»"
+    lore:
+      - "&#F8BEFB&l┃ "
+      - "&#F8BEFB&l┃ &fСписок: &#F8BEFBтоп-10 по победам"
+      - "&#F8BEFB&l┃ "
+      - "&7● &fНажмите, чтобы посмотреть"
+    on_click:
+      - sound: 'block.note_block.pling 0.4 1.2'
+      - "[player] duel leaderboard wins"
+  play:
+    slot: 33
+    material: compass
+    name: "&7« &#F8BEFBСыграть &7»"
+    lore:
+      - "&#F8BEFB&l┃ "
+      - "&#F8BEFB&l┃ &fРежим: &#F8BEFBвызов игрока"
+      - "&#F8BEFB&l┃ "
+      - "&7● &fНажмите, чтобы выбрать игрока"
+    on_click:
+      - sound: 'block.note_block.pling 0.4 1.3'
+      - "[player] duel duels"
+  design_purple_panel:
+    material: purple_stained_glass_pane
+    name: '&r'
+  design_black_panel:
+    material: black_stained_glass_pane
+    name: '&r'
+
+animation:
+  - tick: 0
+    opcodes:
+      - st: back 45
+      - sound: 'block.enchantment_table.use 0.3 1.5'
+  - opcodes:
+      - st: design_purple_panel 36,44,46,47,48,50,51,52,53
+      - sound: 'block.note_block.chime 0.2 0.85'
+  - opcodes:
+      - st: design_purple_panel 18,26,27,35
+      - sound: 'block.note_block.chime 0.23 0.98'
+  - opcodes:
+      - st: design_purple_panel 9,17
+      - sound: 'block.note_block.chime 0.27 1.13'
+  - opcodes:
+      - st: design_purple_panel 0,1,2,3,4,5,6,7,8
+      - sound: 'block.note_block.chime 0.28 1.21'
+  - opcodes:
+      - st: design_black_panel 10,12,14,16,19,20,21,22,23,24,25
+      - sound: 'block.note_block.chime 0.26 1.30'
+  - opcodes:
+      - st: design_black_panel 28,30,32,34,37,38,39,40,41,42,43
+      - sound: 'block.note_block.chime 0.28 1.35'
+  - opcodes:
+      - st: back 45
+      - sound: 'block.note_block.pling 0.3 1.00'
+  - opcodes:
+      - st: close 49
+      - sound: 'block.note_block.pling 0.3 1.07'
+  - opcodes:
+      - st: wins 11
+      - sound: 'block.note_block.pling 0.3 1.14'
+  - opcodes:
+      - st: losses 13
+      - sound: 'block.note_block.pling 0.3 1.21'
+  - opcodes:
+      - st: winrate 15
+      - sound: 'block.note_block.pling 0.3 1.28'
+  - opcodes:
+      - st: score 29
+      - sound: 'block.note_block.pling 0.3 1.35'
+  - opcodes:
+      - st: top 31
+      - sound: 'block.note_block.pling 0.3 1.42'
+  - opcodes:
+      - st: play 33
+      - sound: 'block.note_block.pling 0.3 1.49'

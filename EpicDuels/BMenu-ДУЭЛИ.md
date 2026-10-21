@@ -7,10 +7,18 @@
 
 ```
 plugins/BMenu/menu/elytrix/duel/
-├── duel.yml    главное меню дуэлей (54 слота)
-├── queue.yml   выбор кита для очереди (54 слота)
-└── help.yml    «Как играть», 4 шага (54 слота)
+├── duel.yml         главное меню дуэлей (54 слота)
+├── queue.yml        выбор кита для очереди (54 слота)
+├── help.yml         «Как играть», 4 шага
+├── stats.yml        профиль и топ
+├── rounds.yml       число раундов: 1 / 3 / 5
+├── party.yml        групповая дуэль или турнир
+└── party_size.yml   размер команд: 2v2 / 3v3 / 4v4
 ```
+
+Плюс мост `ElytrixDuelsBridge-1.0.0.jar`: он подменяет окна самого
+EpicDuels на эти меню. Без моста `/duel` показывает меню плагина
+(перекрашенное, но без анимации BMenu).
 
 `BMenu/config.yml` — добавлены команды открытия:
 
@@ -37,8 +45,10 @@ plugins/BMenu/menu/elytrix/duel/
       - дуэлипомощь
 ```
 
-3. Перезагрузить BMenu (`/bmenu reload` или рестарт).
-4. Проверить: `/duels`.
+3. Положить `ElytrixDuelsBridge-1.0.0.jar` в `plugins/` (нужны `EpicDuels`
+   и `BMenu`).
+4. Перезагрузить сервер.
+5. Проверить: `/duel` — должно открыться наше меню с анимацией.
 
 ## Что делает каждая кнопка
 
@@ -50,6 +60,7 @@ plugins/BMenu/menu/elytrix/duel/
 | 13 | Поиск соперника | наше меню с китами → `/duel queue <кит>` |
 | 15 | Наблюдение | `/duel spectate` |
 | 22 | Твой профиль | победы, поражения, процент, очки (PlaceholderAPI, обновляется каждые 2 сек) |
+| 24 | Группа | открывает `elytrix:duel_party` (командная дуэль / турнир) |
 | 29 | Топ игроков | `/duel leaderboard wins` |
 | 31 | Как играть | открывает инструкцию |
 | 33 | Статистика | `/duel stats` |
@@ -65,6 +76,20 @@ plugins/BMenu/menu/elytrix/duel/
 `[player] duel queue <имя>` у нужной кнопки в `queue.yml`.
 
 Внизу: `53` — выйти из очереди, `45` — назад, `49` — закрыть.
+
+### Группа (`elytrix:duel_party`) и размер (`elytrix:duel_party_size`)
+
+11 — командная дуэль (→ `/duelx party team` → выбор 2v2/3v3/4v4),
+15 — турнир (→ `/duelx party tournament`). Мост проверяет, хватает ли
+игроков в группе, и только потом открывает выбор кита.
+
+### Статистика (`elytrix:duel_stats`)
+
+Победы, поражения, процент, очки (PlaceholderAPI), топ и кнопка «Сыграть».
+
+### Раунды (`elytrix:duel_rounds`)
+
+1 / 3 / 5 раундов → `/duelx rounds N`, дальше плагин сам показывает выбор карты.
 
 ### Инструкция (`elytrix:duel_help`)
 
@@ -104,6 +129,39 @@ plugins/BMenu/menu/elytrix/duel/
 
 И добавь его в `animation:` на свободный слот (например `st: duels 25`).
 Файл `main/menu.yml` я не менял — по твоему указанию.
+
+## Мост `ElytrixDuelsBridge`
+
+Мост слушает `InventoryOpenEvent`: если EpicDuels собирается открыть своё
+окно, окно отменяется и через тик открывается меню BMenu. Соответствие
+задаётся в `plugins/ElytrixDuelsBridge/config.yml`:
+
+| Окно EpicDuels | Меню BMenu |
+|---|---|
+| `MAIN` | `elytrix:duel` |
+| `STATS` | `elytrix:duel_stats` |
+| `MATCHMAKING` | `elytrix:duel_queue` |
+| `ROUNDS_SELECT` | `elytrix:duel_rounds` |
+| `PARTY_MODE` | `elytrix:duel_party` |
+| `PARTY_TEAM_SIZE` | `elytrix:duel_party_size` |
+
+Остальные окна (список игроков, киты, арены, наблюдение, пати-кит) остаются
+за плагином: их содержимое зависит от онлайна и настроек, статичным YAML его
+не нарисовать.
+
+Кнопки новых меню вызывают `/duelx`:
+
+```
+/duelx rounds <1|3|5>            передать раунды и открыть выбор карты
+/duelx party <team|tournament>   групповая дуэль или турнир
+/duelx size <2|3|4>              размер команд и выбор кита
+/duelx open <menu>               открыть меню BMenu по id
+```
+
+`/duelx` дергает публичные методы `GUIManager` — то же, что делает клик в
+окне плагина, — и проверяет то же, что плагин: включены ли `team-duels` и
+`tournaments`, хватает ли игроков в группе. Ошибки не ломают меню: игрок
+видит «В группе мало игроков: нужно 4, сейчас 2».
 
 ## Ограничения EpicDuels
 

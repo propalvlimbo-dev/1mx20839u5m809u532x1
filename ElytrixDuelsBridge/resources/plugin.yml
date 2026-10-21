@@ -1,0 +1,12 @@
+name: ElytrixDuelsBridge
+version: 1.0.0
+main: ru.elytrix.duelsbridge.ElytrixDuelsBridge
+api-version: '1.21'
+description: Меню EpicDuels в стиле ElytriX на BMenu
+author: ElytriX
+depend: [EpicDuels, BMenu]
+commands:
+  duelx:
+    description: Продолжить поток дуэли после меню BMenu
+    usage: /duelx <rounds|party|size|open>
+    aliases: [dx]

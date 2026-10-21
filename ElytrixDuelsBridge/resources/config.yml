@@ -1,0 +1,19 @@
+# ElytriX: какие окна EpicDuels заменять меню BMenu.
+# Слева — тип меню EpicDuels, справа — id меню BMenu.
+# Если строку убрать или поставить keep — окно останется от EpicDuels.
+#
+# Меняются только статические экраны. Списки игроков, китов, карт и живых
+# дуэлей плагин рисует сам (их содержимое зависит от онлайна), поэтому
+# они остаются за EpicDuels — но перекрашены через menus.yml.
+menus:
+  MAIN: "elytrix:duel"
+  STATS: "elytrix:duel_stats"
+  MATCHMAKING: "elytrix:duel_queue"
+  ROUNDS_SELECT: "elytrix:duel_rounds"
+  PARTY_MODE: "elytrix:duel_party"
+  PARTY_TEAM_SIZE: "elytrix:duel_party_size"
+
+messages:
+  no-challenge: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cСначала выбери игрока и кит."
+  not-enough-members: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cВ группе мало игроков: нужно &f%need%&c, сейчас &f%have%&c."
+  feature-off: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cВыключено на сервере: &f%name%"
