@@ -82,13 +82,18 @@ final class Menus {
             if (loader == null) return false;
 
             Object menu = null;
-            for (Method method : loader.getClass().getMethods()) {
-                if (!method.getName().equals("create") || method.getParameterCount() != 3) continue;
-                Class<?>[] types = method.getParameterTypes();
-                if (types[0] != String.class) continue;
-                method.setAccessible(true);
-                menu = method.invoke(loader, menuId, player, null);
-                if (menu != null) break;
+            // BMenu разных версий: create(String, Player, Menu) или create(String, Player)
+            for (int count = 3; count >= 2 && menu == null; count--) {
+                for (Method method : loader.getClass().getMethods()) {
+                    if (!method.getName().equals("create") || method.getParameterCount() != count) continue;
+                    if (method.getParameterTypes()[0] != String.class) continue;
+                    method.setAccessible(true);
+                    Object[] params = new Object[count];
+                    params[0] = menuId;
+                    params[1] = player;
+                    menu = method.invoke(loader, params);
+                    if (menu != null) break;
+                }
             }
             if (menu == null) return false;
 
