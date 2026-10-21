@@ -64,6 +64,14 @@ def main() -> int:
     # старые версии jar моста не тащим в архив
     for name in [n for n in merged if "/plugins/ElytrixDuelsBridge-" in n]:
         del merged[name]
+    # удалённые из репозитория меню не должны оставаться в архиве:
+    # сверяем папки REPLACE_DIRS с тем, что реально лежит на диске
+    for src_dir, dst_dir in REPLACE_DIRS.items():
+        keep = {PREFIX + dst_dir + "/" + n for n in os.listdir(os.path.join(ROOT, src_dir))
+                if n.endswith((".yml", ".yaml"))}
+        for name in [n for n in merged if n.startswith(PREFIX + dst_dir + "/")]:
+            if name not in keep:
+                del merged[name]
     before = set(merged)
 
     for src, dst in REPLACE.items():

@@ -40,7 +40,7 @@ result-commands:
 features:
   challenges: true
   matchmaking: true
-  spectating: true
+  spectating: false
   rematch: true
   forfeit: true
   best-of-n: true

@@ -47,9 +47,6 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         DEFAULTS.put("MATCHMAKING", "elytrix:duel_queue");
         DEFAULTS.put("KIT_SELECT", "elytrix:duel_kit");
         DEFAULTS.put("ROUNDS_SELECT", "elytrix:duel_rounds");
-        DEFAULTS.put("PARTY_MODE", "elytrix:duel_party");
-        DEFAULTS.put("PARTY_TEAM_SIZE", "elytrix:duel_party_size");
-        DEFAULTS.put("PARTY_KIT", "elytrix:duel_kit");
         DEFAULTS.put("PARTY_CONFIRM", "elytrix:duel_confirm");
     }
 
@@ -96,6 +93,16 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
                 String path = "menus." + entry.getKey();
                 if (config.getString(path) == null) {
                     config.set(path, entry.getValue());
+                    changed = true;
+                }
+            }
+            // окна прежней группы больше не наши: старые значения переводим в keep,
+            // чтобы после удаления party.yml не было ошибок BMenu
+            for (String key : new String[]{"PARTY_MODE", "PARTY_TEAM_SIZE", "PARTY_KIT"}) {
+                String path = "menus." + key;
+                String value = config.getString(path);
+                if (value != null && value.startsWith("elytrix:duel_party")) {
+                    config.set(path, "keep");
                     changed = true;
                 }
             }
@@ -164,6 +171,23 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
             return;
         }
 
+        // Групповых окон больше нет: игрока ведём в главное меню и объясняем,
+        // что командный бой теперь — кнопка «Бои 2 на 2».
+        if ("PARTY_MODE".equals(type) || "PARTY_TEAM_SIZE".equals(type)) {
+            event.setCancelled(true);
+            Bukkit.getScheduler().runTask(this, new Runnable() {
+                @Override
+                public void run() {
+                    msg(player, string("messages.group-removed",
+                            "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fКомандные дуэли теперь в &f/duels&f: "
+                                    + "&f«Бои 2 на 2»"));
+                    String id = menuForOr("MAIN", "elytrix:duel");
+                    menus.open(player, id, menuArgs(player, id));
+                }
+            });
+            return;
+        }
+
         String menu = menuFor(type);
         if (menu == null || menu.isEmpty()) return;
 
@@ -202,7 +226,7 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
     private String label(String constant) {
         switch (constant) {
             case "TOURNAMENT": return "Турнир";
-            case "TEAM_DUEL": return "Командная дуэль";
+            case "TEAM_DUEL": return "Бои 2 на 2";
             case "TWO_VS_TWO": return "2 на 2";
             case "THREE_VS_THREE": return "3 на 3";
             case "FOUR_VS_FOUR": return "4 на 4";
@@ -338,27 +362,27 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         if (!duels.feature("team-duels")) {
             msg(owner, string("messages.feature-off",
                     "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cВыключено на сервере: &f%name%")
-                    .replace("%name%", "Групповые дуэли"));
+                    .replace("%name%", "Бои 2 на 2"));
             return;
         }
         if (teammate.getUniqueId().equals(owner.getUniqueId())) {
-            msg(owner, string("messages.self", "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНельзя выбрать себя в группу."));
+            msg(owner, string("messages.self", "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНельзя выбрать себя в напарники."));
             return;
         }
         Object party = duels.ownParty(owner);
         if (party == null) {
             msg(owner, string("messages.party-failed",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНе удалось создать группу."));
+                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНе удалось собрать пару."));
             return;
         }
         if (!duels.isOwner(party, owner.getUniqueId())) {
             msg(owner, string("messages.owner-only",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cТы не владелец группы."));
+                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cТиммейта приглашает только лидер пары."));
             return;
         }
         if (!duels.addMember(party, teammate.getUniqueId())) {
             msg(owner, string("messages.party-full",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cВ группе уже &f%size%&c игроков.")
+                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cВ паре уже &f%size%&c игроков.")
                     .replace("%size%", String.valueOf(duels.partySize(party))));
             return;
         }
@@ -370,15 +394,15 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         owner.closeInventory();
 
         msg(owner, string("messages.team-created",
-                "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fГруппа 2 на 2: &d%name% &f+ &d%owner%")
+                "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fПара 2 на 2: &d%owner% &f+ &d%name%")
                 .replace("%name%", teammate.getName()).replace("%owner%", owner.getName()));
         msg(teammate, string("messages.team-invited",
-                "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &d%owner% &fвзял тебя в группу 2 на 2")
+                "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &d%owner% &fвзял тебя в напарники для боя 2 на 2")
                 .replace("%owner%", owner.getName()));
 
         Map<String, String> args = new LinkedHashMap<String, String>();
         args.put("target", teammate.getName());
-        menus.open(owner, menuForOr("PARTY_KIT", "elytrix:duel_kit"), args);
+        menus.open(owner, menuForOr("KIT_SELECT", "elytrix:duel_kit"), args);
     }
 
     /** Открыть наше окно выбора игрока (для команды /duelx team). */
@@ -386,7 +410,7 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         if (!duels.feature("team-duels")) {
             msg(player, string("messages.feature-off",
                     "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cВыключено на сервере: &f%name%")
-                    .replace("%name%", "Групповые дуэли"));
+                    .replace("%name%", "Бои 2 на 2"));
             return;
         }
         PlayerPicker.open(this, player, PlayerPicker.Mode.TEAM, 0);
@@ -396,7 +420,7 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         PlayerPicker.open(this, player, PlayerPicker.Mode.CHALLENGE, 0);
     }
 
-    /** Кит выбран: либо в бой с игроком, либо к подтверждению группы. */
+    /** Кит выбран: либо в бой с игроком, либо к подтверждению боя 2 на 2. */
     void kit(Player player, String kitName) {
         if (!duels.kitExists(kitName)) {
             msg(player, string("messages.kit-gone",
@@ -455,7 +479,7 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         UUID mate = otherMember(party, id);
         if (mate == null) {
             msg(owner, string("messages.pair-broken",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cВ группе должен быть ровно один напарник."));
+                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cВ паре должен быть ровно один напарник."));
             return;
         }
         Pair mine = new Pair(id, mate, kit);

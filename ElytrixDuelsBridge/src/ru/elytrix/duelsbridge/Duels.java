@@ -106,7 +106,7 @@ final class Duels {
         return call(manager("getPartyManager"), "getPartyOf", id);
     }
 
-    /** Создаёт группу или возвращает текущую, если игрок уже в ней. */
+    /** Создаёт пару или возвращает текущую, если игрок уже в ней. */
     Object ownParty(Player player) {
         Object party = partyOf(player.getUniqueId());
         if (party == null) {
@@ -134,7 +134,7 @@ final class Duels {
         call(gui(), "clearPartyFlow", id);
     }
 
-    /** Настройка потока группы: режим, размер (если есть), кит. */
+    /** Настройка потока пары: режим, размер (если есть), кит. */
     void flowMode(UUID id, String modeName) {
         Object gui = gui();
         Class<?> modeClass = secondArg(gui, "setPartyFlowMode");
@@ -169,7 +169,7 @@ final class Duels {
         return call(manager("getKitManager"), "getKit", name) != null;
     }
 
-    /** Запуск боя по текущему потоку группы (аналог кнопки подтверждения). */
+    /** Запуск боя по текущему потоку (аналог кнопки подтверждения). */
     boolean startFlow(Player player) {
         UUID id = player.getUniqueId();
         Object mode = flowModeValue(id);
@@ -184,12 +184,12 @@ final class Duels {
         if (!feature(tournament ? "tournaments" : "team-duels")) {
             plugin.msg(player, plugin.string("messages.feature-off",
                     "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cВыключено на сервере: &f%name%")
-                    .replace("%name%", tournament ? "Турниры" : "Групповые дуэли"));
+                    .replace("%name%", tournament ? "Турниры" : "Бои 2 на 2"));
             return false;
         }
         if (!isOwner(party, id)) {
             plugin.msg(player, plugin.string("messages.owner-only",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cБой запускает только владелец группы."));
+                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cБой запускает только пригласивший тиммейта."));
             return false;
         }
         Object kit = call(manager("getKitManager"), "getKit", kitName);
@@ -204,7 +204,7 @@ final class Duels {
             for (Object member : (List<?>) members) {
                 if (member instanceof UUID && busy((UUID) member)) {
                     plugin.msg(player, plugin.string("messages.member-busy",
-                            "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cКто-то из группы уже в бою."));
+                            "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cКто-то из пары уже в бою."));
                     return false;
                 }
             }

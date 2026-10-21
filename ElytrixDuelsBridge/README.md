@@ -24,8 +24,6 @@ BMenu — с анимацией сборки, звуками и русским �
 /duelx team                      выбор напарника (быстрый 2 на 2)
 /duelx kit <кит>                 кит из нашего меню → раунды или подтверждение
 /duelx confirm | cancel          начать бой / встать в очередь / отмена
-/duelx party <team|tournament>   режим группы   → выбор размера / кита
-/duelx size <2|3|4>              размер команд  → выбор кита
 /duelx open <menu>               открыть меню BMenu
 ```
 
@@ -39,6 +37,22 @@ openArenaSelect, openPartyTeamSizeMenu, openPartyKitMenu, …) — то же, ч
 занятые подписаны «в бою». Клик сразу открывает выбор кита.
 `/duel ник` (и `/d ник`) — быстрый вызов без меню.
 
+## Меню
+
+Семь окон лежат в `BMenu/menu/elytrix/duel/`: главное, киты, поиск соперника,
+раунды, подтверждение, статистика, помощь. Оформление повторяет дефолтное
+`/menu`: имя `&7« &#F8BEFBНазвание &7»`, lore `&#F8BEFB&l┃`, закрытие
+`red_dye`, кадр из чёрных и фиолетовых панелей, сборка кадра со звуками.
+
+Главное меню: `20` — дуэль 1 на 1, `21` — бои 2 на 2, `22` — подбор
+соперника, `23` — статистика, `24` — рейтинг, `31` — как играть,
+`4` — профиль с победами, `45` — возврат в `/menu`, `49` — закрыть.
+
+Групповых окон (`duel_party`, `duel_party_size`) и кнопки «Наблюдение»
+больше нет, наблюдение выключено в `EpicDuels/config.yml`
+(`features.spectating: false`). Бои 2 на 2 идут через пару: выбрал
+тиммейта — встали в очередь вдвоём.
+
 ## Статистика
 
 Значения передаются в BMenu как `{wins}`, `{losses}`, `{winrate}`,
@@ -49,18 +63,16 @@ openArenaSelect, openPartyTeamSizeMenu, openPartyKitMenu, …) — то же, ч
 | Окно EpicDuels | Меню BMenu | Почему можно |
 |---|---|---|
 | `MAIN` (`/duel`) | `elytrix:duel` | статичное, 4 кнопки |
-| `STATS` | `elytrix:duel_stats` | цифры берём из PlaceholderAPI |
+| `STATS` | `elytrix:duel_stats` | цифры передаём сами, без PAPI |
 | `MATCHMAKING` | `elytrix:duel_queue` |
 | `KIT_SELECT` | `elytrix:duel_kit` |
 | `PARTY_KIT` | `elytrix:duel_kit` |
 | `PARTY_CONFIRM` | `elytrix:duel_confirm` | состав китов у нас фиксирован |
 | `ROUNDS_SELECT` | `elytrix:duel_rounds` | 1 / 3 / 5 |
-| `PARTY_MODE` | `elytrix:duel_party` | 2 кнопки |
-| `PARTY_TEAM_SIZE` | `elytrix:duel_party_size` | 2v2 / 3v3 / 4v4 |
 
 Остаются за плагином (содержимое зависит от сервера):
 
-`DUELS` (список игроков), `ARENA_SELECT`, `SPECTATE`, `PARTY_CONFIRM`,
+`DUELS` (список игроков), `ARENA_SELECT`,
 `KIT_LIST`, `KIT_EDITOR_LIST`, `ARENA_LIST`, `KIT_EDIT`, `KIT_PREVIEW`,
 `KIT_CUSTOMIZE`.
 
@@ -87,8 +99,6 @@ menus:
   STATS: "elytrix:duel_stats"
   MATCHMAKING: "elytrix:duel_queue"
   ROUNDS_SELECT: "elytrix:duel_rounds"
-  PARTY_MODE: "elytrix:duel_party"
-  PARTY_TEAM_SIZE: "elytrix:duel_party_size"
 ```
 
 Поставить `keep` — окно вернётся к EpicDuels. Недостающие ключи мост
@@ -108,11 +118,13 @@ bash build.sh /путь/к/jdk /путь/к/ecj.jar
 в `downloads/`.
 
 `stubs/` — минимальные заглушки Bukkit API только для компиляции; в jar они
-не попадают (в архиве ровно 5 файлов: `plugin.yml`, `config.yml`, 3 класса).
+не попадают. В архиве 14 файлов: `plugin.yml`, `config.yml` и 12 классов.
 
-Меню `elytrix/duel/*.yml` генерируются скриптом
-`tools/gen_duel_menus.py` — он же проверяет, что заняты все 54 слота и что
-в анимации нет ссылок на несуществующие предметы.
+Меню `elytrix/duel/*.yml` (7 штук) генерируются скриптом
+`tools/gen_duel_menus.py`. Кадр, палитра, отступы и звуки повторяют
+дефолтное `/menu` (`elytrix:menu`): чёрные панели сверху, фиолетовые по низу
+и бокам, кнопки собираются по одной. Скрипт проверяет, что в анимации нет
+ссылок на несуществующие предметы и нет двух предметов в одном слоте.
 
 ## Ограничения и риски
 

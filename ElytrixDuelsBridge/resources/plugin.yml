@@ -8,5 +8,5 @@ depend: [EpicDuels, BMenu]
 commands:
   duelx:
     description: Продолжить поток дуэли после меню BMenu
-    usage: /duelx <target|team|kit|rounds|party|size|confirm|cancel|open>
+    usage: /duelx <target|team|kit|rounds|confirm|cancel|open>
     aliases: [dx]

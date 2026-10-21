@@ -86,7 +86,6 @@ ElytriX:
 | `epicduels.duel` | всем |
 | `epicduels.stats` | всем |
 | `epicduels.party` | всем |
-| `epicduels.spectate` | всем |
 | `epicduels.admin` | только админам |
 
 По умолчанию права уже стоят правильно, в LuckPerms ничего выдавать не нужно.
@@ -97,7 +96,6 @@ ElytriX:
 /duel                  главное меню
 /duel challenge <ник>  вызвать игрока
 /duel queue <кит>      встать в очередь
-/duel spectate         смотреть живые дуэли
 /duel stats [ник]      статистика
 /duel kits             своя раскладка китов
 /duel forfeit          сдаться

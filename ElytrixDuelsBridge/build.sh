@@ -2,7 +2,7 @@
 # Сборка ElytrixDuelsBridge без Gradle/Maven.
 # Использование: bash build.sh <JAVA_HOME> <ecj.jar>
 #
-# В архиве ровно 5 файлов: plugin.yml, config.yml и 3 класса.
+# В архиве: plugin.yml, config.yml и классы плагина (стабы не попадают).
 set -euo pipefail
 JAVA_HOME="${1:?укажи каталог JRE/JDK}"
 ECJ="${2:?укажи путь к ecj.jar}"

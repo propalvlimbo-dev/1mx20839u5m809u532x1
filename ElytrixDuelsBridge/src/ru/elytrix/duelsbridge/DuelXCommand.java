@@ -18,8 +18,6 @@ import org.bukkit.entity.Player;
  *   /duelx team                    открыть выбор тиммейта (быстрый 2 на 2)
  *   /duelx kit <кит>               кит выбран в нашем меню
  *   /duelx rounds <1|3|5>          число раундов и выбор карты
- *   /duelx party <team|tournament> режим группы
- *   /duelx size <2|3|4>            размер команд, затем выбор кита
  *   /duelx confirm | cancel        начать бой по группе / отменить
  *   /duelx open <menu>             открыть меню BMenu
  */
@@ -39,7 +37,7 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
         }
         Player player = (Player) sender;
         if (args.length == 0) {
-            usage(player, "/duelx <target|team|kit|rounds|party|size|confirm|open>");
+            usage(player, "/duelx <target|team|kit|rounds|confirm|cancel|open>");
             return true;
         }
         String sub = plugin.lower(args[0]);
@@ -83,39 +81,21 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
                 if (bestOf != 1 && bestOf != 3 && bestOf != 5) return usage(player, "/duelx rounds <1|3|5>");
                 return rounds(player, bestOf);
             }
-            if (sub.equals("party")) {
-                if (args.length < 2) return usage(player, "/duelx party <team|tournament>");
-                String mode = plugin.lower(args[1]);
-                if (mode.equals("team") || mode.equals("команда")) return partyTeam(player);
-                if (mode.equals("tournament") || mode.equals("турнир")) return partyTournament(player);
-                return usage(player, "/duelx party <team|tournament>");
-            }
-            if (sub.equals("size")) {
-                if (args.length < 2) return usage(player, "/duelx size <2|3|4>");
-                int perTeam;
-                try {
-                    perTeam = Integer.parseInt(args[1]);
-                } catch (NumberFormatException error) {
-                    return usage(player, "/duelx size <2|3|4>");
-                }
-                if (perTeam < 2 || perTeam > 4) return usage(player, "/duelx size <2|3|4>");
-                return partySize(player, perTeam);
-            }
             if (sub.equals("open")) {
                 if (args.length < 2) return usage(player, "/duelx open <menu>");
                 plugin.menus().open(player, args[1]);
                 return true;
             }
-        } catch (RuntimeException error) {
+        } catch (Throwable error) {
             plugin.getLogger().warning("duelx " + sub + ": " + error);
-            plugin.msg(player, "&f☁ &dᴇʟʏᴛʀɪx &7» &cНе удалось продолжить: " + error.getClass().getSimpleName());
+            plugin.msg(player, "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНе удалось продолжить: " + error.getClass().getSimpleName());
             return true;
         }
-        return usage(player, "/duelx <target|team|kit|rounds|party|size|confirm|open>");
+        return usage(player, "/duelx <target|team|kit|rounds|confirm|cancel|open>");
     }
 
     private boolean usage(Player player, String text) {
-        plugin.msg(player, "&f☁ &dᴇʟʏᴛʀɪx &7» &fИспользование: &d" + text);
+        plugin.msg(player, "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fИспользование: &#F8BEFB" + text);
         return true;
     }
 
@@ -137,62 +117,20 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
         return true;
     }
 
-    private boolean partyTeam(Player player) {
-        if (!plugin.duels().feature("team-duels")) return off(player, "Групповые дуэли");
-        Object gui = plugin.duels().gui();
-        player.closeInventory();
-        Duels.call(gui, "openPartyTeamSizeMenu", player);
-        return true;
-    }
 
-    private boolean partyTournament(Player player) {
-        if (!plugin.duels().feature("tournaments")) return off(player, "Турниры");
-        UUID id = player.getUniqueId();
-        plugin.duels().flowMode(id, "TOURNAMENT");
-        player.closeInventory();
-        Object gui = plugin.duels().gui();
-        Duels.call(gui, "openPartyKitMenu", player, 0);
-        return true;
-    }
 
-    private boolean partySize(Player player, int perTeam) {
-        String sizeName = perTeam == 2 ? "TWO_VS_TWO" : perTeam == 3 ? "THREE_VS_THREE" : "FOUR_VS_FOUR";
-        UUID id = player.getUniqueId();
-        Object party = plugin.duels().partyOf(id);
-        int need = perTeam * 2;
-        int have = party == null ? 0 : plugin.duels().partySize(party);
-        if (have < need) {
-            plugin.msg(player, plugin.string("messages.not-enough-members",
-                    "&f☁ &dᴇʟʏᴛʀɪx &7» &cВ группе мало игроков: нужно &f%need%&c, сейчас &f%have%&c.")
-                    .replace("%need%", String.valueOf(need)).replace("%have%", String.valueOf(have)));
-            return true;
-        }
-        plugin.duels().flowMode(id, "TEAM_DUEL");
-        plugin.duels().flowSize(id, sizeName);
-        player.closeInventory();
-        Duels.call(plugin.duels().gui(), "openPartyKitMenu", player, 0);
-        return true;
-    }
-
-    private boolean off(Player player, String what) {
-        plugin.msg(player, plugin.string("messages.feature-off",
-                "&f☁ &dᴇʟʏᴛʀɪx &7» &cВыключено на сервере: &f%name%").replace("%name%", what));
-        return true;
-    }
 
     // ------------------------------------------------------------- tab list
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
-            return filter(args[0], Arrays.asList("target", "team", "kit", "rounds", "party",
-                    "size", "confirm", "cancel", "open"));
+            return filter(args[0], Arrays.asList("target", "team", "kit", "rounds",
+                    "confirm", "cancel", "open"));
         }
         if (args.length == 2) {
             String sub = plugin.lower(args[0]);
             if (sub.equals("rounds")) return filter(args[1], Arrays.asList("1", "3", "5"));
-            if (sub.equals("party")) return filter(args[1], Arrays.asList("team", "tournament"));
-            if (sub.equals("size")) return filter(args[1], Arrays.asList("2", "3", "4"));
             if (sub.equals("kit")) {
                 List<String> kits = plugin.getConfig().getStringList("kits");
                 if (kits == null || kits.isEmpty()) {
