@@ -15,7 +15,7 @@ items:
       - "&7● &fНажмите, чтобы искать бой"
     on_click:
       - sound: 'block.note_block.pling 0.4 1.05'
-      - "[player] duel queue sword"
+      - "[player] duelx queue sword"
       - "[close]"
   kit_uhc:
     material: golden_apple
@@ -28,7 +28,7 @@ items:
       - "&7● &fНажмите, чтобы искать бой"
     on_click:
       - sound: 'block.note_block.pling 0.4 1.10'
-      - "[player] duel queue uhc"
+      - "[player] duelx queue uhc"
       - "[close]"
   kit_gapple:
     material: enchanted_golden_apple
@@ -41,7 +41,7 @@ items:
       - "&7● &fНажмите, чтобы искать бой"
     on_click:
       - sound: 'block.note_block.pling 0.4 1.15'
-      - "[player] duel queue gapple"
+      - "[player] duelx queue gapple"
       - "[close]"
   kit_sumo:
     material: fishing_rod
@@ -54,7 +54,7 @@ items:
       - "&7● &fНажмите, чтобы искать бой"
     on_click:
       - sound: 'block.note_block.pling 0.4 1.20'
-      - "[player] duel queue sumo"
+      - "[player] duelx queue sumo"
       - "[close]"
   kit_archer:
     material: bow
@@ -67,7 +67,7 @@ items:
       - "&7● &fНажмите, чтобы искать бой"
     on_click:
       - sound: 'block.note_block.pling 0.4 1.25'
-      - "[player] duel queue archer"
+      - "[player] duelx queue archer"
       - "[close]"
   kit_mace:
     material: mace
@@ -80,7 +80,7 @@ items:
       - "&7● &fНажмите, чтобы искать бой"
     on_click:
       - sound: 'block.note_block.pling 0.4 1.30'
-      - "[player] duel queue mace"
+      - "[player] duelx queue mace"
       - "[close]"
   kit_axe:
     material: netherite_axe
@@ -93,7 +93,7 @@ items:
       - "&7● &fНажмите, чтобы искать бой"
     on_click:
       - sound: 'block.note_block.pling 0.4 1.35'
-      - "[player] duel queue axe"
+      - "[player] duelx queue axe"
       - "[close]"
   kit_trident:
     material: trident
@@ -106,7 +106,7 @@ items:
       - "&7● &fНажмите, чтобы искать бой"
     on_click:
       - sound: 'block.note_block.pling 0.4 1.40'
-      - "[player] duel queue trident"
+      - "[player] duelx queue trident"
       - "[close]"
   kit_crossbow:
     material: crossbow
@@ -119,7 +119,7 @@ items:
       - "&7● &fНажмите, чтобы искать бой"
     on_click:
       - sound: 'block.note_block.pling 0.4 1.45'
-      - "[player] duel queue crossbow"
+      - "[player] duelx queue crossbow"
       - "[close]"
   kit_netherite:
     material: netherite_chestplate
@@ -132,7 +132,7 @@ items:
       - "&7● &fНажмите, чтобы искать бой"
     on_click:
       - sound: 'block.note_block.pling 0.4 1.50'
-      - "[player] duel queue netherite"
+      - "[player] duelx queue netherite"
       - "[close]"
   leave:
     material: barrier
@@ -144,7 +144,7 @@ items:
       - "&7● &fНажмите, чтобы выйти"
     on_click:
       - sound: 'ui.button.click 0.4 1.0'
-      - "[player] duel queue leave"
+      - "[player] duelx queue leave"
       - "[close]"
   back:
     material: black_dye

@@ -3,7 +3,7 @@
 Мост между **EpicDuels** и **BMenu**: окна плагина подменяются нашими меню
 BMenu — с анимацией сборки, звуками и русским текстом.
 
-- Версия: 1.2.0
+- Версия: 1.3.0
 - Зависимости: `EpicDuels`, `BMenu` (BMenu сам требует `BLib` и `PlaceholderAPI`)
 - Paper 1.21.1–1.21.11, Java 17+ (собрано под 17, сервер 21 подходит)
 - Java-классы EpicDuels не меняются: мост работает через события и рефлексию
@@ -19,7 +19,10 @@ BMenu — с анимацией сборки, звуками и русским �
 4. Кнопки в меню вызывают команды. Где нужен поток плагина — `/duelx`:
 
 ```
-/duelx rounds <1|3|5>            выбрать раунды  → плагин открывает выбор карты
+/duelx pick                      своё окно выбора игрока
+/duelx queue <кит|leave>         встать в очередь / выйти
+/duelx top                       таблица лидеров
+/duelx rounds <1|3|5>            раунды → вызов уходит сразу, карта случайная
 /duelx target <ник>              соперник выбран → меню кита
 /duelx team                      выбор напарника (быстрый 2 на 2)
 /duelx kit <кит>                 кит из нашего меню → раунды или подтверждение
@@ -28,9 +31,22 @@ BMenu — с анимацией сборки, звуками и русским �
 /duelx open <menu>               открыть меню BMenu
 ```
 
-`/duelx` вызывает публичные методы `GUIManager` (setChallengeRounds,
-openArenaSelect, openPartyTeamSizeMenu, openPartyKitMenu, …) — то же, что
-делает клик в окне плагина.
+`/duelx` вызывает публичные методы `GUIManager` и менеджеров EpicDuels — то
+же, что делает клик в окне плагина. Выбор карты убран: после раундов
+`finishChallengeWithArena` получает случайную готовую арену.
+
+## Только две команды для игрока
+
+Игроку не нужно знать подкоманд: `/duel` открывает меню, `/duel ник` — сразу
+выбор кита. Мост подменяет обработчик `/duel` у EpicDuels:
+
+- ник в таб-дополнении после `/duel ` (`/duel <Tab>` — список онлайн-игроков);
+- подкоманды вроде `arena`, `kit`, `queue`, `stats` игроку недоступны;
+- разрешены только те, на которые EpicDuels ставит кнопки в чате:
+  `accept`, `deny`, `cancel`, `forfeit`, `rematch`, `toggle`;
+- админы (`epicduels.admin` или `elytrix.guard.bypass`) видят полный `/duel`.
+
+Кнопки меню работают через `/duelx`, поэтому фильтр им не мешает.
 
 ## Своё окно выбора игрока
 
@@ -47,6 +63,31 @@ openArenaSelect, openPartyTeamSizeMenu, openPartyKitMenu, …) — то же, ч
 
 Наборы подобраны так, чтобы работать без установки блоков: кристаллов и
 «обсидиановых» китов нет, потому что на аренах блоки ставить нельзя.
+
+## Видимость команд (замена PLHide)
+
+Раздел `command-guard` в `config.yml`:
+
+```yaml
+command-guard:
+  enabled: true
+  duel-menu: true              # /duel: игрокам только «/duel» и «/duel ник»
+  hide-tab: true               # не отправлять скрытые команды клиенту
+  admin-permission: epicduels.admin
+  bypass-permission: elytrix.guard.bypass
+  blocked: [plugins, pl, version, ver, about, icanhasbukkit, help]
+  hidden:  [plugins, pl, version, ver, about, icanhasbukkit, help,
+            bmenu, epicduels, duelx, dx, party, p]
+```
+
+- `hidden` — команды исчезают из автодополнения (`PlayerCommandSendEvent`);
+- `blocked` — команду нельзя выполнить, в том числе `/bukkit:plugins`;
+- OP и права выше видят всё;
+- списки можно расширять: `/reload` не нужен, достаточно перезапуска.
+
+Готовые альтернативы, если нужен отдельный плагин:
+`CommandWhitelist` (YouHaveTrouble, обновляется в 2026),
+`AdvancedPlHide`, `CommandDefender`.
 
 ## Защита арен
 
@@ -105,7 +146,7 @@ openArenaSelect, openPartyTeamSizeMenu, openPartyKitMenu, …) — то же, ч
 
 ## Установка
 
-1. `ElytrixDuelsBridge-1.2.0.jar` → `plugins/`
+1. `ElytrixDuelsBridge-1.3.0.jar` → `plugins/`
 2. Папка меню BMenu `elytrix/duel/*.yml` → `plugins/BMenu/menu/elytrix/duel/`
 3. Запустить сервер (или `/reload confirm` — не рекомендуется) и проверить `/duel`.
 
@@ -148,7 +189,7 @@ bash build.sh /путь/к/jdk /путь/к/ecj.jar
 в `downloads/`.
 
 `stubs/` — минимальные заглушки Bukkit API только для компиляции; в jar они
-не попадают. В архиве 14 файлов: `plugin.yml`, `config.yml` и 12 классов.
+не попадают. В архиве 20 файлов: `plugin.yml`, `config.yml` и 18 классов.
 
 Меню `elytrix/duel/*.yml` (7 штук) генерируются скриптом
 `tools/gen_duel_menus.py`. Кадр, палитра, отступы и звуки повторяют

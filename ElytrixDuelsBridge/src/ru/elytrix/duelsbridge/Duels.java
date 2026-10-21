@@ -243,6 +243,32 @@ final class Duels {
     }
 
     /**
+     * Вызов игрока на случайную готовую арену — без окна выбора карты.
+     * Кит и раунды уже лежат в GUI-потоке (их ставит openRoundsSelect).
+     */
+    boolean finishChallenge(Player player) {
+        UUID id = player.getUniqueId();
+        if (call(gui(), "getChallengeTarget", id) == null
+                || call(gui(), "getChallengeKit", id) == null) {
+            plugin.msg(player, plugin.string("messages.no-challenge",
+                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cСначала выбери игрока и кит."));
+            return false;
+        }
+        Object arenas = call(manager("getArenaManager"), "getReadyArenas");
+        if (!(arenas instanceof List) || ((List<?>) arenas).isEmpty()) {
+            plugin.msg(player, plugin.string("messages.no-arenas",
+                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНет готовых арен — сообщи администратору."));
+            return false;
+        }
+        List<?> ready = (List<?>) arenas;
+        Object arena = ready.get(random.nextInt(ready.size()));
+        Object name = call(arena, "getName");
+        if (name == null) return false;
+        call(gui(), "finishChallengeWithArena", player, String.valueOf(name));
+        return true;
+    }
+
+    /**
      * Запуск командного боя из готового списка игроков (для очереди пар).
      * Порядок: первая пара — команда A, вторая — команда B (см. fixTeams).
      */

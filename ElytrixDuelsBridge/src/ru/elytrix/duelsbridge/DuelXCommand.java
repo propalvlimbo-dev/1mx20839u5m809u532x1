@@ -18,6 +18,9 @@ import org.bukkit.entity.Player;
  *   /duelx team                    открыть выбор тиммейта (быстрый 2 на 2)
  *   /duelx kit <кит>               кит выбран в нашем меню
  *   /duelx rounds <1|3|5>          число раундов и выбор карты
+ *   /duelx pick                    открыть выбор игрока
+ *   /duelx queue <кит|leave>       встать в очередь / выйти
+ *   /duelx top                     таблица лидеров
  *   /duelx kits [reset]            создать 10 готовых наборов
  *   /duelx confirm | cancel        начать бой / отменить
  *   /duelx open <menu>             открыть меню BMenu
@@ -38,7 +41,7 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
         }
         Player player = (Player) sender;
         if (args.length == 0) {
-            usage(player, "/duelx <target|team|kit|rounds|kits|confirm|cancel|open>");
+            usage(player, "/duelx <pick|target|team|kit|rounds|queue|top|kits|confirm|cancel|open>");
             return true;
         }
         String sub = plugin.lower(args[0]);
@@ -82,6 +85,19 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
                 if (bestOf != 1 && bestOf != 3 && bestOf != 5) return usage(player, "/duelx rounds <1|3|5>");
                 return rounds(player, bestOf);
             }
+            if (sub.equals("pick")) {
+                plugin.pickOpponent(player);
+                return true;
+            }
+            if (sub.equals("top")) {
+                plugin.runOriginal(player, "leaderboard", "wins");
+                return true;
+            }
+            if (sub.equals("queue")) {
+                if (args.length < 2) return usage(player, "/duelx queue <кит|leave>");
+                plugin.runOriginal(player, "queue", args[1]);
+                return true;
+            }
             if (sub.equals("kits")) {
                 plugin.installKits(player, args.length > 1
                         && plugin.lower(args[1]).equals("reset"));
@@ -97,7 +113,7 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
             plugin.msg(player, "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНе удалось продолжить: " + error.getClass().getSimpleName());
             return true;
         }
-        return usage(player, "/duelx <target|team|kit|rounds|kits|confirm|cancel|open>");
+        return usage(player, "/duelx <pick|target|team|kit|rounds|queue|top|kits|confirm|cancel|open>");
     }
 
     private boolean usage(Player player, String text) {
@@ -119,8 +135,8 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
         }
         Duels.call(gui, "setChallengeRounds", uuid, bestOf);
         player.closeInventory();
-        Duels.call(gui, "openArenaSelect", player, target, kit);
-        return true;
+        // выбор карты убран: вызов уходит на случайную готовую арену
+        return plugin.duels().finishChallenge(player);
     }
 
 
@@ -131,13 +147,20 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
-            return filter(args[0], Arrays.asList("target", "team", "kit", "rounds",
-                    "confirm", "cancel", "kits", "open"));
+            return filter(args[0], Arrays.asList("pick", "target", "team", "kit", "rounds",
+                    "queue", "top", "confirm", "cancel", "kits", "open"));
         }
         if (args.length == 2) {
             String sub = plugin.lower(args[0]);
             if (sub.equals("rounds")) return filter(args[1], Arrays.asList("1", "3", "5"));
             if (sub.equals("kits")) return filter(args[1], Arrays.asList("reset"));
+            if (sub.equals("queue")) {
+                List<String> kits = plugin.getConfig().getStringList("kits.names");
+                if (kits == null || kits.isEmpty()) kits = Arrays.asList(Kits.NAMES);
+                List<String> values = new ArrayList<String>(kits);
+                values.add("leave");
+                return filter(args[1], values);
+            }
             if (sub.equals("kit")) {
                 List<String> kits = plugin.getConfig().getStringList("kits.names");
                 if (kits == null || kits.isEmpty()) {

@@ -154,7 +154,7 @@ main = [
     (item("duel", "netherite_sword", T("Дуэль 1 на 1"),
           [B0, B + "Формат: " + H + "1 на 1", B + "Кит: " + H + "выбираешь сам",
            B + "Раунды: " + H + "выбираешь сам", B0, DOT + "Нажмите, чтобы выбрать игрока"],
-          ["sound: 'block.note_block.pling 0.4 1.1'", "[player] duel duels"]), 20),
+          ["sound: 'block.note_block.pling 0.4 1.1'", "[player] duelx pick"]), 20),
     (item("team", "iron_sword", T("Бои 2 на 2"),
           [B0, B + "Формат: " + H + "2 на 2", B + "Тиммейт: " + H + "выбираешь сам",
            B + "Очередь: " + H + "встаёте парой", B0, DOT + "Нажмите, чтобы выбрать тиммейта"],
@@ -171,7 +171,7 @@ main = [
     (item("top", "nether_star", T("Рейтинг"),
           [B0, B + "Список: " + H + "топ-10 по победам", B + "Обновление: " + H + "каждый бой",
            B0, DOT + "Нажмите, чтобы посмотреть"],
-          ["sound: 'block.note_block.pling 0.4 1.42'", "[player] duel leaderboard wins"]), 24),
+          ["sound: 'block.note_block.pling 0.4 1.42'", "[player] duelx top"]), 24),
     (item("help", "knowledge_book", T("Как играть"),
           [B0, B + "Гайд: " + H + "4 шага до боя", B + "Команды: " + H + "внутри",
            B0, DOT + "Нажмите, чтобы открыть"],
@@ -199,10 +199,10 @@ stats_content = [
           [B0, B + "Рейтинг: " + H + "{score}", B0, DOT + "Растёт с каждой победой"]), 30),
     (item("top", "book", T("Топ игроков"),
           [B0, B + "Список: " + H + "топ-10 по победам", B0, DOT + "Нажмите, чтобы посмотреть"],
-          ["sound: 'block.note_block.pling 0.4 1.2'", "[player] duel leaderboard wins"]), 32),
+          ["sound: 'block.note_block.pling 0.4 1.2'", "[player] duelx top"]), 32),
     (item("play", "compass", T("Сыграть"),
           [B0, B + "Режим: " + H + "вызов игрока", B0, DOT + "Нажмите, чтобы выбрать игрока"],
-          ["sound: 'block.note_block.pling 0.4 1.3'", "[player] duel duels"]), 31),
+          ["sound: 'block.note_block.pling 0.4 1.3'", "[player] duelx pick"]), 31),
 ]
 stats_tail = [back(45), close(49)]
 write("stats.yml", build("duel_stats", "Статистика", stats_content, stats_tail))
@@ -256,12 +256,12 @@ for index, (kit_id, material, title, hint) in enumerate(KITS):
              [B0, B + "Кит: " + H + hint, B + "Поиск: " + H + "начнётся сразу",
               B0, DOT + "Нажмите, чтобы искать бой"],
              [f"sound: 'block.note_block.pling 0.4 {1.05 + index * 0.05:.2f}'",
-              f"[player] duel queue {kit_id}", "[close]"]),
+              f"[player] duelx queue {kit_id}", "[close]"]),
         PLACE[10][index]))
 queue_content.append((
     item("leave", "barrier", "&7« &cВыйти из очереди &7»",
          [B0, B + "Очередь: " + H + "будет сброшена", B0, DOT + "Нажмите, чтобы выйти"],
-         ["sound: 'ui.button.click 0.4 1.0'", "[player] duel queue leave", "[close]"]),
+         ["sound: 'ui.button.click 0.4 1.0'", "[player] duelx queue leave", "[close]"]),
     40))
 queue_tail = [back(45), close(49)]
 write("queue.yml", build("duel_queue", "Поиск соперника", queue_content, queue_tail))
@@ -278,8 +278,8 @@ help_content = [
            B + "Предметы: " + H + "выдаются автоматически",
            B + "Свой кит собрать: " + H + "нельзя",
            B0, DOT + "Нажми на кит, чтобы продолжить"]), 21),
-    (item("step3", "paper", T("Шаг 3 — карта и раунды"),
-          [B0, B + "Карта: " + H + "любая или случайная",
+    (item("step3", "paper", T("Шаг 3 — раунды"),
+          [B0, B + "Карта: " + H + "подбирается сама",
            B + "Раунды: " + H + "1, 3 или 5",
            B + "Соперник: " + H + "получит твой вызов",
            B0, DOT + "Прими вызов, когда он придёт"]), 22),
@@ -290,10 +290,10 @@ help_content = [
            B0, DOT + "Реванш предлагается после боя"]), 23),
     (item("commands", "book", T("Команды"),
           [B0, B + "Меню дуэлей: " + H + "/duels",
-           B + "Вызов: " + H + "/duel ник",
-           B + "Очередь: " + H + "/duel queue кит",
-           B + "Статистика: " + H + "/duel stats",
-           B0, DOT + "Все команды: /duel help"]), 24),
+           B + "Вызов игрока: " + H + "/duel ник",
+           B + "Очередь: " + H + "кнопка в меню",
+           B + "Статистика: " + H + "кнопка в меню",
+           B0, DOT + "Больше ничего вводить не нужно"]), 24),
     (item("important", "knowledge_book", T("Важно"),
           [B0, B + "Награды: &cнет", B + "Считается: " + H + "только статистика",
            B + "Инвентарь: " + H + "выдаётся на бой",

@@ -46,7 +46,7 @@ items:
       - "&7● &fНажмите, чтобы посмотреть"
     on_click:
       - sound: 'block.note_block.pling 0.4 1.2'
-      - "[player] duel leaderboard wins"
+      - "[player] duelx top"
   play:
     material: compass
     name: "&7« &#F8BEFBСыграть &7»"
@@ -57,7 +57,7 @@ items:
       - "&7● &fНажмите, чтобы выбрать игрока"
     on_click:
       - sound: 'block.note_block.pling 0.4 1.3'
-      - "[player] duel duels"
+      - "[player] duelx pick"
   back:
     material: black_dye
     name: "&7« &#F8BEFBНазад &7»"

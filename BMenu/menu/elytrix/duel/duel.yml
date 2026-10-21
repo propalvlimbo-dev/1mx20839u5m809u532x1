@@ -16,7 +16,7 @@ items:
       - "&7● &fНажмите, чтобы выбрать игрока"
     on_click:
       - sound: 'block.note_block.pling 0.4 1.1'
-      - "[player] duel duels"
+      - "[player] duelx pick"
   team:
     material: iron_sword
     name: "&7« &#F8BEFBБои 2 на 2 &7»"
@@ -68,7 +68,7 @@ items:
       - "&7● &fНажмите, чтобы посмотреть"
     on_click:
       - sound: 'block.note_block.pling 0.4 1.42'
-      - "[player] duel leaderboard wins"
+      - "[player] duelx top"
   help:
     material: knowledge_book
     name: "&7« &#F8BEFBКак играть &7»"

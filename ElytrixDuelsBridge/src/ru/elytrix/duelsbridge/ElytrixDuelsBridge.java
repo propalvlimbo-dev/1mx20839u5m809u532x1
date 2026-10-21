@@ -14,7 +14,9 @@ import java.util.Set;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -58,6 +60,10 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
     private final Duels duels = new Duels(this);
     private final Menus menus = new Menus(this);
     private final Kits kits = new Kits(this);
+    /** Оригинальные обработчики /duel из EpicDuels — нужны админам и /duelx. */
+    private PluginCommand duelCommand;
+    private CommandExecutor duelExecutor;
+    private TabCompleter duelCompleter;
     /** Кого игрок выбрал в своём окне (до выбора кита). */
     private final Map<UUID, UUID> targets = new HashMap<UUID, UUID>();
     /** Очередь пар 2 на 2: ждём вторую пару с тем же китом. */
@@ -114,6 +120,8 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
 
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(new ArenaGuard(this), this);
+        getServer().getPluginManager().registerEvents(new CommandGuard(this), this);
+        hijackDuel();
 
         PluginCommand command = getCommand("duelx");
         if (command != null) {
@@ -141,9 +149,55 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         getLogger().info("ElytriX: мосты меню EpicDuels -> BMenu включены");
     }
 
+    /** Забираем /duel себе: игрокам только «/duel» и «/duel ник». */
+    private void hijackDuel() {
+        if (!getConfig().getBoolean("command-guard.duel-menu", true)) return;
+        PluginCommand command = getServer().getPluginCommand("duel");
+        if (command == null) {
+            getLogger().warning("Команда /duel не найдена — EpicDuels загрузился?");
+            return;
+        }
+        duelCommand = command;
+        duelExecutor = command.getExecutor();
+        duelCompleter = command.getTabCompleter();
+        DuelCommandGuard guard = new DuelCommandGuard(this, duelExecutor, duelCompleter);
+        command.setExecutor(guard);
+        command.setTabCompleter(guard);
+    }
+
+    /** Права администратора: видит все команды и полный /duel. */
+    boolean isAdmin(Player player) {
+        if (player == null) return false;
+        if (player.isOp()) return true;
+        String admin = getConfig().getString("command-guard.admin-permission", "epicduels.admin");
+        if (admin != null && !admin.isEmpty() && player.hasPermission(admin)) return true;
+        String bypass = getConfig().getString("command-guard.bypass-permission", "elytrix.guard.bypass");
+        return bypass != null && !bypass.isEmpty() && player.hasPermission(bypass);
+    }
+
+    /** Главное меню дуэлей — то же, что открывает пустой /duel. */
+    void openMainMenu(Player player) {
+        String id = menuForOr("MAIN", "elytrix:duel");
+        menus.open(player, id, menuArgs(player, id));
+    }
+
+    /** Выполнить подкоманду EpicDuels напрямую, минуя наш фильтр. */
+    void runOriginal(Player player, String... args) {
+        if (duelExecutor == null || duelCommand == null) {
+            msg(player, "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cEpicDuels не отвечает — перезапусти сервер.");
+            return;
+        }
+        duelExecutor.onCommand(player, duelCommand, "duel", args);
+    }
+
     @Override
     public void onDisable() {
         targets.clear();
+        // возвращаем EpicDuels его обработчики /duel
+        if (duelCommand != null) {
+            if (duelExecutor != null) duelCommand.setExecutor(duelExecutor);
+            if (duelCompleter != null) duelCommand.setTabCompleter(duelCompleter);
+        }
         getLogger().info("ElytriX: мосты меню выключены");
     }
 
@@ -179,6 +233,18 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
                 @Override
                 public void run() {
                     PlayerPicker.open(ElytrixDuelsBridge.this, player, mode, 0);
+                }
+            });
+            return;
+        }
+
+        // Выбор карты убран: окно арен не показываем, берём случайную готовую.
+        if ("ARENA_SELECT".equals(type)) {
+            event.setCancelled(true);
+            Bukkit.getScheduler().runTask(this, new Runnable() {
+                @Override
+                public void run() {
+                    duels.finishChallenge(player);
                 }
             });
             return;

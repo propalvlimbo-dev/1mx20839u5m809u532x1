@@ -28,10 +28,10 @@ items:
       - "&7● &fНажми на кит, чтобы продолжить"
   step3:
     material: paper
-    name: "&7« &#F8BEFBШаг 3 — карта и раунды &7»"
+    name: "&7« &#F8BEFBШаг 3 — раунды &7»"
     lore:
       - "&#F8BEFB&l┃ "
-      - "&#F8BEFB&l┃ &fКарта: &#F8BEFBлюбая или случайная"
+      - "&#F8BEFB&l┃ &fКарта: &#F8BEFBподбирается сама"
       - "&#F8BEFB&l┃ &fРаунды: &#F8BEFB1, 3 или 5"
       - "&#F8BEFB&l┃ &fСоперник: &#F8BEFBполучит твой вызов"
       - "&#F8BEFB&l┃ "
@@ -52,11 +52,11 @@ items:
     lore:
       - "&#F8BEFB&l┃ "
       - "&#F8BEFB&l┃ &fМеню дуэлей: &#F8BEFB/duels"
-      - "&#F8BEFB&l┃ &fВызов: &#F8BEFB/duel ник"
-      - "&#F8BEFB&l┃ &fОчередь: &#F8BEFB/duel queue кит"
-      - "&#F8BEFB&l┃ &fСтатистика: &#F8BEFB/duel stats"
+      - "&#F8BEFB&l┃ &fВызов игрока: &#F8BEFB/duel ник"
+      - "&#F8BEFB&l┃ &fОчередь: &#F8BEFBкнопка в меню"
+      - "&#F8BEFB&l┃ &fСтатистика: &#F8BEFBкнопка в меню"
       - "&#F8BEFB&l┃ "
-      - "&7● &fВсе команды: /duel help"
+      - "&7● &fБольше ничего вводить не нужно"
   important:
     material: knowledge_book
     name: "&7« &#F8BEFBВажно &7»"

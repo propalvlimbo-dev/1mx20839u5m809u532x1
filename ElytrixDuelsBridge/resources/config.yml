@@ -28,6 +28,38 @@ kits:
     - crossbow
     - netherite
 
+# /duel и видимость команд (замена PLHide).
+# hidden — эти команды не отправляются клиенту, их не видно в автодополнении;
+# blocked — эти команды нельзя выполнить, в том числе через /bukkit:имя.
+command-guard:
+  enabled: true
+  duel-menu: true              # /duel: игрокам только «/duel» и «/duel ник»
+  hide-tab: true
+  admin-permission: epicduels.admin
+  bypass-permission: elytrix.guard.bypass
+  blocked:
+    - plugins
+    - pl
+    - version
+    - ver
+    - about
+    - icanhasbukkit
+    - help
+  hidden:
+    - plugins
+    - pl
+    - version
+    - ver
+    - about
+    - icanhasbukkit
+    - help
+    - bmenu
+    - epicduels
+    - duelx
+    - dx
+    - party
+    - p
+
 # Правила на боевых копиях арен (arena_instance_*),
 # в шаблонах arena_template_* строительство остаётся доступным.
 protection:
@@ -61,4 +93,6 @@ messages:
   group-removed: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fКомандные дуэли теперь в &f/duels&f: &f«Бои 2 на 2»"
   arena-no-build: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНа арене нельзя ставить блоки."
   kits-ready: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fГотовых наборов: &f%count%"
+  duel-usage: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fДоступно: &f/duel &7и &f/duel ник"
+  command-blocked: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНеизвестная команда."
   kits-failed: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНе удалось: EpicDuels не отдал KitManager."
