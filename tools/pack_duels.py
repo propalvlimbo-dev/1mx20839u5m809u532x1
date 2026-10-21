@@ -41,7 +41,7 @@ REPLACE_DIRS = {
 
 ADD = {
     "downloads/EpicDuels-ElytriX-3.1.0.jar": "plugins/EpicDuels-ElytriX-3.1.0.jar",
-    "downloads/ElytrixDuelsBridge-1.0.0.jar": "plugins/ElytrixDuelsBridge-1.0.0.jar",
+    "downloads/ElytrixDuelsBridge-1.1.0.jar": "plugins/ElytrixDuelsBridge-1.1.0.jar",
 }
 
 
@@ -61,6 +61,9 @@ def main() -> int:
                    if not i.is_dir()]
 
     merged: dict[str, bytes] = {name: data for name, _, data in entries}
+    # старые версии jar моста не тащим в архив
+    for name in [n for n in merged if "/plugins/ElytrixDuelsBridge-" in n]:
+        del merged[name]
     before = set(merged)
 
     for src, dst in REPLACE.items():

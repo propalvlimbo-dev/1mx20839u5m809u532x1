@@ -280,6 +280,21 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         String message = event.getMessage();
         if (message == null) return;
         String[] parts = message.trim().split("\\s+");
+        if (parts.length == 1) {
+            String only = parts[0].toLowerCase(Locale.ROOT);
+            if (only.equals("/duels") || only.equals("/дуэли")) {
+                final Player viewer = event.getPlayer();
+                event.setCancelled(true);
+                Bukkit.getScheduler().runTask(this, new Runnable() {
+                    @Override
+                    public void run() {
+                        String id = menuForOr("MAIN", "elytrix:duel");
+                        menus.open(viewer, id, menuArgs(viewer, id));
+                    }
+                });
+            }
+            return;
+        }
         if (parts.length != 2) return;
         String command = parts[0].toLowerCase(Locale.ROOT);
         if (!command.equals("/duel") && !command.equals("/d")) return;

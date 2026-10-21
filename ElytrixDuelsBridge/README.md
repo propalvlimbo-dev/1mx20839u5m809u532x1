@@ -3,7 +3,7 @@
 Мост между **EpicDuels** и **BMenu**: окна плагина подменяются нашими меню
 BMenu — с анимацией сборки, звуками и русским текстом.
 
-- Версия: 1.0.0
+- Версия: 1.1.0
 - Зависимости: `EpicDuels`, `BMenu` (BMenu сам требует `BLib` и `PlaceholderAPI`)
 - Paper 1.21.1–1.21.11, Java 17+ (собрано под 17, сервер 21 подходит)
 - Java-классы EpicDuels не меняются: мост работает через события и рефлексию
@@ -70,7 +70,7 @@ openArenaSelect, openPartyTeamSizeMenu, openPartyKitMenu, …) — то же, ч
 
 ## Установка
 
-1. `ElytrixDuelsBridge-1.0.0.jar` → `plugins/`
+1. `ElytrixDuelsBridge-1.1.0.jar` → `plugins/`
 2. Папка меню BMenu `elytrix/duel/*.yml` → `plugins/BMenu/menu/elytrix/duel/`
 3. Запустить сервер (или `/reload confirm` — не рекомендуется) и проверить `/duel`.
 
