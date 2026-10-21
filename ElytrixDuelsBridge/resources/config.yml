@@ -11,17 +11,28 @@ menus:
   PARTY_KIT: "elytrix:duel_kit"
   PARTY_CONFIRM: "elytrix:duel_confirm"
 
-# Имена китов для подсказок в /duelx kit (как в elytrix/duel/kit.yml).
+# Десять готовых наборов. Мост создаёт их сам при запуске, если таких
+# китов ещё нет в kits.yml EpicDuels; существующие не трогаются.
+# Пересоздать: /duelx kits reset
 kits:
-  - sword
-  - nodebuff
-  - uhc
-  - sumo
-  - gapple
-  - archer
-  - mace
-  - crystal
-  - pot
+  auto-install: true
+  names:
+    - sword
+    - uhc
+    - gapple
+    - sumo
+    - archer
+    - mace
+    - axe
+    - trident
+    - crossbow
+    - netherite
+
+# Правила на боевых копиях арен (arena_instance_*),
+# в шаблонах arena_template_* строительство остаётся доступным.
+protection:
+  block-place: true   # нельзя ставить блоки и выливать жидкости
+  explosions: true    # взрывы не ломают блоки арены
 
 messages:
   no-challenge: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cСначала выбери игрока и кит."
@@ -48,3 +59,6 @@ messages:
   pair-found: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fПара найдена: &d%mate% &fпротив &d%a% &f+ &d%b%"
   cancelled: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Отменено."
   group-removed: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fКомандные дуэли теперь в &f/duels&f: &f«Бои 2 на 2»"
+  arena-no-build: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНа арене нельзя ставить блоки."
+  kits-ready: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fГотовых наборов: &f%count%"
+  kits-failed: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНе удалось: EpicDuels не отдал KitManager."

@@ -18,7 +18,8 @@ import org.bukkit.entity.Player;
  *   /duelx team                    открыть выбор тиммейта (быстрый 2 на 2)
  *   /duelx kit <кит>               кит выбран в нашем меню
  *   /duelx rounds <1|3|5>          число раундов и выбор карты
- *   /duelx confirm | cancel        начать бой по группе / отменить
+ *   /duelx kits [reset]            создать 10 готовых наборов
+ *   /duelx confirm | cancel        начать бой / отменить
  *   /duelx open <menu>             открыть меню BMenu
  */
 public final class DuelXCommand implements CommandExecutor, TabCompleter {
@@ -37,7 +38,7 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
         }
         Player player = (Player) sender;
         if (args.length == 0) {
-            usage(player, "/duelx <target|team|kit|rounds|confirm|cancel|open>");
+            usage(player, "/duelx <target|team|kit|rounds|kits|confirm|cancel|open>");
             return true;
         }
         String sub = plugin.lower(args[0]);
@@ -81,6 +82,11 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
                 if (bestOf != 1 && bestOf != 3 && bestOf != 5) return usage(player, "/duelx rounds <1|3|5>");
                 return rounds(player, bestOf);
             }
+            if (sub.equals("kits")) {
+                plugin.installKits(player, args.length > 1
+                        && plugin.lower(args[1]).equals("reset"));
+                return true;
+            }
             if (sub.equals("open")) {
                 if (args.length < 2) return usage(player, "/duelx open <menu>");
                 plugin.menus().open(player, args[1]);
@@ -91,7 +97,7 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
             plugin.msg(player, "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНе удалось продолжить: " + error.getClass().getSimpleName());
             return true;
         }
-        return usage(player, "/duelx <target|team|kit|rounds|confirm|cancel|open>");
+        return usage(player, "/duelx <target|team|kit|rounds|kits|confirm|cancel|open>");
     }
 
     private boolean usage(Player player, String text) {
@@ -126,16 +132,19 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
             return filter(args[0], Arrays.asList("target", "team", "kit", "rounds",
-                    "confirm", "cancel", "open"));
+                    "confirm", "cancel", "kits", "open"));
         }
         if (args.length == 2) {
             String sub = plugin.lower(args[0]);
             if (sub.equals("rounds")) return filter(args[1], Arrays.asList("1", "3", "5"));
+            if (sub.equals("kits")) return filter(args[1], Arrays.asList("reset"));
             if (sub.equals("kit")) {
-                List<String> kits = plugin.getConfig().getStringList("kits");
+                List<String> kits = plugin.getConfig().getStringList("kits.names");
                 if (kits == null || kits.isEmpty()) {
-                    kits = Arrays.asList("sword", "nodebuff", "uhc", "sumo", "gapple",
-                            "archer", "mace", "crystal", "pot");
+                    kits = plugin.getConfig().getStringList("kits"); // старый формат
+                }
+                if (kits == null || kits.isEmpty()) {
+                    kits = Arrays.asList(Kits.NAMES);
                 }
                 return filter(args[1], kits);
             }

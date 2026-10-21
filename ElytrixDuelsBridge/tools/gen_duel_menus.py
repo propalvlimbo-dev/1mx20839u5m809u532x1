@@ -137,15 +137,16 @@ def write(name, text):
 
 
 KITS = [
-    ("sword", "netherite_sword", "Классика", "меч, броня, гаплы"),
-    ("nodebuff", "splash_potion", "Зелья", "без брони, только зелья"),
-    ("uhc", "golden_apple", "УХК", "гаплы, настойки, лук"),
-    ("sumo", "fishing_rod", "Сумо", "вытолкнуть соперника"),
-    ("gapple", "enchanted_golden_apple", "Гаппли", "только золотые яблоки"),
+    ("sword", "netherite_sword", "Классика", "меч, железная броня, гаплы"),
+    ("uhc", "golden_apple", "УХК", "меч, лук, гаплы"),
+    ("gapple", "enchanted_golden_apple", "Гаппли", "алмазка и яблоки"),
+    ("sumo", "fishing_rod", "Сумо", "только кулаки"),
     ("archer", "bow", "Лучник", "лук и стрелы"),
-    ("mace", "mace", "Булава", "удар булавой сверху"),
-    ("crystal", "end_crystal", "Кристаллы", "кристаллы и обсидиан"),
-    ("pot", "lingering_potion", "Агрессия", "зелья и меч"),
+    ("mace", "mace", "Булава", "булава и вихри"),
+    ("axe", "netherite_axe", "Топор и щит", "топор, щит, броня"),
+    ("trident", "trident", "Тризуб", "тризуб и броня"),
+    ("crossbow", "crossbow", "Арбалет", "арбалет и стрелы"),
+    ("netherite", "netherite_chestplate", "Незерит", "незерит и меч"),
 ]
 
 # ------------------------------------------------------------------ главное
@@ -243,7 +244,7 @@ for index, (kit_id, material, title, hint) in enumerate(KITS):
               B0, DOT + "Нажмите, чтобы выбрать"],
              [f"sound: 'block.note_block.pling 0.4 {1.05 + index * 0.05:.2f}'",
               f"[player] duelx kit {kit_id}"]),
-        PLACE[9][index]))
+        PLACE[10][index]))
 kit_tail = [back(45), close(49)]
 write("kit.yml", build("duel_kit", "Выбор кита", kit_content, kit_tail))
 
@@ -261,7 +262,7 @@ queue_content.append((
     item("leave", "barrier", "&7« &cВыйти из очереди &7»",
          [B0, B + "Очередь: " + H + "будет сброшена", B0, DOT + "Нажмите, чтобы выйти"],
          ["sound: 'ui.button.click 0.4 1.0'", "[player] duel queue leave", "[close]"]),
-    PLACE[10][9]))
+    40))
 queue_tail = [back(45), close(49)]
 write("queue.yml", build("duel_queue", "Поиск соперника", queue_content, queue_tail))
 
@@ -273,7 +274,7 @@ help_content = [
            B0, DOT + "Открой меню дуэлей: /duels"],
           ["sound: 'ui.button.click 0.4 1.0'", "[open] elytrix:duel"]), 20),
     (item("step2", "paper", T("Шаг 2 — выбери кит"),
-          [B0, B + "Киты: " + H + "9 готовых наборов",
+          [B0, B + "Киты: " + H + "10 готовых наборов",
            B + "Предметы: " + H + "выдаются автоматически",
            B + "Свой кит собрать: " + H + "нельзя",
            B0, DOT + "Нажми на кит, чтобы продолжить"]), 21),

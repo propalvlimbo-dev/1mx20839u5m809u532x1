@@ -3,7 +3,7 @@
 Мост между **EpicDuels** и **BMenu**: окна плагина подменяются нашими меню
 BMenu — с анимацией сборки, звуками и русским текстом.
 
-- Версия: 1.1.0
+- Версия: 1.2.0
 - Зависимости: `EpicDuels`, `BMenu` (BMenu сам требует `BLib` и `PlaceholderAPI`)
 - Paper 1.21.1–1.21.11, Java 17+ (собрано под 17, сервер 21 подходит)
 - Java-классы EpicDuels не меняются: мост работает через события и рефлексию
@@ -24,6 +24,7 @@ BMenu — с анимацией сборки, звуками и русским �
 /duelx team                      выбор напарника (быстрый 2 на 2)
 /duelx kit <кит>                 кит из нашего меню → раунды или подтверждение
 /duelx confirm | cancel          начать бой / встать в очередь / отмена
+/duelx kits [reset]              создать 10 готовых наборов (reset — пересоздать)
 /duelx open <menu>               открыть меню BMenu
 ```
 
@@ -36,6 +37,28 @@ openArenaSelect, openPartyTeamSizeMenu, openPartyKitMenu, …) — то же, ч
 Список игроков рисует мост: головы онлайн-игроков, страницы по 28,
 занятые подписаны «в бою». Клик сразу открывает выбор кита.
 `/duel ник` (и `/d ник`) — быстрый вызов без меню.
+
+## 10 готовых наборов
+
+Мост сам создаёт киты в EpicDuels (`plugins/EpicDuels/kits.yml`), если их там
+ещё нет: `sword`, `uhc`, `gapple`, `sumo`, `archer`, `mace`, `axe`, `trident`,
+`crossbow`, `netherite`. Существующие киты не перезаписываются, принудительно —
+`/duelx kits reset`. Состав описан в `EpicDuels/КИТЫ.md`.
+
+Наборы подобраны так, чтобы работать без установки блоков: кристаллов и
+«обсидиановых» китов нет, потому что на аренах блоки ставить нельзя.
+
+## Защита арен
+
+На боевых копиях арен (`arena_instance_*`) мост:
+
+- запрещает ставить блоки и выливать жидкости из ведра;
+- гасит взрывы — `blockList` очищается, поэтому ни один блок арены не ломается
+  (урон игрокам от взрывов остаётся);
+- блокирует поджог.
+
+Шаблоны (`arena_template_*`) не трогаются — там администратор строит арену.
+Отключить можно в конфиге: `protection.block-place` и `protection.explosions`.
 
 ## Меню
 
@@ -82,7 +105,7 @@ openArenaSelect, openPartyTeamSizeMenu, openPartyKitMenu, …) — то же, ч
 
 ## Установка
 
-1. `ElytrixDuelsBridge-1.1.0.jar` → `plugins/`
+1. `ElytrixDuelsBridge-1.2.0.jar` → `plugins/`
 2. Папка меню BMenu `elytrix/duel/*.yml` → `plugins/BMenu/menu/elytrix/duel/`
 3. Запустить сервер (или `/reload confirm` — не рекомендуется) и проверить `/duel`.
 
@@ -99,6 +122,13 @@ menus:
   STATS: "elytrix:duel_stats"
   MATCHMAKING: "elytrix:duel_queue"
   ROUNDS_SELECT: "elytrix:duel_rounds"
+
+kits:
+  auto-install: true     # создать 10 наборов, если их ещё нет
+
+protection:
+  block-place: true      # блоки и жидкости на аренах запрещены
+  explosions: true       # взрывы не ломают арену
 ```
 
 Поставить `keep` — окно вернётся к EpicDuels. Недостающие ключи мост

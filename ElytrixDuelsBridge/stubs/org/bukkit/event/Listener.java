@@ -1,2 +1,3 @@
 package org.bukkit.event;
-public interface Listener { }
+public interface Listener {
+}

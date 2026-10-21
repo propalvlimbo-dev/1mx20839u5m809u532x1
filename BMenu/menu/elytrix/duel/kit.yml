@@ -10,60 +10,48 @@ items:
     lore:
       - "&#F8BEFB&l┃ "
       - "&#F8BEFB&l┃ &fКит: &#F8BEFBsword"
-      - "&#F8BEFB&l┃ &fСостав: &#F8BEFBмеч, броня, гаплы"
+      - "&#F8BEFB&l┃ &fСостав: &#F8BEFBмеч, железная броня, гаплы"
       - "&#F8BEFB&l┃ "
       - "&7● &fНажмите, чтобы выбрать"
     on_click:
       - sound: 'block.note_block.pling 0.4 1.05'
       - "[player] duelx kit sword"
-  kit_nodebuff:
-    material: splash_potion
-    name: "&7« &#F8BEFBЗелья &7»"
-    lore:
-      - "&#F8BEFB&l┃ "
-      - "&#F8BEFB&l┃ &fКит: &#F8BEFBnodebuff"
-      - "&#F8BEFB&l┃ &fСостав: &#F8BEFBбез брони, только зелья"
-      - "&#F8BEFB&l┃ "
-      - "&7● &fНажмите, чтобы выбрать"
-    on_click:
-      - sound: 'block.note_block.pling 0.4 1.10'
-      - "[player] duelx kit nodebuff"
   kit_uhc:
     material: golden_apple
     name: "&7« &#F8BEFBУХК &7»"
     lore:
       - "&#F8BEFB&l┃ "
       - "&#F8BEFB&l┃ &fКит: &#F8BEFBuhc"
-      - "&#F8BEFB&l┃ &fСостав: &#F8BEFBгаплы, настойки, лук"
+      - "&#F8BEFB&l┃ &fСостав: &#F8BEFBмеч, лук, гаплы"
       - "&#F8BEFB&l┃ "
       - "&7● &fНажмите, чтобы выбрать"
     on_click:
-      - sound: 'block.note_block.pling 0.4 1.15'
+      - sound: 'block.note_block.pling 0.4 1.10'
       - "[player] duelx kit uhc"
-  kit_sumo:
-    material: fishing_rod
-    name: "&7« &#F8BEFBСумо &7»"
-    lore:
-      - "&#F8BEFB&l┃ "
-      - "&#F8BEFB&l┃ &fКит: &#F8BEFBsumo"
-      - "&#F8BEFB&l┃ &fСостав: &#F8BEFBвытолкнуть соперника"
-      - "&#F8BEFB&l┃ "
-      - "&7● &fНажмите, чтобы выбрать"
-    on_click:
-      - sound: 'block.note_block.pling 0.4 1.20'
-      - "[player] duelx kit sumo"
   kit_gapple:
     material: enchanted_golden_apple
     name: "&7« &#F8BEFBГаппли &7»"
     lore:
       - "&#F8BEFB&l┃ "
       - "&#F8BEFB&l┃ &fКит: &#F8BEFBgapple"
-      - "&#F8BEFB&l┃ &fСостав: &#F8BEFBтолько золотые яблоки"
+      - "&#F8BEFB&l┃ &fСостав: &#F8BEFBалмазка и яблоки"
       - "&#F8BEFB&l┃ "
       - "&7● &fНажмите, чтобы выбрать"
     on_click:
-      - sound: 'block.note_block.pling 0.4 1.25'
+      - sound: 'block.note_block.pling 0.4 1.15'
       - "[player] duelx kit gapple"
+  kit_sumo:
+    material: fishing_rod
+    name: "&7« &#F8BEFBСумо &7»"
+    lore:
+      - "&#F8BEFB&l┃ "
+      - "&#F8BEFB&l┃ &fКит: &#F8BEFBsumo"
+      - "&#F8BEFB&l┃ &fСостав: &#F8BEFBтолько кулаки"
+      - "&#F8BEFB&l┃ "
+      - "&7● &fНажмите, чтобы выбрать"
+    on_click:
+      - sound: 'block.note_block.pling 0.4 1.20'
+      - "[player] duelx kit sumo"
   kit_archer:
     material: bow
     name: "&7« &#F8BEFBЛучник &7»"
@@ -74,7 +62,7 @@ items:
       - "&#F8BEFB&l┃ "
       - "&7● &fНажмите, чтобы выбрать"
     on_click:
-      - sound: 'block.note_block.pling 0.4 1.30'
+      - sound: 'block.note_block.pling 0.4 1.25'
       - "[player] duelx kit archer"
   kit_mace:
     material: mace
@@ -82,36 +70,60 @@ items:
     lore:
       - "&#F8BEFB&l┃ "
       - "&#F8BEFB&l┃ &fКит: &#F8BEFBmace"
-      - "&#F8BEFB&l┃ &fСостав: &#F8BEFBудар булавой сверху"
+      - "&#F8BEFB&l┃ &fСостав: &#F8BEFBбулава и вихри"
+      - "&#F8BEFB&l┃ "
+      - "&7● &fНажмите, чтобы выбрать"
+    on_click:
+      - sound: 'block.note_block.pling 0.4 1.30'
+      - "[player] duelx kit mace"
+  kit_axe:
+    material: netherite_axe
+    name: "&7« &#F8BEFBТопор и щит &7»"
+    lore:
+      - "&#F8BEFB&l┃ "
+      - "&#F8BEFB&l┃ &fКит: &#F8BEFBaxe"
+      - "&#F8BEFB&l┃ &fСостав: &#F8BEFBтопор, щит, броня"
       - "&#F8BEFB&l┃ "
       - "&7● &fНажмите, чтобы выбрать"
     on_click:
       - sound: 'block.note_block.pling 0.4 1.35'
-      - "[player] duelx kit mace"
-  kit_crystal:
-    material: end_crystal
-    name: "&7« &#F8BEFBКристаллы &7»"
+      - "[player] duelx kit axe"
+  kit_trident:
+    material: trident
+    name: "&7« &#F8BEFBТризуб &7»"
     lore:
       - "&#F8BEFB&l┃ "
-      - "&#F8BEFB&l┃ &fКит: &#F8BEFBcrystal"
-      - "&#F8BEFB&l┃ &fСостав: &#F8BEFBкристаллы и обсидиан"
+      - "&#F8BEFB&l┃ &fКит: &#F8BEFBtrident"
+      - "&#F8BEFB&l┃ &fСостав: &#F8BEFBтризуб и броня"
       - "&#F8BEFB&l┃ "
       - "&7● &fНажмите, чтобы выбрать"
     on_click:
       - sound: 'block.note_block.pling 0.4 1.40'
-      - "[player] duelx kit crystal"
-  kit_pot:
-    material: lingering_potion
-    name: "&7« &#F8BEFBАгрессия &7»"
+      - "[player] duelx kit trident"
+  kit_crossbow:
+    material: crossbow
+    name: "&7« &#F8BEFBАрбалет &7»"
     lore:
       - "&#F8BEFB&l┃ "
-      - "&#F8BEFB&l┃ &fКит: &#F8BEFBpot"
-      - "&#F8BEFB&l┃ &fСостав: &#F8BEFBзелья и меч"
+      - "&#F8BEFB&l┃ &fКит: &#F8BEFBcrossbow"
+      - "&#F8BEFB&l┃ &fСостав: &#F8BEFBарбалет и стрелы"
       - "&#F8BEFB&l┃ "
       - "&7● &fНажмите, чтобы выбрать"
     on_click:
       - sound: 'block.note_block.pling 0.4 1.45'
-      - "[player] duelx kit pot"
+      - "[player] duelx kit crossbow"
+  kit_netherite:
+    material: netherite_chestplate
+    name: "&7« &#F8BEFBНезерит &7»"
+    lore:
+      - "&#F8BEFB&l┃ "
+      - "&#F8BEFB&l┃ &fКит: &#F8BEFBnetherite"
+      - "&#F8BEFB&l┃ &fСостав: &#F8BEFBнезерит и меч"
+      - "&#F8BEFB&l┃ "
+      - "&7● &fНажмите, чтобы выбрать"
+    on_click:
+      - sound: 'block.note_block.pling 0.4 1.50'
+      - "[player] duelx kit netherite"
   back:
     material: black_dye
     name: "&7« &#F8BEFBНазад &7»"
@@ -169,26 +181,29 @@ animation:
       - st: kit_sword 20
       - sound: 'block.note_block.pling 0.28 1.00'
   - opcodes:
-      - st: kit_nodebuff 21
+      - st: kit_uhc 21
       - sound: 'block.note_block.pling 0.30 1.07'
   - opcodes:
-      - st: kit_uhc 22
+      - st: kit_gapple 22
       - sound: 'block.note_block.pling 0.32 1.14'
   - opcodes:
       - st: kit_sumo 23
       - sound: 'block.note_block.pling 0.34 1.21'
   - opcodes:
-      - st: kit_gapple 24
+      - st: kit_archer 24
       - sound: 'block.note_block.pling 0.36 1.28'
   - opcodes:
-      - st: kit_archer 29
+      - st: kit_mace 29
       - sound: 'block.note_block.pling 0.38 1.35'
   - opcodes:
-      - st: kit_mace 30
+      - st: kit_axe 30
       - sound: 'block.note_block.pling 0.40 1.42'
   - opcodes:
-      - st: kit_crystal 31
+      - st: kit_trident 31
       - sound: 'block.note_block.pling 0.42 1.49'
   - opcodes:
-      - st: kit_pot 32
+      - st: kit_crossbow 32
       - sound: 'block.note_block.pling 0.44 1.56'
+  - opcodes:
+      - st: kit_netherite 33
+      - sound: 'block.note_block.pling 0.44 1.63'

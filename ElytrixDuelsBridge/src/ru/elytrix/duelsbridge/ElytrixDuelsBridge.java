@@ -57,6 +57,7 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
 
     private final Duels duels = new Duels(this);
     private final Menus menus = new Menus(this);
+    private final Kits kits = new Kits(this);
     /** Кого игрок выбрал в своём окне (до выбора кита). */
     private final Map<UUID, UUID> targets = new HashMap<UUID, UUID>();
     /** Очередь пар 2 на 2: ждём вторую пару с тем же китом. */
@@ -112,6 +113,7 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         }
 
         getServer().getPluginManager().registerEvents(this, this);
+        getServer().getPluginManager().registerEvents(new ArenaGuard(this), this);
 
         PluginCommand command = getCommand("duelx");
         if (command != null) {
@@ -124,6 +126,17 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         }
         if (getServer().getPluginManager().getPlugin("BMenu") == null) {
             getLogger().warning("BMenu не найден: окна EpicDuels будут открываться как есть.");
+        }
+        if (getConfig().getBoolean("kits.auto-install", true)) {
+            int created = kits.install(false);
+            if (created > 0) {
+                getLogger().info("ElytriX: добавлено наборов — " + created
+                        + " (всего в kits.yml " + Kits.NAMES.length + ")");
+            } else if (created == 0) {
+                getLogger().info("ElytriX: наборы уже есть, kits.yml не менялся");
+            } else {
+                getLogger().warning("ElytriX: наборы не созданы — EpicDuels не отдал KitManager");
+            }
         }
         getLogger().info("ElytriX: мосты меню EpicDuels -> BMenu включены");
     }
@@ -338,6 +351,19 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
     }
 
     // ------------------------------------------------------------- действия
+
+    /** /duelx kits — создать (или пересоздать) десять готовых наборов. */
+    void installKits(Player player, boolean reset) {
+        int created = kits.install(reset);
+        if (created < 0) {
+            msg(player, string("messages.kits-failed",
+                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНе удалось: EpicDuels не отдал KitManager."));
+            return;
+        }
+        msg(player, string("messages.kits-ready",
+                "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fНаборов готово: &f%count%")
+                .replace("%count%", String.valueOf(created)));
+    }
 
     /** Выбран соперник: запоминаем и сразу показываем выбор кита. */
     void requestDuel(Player player, Player target) {
