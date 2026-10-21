@@ -34,7 +34,7 @@ items:
     name: "&7« &#F8BEFBПобеды &7»"
     lore:
       - "&#F8BEFB&l┃ "
-      - "&#F8BEFB&l┃ &fВсего: &#F8BEFB%epicduels_wins%"
+      - "&#F8BEFB&l┃ &fВсего: &#F8BEFB{wins}"
       - "&#F8BEFB&l┃ "
       - "&7● &fРастёт за каждый выигранный бой"
   losses:
@@ -43,7 +43,7 @@ items:
     name: "&7« &#F8BEFBПоражения &7»"
     lore:
       - "&#F8BEFB&l┃ "
-      - "&#F8BEFB&l┃ &fВсего: &#F8BEFB%epicduels_losses%"
+      - "&#F8BEFB&l┃ &fВсего: &#F8BEFB{losses}"
       - "&#F8BEFB&l┃ "
       - "&7● &fНе влияет на очередь"
   winrate:
@@ -52,7 +52,7 @@ items:
     name: "&7« &#F8BEFBПроцент побед &7»"
     lore:
       - "&#F8BEFB&l┃ "
-      - "&#F8BEFB&l┃ &fПобеды: &#F8BEFB%epicduels_winrate%%"
+      - "&#F8BEFB&l┃ &fПобеды: &#F8BEFB{winrate}%"
       - "&#F8BEFB&l┃ "
       - "&7● &fСчитается по всем дуэлям"
   score:
@@ -61,7 +61,7 @@ items:
     name: "&7« &#F8BEFBОчки &7»"
     lore:
       - "&#F8BEFB&l┃ "
-      - "&#F8BEFB&l┃ &fРейтинг: &#F8BEFB%epicduels_score%"
+      - "&#F8BEFB&l┃ &fРейтинг: &#F8BEFB{score}"
       - "&#F8BEFB&l┃ "
       - "&7● &fРастёт с каждой победой"
   top:

@@ -20,7 +20,10 @@ BMenu — с анимацией сборки, звуками и русским �
 
 ```
 /duelx rounds <1|3|5>            выбрать раунды  → плагин открывает выбор карты
+/duelx target <ник>              соперник выбран → меню кита
+/duelx team                      выбор напарника (быстрый 2 на 2)
 /duelx kit <кит>                 кит из нашего меню → раунды или подтверждение
+/duelx confirm | cancel          начать бой / встать в очередь / отмена
 /duelx party <team|tournament>   режим группы   → выбор размера / кита
 /duelx size <2|3|4>              размер команд  → выбор кита
 /duelx open <menu>               открыть меню BMenu
@@ -30,6 +33,17 @@ BMenu — с анимацией сборки, звуками и русским �
 openArenaSelect, openPartyTeamSizeMenu, openPartyKitMenu, …) — то же, что
 делает клик в окне плагина.
 
+## Своё окно выбора игрока
+
+Список игроков рисует мост: головы онлайн-игроков, страницы по 28,
+занятые подписаны «в бою». Клик сразу открывает выбор кита.
+`/duel ник` (и `/d ник`) — быстрый вызов без меню.
+
+## Статистика
+
+Значения передаются в BMenu как `{wins}`, `{losses}`, `{winrate}`,
+`{score}` — PlaceholderAPI и расширение EpicDuels не нужны.
+
 ## Какие экраны заменяются
 
 | Окно EpicDuels | Меню BMenu | Почему можно |
@@ -38,7 +52,8 @@ openArenaSelect, openPartyTeamSizeMenu, openPartyKitMenu, …) — то же, ч
 | `STATS` | `elytrix:duel_stats` | цифры берём из PlaceholderAPI |
 | `MATCHMAKING` | `elytrix:duel_queue` |
 | `KIT_SELECT` | `elytrix:duel_kit` |
-| `PARTY_KIT` | `elytrix:duel_kit` | состав китов у нас фиксирован |
+| `PARTY_KIT` | `elytrix:duel_kit` |
+| `PARTY_CONFIRM` | `elytrix:duel_confirm` | состав китов у нас фиксирован |
 | `ROUNDS_SELECT` | `elytrix:duel_rounds` | 1 / 3 / 5 |
 | `PARTY_MODE` | `elytrix:duel_party` | 2 кнопки |
 | `PARTY_TEAM_SIZE` | `elytrix:duel_party_size` | 2v2 / 3v3 / 4v4 |

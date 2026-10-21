@@ -1,11 +1,20 @@
 package org.bukkit;
+import java.util.Collection;
+import java.util.UUID;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.scheduler.BukkitScheduler;
 public final class Bukkit {
     public static PluginManager getPluginManager() { return null; }
     public static ConsoleCommandSender getConsoleSender() { return null; }
     public static BukkitScheduler getScheduler() { return null; }
     public static boolean dispatchCommand(CommandSender sender, String commandLine) { return false; }
+    public static Inventory createInventory(InventoryHolder owner, int size, String title) { return null; }
+    public static Collection<? extends Player> getOnlinePlayers() { return java.util.Collections.emptyList(); }
+    public static Player getPlayerExact(String name) { return null; }
+    public static Player getPlayer(UUID id) { return null; }
 }

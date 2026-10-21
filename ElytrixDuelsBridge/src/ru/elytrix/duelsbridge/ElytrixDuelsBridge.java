@@ -1,31 +1,41 @@
 package ru.elytrix.duelsbridge;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
- * Подменяет окна EpicDuels на меню BMenu.
+ * Подменяет окна EpicDuels на меню BMenu и на своё окно выбора игрока.
  *
- * Плагин не трогает java-классы EpicDuels: он слушает InventoryOpenEvent,
+ * Плагин не трогает java-классы EpicDuels: он слушает события Bukkit,
  * определяет, какое окно собирается открыть EpicDuels (по MenuHolder),
- * отменяет открытие и через тик открывает наше меню BMenu командой
- * /bmenu open <id> <игрок>. Внутри меню BMenu кнопки вызывают /duelx ...,
- * который продолжает поток плагина (раунды, пати) через его публичные методы.
+ * отменяет открытие и показывает наше меню. Значения для меню
+ * ({wins}, {target}, ...) передаются прямо в BMenu, без PlaceholderAPI.
  */
 public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
 
-    private static final String EPICDUELS = "EpicDuels";
     private static final String HOLDER = "dev.epicduels.gui.MenuHolder";
 
     /** Значения по умолчанию: страхуют, если ключа нет в старом config.yml. */
@@ -40,7 +50,39 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         DEFAULTS.put("PARTY_MODE", "elytrix:duel_party");
         DEFAULTS.put("PARTY_TEAM_SIZE", "elytrix:duel_party_size");
         DEFAULTS.put("PARTY_KIT", "elytrix:duel_kit");
+        DEFAULTS.put("PARTY_CONFIRM", "elytrix:duel_confirm");
     }
+
+    private static final Set<String> DUEL_SUBCOMMANDS = new HashSet<String>(Arrays.asList(
+            "menu", "duels", "matchmaking", "stats", "challenge", "accept", "deny", "cancel",
+            "queue", "kits", "spectate", "forfeit", "rematch", "toggle", "leaderboard",
+            "arena", "kit", "setlobby", "lobby", "reload", "help"));
+
+    private final Duels duels = new Duels(this);
+    private final Menus menus = new Menus(this);
+    /** Кого игрок выбрал в своём окне (до выбора кита). */
+    private final Map<UUID, UUID> targets = new HashMap<UUID, UUID>();
+    /** Очередь пар 2 на 2: ждём вторую пару с тем же китом. */
+    private final List<Pair> pairs = new ArrayList<Pair>();
+
+    /** Пара игроков, вставшая в очередь на 2 на 2. */
+    private static final class Pair {
+        final UUID owner;
+        final UUID mate;
+        final String kit;
+
+        Pair(UUID owner, UUID mate, String kit) {
+            this.owner = owner;
+            this.mate = mate;
+            this.kit = kit;
+        }
+
+        boolean has(UUID id) {
+            return owner.equals(id) || mate.equals(id);
+        }
+    }
+
+    // ------------------------------------------------------------- включение
 
     @Override
     public void onEnable() {
@@ -61,6 +103,7 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         } catch (RuntimeException error) {
             getLogger().warning("Не удалось обновить config.yml: " + error);
         }
+
         getServer().getPluginManager().registerEvents(this, this);
 
         PluginCommand command = getCommand("duelx");
@@ -80,8 +123,11 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
+        targets.clear();
         getLogger().info("ElytriX: мосты меню выключены");
     }
+
+    // ----------------------------------------------------------- открытие окна
 
     @EventHandler
     public void onInventoryOpen(InventoryOpenEvent event) {
@@ -94,6 +140,8 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
             return;
         }
         if (holder == null || !HOLDER.equals(holder.getClass().getName())) return;
+        if (!(event.getPlayer() instanceof Player)) return;
+        final Player player = (Player) event.getPlayer();
 
         String type;
         try {
@@ -103,19 +151,63 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
             return;
         }
 
+        // Список игроков рисуем сами — окно плагина не показываем.
+        if ("DUELS".equals(type)) {
+            event.setCancelled(true);
+            final PlayerPicker.Mode mode = PlayerPicker.Mode.CHALLENGE;
+            Bukkit.getScheduler().runTask(this, new Runnable() {
+                @Override
+                public void run() {
+                    PlayerPicker.open(ElytrixDuelsBridge.this, player, mode, 0);
+                }
+            });
+            return;
+        }
+
         String menu = menuFor(type);
         if (menu == null || menu.isEmpty()) return;
-        if (!(event.getPlayer() instanceof Player)) return;
-        final Player player = (Player) event.getPlayer();
 
-        // Окно плагина не показываем вообще — сразу наше меню.
         event.setCancelled(true);
+        final String menuId = menu;
         Bukkit.getScheduler().runTask(this, new Runnable() {
             @Override
             public void run() {
-                open(player, menuFor(type));
+                menus.open(player, menuId, menuArgs(player, menuId));
             }
         });
+    }
+
+    /** Значения, которые подставляются в {фигурные скобки} меню BMenu. */
+    private Map<String, String> menuArgs(Player player, String menuId) {
+        Map<String, String> args = new LinkedHashMap<String, String>();
+        if (menuId.endsWith(":duel") || menuId.endsWith(":duel_stats")) {
+            args.putAll(duels.stats(player.getUniqueId()));
+        }
+        if (menuId.endsWith(":duel_confirm")) {
+            Object mode = duels.flowModeValue(player.getUniqueId());
+            Object size = duels.flowSizeValue(player.getUniqueId());
+            Object kit = duels.flowKitValue(player.getUniqueId());
+            args.put("mode", mode == null ? "—" : label(String.valueOf(mode)));
+            args.put("size", size == null ? "—" : label(String.valueOf(size)));
+            args.put("kit", kit == null ? "—" : String.valueOf(kit));
+            Object party = duels.partyOf(player.getUniqueId());
+            int members = party == null ? 0 : duels.partySize(party);
+            boolean pair = "TEAM_DUEL".equals(String.valueOf(mode))
+                    && "TWO_VS_TWO".equals(String.valueOf(size)) && members == 2;
+            args.put("action", pair ? "Встать в очередь" : "Начать бой");
+        }
+        return args;
+    }
+
+    private String label(String constant) {
+        switch (constant) {
+            case "TOURNAMENT": return "Турнир";
+            case "TEAM_DUEL": return "Командная дуэль";
+            case "TWO_VS_TWO": return "2 на 2";
+            case "THREE_VS_THREE": return "3 на 3";
+            case "FOUR_VS_FOUR": return "4 на 4";
+            default: return constant;
+        }
     }
 
     /** id меню BMenu для типа окна EpicDuels, либо null (окно остаётся от плагина). */
@@ -128,14 +220,356 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         return value;
     }
 
-    void open(Player player, String menu) {
-        if (menu == null || menu.isEmpty()) return;
-        boolean ok = Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-                "bmenu open " + menu + " " + player.getName());
-        if (!ok) {
-            getLogger().warning("BMenu не принял команду: bmenu open " + menu
-                    + " " + player.getName() + " (проверь id меню в config.yml)");
+    // -------------------------------------------------------------- клики
+
+    @EventHandler
+    public void onClick(InventoryClickEvent event) {
+        Inventory clicked = event.getClickedInventory();
+        if (clicked == null) return;
+        InventoryHolder holder = clicked.getHolder();
+        if (!(holder instanceof PlayerPicker)) return;
+        event.setCancelled(true);
+        if (!(event.getWhoClicked() instanceof Player)) return;
+
+        Player player = (Player) event.getWhoClicked();
+        PlayerPicker picker = (PlayerPicker) holder;
+        int slot = event.getSlot();
+
+        if (slot == PlayerPicker.closeSlot()) {
+            player.closeInventory();
+            return;
         }
+        if (slot == PlayerPicker.prevSlot()) {
+            if (picker.page() > 0) {
+                PlayerPicker.open(this, player, picker.mode(), picker.page() - 1);
+            }
+            return;
+        }
+        if (slot == PlayerPicker.nextSlot()) {
+            if (picker.page() + 1 < picker.pages()) {
+                PlayerPicker.open(this, player, picker.mode(), picker.page() + 1);
+            }
+            return;
+        }
+
+        UUID picked = picker.shown().get(slot);
+        if (picked == null) return;
+        Player target = Bukkit.getPlayer(picked);
+        if (target == null) {
+            msg(player, string("messages.player-gone", "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cИгрок уже вышел."));
+            PlayerPicker.open(this, player, picker.mode(), picker.page());
+            return;
+        }
+        if (duels.busy(picked)) {
+            msg(player, string("messages.target-busy", "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &c%name%&c сейчас в бою.")
+                    .replace("%name%", target.getName()));
+            return;
+        }
+
+        if (picker.mode() == PlayerPicker.Mode.TEAM) {
+            startTeam(player, target);
+        } else {
+            requestDuel(player, target);
+        }
+    }
+
+    // ------------------------------------------------- /duel <ник> и /duel
+
+    @EventHandler
+    public void onCommand(PlayerCommandPreprocessEvent event) {
+        String message = event.getMessage();
+        if (message == null) return;
+        String[] parts = message.trim().split("\\s+");
+        if (parts.length != 2) return;
+        String command = parts[0].toLowerCase(Locale.ROOT);
+        if (!command.equals("/duel") && !command.equals("/d")) return;
+        if (DUEL_SUBCOMMANDS.contains(parts[1].toLowerCase(Locale.ROOT))) return;
+
+        final Player target = Bukkit.getPlayerExact(parts[1]);
+        if (target == null) return;
+        final Player player = event.getPlayer();
+
+        event.setCancelled(true);
+        Bukkit.getScheduler().runTask(this, new Runnable() {
+            @Override
+            public void run() {
+                requestDuel(player, target);
+            }
+        });
+    }
+
+    // ------------------------------------------------------------- действия
+
+    /** Выбран соперник: запоминаем и сразу показываем выбор кита. */
+    void requestDuel(Player player, Player target) {
+        if (target.getUniqueId().equals(player.getUniqueId())) {
+            msg(player, string("messages.self", "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНельзя вызвать самого себя."));
+            return;
+        }
+        if (duels.busy(target.getUniqueId())) {
+            msg(player, string("messages.target-busy", "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &c%name%&c сейчас в бою.")
+                    .replace("%name%", target.getName()));
+            return;
+        }
+        targets.put(player.getUniqueId(), target.getUniqueId());
+        player.closeInventory();
+        Map<String, String> args = new LinkedHashMap<String, String>();
+        args.put("target", target.getName());
+        menus.open(player, menuForOr("KIT_SELECT", "elytrix:duel_kit"), args);
+    }
+
+    /** Быстрый 2 на 2: группа из двух игроков без приглашений. */
+    void startTeam(Player owner, Player teammate) {
+        if (!duels.feature("team-duels")) {
+            msg(owner, string("messages.feature-off",
+                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cВыключено на сервере: &f%name%")
+                    .replace("%name%", "Групповые дуэли"));
+            return;
+        }
+        if (teammate.getUniqueId().equals(owner.getUniqueId())) {
+            msg(owner, string("messages.self", "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНельзя выбрать себя в группу."));
+            return;
+        }
+        Object party = duels.ownParty(owner);
+        if (party == null) {
+            msg(owner, string("messages.party-failed",
+                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНе удалось создать группу."));
+            return;
+        }
+        if (!duels.isOwner(party, owner.getUniqueId())) {
+            msg(owner, string("messages.owner-only",
+                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cТы не владелец группы."));
+            return;
+        }
+        if (!duels.addMember(party, teammate.getUniqueId())) {
+            msg(owner, string("messages.party-full",
+                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cВ группе уже &f%size%&c игроков.")
+                    .replace("%size%", String.valueOf(duels.partySize(party))));
+            return;
+        }
+
+        UUID id = owner.getUniqueId();
+        duels.flowMode(id, "TEAM_DUEL");
+        duels.flowSize(id, "TWO_VS_TWO");
+        targets.remove(id);
+        owner.closeInventory();
+
+        msg(owner, string("messages.team-created",
+                "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fГруппа 2 на 2: &d%name% &f+ &d%owner%")
+                .replace("%name%", teammate.getName()).replace("%owner%", owner.getName()));
+        msg(teammate, string("messages.team-invited",
+                "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &d%owner% &fвзял тебя в группу 2 на 2")
+                .replace("%owner%", owner.getName()));
+
+        Map<String, String> args = new LinkedHashMap<String, String>();
+        args.put("target", teammate.getName());
+        menus.open(owner, menuForOr("PARTY_KIT", "elytrix:duel_kit"), args);
+    }
+
+    /** Открыть наше окно выбора игрока (для команды /duelx team). */
+    void pickTeam(Player player) {
+        if (!duels.feature("team-duels")) {
+            msg(player, string("messages.feature-off",
+                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cВыключено на сервере: &f%name%")
+                    .replace("%name%", "Групповые дуэли"));
+            return;
+        }
+        PlayerPicker.open(this, player, PlayerPicker.Mode.TEAM, 0);
+    }
+
+    void pickOpponent(Player player) {
+        PlayerPicker.open(this, player, PlayerPicker.Mode.CHALLENGE, 0);
+    }
+
+    /** Кит выбран: либо в бой с игроком, либо к подтверждению группы. */
+    void kit(Player player, String kitName) {
+        if (!duels.kitExists(kitName)) {
+            msg(player, string("messages.kit-gone",
+                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cКит &f%kit%&c не найден.")
+                    .replace("%kit%", kitName));
+            return;
+        }
+        UUID id = player.getUniqueId();
+        UUID target = targets.remove(id);
+        if (target == null) {
+            Object pluginTarget = duels.call(duels.gui(), "getChallengeTarget", id);
+            if (pluginTarget instanceof UUID) target = (UUID) pluginTarget;
+        }
+        player.closeInventory();
+
+        if (target != null) {
+            Object gui = duels.gui();
+            duels.call(gui, "openRoundsSelect", player, target, kitName);
+            return;
+        }
+        if (duels.flowModeValue(id) != null) {
+            duels.flowKit(id, kitName);
+            menus.open(player, menuForOr("PARTY_CONFIRM", "elytrix:duel_confirm"),
+                    menuArgs(player, menuForOr("PARTY_CONFIRM", "elytrix:duel_confirm")));
+            return;
+        }
+        msg(player, string("messages.no-target",
+                "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cСначала выбери соперника: &f/duel ник"));
+    }
+
+    void confirm(Player player) {
+        player.closeInventory();
+        UUID id = player.getUniqueId();
+        Object mode = duels.flowModeValue(id);
+        Object size = duels.flowSizeValue(id);
+        Object party = duels.partyOf(id);
+        int members = party == null ? 0 : duels.partySize(party);
+        if ("TEAM_DUEL".equals(String.valueOf(mode))
+                && "TWO_VS_TWO".equals(String.valueOf(size))
+                && members == 2) {
+            enqueuePair(player, party);
+            return;
+        }
+        duels.startFlow(player);
+    }
+
+    /** Пара готова: ищем вторую пару с тем же китом. */
+    private void enqueuePair(Player owner, Object party) {
+        UUID id = owner.getUniqueId();
+        Object kitValue = duels.flowKitValue(id);
+        if (kitValue == null) {
+            duels.startFlow(owner);
+            return;
+        }
+        String kit = String.valueOf(kitValue);
+        UUID mate = otherMember(party, id);
+        if (mate == null) {
+            msg(owner, string("messages.pair-broken",
+                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cВ группе должен быть ровно один напарник."));
+            return;
+        }
+        Pair mine = new Pair(id, mate, kit);
+        Pair found = null;
+        synchronized (pairs) {
+            Iterator<Pair> iterator = pairs.iterator();
+            while (iterator.hasNext()) {
+                Pair candidate = iterator.next();
+                if (candidate.has(id) || candidate.has(mate)) {
+                    iterator.remove();
+                    continue;
+                }
+                if (!candidate.kit.equalsIgnoreCase(kit)) continue;
+                if (!online(candidate.owner) || !online(candidate.mate)) {
+                    iterator.remove();
+                    continue;
+                }
+                found = candidate;
+                iterator.remove();
+                break;
+            }
+            if (found == null) pairs.add(mine);
+        }
+
+        if (found == null) {
+            msg(owner, string("messages.queue-wait",
+                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fИщем вторую пару &7(кит &f%kit%&7)&f. &7Не выходи из игры.")
+                    .replace("%kit%", kit));
+            return;
+        }
+        startPairMatch(found, mine);
+    }
+
+    private void startPairMatch(Pair other, Pair mine) {
+        List<UUID> all = Arrays.asList(other.owner, other.mate, mine.owner, mine.mate);
+        if (!duels.startTeamDuel(all, "TWO_VS_TWO", mine.kit)) {
+            String text = string("messages.start-failed",
+                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНе удалось начать бой. Попробуй ещё раз.");
+            msg(Bukkit.getPlayer(other.owner), text);
+            msg(Bukkit.getPlayer(mine.owner), text);
+            return;
+        }
+        // EpicDuels перемешивает составы — возвращаем выбранных напарников.
+        duels.fixTeams(other.owner, other.mate, mine.owner, mine.mate);
+        duels.clearFlow(other.owner);
+        duels.clearFlow(mine.owner);
+        targets.remove(mine.owner);
+        targets.remove(other.owner);
+
+        String text = string("messages.pair-found",
+                "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fПара найдена: &d%mate% &fпротив &d%a% &f+ &d%b%")
+                .replace("%mate%", name(mine.mate))
+                .replace("%a%", name(other.owner))
+                .replace("%b%", name(other.mate));
+        for (UUID id : all) msg(Bukkit.getPlayer(id), text);
+    }
+
+    private UUID otherMember(Object party, UUID id) {
+        Object members = Duels.call(party, "getMembers");
+        if (!(members instanceof List)) return null;
+        UUID found = null;
+        for (Object member : (List<?>) members) {
+            if (!(member instanceof UUID) || member.equals(id)) continue;
+            if (found != null) return null;
+            found = (UUID) member;
+        }
+        return found;
+    }
+
+    private boolean online(UUID id) {
+        Player player = Bukkit.getPlayer(id);
+        return player != null && player.isOnline();
+    }
+
+    private String name(UUID id) {
+        Player player = Bukkit.getPlayer(id);
+        return player == null ? "?" : player.getName();
+    }
+
+    void leaveQueue(Player player) {
+        UUID id = player.getUniqueId();
+        synchronized (pairs) {
+            Iterator<Pair> iterator = pairs.iterator();
+            while (iterator.hasNext()) {
+                Pair pair = iterator.next();
+                if (!pair.has(id)) continue;
+                iterator.remove();
+                msg(Bukkit.getPlayer(pair.owner), string("messages.queue-left",
+                        "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Поиск пары отменён."));
+                msg(Bukkit.getPlayer(pair.mate), string("messages.queue-left",
+                        "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Поиск пары отменён."));
+            }
+        }
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+        if (player == null) return;
+        targets.remove(player.getUniqueId());
+        leaveQueue(player);
+    }
+
+    void cancelFlow(Player player) {
+        leaveQueue(player);
+        duels.clearFlow(player.getUniqueId());
+        player.closeInventory();
+        msg(player, string("messages.cancelled",
+                "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Отменено."));
+    }
+
+    String menuForOr(String type, String fallback) {
+        String value = menuFor(type);
+        return value == null ? fallback : value;
+    }
+
+    // ------------------------------------------------------------- утилиты
+
+    Duels duels() {
+        return duels;
+    }
+
+    Menus menus() {
+        return menus;
+    }
+
+    String string(String path, String fallback) {
+        String value = getConfig().getString(path);
+        return value == null ? fallback : value;
     }
 
     void msg(Player player, String text) {
@@ -174,5 +608,13 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
 
     String lower(String value) {
         return value == null ? "" : value.toLowerCase(Locale.ROOT);
+    }
+
+    void messageTargetGone(Player player) {
+        msg(player, string("messages.player-gone", "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cИгрок уже вышел."));
+    }
+
+    static Map<String, String> emptyArgs() {
+        return Collections.emptyMap();
     }
 }

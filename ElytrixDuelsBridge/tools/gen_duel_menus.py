@@ -107,13 +107,13 @@ stats_items = [
     item("close", 49, "red_dye", "&7« &cЗакрыть меню &7»", [B0, B + "Выход в игровой мир.", B0, DOT + "Нажмите для закрытия"],
          ["sound: 'ui.button.click 0.4 1.0'", "[close]"]),
     item("wins", 11, "emerald", T("Победы"),
-         [B0, B + "Всего: " + H + "%epicduels_wins%", B0, DOT + "Растёт за каждый выигранный бой"]),
+         [B0, B + "Всего: " + H + "{wins}", B0, DOT + "Растёт за каждый выигранный бой"]),
     item("losses", 13, "redstone", T("Поражения"),
-         [B0, B + "Всего: " + H + "%epicduels_losses%", B0, DOT + "Не влияет на очередь"]),
+         [B0, B + "Всего: " + H + "{losses}", B0, DOT + "Не влияет на очередь"]),
     item("winrate", 15, "gold_ingot", T("Процент побед"),
-         [B0, B + "Победы: " + H + "%epicduels_winrate%%", B0, DOT + "Считается по всем дуэлям"]),
+         [B0, B + "Победы: " + H + "{winrate}%", B0, DOT + "Считается по всем дуэлям"]),
     item("score", 29, "nether_star", T("Очки"),
-         [B0, B + "Рейтинг: " + H + "%epicduels_score%", B0, DOT + "Растёт с каждой победой"]),
+         [B0, B + "Рейтинг: " + H + "{score}", B0, DOT + "Растёт с каждой победой"]),
     item("top", 31, "book", T("Топ игроков"),
          [B0, B + "Список: " + H + "топ-10 по победам", B0, DOT + "Нажмите, чтобы посмотреть"],
          ["sound: 'block.note_block.pling 0.4 1.2'", "[player] duel leaderboard wins"]),
@@ -217,5 +217,26 @@ open(os.path.join(OUT, "kit.yml"), "w", encoding="utf-8").write(
     build("duel_kit", "Выбор кита", kit_items,
           [("back", 45), ("close", 49)] +
           [("kit_" + kit_id, KIT_SLOTS[i]) for i, (kit_id, *_rest) in enumerate(KITS)]))
+
+
+# ---------------------------------------------------------- подтверждение
+confirm_items = [
+    item("confirm", 11, "lime_dye", "&7« &aНачать бой &7»",
+         [B0, B + "Режим: " + H + "{mode}", B + "Размер: " + H + "{size}",
+          B + "Кит: " + H + "{kit}", B0, DOT + "{action}"],
+         ["sound: 'block.note_block.pling 0.4 1.4'", "[player] duelx confirm"]),
+    item("cancel", 15, "red_dye", "&7« &cОтмена &7»",
+         [B0, B + "Вернуться к выбору кита", B0, DOT + "Нажмите, чтобы отменить"],
+         ["sound: 'ui.button.click 0.4 1.0'", "[player] duelx cancel"]),
+    item("back", 45, "black_dye", T("Назад"),
+         [B0, B + "Вернуться к выбору кита", B0, DOT + "Нажмите для возврата"],
+         ["sound: 'ui.button.click 0.4 1.0'", "[open] elytrix:duel_kit"]),
+    item("close", 49, "red_dye", "&7« &cЗакрыть меню &7»",
+         [B0, B + "Выход в игровой мир.", B0, DOT + "Нажмите для закрытия"],
+         ["sound: 'ui.button.click 0.4 1.0'", "[close]"]),
+]
+open(os.path.join(OUT, "confirm.yml"), "w", encoding="utf-8").write(
+    build("duel_confirm", "Подтверждение", confirm_items,
+          [("back", 45), ("close", 49), ("confirm", 11), ("cancel", 15)]))
 
 print("готово:", sorted(os.listdir(OUT)))

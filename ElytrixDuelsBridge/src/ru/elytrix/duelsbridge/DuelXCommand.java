@@ -14,9 +14,13 @@ import org.bukkit.entity.Player;
 /**
  * /duelx — продолжение потока EpicDuels после наших меню BMenu.
  *
- *   /duelx rounds <1|3|5>          выбрать число раундов и открыть выбор карты
- *   /duelx party <team|tournament> режим групповой дуэли
+ *   /duelx target <ник>            выбрать соперника и открыть выбор кита
+ *   /duelx team                    открыть выбор тиммейта (быстрый 2 на 2)
+ *   /duelx kit <кит>               кит выбран в нашем меню
+ *   /duelx rounds <1|3|5>          число раундов и выбор карты
+ *   /duelx party <team|tournament> режим группы
  *   /duelx size <2|3|4>            размер команд, затем выбор кита
+ *   /duelx confirm | cancel        начать бой по группе / отменить
  *   /duelx open <menu>             открыть меню BMenu
  */
 public final class DuelXCommand implements CommandExecutor, TabCompleter {
@@ -35,11 +39,39 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
         }
         Player player = (Player) sender;
         if (args.length == 0) {
-            plugin.msg(player, "&f☁ &dᴇʟʏᴛʀɪx &7» &fИспользование: &d/duelx <rounds|party|size|open>");
+            usage(player, "/duelx <target|team|kit|rounds|party|size|confirm|open>");
             return true;
         }
         String sub = plugin.lower(args[0]);
         try {
+            if (sub.equals("target")) {
+                if (args.length < 2) return usage(player, "/duelx target <ник>");
+                Player target = Bukkit.getPlayerExact(args[1]);
+                if (target == null) {
+                    plugin.msg(player, plugin.string("messages.player-gone",
+                            "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cИгрок уже вышел."));
+                    return true;
+                }
+                plugin.requestDuel(player, target);
+                return true;
+            }
+            if (sub.equals("team")) {
+                plugin.pickTeam(player);
+                return true;
+            }
+            if (sub.equals("kit")) {
+                if (args.length < 2) return usage(player, "/duelx kit <кит>");
+                plugin.kit(player, args[1]);
+                return true;
+            }
+            if (sub.equals("confirm")) {
+                plugin.confirm(player);
+                return true;
+            }
+            if (sub.equals("cancel")) {
+                plugin.cancelFlow(player);
+                return true;
+            }
             if (sub.equals("rounds")) {
                 if (args.length < 2) return usage(player, "/duelx rounds <1|3|5>");
                 int bestOf;
@@ -69,21 +101,17 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
                 if (perTeam < 2 || perTeam > 4) return usage(player, "/duelx size <2|3|4>");
                 return partySize(player, perTeam);
             }
-            if (sub.equals("kit")) {
-                if (args.length < 2) return usage(player, "/duelx kit <кит>");
-                return kit(player, args[1]);
-            }
             if (sub.equals("open")) {
                 if (args.length < 2) return usage(player, "/duelx open <menu>");
-                plugin.open(player, args[1]);
+                plugin.menus().open(player, args[1]);
                 return true;
             }
-        } catch (ReflectiveOperationException | RuntimeException error) {
+        } catch (RuntimeException error) {
             plugin.getLogger().warning("duelx " + sub + ": " + error);
             plugin.msg(player, "&f☁ &dᴇʟʏᴛʀɪx &7» &cНе удалось продолжить: " + error.getClass().getSimpleName());
             return true;
         }
-        return usage(player, "/duelx <rounds|party|size|open>");
+        return usage(player, "/duelx <target|team|kit|rounds|party|size|confirm|open>");
     }
 
     private boolean usage(Player player, String text) {
@@ -93,130 +121,61 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
 
     // ------------------------------------------------------------------ flow
 
-    private Object gui() throws ReflectiveOperationException {
-        Object epic = Bukkit.getPluginManager().getPlugin("EpicDuels");
-        if (epic == null) throw new IllegalStateException("EpicDuels не найден");
-        return epic.getClass().getMethod("getGUIManager").invoke(epic);
-    }
-
-    private boolean rounds(Player player, int bestOf) throws ReflectiveOperationException {
-        Object gui = gui();
+    private boolean rounds(Player player, int bestOf) {
+        Object gui = plugin.duels().gui();
         UUID uuid = player.getUniqueId();
-        Object target = gui.getClass().getMethod("getChallengeTarget", UUID.class).invoke(gui, uuid);
-        Object kit = gui.getClass().getMethod("getChallengeKit", UUID.class).invoke(gui, uuid);
+        Object target = Duels.call(gui, "getChallengeTarget", uuid);
+        Object kit = Duels.call(gui, "getChallengeKit", uuid);
         if (target == null || kit == null) {
-            plugin.msg(player, plugin.getConfig().getString("messages.no-challenge",
+            plugin.msg(player, plugin.string("messages.no-challenge",
                     "&f☁ &dᴇʟʏᴛʀɪx &7» &cСначала выбери игрока и кит."));
             return true;
         }
-        gui.getClass().getMethod("setChallengeRounds", UUID.class, int.class).invoke(gui, uuid, bestOf);
-        gui.getClass().getMethod("openArenaSelect", Player.class, UUID.class, String.class)
-                .invoke(gui, player, target, kit);
-        return true;
-    }
-
-    private boolean partyTeam(Player player) throws ReflectiveOperationException {
-        if (!feature("team-duels")) return off(player, "Групповые дуэли");
-        Object gui = gui();
+        Duels.call(gui, "setChallengeRounds", uuid, bestOf);
         player.closeInventory();
-        gui.getClass().getMethod("openPartyTeamSizeMenu", Player.class).invoke(gui, player);
+        Duels.call(gui, "openArenaSelect", player, target, kit);
         return true;
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    private boolean partyTournament(Player player) throws ReflectiveOperationException {
-        if (!feature("tournaments")) return off(player, "Турниры");
-        Object gui = gui();
-        Class<?> modeClass = secondArg(gui, "setPartyFlowMode");
-        Object mode = Enum.valueOf((Class) modeClass, "TOURNAMENT");
-        gui.getClass().getMethod("setPartyFlowMode", UUID.class, modeClass)
-                .invoke(gui, player.getUniqueId(), mode);
+    private boolean partyTeam(Player player) {
+        if (!plugin.duels().feature("team-duels")) return off(player, "Групповые дуэли");
+        Object gui = plugin.duels().gui();
         player.closeInventory();
-        gui.getClass().getMethod("openPartyKitMenu", Player.class, int.class).invoke(gui, player, 0);
+        Duels.call(gui, "openPartyTeamSizeMenu", player);
         return true;
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    private boolean partySize(Player player, int perTeam) throws ReflectiveOperationException {
-        Object gui = gui();
+    private boolean partyTournament(Player player) {
+        if (!plugin.duels().feature("tournaments")) return off(player, "Турниры");
+        UUID id = player.getUniqueId();
+        plugin.duels().flowMode(id, "TOURNAMENT");
+        player.closeInventory();
+        Object gui = plugin.duels().gui();
+        Duels.call(gui, "openPartyKitMenu", player, 0);
+        return true;
+    }
+
+    private boolean partySize(Player player, int perTeam) {
         String sizeName = perTeam == 2 ? "TWO_VS_TWO" : perTeam == 3 ? "THREE_VS_THREE" : "FOUR_VS_FOUR";
-        Class<?> sizeClass = secondArg(gui, "setPartyFlowTeamSize");
-        Class<?> modeClass = secondArg(gui, "setPartyFlowMode");
-        Object size = Enum.valueOf((Class) sizeClass, sizeName);
-        Object mode = Enum.valueOf((Class) modeClass, "TEAM_DUEL");
-
-        Object party = party(player);
-        int need = (Integer) size.getClass().getMethod("getTotalPlayers").invoke(size);
-        int have = party == null ? 0 : (Integer) party.getClass().getMethod("size").invoke(party);
+        UUID id = player.getUniqueId();
+        Object party = plugin.duels().partyOf(id);
+        int need = perTeam * 2;
+        int have = party == null ? 0 : plugin.duels().partySize(party);
         if (have < need) {
-            plugin.msg(player, plugin.getConfig().getString("messages.not-enough-members",
+            plugin.msg(player, plugin.string("messages.not-enough-members",
                     "&f☁ &dᴇʟʏᴛʀɪx &7» &cВ группе мало игроков: нужно &f%need%&c, сейчас &f%have%&c.")
                     .replace("%need%", String.valueOf(need)).replace("%have%", String.valueOf(have)));
             return true;
         }
-        gui.getClass().getMethod("setPartyFlowMode", UUID.class, modeClass)
-                .invoke(gui, player.getUniqueId(), mode);
-        gui.getClass().getMethod("setPartyFlowTeamSize", UUID.class, sizeClass)
-                .invoke(gui, player.getUniqueId(), size);
+        plugin.duels().flowMode(id, "TEAM_DUEL");
+        plugin.duels().flowSize(id, sizeName);
         player.closeInventory();
-        gui.getClass().getMethod("openPartyKitMenu", Player.class, int.class).invoke(gui, player, 0);
+        Duels.call(plugin.duels().gui(), "openPartyKitMenu", player, 0);
         return true;
-    }
-
-    /**
-     * Кит выбран в нашем меню. Если идёт вызов игрока — открываем выбор
-     * раундов; если это поток группы — сразу подтверждение.
-     */
-    private boolean kit(Player player, String kitName) throws ReflectiveOperationException {
-        Object gui = gui();
-        UUID uuid = player.getUniqueId();
-        Object target = gui.getClass().getMethod("getChallengeTarget", UUID.class).invoke(gui, uuid);
-        player.closeInventory();
-        if (target != null) {
-            gui.getClass().getMethod("openRoundsSelect", Player.class, UUID.class, String.class)
-                    .invoke(gui, player, target, kitName);
-            return true;
-        }
-        Object mode = gui.getClass().getMethod("getPartyFlowMode", UUID.class).invoke(gui, uuid);
-        if (mode == null) {
-            plugin.msg(player, plugin.getConfig().getString("messages.no-challenge",
-                    "&f☁ &dᴇʟʏᴛʀɪx &7» &cСначала выбери игрока и кит."));
-            return true;
-        }
-        gui.getClass().getMethod("setPartyFlowKit", UUID.class, String.class).invoke(gui, uuid, kitName);
-        gui.getClass().getMethod("openPartyConfirmMenu", Player.class).invoke(gui, player);
-        return true;
-    }
-
-    /**
-     * Тип второго аргумента метода — так классы PartyMode/TeamSize берутся
-     * из самого плагина, без Class.forName (у плагинов свои ClassLoader'ы).
-     */
-    private static Class<?> secondArg(Object target, String method) throws NoSuchMethodException {
-        for (java.lang.reflect.Method candidate : target.getClass().getMethods()) {
-            if (candidate.getName().equals(method) && candidate.getParameterCount() == 2) {
-                return candidate.getParameterTypes()[1];
-            }
-        }
-        throw new NoSuchMethodException(method);
-    }
-
-    private Object party(Player player) throws ReflectiveOperationException {
-        Object epic = Bukkit.getPluginManager().getPlugin("EpicDuels");
-        if (epic == null) return null;
-        Object manager = epic.getClass().getMethod("getPartyManager").invoke(epic);
-        return manager.getClass().getMethod("getPartyOf", UUID.class).invoke(manager, player.getUniqueId());
-    }
-
-    private boolean feature(String name) throws ReflectiveOperationException {
-        Object epic = Bukkit.getPluginManager().getPlugin("EpicDuels");
-        if (epic == null) return true;
-        Object value = epic.getClass().getMethod("isFeatureEnabled", String.class).invoke(epic, name);
-        return !(value instanceof Boolean) || (Boolean) value;
     }
 
     private boolean off(Player player, String what) {
-        plugin.msg(player, plugin.getConfig().getString("messages.feature-off",
+        plugin.msg(player, plugin.string("messages.feature-off",
                 "&f☁ &dᴇʟʏᴛʀɪx &7» &cВыключено на сервере: &f%name%").replace("%name%", what));
         return true;
     }
@@ -225,7 +184,10 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        if (args.length == 1) return filter(args[0], Arrays.asList("rounds", "party", "size", "kit", "open"));
+        if (args.length == 1) {
+            return filter(args[0], Arrays.asList("target", "team", "kit", "rounds", "party",
+                    "size", "confirm", "cancel", "open"));
+        }
         if (args.length == 2) {
             String sub = plugin.lower(args[0]);
             if (sub.equals("rounds")) return filter(args[1], Arrays.asList("1", "3", "5"));
@@ -239,6 +201,11 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
                 }
                 return filter(args[1], kits);
             }
+            if (sub.equals("target")) {
+                List<String> names = new ArrayList<String>();
+                for (Player online : Bukkit.getOnlinePlayers()) names.add(online.getName());
+                return filter(args[1], names);
+            }
         }
         return new ArrayList<String>();
     }
@@ -247,7 +214,7 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
         List<String> out = new ArrayList<String>();
         String low = plugin.lower(prefix);
         for (String value : values) {
-            if (low.isEmpty() || value.startsWith(low)) out.add(value);
+            if (low.isEmpty() || value.toLowerCase().startsWith(low)) out.add(value);
         }
         return out;
     }

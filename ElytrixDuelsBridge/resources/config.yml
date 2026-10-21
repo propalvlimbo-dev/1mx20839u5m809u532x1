@@ -2,11 +2,6 @@
 # Слева — тип меню EpicDuels, справа — id меню BMenu.
 # Поставь keep — окно останется от EpicDuels. Недостающие ключи мост
 # дописывает в этот файл сам при запуске, значения не перезаписываются.
-#
-# Меняются все экраны с фиксированным содержимым: главное меню, статистика,
-# очередь, выбор кита, раунды и группа. Списки игроков, арен и живых дуэлей
-# рисует сам плагин — их содержимое зависит от сервера, статичным меню его
-# не показать; эти окна перекрашены через menus.yml EpicDuels.
 menus:
   MAIN: "elytrix:duel"
   STATS: "elytrix:duel_stats"
@@ -16,6 +11,7 @@ menus:
   PARTY_MODE: "elytrix:duel_party"
   PARTY_TEAM_SIZE: "elytrix:duel_party_size"
   PARTY_KIT: "elytrix:duel_kit"
+  PARTY_CONFIRM: "elytrix:duel_confirm"
 
 # Имена китов для подсказок в /duelx kit (как в elytrix/duel/kit.yml).
 kits:
@@ -31,5 +27,25 @@ kits:
 
 messages:
   no-challenge: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cСначала выбери игрока и кит."
-  not-enough-members: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cВ группе мало игроков: нужно &f%need%&c, сейчас &f%have%&c."
+  no-target: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cСначала выбери соперника: &f/duel ник"
+  player-gone: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cИгрок уже вышел."
+  target-busy: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &c%name%&c сейчас в бою."
+  self: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНельзя вызвать самого себя."
+  kit-gone: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cКит &f%kit%&c не найден."
   feature-off: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cВыключено на сервере: &f%name%"
+  not-enough-members: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cВ группе мало игроков: нужно &f%need%&c, сейчас &f%have%&c."
+  party-failed: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНе удалось создать группу."
+  owner-only: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cБой запускает только владелец группы."
+  party-full: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cВ группе уже &f%size%&c игроков."
+  team-created: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fГруппа 2 на 2: &d%name% &f+ &d%owner%"
+  team-invited: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &d%owner% &fвзял тебя в группу 2 на 2"
+  missing-data: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cДанные боя потерялись, начни заново."
+  no-team-size: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cСначала выбери размер команд."
+  no-arenas: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНет готовых арен — сообщи администратору."
+  start-failed: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНе удалось начать бой. Попробуй ещё раз."
+  member-busy: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cКто-то из группы уже в бою."
+  pair-broken: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cВ группе должен быть ровно один напарник."
+  queue-wait: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fИщем вторую пару &7(кит &f%kit%&7)&f. &7Не выходи из игры."
+  queue-left: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Поиск пары отменён."
+  pair-found: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fПара найдена: &d%mate% &fпротив &d%a% &f+ &d%b%"
+  cancelled: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Отменено."
