@@ -1,9 +1,12 @@
 package ru.elytrix.duelsbridge;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryOpenEvent;
@@ -25,9 +28,39 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
     private static final String EPICDUELS = "EpicDuels";
     private static final String HOLDER = "dev.epicduels.gui.MenuHolder";
 
+    /** Значения по умолчанию: страхуют, если ключа нет в старом config.yml. */
+    private static final Map<String, String> DEFAULTS = new HashMap<String, String>();
+
+    static {
+        DEFAULTS.put("MAIN", "elytrix:duel");
+        DEFAULTS.put("STATS", "elytrix:duel_stats");
+        DEFAULTS.put("MATCHMAKING", "elytrix:duel_queue");
+        DEFAULTS.put("KIT_SELECT", "elytrix:duel_kit");
+        DEFAULTS.put("ROUNDS_SELECT", "elytrix:duel_rounds");
+        DEFAULTS.put("PARTY_MODE", "elytrix:duel_party");
+        DEFAULTS.put("PARTY_TEAM_SIZE", "elytrix:duel_party_size");
+        DEFAULTS.put("PARTY_KIT", "elytrix:duel_kit");
+    }
+
     @Override
     public void onEnable() {
         saveDefaultConfig();
+        // дописываем недостающие ключи в уже существующий config.yml,
+        // не трогая то, что там уже стоит
+        try {
+            FileConfiguration config = getConfig();
+            boolean changed = false;
+            for (Map.Entry<String, String> entry : DEFAULTS.entrySet()) {
+                String path = "menus." + entry.getKey();
+                if (config.getString(path) == null) {
+                    config.set(path, entry.getValue());
+                    changed = true;
+                }
+            }
+            if (changed) saveConfig();
+        } catch (RuntimeException error) {
+            getLogger().warning("Не удалось обновить config.yml: " + error);
+        }
         getServer().getPluginManager().registerEvents(this, this);
 
         PluginCommand command = getCommand("duelx");
@@ -88,6 +121,7 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
     /** id меню BMenu для типа окна EpicDuels, либо null (окно остаётся от плагина). */
     String menuFor(String type) {
         String value = getConfig().getString("menus." + type);
+        if (value == null) value = DEFAULTS.get(type);
         if (value == null) return null;
         value = value.trim();
         if (value.isEmpty() || value.equalsIgnoreCase("keep")) return null;

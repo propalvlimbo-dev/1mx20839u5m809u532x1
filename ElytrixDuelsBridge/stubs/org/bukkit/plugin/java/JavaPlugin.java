@@ -10,6 +10,7 @@ public abstract class JavaPlugin implements Plugin {
     public void onEnable() { }
     public void onDisable() { }
     public void saveDefaultConfig() { }
+    public void saveConfig() { }
     public FileConfiguration getConfig() { return null; }
     public Logger getLogger() { return null; }
     public Server getServer() { return null; }
