@@ -44,15 +44,20 @@
 | `features.kit-editor` | `false` | обычные игроки не собирают киты |
 | `duel.time-limit-seconds` | `300` | 5 минут на бой |
 
-Награды (`result-commands`):
+Награды выключены:
 
 ```
-победитель: 25 коинов + 500 монет
-проигравший: 5 коинов
+result-commands:
+  winner: []
+  loser: []
 ```
 
-Команды `points give` (PlayerPoints) и `eco give` (EssentialsX/Vault).
-Если экономика называется иначе — поменять здесь, `/duel reload`.
+За победу не выдаётся ничего — дуэли только для статистики и рейтинга.
+Если позже решишь платить, вписать команды сюда (`points give {player} N`),
+`/duel reload`.
+
+Ставок в EpicDuels нет: в плагине нет ни ставок, ни событий/API, через
+которые их можно было бы считать. Подробно — `СТАВКИ.md`.
 
 ## Оформление
 
@@ -120,11 +125,11 @@ ElytriX:
 
 ## Интеграция с остальным сервером
 
-- **BMenu:** в `BMenu/menu/elytrix/main/menu.yml` добавить кнопку с
-  `[player] duel` (или `[console] duel %player_name%`).
+- **BMenu:** меню дуэлей в стиле ElytriX — `BMenu/menu/elytrix/duel/`,
+  открывается командой `/duels`. См. `BMenu-ДУЭЛИ.md`.
 - **Голограммы:** `/duel leaderboard sethologram wins` — обычная голограмма
   плагина; или вывести топ в DH через PAPI.
-- **Кейсы:** за серию побед можно выдать ключ из `result-commands`
+- **Кейсы:** если включишь награды, ключ можно выдать из `result-commands`
   консольной командой BCases.
 
 ## Если что-то не работает

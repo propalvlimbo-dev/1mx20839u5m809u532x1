@@ -34,11 +34,8 @@ duel:
   broadcast-results: true
 
 result-commands:
-  winner:
-    - "points give {player} 25"
-    - "eco give {player} 500"
-  loser:
-    - "points give {player} 5"
+  winner: []
+  loser: []
 
 features:
   challenges: true

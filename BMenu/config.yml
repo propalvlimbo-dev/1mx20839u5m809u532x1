@@ -30,6 +30,16 @@ open_commands:
       - гайд
   menu:
     menu: elytrix:menu
+  duels:
+    menu: elytrix:duel
+    aliases:
+      - duels
+      - дуэли
+  duel_help_menu:
+    menu: elytrix:duel_help
+    aliases:
+      - duelshelp
+      - дуэлипомощь
   rtp:
     menu: elytrix:rtp
     aliases:
