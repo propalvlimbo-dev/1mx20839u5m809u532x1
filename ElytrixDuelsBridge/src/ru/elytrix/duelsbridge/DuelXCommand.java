@@ -14,12 +14,19 @@ import org.bukkit.entity.Player;
 /**
  * /duelx — продолжение потока EpicDuels после наших меню BMenu.
  *
+ *   /duelx menu | stats            главное меню / статистика
  *   /duelx target <ник>            выбрать соперника и открыть выбор кита
- *   /duelx team                    открыть выбор тиммейта (быстрый 2 на 2)
- *   /duelx kit <кит>               кит выбран в нашем меню
- *   /duelx rounds <1|3|5>          число раундов и выбор карты
  *   /duelx pick                    открыть выбор игрока
- *   /duelx queue <кит|leave>       встать в очередь / выйти
+ *   /duelx kit <кит>               кит выбран в нашем меню
+ *   /duelx kitmenu                 выбрать кит и встать в очередь
+ *   /duelx rounds <1|3|5>          число раундов (арена — случайная)
+ *   /duelx team                    выбор напарника 2 на 2
+ *   /duelx team random             пригласить случайного игрока
+ *   /duelx team accept|deny|leave  принять / отклонить / выйти из пары
+ *   /duelx team solo              2 на 2 без напарника (рандом в бою)
+ *   /duelx queue [кит]             очередь 1 на 1 / выбор кита
+ *   /duelx queue team [кит]        очередь 2 на 2 без напарника
+ *   /duelx queue leave             выйти из очереди
  *   /duelx top                     таблица лидеров
  *   /duelx bounds                  границы текущей арены (админ)
  *   /duelx kits [reset]            создать 10 готовых наборов
@@ -58,9 +65,45 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
                 plugin.requestDuel(player, target);
                 return true;
             }
-            if (sub.equals("team")) {
-                plugin.pickTeam(player);
+            if (sub.equals("menu") || sub.equals("main")) {
+                plugin.openMainMenu(player);
                 return true;
+            }
+            if (sub.equals("stats") || sub.equals("stat")) {
+                plugin.openStats(player);
+                return true;
+            }
+            if (sub.equals("kitmenu")) {
+                plugin.kitMenu(player, args.length > 1 ? plugin.lower(args[1]) : null);
+                return true;
+            }
+            if (sub.equals("team")) {
+                if (args.length == 1) {
+                    plugin.pickTeam(player);
+                    return true;
+                }
+                String action = plugin.lower(args[1]);
+                if (action.equals("random") || action.equals("рандом")) {
+                    plugin.pickTeamRandom(player);
+                    return true;
+                }
+                if (action.equals("accept") || action.equals("принять")) {
+                    plugin.teamAccept(player, args.length > 2 ? args[2] : null);
+                    return true;
+                }
+                if (action.equals("deny") || action.equals("отклонить")) {
+                    plugin.teamDeny(player);
+                    return true;
+                }
+                if (action.equals("leave") || action.equals("выйти")) {
+                    plugin.teamLeave(player);
+                    return true;
+                }
+                if (action.equals("solo") || action.equals("random-solo")) {
+                    plugin.pickSoloTeam(player);
+                    return true;
+                }
+                return usage(player, "/duelx team <random|accept|deny|leave|solo>");
             }
             if (sub.equals("kit")) {
                 if (args.length < 2) return usage(player, "/duelx kit <кит>");
@@ -95,8 +138,13 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
             if (sub.equals("queue")) {
-                if (args.length < 2) return usage(player, "/duelx queue <кит|leave>");
-                plugin.runOriginal(player, "queue", args[1]);
+                if (args.length < 2) {
+                    plugin.queueCommand(player, new String[0]);
+                    return true;
+                }
+                String[] rest = new String[args.length - 1];
+                System.arraycopy(args, 1, rest, 0, rest.length);
+                plugin.queueCommand(player, rest);
                 return true;
             }
             if (sub.equals("bounds")) {
@@ -110,7 +158,7 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
             }
             if (sub.equals("open")) {
                 if (args.length < 2) return usage(player, "/duelx open <menu>");
-                plugin.menus().open(player, args[1]);
+                plugin.menus().open(player, args[1], plugin.menuArgsFor(player, args[1]));
                 return true;
             }
         } catch (Throwable error) {
@@ -152,29 +200,23 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
-            return filter(args[0], Arrays.asList("pick", "target", "team", "kit", "rounds",
-                    "queue", "top", "bounds", "confirm", "cancel", "kits", "open"));
+            return filter(args[0], Arrays.asList("menu", "stats", "pick", "target", "team", "kit",
+                    "kitmenu", "rounds", "queue", "top", "bounds", "confirm", "cancel", "kits", "open"));
         }
         if (args.length == 2) {
             String sub = plugin.lower(args[0]);
             if (sub.equals("rounds")) return filter(args[1], Arrays.asList("1", "3", "5"));
             if (sub.equals("kits")) return filter(args[1], Arrays.asList("reset"));
+            if (sub.equals("team")) return filter(args[1], Arrays.asList("random", "accept", "deny", "leave", "solo"));
             if (sub.equals("queue")) {
-                List<String> kits = plugin.getConfig().getStringList("kits.names");
-                if (kits == null || kits.isEmpty()) kits = Arrays.asList(Kits.NAMES);
-                List<String> values = new ArrayList<String>(kits);
+                List<String> k = kits();
+                List<String> values = new ArrayList<String>(k);
                 values.add("leave");
+                values.add("team");
                 return filter(args[1], values);
             }
             if (sub.equals("kit")) {
-                List<String> kits = plugin.getConfig().getStringList("kits.names");
-                if (kits == null || kits.isEmpty()) {
-                    kits = plugin.getConfig().getStringList("kits"); // старый формат
-                }
-                if (kits == null || kits.isEmpty()) {
-                    kits = Arrays.asList(Kits.NAMES);
-                }
-                return filter(args[1], kits);
+                return filter(args[1], kits());
             }
             if (sub.equals("target")) {
                 List<String> names = new ArrayList<String>();
@@ -183,6 +225,14 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
             }
         }
         return new ArrayList<String>();
+    }
+
+    private List<String> kits() {
+        List<String> names = plugin.getConfig().getStringList("kits.names");
+        if (names == null || names.isEmpty()) names = Arrays.asList(Kits.NAMES);
+        List<String> out = new ArrayList<String>();
+        for (String name : names) out.add(Kits.canonical(name));
+        return out;
     }
 
     private List<String> filter(String prefix, List<String> values) {

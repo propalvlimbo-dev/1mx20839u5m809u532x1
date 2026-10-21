@@ -23,10 +23,10 @@ items:
     lore:
       - "&#F8BEFB&l┃ "
       - "&#F8BEFB&l┃ &fФормат: &#F8BEFB2 на 2"
-      - "&#F8BEFB&l┃ &fТиммейт: &#F8BEFBвыбираешь сам"
-      - "&#F8BEFB&l┃ &fОчередь: &#F8BEFBвстаёте парой"
+      - "&#F8BEFB&l┃ &fТиммейт: &#F8BEFBс подтверждением"
+      - "&#F8BEFB&l┃ &fОчередь: &#F8BEFBпарой или рандом"
       - "&#F8BEFB&l┃ "
-      - "&7● &fНажмите, чтобы выбрать тиммейта"
+      - "&7● &fНажмите, чтобы позвать напарника"
     on_click:
       - sound: 'block.note_block.pling 0.4 1.18'
       - "[player] duelx team"
@@ -37,7 +37,7 @@ items:
       - "&#F8BEFB&l┃ "
       - "&#F8BEFB&l┃ &fРежим: &#F8BEFBочередь"
       - "&#F8BEFB&l┃ &fКит: &#F8BEFBвыбираешь сам"
-      - "&#F8BEFB&l┃ &fСоперник: &#F8BEFBподбирается сам"
+      - "&#F8BEFB&l┃ &fСоперник: &#F8BEFBподбирается сразу"
       - "&#F8BEFB&l┃ "
       - "&7● &fНажмите, чтобы выбрать кит"
     on_click:
@@ -48,15 +48,13 @@ items:
     name: "&7« &#F8BEFBСтатистика &7»"
     lore:
       - "&#F8BEFB&l┃ "
-      - "&#F8BEFB&l┃ &fПобеды: &#F8BEFB{wins}"
-      - "&#F8BEFB&l┃ &fПоражения: &#F8BEFB{losses}"
-      - "&#F8BEFB&l┃ &fПроцент побед: &#F8BEFB{winrate}%"
-      - "&#F8BEFB&l┃ &fОчки: &#F8BEFB{score}"
+      - "&#F8BEFB&l┃ &fПобеды, поражения, процент"
+      - "&#F8BEFB&l┃ &fОчки и место в рейтинге"
       - "&#F8BEFB&l┃ "
-      - "&7● &fНажмите для подробностей"
+      - "&7● &fНажмите, чтобы открыть"
     on_click:
       - sound: 'block.note_block.pling 0.4 1.34'
-      - "[open] elytrix:duel_stats"
+      - "[player] duelx stats"
   top:
     material: nether_star
     name: "&7« &#F8BEFBРейтинг &7»"
@@ -86,15 +84,13 @@ items:
     name: "&7« &#F8BEFBТвой профиль &7»"
     lore:
       - "&#F8BEFB&l┃ "
-      - "&#F8BEFB&l┃ &fПобеды: &#F8BEFB{wins}"
-      - "&#F8BEFB&l┃ &fПоражения: &#F8BEFB{losses}"
-      - "&#F8BEFB&l┃ &fПроцент побед: &#F8BEFB{winrate}%"
-      - "&#F8BEFB&l┃ &fОчки: &#F8BEFB{score}"
+      - "&#F8BEFB&l┃ &fПобеды и поражения"
+      - "&#F8BEFB&l┃ &fПроцент побед и очки"
       - "&#F8BEFB&l┃ "
-      - "&7● &fДанные обновляются в бою"
-    tick_speed: 40
-    on_tick:
-      - '[update]'
+      - "&7● &fНажмите, чтобы открыть"
+    on_click:
+      - sound: 'block.note_block.pling 0.4 1.30'
+      - "[player] duelx stats"
   back:
     material: black_dye
     name: "&7« &#F8BEFBГлавное меню &7»"

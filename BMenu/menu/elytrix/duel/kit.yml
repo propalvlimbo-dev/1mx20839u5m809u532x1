@@ -9,121 +9,121 @@ items:
     name: "&7« &#F8BEFBКлассика &7»"
     lore:
       - "&#F8BEFB&l┃ "
-      - "&#F8BEFB&l┃ &fКит: &#F8BEFBsword"
+      - "&#F8BEFB&l┃ &fКит: &#F8BEFBКлассика"
       - "&#F8BEFB&l┃ &fСостав: &#F8BEFBмеч, железная броня, гаплы"
       - "&#F8BEFB&l┃ "
       - "&7● &fНажмите, чтобы выбрать"
     on_click:
       - sound: 'block.note_block.pling 0.4 1.05'
-      - "[player] duelx kit sword"
+      - "[player] duelx kit Классика"
   kit_uhc:
     material: golden_apple
     name: "&7« &#F8BEFBУХК &7»"
     lore:
       - "&#F8BEFB&l┃ "
-      - "&#F8BEFB&l┃ &fКит: &#F8BEFBuhc"
+      - "&#F8BEFB&l┃ &fКит: &#F8BEFBУХК"
       - "&#F8BEFB&l┃ &fСостав: &#F8BEFBмеч, лук, гаплы"
       - "&#F8BEFB&l┃ "
       - "&7● &fНажмите, чтобы выбрать"
     on_click:
       - sound: 'block.note_block.pling 0.4 1.10'
-      - "[player] duelx kit uhc"
+      - "[player] duelx kit УХК"
   kit_gapple:
     material: enchanted_golden_apple
     name: "&7« &#F8BEFBГаппли &7»"
     lore:
       - "&#F8BEFB&l┃ "
-      - "&#F8BEFB&l┃ &fКит: &#F8BEFBgapple"
+      - "&#F8BEFB&l┃ &fКит: &#F8BEFBГаппли"
       - "&#F8BEFB&l┃ &fСостав: &#F8BEFBалмазка и яблоки"
       - "&#F8BEFB&l┃ "
       - "&7● &fНажмите, чтобы выбрать"
     on_click:
       - sound: 'block.note_block.pling 0.4 1.15'
-      - "[player] duelx kit gapple"
+      - "[player] duelx kit Гаппли"
   kit_sumo:
     material: fishing_rod
     name: "&7« &#F8BEFBСумо &7»"
     lore:
       - "&#F8BEFB&l┃ "
-      - "&#F8BEFB&l┃ &fКит: &#F8BEFBsumo"
+      - "&#F8BEFB&l┃ &fКит: &#F8BEFBСумо"
       - "&#F8BEFB&l┃ &fСостав: &#F8BEFBтолько кулаки"
       - "&#F8BEFB&l┃ "
       - "&7● &fНажмите, чтобы выбрать"
     on_click:
       - sound: 'block.note_block.pling 0.4 1.20'
-      - "[player] duelx kit sumo"
+      - "[player] duelx kit Сумо"
   kit_archer:
     material: bow
     name: "&7« &#F8BEFBЛучник &7»"
     lore:
       - "&#F8BEFB&l┃ "
-      - "&#F8BEFB&l┃ &fКит: &#F8BEFBarcher"
+      - "&#F8BEFB&l┃ &fКит: &#F8BEFBЛучник"
       - "&#F8BEFB&l┃ &fСостав: &#F8BEFBлук и стрелы"
       - "&#F8BEFB&l┃ "
       - "&7● &fНажмите, чтобы выбрать"
     on_click:
       - sound: 'block.note_block.pling 0.4 1.25'
-      - "[player] duelx kit archer"
+      - "[player] duelx kit Лучник"
   kit_mace:
     material: mace
     name: "&7« &#F8BEFBБулава &7»"
     lore:
       - "&#F8BEFB&l┃ "
-      - "&#F8BEFB&l┃ &fКит: &#F8BEFBmace"
+      - "&#F8BEFB&l┃ &fКит: &#F8BEFBБулава"
       - "&#F8BEFB&l┃ &fСостав: &#F8BEFBбулава и вихри"
       - "&#F8BEFB&l┃ "
       - "&7● &fНажмите, чтобы выбрать"
     on_click:
       - sound: 'block.note_block.pling 0.4 1.30'
-      - "[player] duelx kit mace"
+      - "[player] duelx kit Булава"
   kit_axe:
     material: netherite_axe
-    name: "&7« &#F8BEFBТопор и щит &7»"
+    name: "&7« &#F8BEFBТопор &7»"
     lore:
       - "&#F8BEFB&l┃ "
-      - "&#F8BEFB&l┃ &fКит: &#F8BEFBaxe"
+      - "&#F8BEFB&l┃ &fКит: &#F8BEFBТопор"
       - "&#F8BEFB&l┃ &fСостав: &#F8BEFBтопор, щит, броня"
       - "&#F8BEFB&l┃ "
       - "&7● &fНажмите, чтобы выбрать"
     on_click:
       - sound: 'block.note_block.pling 0.4 1.35'
-      - "[player] duelx kit axe"
+      - "[player] duelx kit Топор"
   kit_trident:
     material: trident
     name: "&7« &#F8BEFBТризуб &7»"
     lore:
       - "&#F8BEFB&l┃ "
-      - "&#F8BEFB&l┃ &fКит: &#F8BEFBtrident"
+      - "&#F8BEFB&l┃ &fКит: &#F8BEFBТризуб"
       - "&#F8BEFB&l┃ &fСостав: &#F8BEFBтризуб и броня"
       - "&#F8BEFB&l┃ "
       - "&7● &fНажмите, чтобы выбрать"
     on_click:
       - sound: 'block.note_block.pling 0.4 1.40'
-      - "[player] duelx kit trident"
+      - "[player] duelx kit Тризуб"
   kit_crossbow:
     material: crossbow
     name: "&7« &#F8BEFBАрбалет &7»"
     lore:
       - "&#F8BEFB&l┃ "
-      - "&#F8BEFB&l┃ &fКит: &#F8BEFBcrossbow"
+      - "&#F8BEFB&l┃ &fКит: &#F8BEFBАрбалет"
       - "&#F8BEFB&l┃ &fСостав: &#F8BEFBарбалет и стрелы"
       - "&#F8BEFB&l┃ "
       - "&7● &fНажмите, чтобы выбрать"
     on_click:
       - sound: 'block.note_block.pling 0.4 1.45'
-      - "[player] duelx kit crossbow"
+      - "[player] duelx kit Арбалет"
   kit_netherite:
     material: netherite_chestplate
     name: "&7« &#F8BEFBНезерит &7»"
     lore:
       - "&#F8BEFB&l┃ "
-      - "&#F8BEFB&l┃ &fКит: &#F8BEFBnetherite"
+      - "&#F8BEFB&l┃ &fКит: &#F8BEFBНезерит"
       - "&#F8BEFB&l┃ &fСостав: &#F8BEFBнезерит и меч"
       - "&#F8BEFB&l┃ "
       - "&7● &fНажмите, чтобы выбрать"
     on_click:
       - sound: 'block.note_block.pling 0.4 1.50'
-      - "[player] duelx kit netherite"
+      - "[player] duelx kit Незерит"
   back:
     material: black_dye
     name: "&7« &#F8BEFBНазад &7»"

@@ -12,6 +12,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.command.CommandExecutor;
@@ -61,31 +62,20 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
     private final Menus menus = new Menus(this);
     private final Kits kits = new Kits(this);
     private final ArenaRules arenaRules = new ArenaRules(this, duels);
+    private final Teams teams = new Teams(this);
+    private final Queue queue = new Queue(this);
     /** Оригинальные обработчики /duel из EpicDuels — нужны админам и /duelx. */
     private PluginCommand duelCommand;
     private CommandExecutor duelExecutor;
     private TabCompleter duelCompleter;
     /** Кого игрок выбрал в своём окне (до выбора кита). */
     private final Map<UUID, UUID> targets = new HashMap<UUID, UUID>();
-    /** Очередь пар 2 на 2: ждём вторую пару с тем же китом. */
-    private final List<Pair> pairs = new ArrayList<Pair>();
-
-    /** Пара игроков, вставшая в очередь на 2 на 2. */
-    private static final class Pair {
-        final UUID owner;
-        final UUID mate;
-        final String kit;
-
-        Pair(UUID owner, UUID mate, String kit) {
-            this.owner = owner;
-            this.mate = mate;
-            this.kit = kit;
-        }
-
-        boolean has(UUID id) {
-            return owner.equals(id) || mate.equals(id);
-        }
-    }
+    /**
+     * Что делать после выбора кита: TEAM_PAIR — встать в очередь парой,
+     * TEAM_SOLO — 2 на 2 «рандом», QUEUE_1V1 — очередь 1 на 1.
+     * Нет записи — вызов игрока или старый поток EpicDuels.
+     */
+    private final Map<UUID, String> intents = new HashMap<UUID, String>();
 
     // ------------------------------------------------------------- включение
 
@@ -132,6 +122,18 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
                 config.set("kits.names", Arrays.asList(Kits.NAMES));
                 changed = true;
             }
+            // старые английские id наборов → русские имена
+            List<String> kitNames = config.getStringList("kits.names");
+            if (kitNames != null && kitNames.contains("sword")) {
+                config.set("kits.names", Arrays.asList(Kits.NAMES));
+                changed = true;
+            }
+            if (config.getString("queue.timeout-seconds") == null) {
+                config.set("queue.timeout-seconds", 180);
+                config.set("queue.team-timeout-seconds", 300);
+                config.set("queue.broadcast", true);
+                changed = true;
+            }
             if (config.getString("protection.block-place") == null) {
                 config.set("protection.block-place", true);
                 config.set("protection.explosions", true);
@@ -158,6 +160,8 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new CommandGuard(this), this);
         getServer().getPluginManager().registerEvents(arenaRules, this);
         arenaRules.start();
+        teams.start();
+        queue.start();
         hijackDuel();
 
         PluginCommand command = getCommand("duelx");
@@ -214,7 +218,36 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
 
     /** Главное меню дуэлей — то же, что открывает пустой /duel. */
     void openMainMenu(Player player) {
+        if (player == null) return;
+        // В поиске /duel показывает одно окно с красной кнопкой «Отменить поиск»
+        if (queue.isQueued(player.getUniqueId())) {
+            openQueueWait(player);
+            return;
+        }
         String id = menuForOr("MAIN", "elytrix:duel");
+        menus.open(player, id, menuArgs(player, id));
+    }
+
+    /** Окно «Ищем бой»: кит, режим, сколько ждём и кнопка отмены. */
+    void openQueueWait(Player player) {
+        String id = menuForOr("QUEUE_WAIT", "elytrix:duel_queue_wait");
+        if (menus.open(player, id, queue.argsFor(player))) return;
+        // меню ещё не установлено — хотя бы кнопка в чате
+        Component line = Text.of(string("messages.queue-wait-hint",
+                "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fТы в поиске. "));
+        Text.send(player, line.append(Text.button("&c&l[Отменить поиск]",
+                "/duelx queue leave", "Больше не искать")));
+    }
+
+    /** Статистика: числа подставляем сами, без PlaceholderAPI. */
+    void openStats(Player player) {
+        String id = menuForOr("STATS", "elytrix:duel_stats");
+        menus.open(player, id, duels.stats(player.getUniqueId()));
+    }
+
+    /** Окно очереди (выбор кита для 1 на 1). */
+    void openQueueMenu(Player player) {
+        String id = menuForOr("MATCHMAKING", "elytrix:duel_queue");
         menus.open(player, id, menuArgs(player, id));
     }
 
@@ -318,10 +351,17 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
     }
 
     /** Значения, которые подставляются в {фигурные скобки} меню BMenu. */
+    Map<String, String> menuArgsFor(Player player, String menuId) {
+        return menuArgs(player, menuId);
+    }
+
     private Map<String, String> menuArgs(Player player, String menuId) {
         Map<String, String> args = new LinkedHashMap<String, String>();
         if (menuId.endsWith(":duel") || menuId.endsWith(":duel_stats")) {
             args.putAll(duels.stats(player.getUniqueId()));
+        }
+        if (menuId.endsWith(":duel_queue_wait")) {
+            args.putAll(queue.argsFor(player));
         }
         if (menuId.endsWith(":duel_confirm")) {
             Object mode = duels.flowModeValue(player.getUniqueId());
@@ -383,6 +423,16 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
             if (picker.page() > 0) {
                 PlayerPicker.open(this, player, picker.mode(), picker.page() - 1);
             }
+            return;
+        }
+        if (slot == PlayerPicker.randomSlot() && picker.mode() == PlayerPicker.Mode.TEAM) {
+            player.closeInventory();
+            pickTeamRandom(player);
+            return;
+        }
+        if (slot == PlayerPicker.soloSlot() && picker.mode() == PlayerPicker.Mode.TEAM) {
+            player.closeInventory();
+            pickSoloTeam(player);
             return;
         }
         if (slot == PlayerPicker.nextSlot()) {
@@ -498,6 +548,9 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
                     .replace("%name%", target.getName()));
             return;
         }
+        intents.remove(player.getUniqueId());
+        // вызвал игрока — поиск в очереди больше не нужен
+        if (queue.isQueued(player.getUniqueId())) queue.leave(player);
         targets.put(player.getUniqueId(), target.getUniqueId());
         player.closeInventory();
         Map<String, String> args = new LinkedHashMap<String, String>();
@@ -505,7 +558,7 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         menus.open(player, menuForOr("KIT_SELECT", "elytrix:duel_kit"), args);
     }
 
-    /** Быстрый 2 на 2: группа из двух игроков без приглашений. */
+    /** Приглашение в пару: тиммейт сам решает, принять или отклонить. */
     void startTeam(Player owner, Player teammate) {
         if (!duels.feature("team-duels")) {
             msg(owner, string("messages.feature-off",
@@ -513,47 +566,11 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
                     .replace("%name%", "Бои 2 на 2"));
             return;
         }
-        if (teammate.getUniqueId().equals(owner.getUniqueId())) {
-            msg(owner, string("messages.self", "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНельзя выбрать себя в напарники."));
-            return;
-        }
-        Object party = duels.ownParty(owner);
-        if (party == null) {
-            msg(owner, string("messages.party-failed",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНе удалось собрать пару."));
-            return;
-        }
-        if (!duels.isOwner(party, owner.getUniqueId())) {
-            msg(owner, string("messages.owner-only",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cТиммейта приглашает только лидер пары."));
-            return;
-        }
-        if (!duels.addMember(party, teammate.getUniqueId())) {
-            msg(owner, string("messages.party-full",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cВ паре уже &f%size%&c игроков.")
-                    .replace("%size%", String.valueOf(duels.partySize(party))));
-            return;
-        }
-
-        UUID id = owner.getUniqueId();
-        duels.flowMode(id, "TEAM_DUEL");
-        duels.flowSize(id, "TWO_VS_TWO");
-        targets.remove(id);
+        teams.invite(owner, teammate);
         owner.closeInventory();
-
-        msg(owner, string("messages.team-created",
-                "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fПара 2 на 2: &d%owner% &f+ &d%name%")
-                .replace("%name%", teammate.getName()).replace("%owner%", owner.getName()));
-        msg(teammate, string("messages.team-invited",
-                "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &d%owner% &fвзял тебя в напарники для боя 2 на 2")
-                .replace("%owner%", owner.getName()));
-
-        Map<String, String> args = new LinkedHashMap<String, String>();
-        args.put("target", teammate.getName());
-        menus.open(owner, menuForOr("KIT_SELECT", "elytrix:duel_kit"), args);
     }
 
-    /** Открыть наше окно выбора игрока (для команды /duelx team). */
+    /** Окно выбора напарника (или сведения о текущей паре). */
     void pickTeam(Player player) {
         if (!duels.feature("team-duels")) {
             msg(player, string("messages.feature-off",
@@ -561,19 +578,79 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
                     .replace("%name%", "Бои 2 на 2"));
             return;
         }
+        UUID id = player.getUniqueId();
+        if (teams.paired(id)) {
+            // pairLine уже с никами, поэтому подставляем вручную
+            Component line = Text.of(string("messages.team-status",
+                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fТвоя пара: &d%pair%&f. ")
+                    .replace("%pair%", teams.pairLine(id)));
+            Component kit = Text.button("&d&l[Выбрать кит] ", "/duelx kitmenu",
+                    "Открыть выбор кита и встать в очередь");
+            Component out = Text.button("&c[Выйти из пары]", "/duelx team leave", "Разорвать пару");
+            Text.send(player, line.append(kit).append(out));
+            return;
+        }
         PlayerPicker.open(this, player, PlayerPicker.Mode.TEAM, 0);
     }
 
+    /** Случайный свободный игрок получает приглашение в пару. */
+    void pickTeamRandom(Player player) {
+        if (!duels.feature("team-duels")) {
+            msg(player, string("messages.feature-off",
+                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cВыключено на сервере: &f%name%")
+                    .replace("%name%", "Бои 2 на 2"));
+            return;
+        }
+        teams.randomInvite(player);
+    }
+
+    /** 2 на 2 без напарника: ищем случайного напарника сразу в бою. */
+    void pickSoloTeam(Player player) {
+        kitMenu(player, "TEAM_SOLO");
+    }
+
+    /** Открыть выбор кита с намерением: очередь 1 на 1, пара, соло 2 на 2. */
+    void kitMenu(Player player, String intent) {
+        UUID id = player.getUniqueId();
+        // старые данные EpicDuels (вызов, поток пары) не должны мешать
+        duels.call(duels.gui(), "clearChallengeData", id);
+        if (intent == null) {
+            intents.remove(id);
+        } else {
+            intents.put(id, intent);
+        }
+        targets.remove(id);
+        Map<String, String> args = new LinkedHashMap<String, String>();
+        UUID mate = teams.partnerOf(id);
+        args.put("target", mate == null ? "—" : name(mate));
+        menus.open(player, menuForOr("KIT_SELECT", "elytrix:duel_kit"), args);
+    }
+
+    void teamAccept(Player player, String ownerName) {
+        teams.accept(player, ownerName);
+    }
+
+    void teamDeny(Player player) {
+        teams.deny(player);
+    }
+
+    void teamLeave(Player player) {
+        teams.leave(player);
+    }
+
     void pickOpponent(Player player) {
+        intents.remove(player.getUniqueId());
+        targets.remove(player.getUniqueId());
         PlayerPicker.open(this, player, PlayerPicker.Mode.CHALLENGE, 0);
     }
 
-    /** Кит выбран: либо в бой с игроком, либо к подтверждению боя 2 на 2. */
+    /** Кит выбран: вызов игрока, очередь 1 на 1 или очередь 2 на 2. */
     void kit(Player player, String kitName) {
-        if (!duels.kitExists(kitName)) {
+        String kit = Kits.canonical(kitName);
+        if (!duels.kitExists(kit)) {
             msg(player, string("messages.kit-gone",
                     "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cКит &f%kit%&c не найден.")
-                    .replace("%kit%", kitName));
+                    .replace("%kit%", String.valueOf(kitName)));
             return;
         }
         UUID id = player.getUniqueId();
@@ -585,12 +662,39 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         player.closeInventory();
 
         if (target != null) {
-            Object gui = duels.gui();
-            duels.call(gui, "openRoundsSelect", player, target, kitName);
+            intents.remove(id);
+            duels.call(duels.gui(), "openRoundsSelect", player, target, kit);
+            return;
+        }
+
+        String intent = intents.remove(id);
+        if ("TEAM_PAIR".equals(intent)) {
+            if (!duels.feature("team-duels")) {
+                msg(player, string("messages.feature-off",
+                        "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cВыключено на сервере: &f%name%")
+                        .replace("%name%", "Бои 2 на 2"));
+                return;
+            }
+            UUID mate = teams.partnerOf(id);
+            Player partner = mate == null ? null : Bukkit.getPlayer(mate);
+            if (partner == null || !partner.isOnline()) {
+                msg(player, string("messages.team-partner-gone",
+                        "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНапарник вышел — найди нового."));
+                return;
+            }
+            queue.joinPair(player, partner, kit);
+            return;
+        }
+        if ("TEAM_SOLO".equals(intent)) {
+            queue.join(player, kit, true);
+            return;
+        }
+        if ("QUEUE_1V1".equals(intent)) {
+            queue.join(player, kit, false);
             return;
         }
         if (duels.flowModeValue(id) != null) {
-            duels.flowKit(id, kitName);
+            duels.flowKit(id, kit);
             menus.open(player, menuForOr("PARTY_CONFIRM", "elytrix:duel_confirm"),
                     menuArgs(player, menuForOr("PARTY_CONFIRM", "elytrix:duel_confirm")));
             return;
@@ -599,107 +703,49 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
                 "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cСначала выбери соперника: &f/duel ник"));
     }
 
+    /** Подтверждение боя: пара идёт в очередь, остальное — старый поток EpicDuels. */
     void confirm(Player player) {
         player.closeInventory();
         UUID id = player.getUniqueId();
-        Object mode = duels.flowModeValue(id);
-        Object size = duels.flowSizeValue(id);
-        Object party = duels.partyOf(id);
-        int members = party == null ? 0 : duels.partySize(party);
-        if ("TEAM_DUEL".equals(String.valueOf(mode))
-                && "TWO_VS_TWO".equals(String.valueOf(size))
-                && members == 2) {
-            enqueuePair(player, party);
+        if (teams.paired(id)) {
+            kitMenu(player, "TEAM_PAIR");
             return;
         }
         duels.startFlow(player);
     }
 
-    /** Пара готова: ищем вторую пару с тем же китом. */
-    private void enqueuePair(Player owner, Object party) {
-        UUID id = owner.getUniqueId();
-        Object kitValue = duels.flowKitValue(id);
-        if (kitValue == null) {
-            duels.startFlow(owner);
+    /**
+     * Очередь: /duel queue, /duelx queue <кит>, queue team <кит>, queue leave.
+     * Без аргументов открываем окно выбора кита для 1 на 1.
+     */
+    void queueCommand(Player player, String[] args) {
+        if (args == null || args.length == 0) {
+            openQueueMenu(player);
             return;
         }
-        String kit = String.valueOf(kitValue);
-        UUID mate = otherMember(party, id);
-        if (mate == null) {
-            msg(owner, string("messages.pair-broken",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cВ паре должен быть ровно один напарник."));
+        String first = lower(args[0]);
+        if (first.equals("leave") || first.equals("выйти") || first.equals("cancel")
+                || first.equals("отмена")) {
+            queue.leave(player);
             return;
         }
-        Pair mine = new Pair(id, mate, kit);
-        Pair found = null;
-        synchronized (pairs) {
-            Iterator<Pair> iterator = pairs.iterator();
-            while (iterator.hasNext()) {
-                Pair candidate = iterator.next();
-                if (candidate.has(id) || candidate.has(mate)) {
-                    iterator.remove();
-                    continue;
-                }
-                if (!candidate.kit.equalsIgnoreCase(kit)) continue;
-                if (!online(candidate.owner) || !online(candidate.mate)) {
-                    iterator.remove();
-                    continue;
-                }
-                found = candidate;
-                iterator.remove();
-                break;
+        if (first.equals("team") || first.equals("2x2") || first.equals("пара")) {
+            if (args.length >= 2) {
+                queue.join(player, Kits.canonical(args[1]), true);
+            } else {
+                kitMenu(player, "TEAM_SOLO");
             }
-            if (found == null) pairs.add(mine);
-        }
-
-        if (found == null) {
-            msg(owner, string("messages.queue-wait",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fИщем вторую пару &7(кит &f%kit%&7)&f. &7Не выходи из игры.")
-                    .replace("%kit%", kit));
             return;
         }
-        startPairMatch(found, mine);
-    }
-
-    private void startPairMatch(Pair other, Pair mine) {
-        List<UUID> all = Arrays.asList(other.owner, other.mate, mine.owner, mine.mate);
-        if (!duels.startTeamDuel(all, "TWO_VS_TWO", mine.kit)) {
-            String text = string("messages.start-failed",
-                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНе удалось начать бой. Попробуй ещё раз.");
-            msg(Bukkit.getPlayer(other.owner), text);
-            msg(Bukkit.getPlayer(mine.owner), text);
+        if (first.equals("1x1") || first.equals("solo")) {
+            if (args.length >= 2) {
+                queue.join(player, Kits.canonical(args[1]), false);
+            } else {
+                kitMenu(player, "QUEUE_1V1");
+            }
             return;
         }
-        // EpicDuels перемешивает составы — возвращаем выбранных напарников.
-        duels.fixTeams(other.owner, other.mate, mine.owner, mine.mate);
-        duels.clearFlow(other.owner);
-        duels.clearFlow(mine.owner);
-        targets.remove(mine.owner);
-        targets.remove(other.owner);
-
-        String text = string("messages.pair-found",
-                "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fПара найдена: &d%mate% &fпротив &d%a% &f+ &d%b%")
-                .replace("%mate%", name(mine.mate))
-                .replace("%a%", name(other.owner))
-                .replace("%b%", name(other.mate));
-        for (UUID id : all) msg(Bukkit.getPlayer(id), text);
-    }
-
-    private UUID otherMember(Object party, UUID id) {
-        Object members = Duels.call(party, "getMembers");
-        if (!(members instanceof List)) return null;
-        UUID found = null;
-        for (Object member : (List<?>) members) {
-            if (!(member instanceof UUID) || member.equals(id)) continue;
-            if (found != null) return null;
-            found = (UUID) member;
-        }
-        return found;
-    }
-
-    private boolean online(UUID id) {
-        Player player = Bukkit.getPlayer(id);
-        return player != null && player.isOnline();
+        queue.join(player, Kits.canonical(args[0]), false);
     }
 
     private String name(UUID id) {
@@ -708,27 +754,18 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
     }
 
     void leaveQueue(Player player) {
-        UUID id = player.getUniqueId();
-        synchronized (pairs) {
-            Iterator<Pair> iterator = pairs.iterator();
-            while (iterator.hasNext()) {
-                Pair pair = iterator.next();
-                if (!pair.has(id)) continue;
-                iterator.remove();
-                msg(Bukkit.getPlayer(pair.owner), string("messages.queue-left",
-                        "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Поиск пары отменён."));
-                msg(Bukkit.getPlayer(pair.mate), string("messages.queue-left",
-                        "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Поиск пары отменён."));
-            }
-        }
+        queue.leave(player);
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         if (player == null) return;
-        targets.remove(player.getUniqueId());
-        leaveQueue(player);
+        UUID id = player.getUniqueId();
+        targets.remove(id);
+        intents.remove(id);
+        queue.quit(player);
+        teams.quit(player);
     }
 
     void cancelFlow(Player player) {
@@ -748,6 +785,19 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
 
     Duels duels() {
         return duels;
+    }
+
+    Teams teams() {
+        return teams;
+    }
+
+    Queue queue() {
+        return queue;
+    }
+
+    /** Игрок больше не ждёт выбора кита для старой цели. */
+    void forgetTarget(UUID id) {
+        targets.remove(id);
     }
 
     Menus menus() {

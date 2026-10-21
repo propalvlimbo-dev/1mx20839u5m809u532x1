@@ -53,6 +53,21 @@ final class DuelCommandGuard implements CommandExecutor, TabCompleter {
             return true;
         }
         String sub = plugin.lower(args[0]);
+        // поиск пары и статистика — наши, с кнопками и подсказками
+        if (sub.equals("stats") || sub.equals("stat")) {
+            plugin.openStats(player);
+            return true;
+        }
+        if (sub.equals("queue") || sub.equals("matchmaking")) {
+            String[] rest = new String[Math.max(0, args.length - 1)];
+            System.arraycopy(args, 1, rest, 0, rest.length);
+            plugin.queueCommand(player, rest);
+            return true;
+        }
+        if (sub.equals("team") || sub.equals("party") || sub.equals("duo")) {
+            plugin.pickTeam(player);
+            return true;
+        }
         if (GAMEPLAY.contains(sub) && original != null) {
             return original.onCommand(sender, command, label, args);
         }

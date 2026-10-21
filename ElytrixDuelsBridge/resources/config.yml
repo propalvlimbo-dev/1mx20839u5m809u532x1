@@ -12,21 +12,22 @@ menus:
   PARTY_CONFIRM: "elytrix:duel_confirm"
 
 # Десять готовых наборов. Мост создаёт их сам при запуске, если таких
-# китов ещё нет в kits.yml EpicDuels; существующие не трогаются.
+# китов ещё нет в kits.yml EpicDuels. Английские id (sword, uhc, ...) при
+# первом запуске переносятся под русские имена — вещи не теряются.
 # Пересоздать: /duelx kits reset
 kits:
   auto-install: true
   names:
-    - sword
-    - uhc
-    - gapple
-    - sumo
-    - archer
-    - mace
-    - axe
-    - trident
-    - crossbow
-    - netherite
+    - Классика
+    - УХК
+    - Гаппли
+    - Сумо
+    - Лучник
+    - Булава
+    - Топор
+    - Тризуб
+    - Арбалет
+    - Незерит
 
 # /duel и видимость команд (замена PLHide).
 # hidden — эти команды не отправляются клиенту, их не видно в автодополнении;
@@ -59,6 +60,14 @@ command-guard:
     - dx
     - party
     - p
+
+# Своя очередь на бой (родная очередь EpicDuels не используется).
+# 1 на 1 — два игрока с одним китом встречаются сразу.
+# 2 на 2 — пара ищет вторую пару, одиночки собираются в пары автоматически.
+queue:
+  timeout-seconds: 180        # сколько ждёт 1 на 1 (3 минуты)
+  team-timeout-seconds: 300   # сколько ждёт 2 на 2 (5 минут)
+  broadcast: true             # объявлять в чат с кнопкой «встать в очередь»
 
 # Правила на боевых копиях арен (arena_instance_*),
 # в шаблонах arena_template_* строительство остаётся доступным.
@@ -118,3 +127,47 @@ messages:
   duel-usage: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fДоступно: &f/duel &7и &f/duel ник"
   command-blocked: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНеизвестная команда."
   kits-failed: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНе удалось: EpicDuels не отдал KitManager."
+
+  # ---- пара 2 на 2 ----
+  team-status: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fТвоя пара: &d%pair%&f. "
+  team-self: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cСебя в напарники не взять."
+  team-already: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cТы уже в паре с &f%name%&c. Сначала выйди из неё."
+  team-target-gone: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cИгрок уже вышел."
+  team-target-busy: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &c%name%&c сейчас занят: в бою или в поиске."
+  team-target-paired: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &c%name%&c уже в паре."
+  team-invite-wait: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Ты уже позвал &f%name%&7, ждём ответа."
+  team-invite-sent: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fПриглашение отправлено: &d%name%&f. Ждём ответа &f60 с&f."
+  team-invite-received: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &d%owner% &fзовёт тебя в пару для боя 2 на 2. "
+  team-no-random: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cСвободных игроков нет — попробуй через минуту."
+  team-invite-stale: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Это приглашение уже неактуально."
+  team-none: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cТебя никто не приглашал (или приглашение истекло)."
+  team-owner-gone: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &c%name%&c уже вышел."
+  team-busy: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cКто-то уже в бою или в поиске."
+  team-paired: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cУ кого-то уже есть пара."
+  team-ready: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fПара собрана: &d%a% &f+ &d%b%&f."
+  team-next: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Дальше выбери кит — встанем в очередь парой. "
+  team-denied-self: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Приглашение отклонено."
+  team-denied: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &c%name%&c отклонил приглашение."
+  team-not-paired: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Ты не в паре."
+  team-left: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Ты вышел из пары."
+  team-partner-left: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &f%name% &7вышел из пары."
+  team-expired: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Приглашение для &f%name%&7 истекло."
+  team-expired-self: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Приглашение от &f%name%&7 истекло."
+  team-partner-gone: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНапарник вышел — найди нового."
+  # ---- очередь ----
+  queue-you-busy: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cТы уже в бою."
+  queue-pair-busy: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cКто-то из пары уже в бою."
+  queue-wait-hint: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fТы в поиске. "
+  queue-not-in: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Ты не в очереди."
+  queue-left: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Поиск отменён."
+  queue-mate-left: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Поиск отменён: напарник вышел."
+  queue-busy: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Поиск отменён: ты уже в бою."
+  queue-timeout: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Соперник не нашёлся за &f%minutes%&7 мин — поиск отменён."
+  queue-joined-1v1: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fИщем соперника &7(кит &f%kit%&7)&f. "
+  queue-joined-2v2: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fИщем вторую пару &7(кит &f%kit%&7)&f. "
+  queue-joined-solo2v2: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fИщем напарника и вторую пару &7(кит &f%kit%&7)&f. "
+  queue-broadcast-1v1: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &d%player% &fищет бой 1 на 1: кит &d%kit%&f. "
+  queue-broadcast-2v2: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &d%player% &fищет вторую пару 2 на 2: кит &d%kit%&f. "
+  queue-broadcast-solo2v2: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &d%player% &fищет пару 2 на 2: кит &d%kit%&f. "
+  queue-found-1v1: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fСоперник найден: &d%name%&f. Кит &d%kit%&f."
+  queue-found-2v2: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fПара найдена: &d%a% + %b% &fпротив &d%c% + %d%&f."

@@ -166,7 +166,14 @@ final class Duels {
     }
 
     boolean kitExists(String name) {
-        return call(manager("getKitManager"), "getKit", name) != null;
+        String kit = Kits.canonical(name);
+        return kit != null && call(manager("getKitManager"), "getKit", kit) != null;
+    }
+
+    /** Подпись кита для сообщений: русское имя, если оно известно. */
+    String kitLabel(String name) {
+        String kit = Kits.canonical(name);
+        return kit == null ? String.valueOf(name) : kit;
     }
 
     /** Запуск боя по текущему потоку (аналог кнопки подтверждения). */
@@ -268,6 +275,44 @@ final class Duels {
         return true;
     }
 
+    /** Случайная готовая арена или null. */
+    Object randomArena() {
+        Object arenas = call(manager("getArenaManager"), "getReadyArenas");
+        if (!(arenas instanceof List) || ((List<?>) arenas).isEmpty()) return null;
+        List<?> ready = (List<?>) arenas;
+        return ready.get(random.nextInt(ready.size()));
+    }
+
+    /**
+     * Мгновенный бой 1 на 1 из очереди: без вызова и подтверждения,
+     * сразу стартуем на случайной арене.
+     */
+    boolean startQueue1v1(Player first, Player second, String kitName) {
+        String kit = Kits.canonical(kitName);
+        if (first == null || second == null || kit == null) return false;
+        Object arena = randomArena();
+        Object kitObject = call(manager("getKitManager"), "getKit", kit);
+        if (arena == null || kitObject == null) return false;
+        Object started = invokeRaw(manager("getDuelManager"), "startDirectDuel",
+                new Class<?>[]{Player.class, Player.class, arena.getClass(), kitObject.getClass(), int.class},
+                first, second, arena, kitObject, Integer.valueOf(1));
+        return started != null;
+    }
+
+    /**
+     * Бой 2 на 2 из очереди: составы задаём сами (пары не перемешиваем).
+     */
+    boolean startQueue2v2(java.util.List<UUID> teamA, java.util.List<UUID> teamB, String kitName) {
+        if (teamA == null || teamB == null || teamA.size() != 2 || teamB.size() != 2) return false;
+        String kit = Kits.canonical(kitName);
+        if (kit == null) return false;
+        java.util.List<UUID> all = new ArrayList<UUID>(teamA);
+        all.addAll(teamB);
+        if (!startTeamDuel(all, "TWO_VS_TWO", kit)) return false;
+        fixTeams(teamA.get(0), teamA.get(1), teamB.get(0), teamB.get(1));
+        return true;
+    }
+
     /**
      * Запуск командного боя из готового списка игроков (для очереди пар).
      * Порядок: первая пара — команда A, вторая — команда B (см. fixTeams).
@@ -310,6 +355,18 @@ final class Duels {
         set.clear();
         set.add(first);
         set.add(second);
+    }
+
+    private Object invokeRaw(Object target, String method, Class<?>[] types, Object... args) {
+        if (target == null) return null;
+        try {
+            Method found = target.getClass().getMethod(method, types);
+            found.setAccessible(true);
+            return found.invoke(target, args);
+        } catch (Throwable error) {
+            plugin.getLogger().warning("EpicDuels." + method + ": " + error);
+            return null;
+        }
     }
 
     private boolean invoke(Object target, String method, Class<?>[] types, Object... args) {

@@ -19,15 +19,24 @@ import org.bukkit.plugin.Plugin;
  */
 final class Kits {
 
+    /**
+     * Имена наборов, которые видит игрок (они же id в kits.yml EpicDuels).
+     * Русские, потому что EpicDuels показывает имя набора как есть —
+     * и в меню, и в сообщениях, и на скорборде.
+     */
     static final String[] NAMES = {
+            "Классика", "УХК", "Гаппли", "Сумо", "Лучник",
+            "Булава", "Топор", "Тризуб", "Арбалет", "Незерит"
+    };
+
+    /** Прежние английские id — для перехода и для старых меню/команд. */
+    static final String[] LEGACY = {
             "sword", "uhc", "gapple", "sumo", "archer",
             "mace", "axe", "trident", "crossbow", "netherite"
     };
 
-    static final String[] LABELS = {
-            "Классика", "УХК", "Гаппли", "Сумо", "Лучник",
-            "Булава", "Топор и щит", "Тризуб", "Арбалет", "Незерит"
-    };
+    /** Подписи в меню: совпадают с именами. */
+    static final String[] LABELS = NAMES;
 
     private static final Material[] ICONS = {
             Material.NETHERITE_SWORD,
@@ -81,20 +90,29 @@ final class Kits {
         int created = 0;
         for (int index = 0; index < NAMES.length; index++) {
             String name = NAMES[index];
+            String legacy = LEGACY[index];
             try {
                 Object existing = getKit.invoke(manager, name);
-                if (existing != null) {
-                    if (!overwrite) continue;
+                Object old = getKit.invoke(manager, legacy);
+                if (existing == null) {
+                    if (old != null && !overwrite) {
+                        // переносим прежний набор под русское имя, вещи не теряются
+                        create(manager, createKit, name, old, ICONS[index], true);
+                    } else {
+                        createKit.invoke(manager, name, contents(legacy), armor(legacy), offhand(legacy));
+                        setIcon(manager, getKit, name, ICONS[index]);
+                    }
+                    created++;
+                } else if (overwrite) {
                     deleteKit.invoke(manager, name);
+                    createKit.invoke(manager, name, contents(legacy), armor(legacy), offhand(legacy));
+                    setIcon(manager, getKit, name, ICONS[index]);
+                    created++;
                 }
-                Object kit = createKit.invoke(manager, name, contents(name), armor(name), offhand(name));
-                if (kit == null) continue;
-                try {
-                    kit.getClass().getMethod("setIcon", Material.class).invoke(kit, ICONS[index]);
-                } catch (Throwable ignored) {
-                    // иконка нужна только родному меню EpicDuels — не критично
+                // английский дубль больше не нужен
+                if (getKit.invoke(manager, legacy) != null && getKit.invoke(manager, name) != null) {
+                    deleteKit.invoke(manager, legacy);
                 }
-                created++;
             } catch (Throwable error) {
                 plugin.getLogger().warning("Набор " + name + ": " + error);
             }
@@ -107,6 +125,56 @@ final class Kits {
             }
         }
         return created;
+    }
+
+    /** Копия старого набора под новым именем. */
+    private void create(Object manager, Method createKit, String name, Object old,
+                        Material icon, boolean copy) throws Exception {
+        ItemStack[] contents = copy ? (ItemStack[]) Duels.call(old, "getContents") : null;
+        ItemStack[] armor = copy ? (ItemStack[]) Duels.call(old, "getArmorContents") : null;
+        ItemStack offHand = copy ? (ItemStack) Duels.call(old, "getOffHand") : null;
+        if (contents == null) contents = new ItemStack[0];
+        createKit.invoke(manager, name, contents, armor, offHand);
+        Object created = Duels.call(manager, "getKit", name);
+        if (created != null) {
+            Object oldIcon = Duels.call(old, "getIcon");
+            Material use = oldIcon instanceof Material ? (Material) oldIcon : icon;
+            try {
+                created.getClass().getMethod("setIcon", Material.class).invoke(created, use);
+            } catch (Throwable ignored) {
+                // иконка нужна только родному меню EpicDuels — не критично
+            }
+        }
+    }
+
+    private void setIcon(Object manager, Method getKit, String name, Material icon) {
+        try {
+            Object kit = getKit.invoke(manager, name);
+            if (kit == null) return;
+            kit.getClass().getMethod("setIcon", Material.class).invoke(kit, icon);
+        } catch (Throwable ignored) {
+            // иконка нужна только родному меню EpicDuels — не критично
+        }
+    }
+
+    /** Английский id или подпись → настоящее имя набора. */
+    static String canonical(String name) {
+        if (name == null) return null;
+        String clean = name.trim();
+        for (int index = 0; index < NAMES.length; index++) {
+            if (clean.equalsIgnoreCase(LEGACY[index])) return NAMES[index];
+            if (clean.equalsIgnoreCase(NAMES[index])) return NAMES[index];
+        }
+        return clean;
+    }
+
+    static boolean known(String name) {
+        String canonical = canonical(name);
+        if (canonical == null) return false;
+        for (String value : NAMES) {
+            if (value.equalsIgnoreCase(canonical)) return true;
+        }
+        return false;
     }
 
     // ------------------------------------------------------------------ вещи

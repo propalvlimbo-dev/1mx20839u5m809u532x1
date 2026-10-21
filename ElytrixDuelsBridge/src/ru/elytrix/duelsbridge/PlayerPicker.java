@@ -47,7 +47,9 @@ final class PlayerPicker implements InventoryHolder {
             37, 38, 39, 40, 41, 42, 43
     };
     private static final int PREV = 45;
+    private static final int RANDOM = 48;
     private static final int CLOSE = 49;
+    private static final int SOLO = 50;
     private static final int NEXT = 53;
     static final int SIZE = 54;
 
@@ -134,6 +136,16 @@ final class PlayerPicker implements InventoryHolder {
         if (page + 1 < pages) {
             inventory.setItem(NEXT, pane(Material.ARROW, "\u00A7dСтраница " + (page + 2) + " \u00A77»"));
         }
+        if (mode == Mode.TEAM) {
+            inventory.setItem(RANDOM, button(Material.NETHER_STAR,
+                    "\u00A77« \u00A7dСлучайный тиммейт \u00A77»",
+                    "\u00A77\u25CF \u00A7fПриглашение уйдёт случайному игроку",
+                    "\u00A77\u25CF \u00A7fОн сам решит: принять или нет"));
+            inventory.setItem(SOLO, button(Material.COMPASS,
+                    "\u00A77« \u00A7dРандом без тиммейта \u00A77»",
+                    "\u00A77\u25CF \u00A7fВстанем в очередь 2 на 2 одни",
+                    "\u00A77\u25CF \u00A7fНапарника подберём в бою"));
+        }
         inventory.setItem(CLOSE, pane(Material.RED_DYE, "\u00A77« \u00A7cЗакрыть меню \u00A77»"));
 
         viewer.openInventory(inventory);
@@ -161,6 +173,17 @@ final class PlayerPicker implements InventoryHolder {
         return item;
     }
 
+    private static ItemStack button(Material material, String name, String... lore) {
+        ItemStack item = new ItemStack(material);
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName(name);
+            meta.setLore(Arrays.asList(lore));
+            item.setItemMeta(meta);
+        }
+        return item;
+    }
+
     private static ItemStack pane(Material material, String name) {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
@@ -177,6 +200,14 @@ final class PlayerPicker implements InventoryHolder {
 
     static int closeSlot() {
         return CLOSE;
+    }
+
+    static int randomSlot() {
+        return RANDOM;
+    }
+
+    static int soloSlot() {
+        return SOLO;
     }
 
     static int nextSlot() {
