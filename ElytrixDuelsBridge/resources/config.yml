@@ -65,6 +65,22 @@ command-guard:
 protection:
   block-place: true   # нельзя ставить блоки и выливать жидкости
   explosions: true    # взрывы не ломают блоки арены
+  leave: true         # из боя нельзя уйти: границы, пёрлы, телепорт, /spawn
+  pearl-limit: true   # пёрл за границу или выше лимита не телепортирует
+  max-height: 7       # на сколько блоков можно подняться над точкой спавна
+  arena-margin: 20    # запас зоны вокруг точек спавна (половина дистанции + это)
+  min-drop: 25        # ниже спавна на столько — возвращаем на спавн (пустота)
+  # команды, недоступные во время боя
+  blocked-commands:
+    - spawn
+    - hub
+    - lobby
+    - tpa
+    - tpahere
+    - tpaccept
+    - warp
+    - home
+    - back
 
 messages:
   no-challenge: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cСначала выбери игрока и кит."
@@ -91,6 +107,12 @@ messages:
   pair-found: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fПара найдена: &d%mate% &fпротив &d%a% &f+ &d%b%"
   cancelled: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &7Отменено."
   group-removed: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fКомандные дуэли теперь в &f/duels&f: &f«Бои 2 на 2»"
+  arena-bounds: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cЭто край арены."
+  arena-height: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cВыше &f%block%&c блоков не подняться."
+  pearl-blocked: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cПёрл туда не сработает: за ареной или слишком высоко."
+  arena-leave: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cИз боя телепортом не выйти."
+  arena-command: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cВо время боя эта команда недоступна."
+  arena-no-duel: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cТы не в бою."
   arena-no-build: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cНа арене нельзя ставить блоки."
   kits-ready: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fГотовых наборов: &f%count%"
   duel-usage: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fДоступно: &f/duel &7и &f/duel ник"

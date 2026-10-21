@@ -27,8 +27,10 @@ lobby:
     death-messages: false
 
 duel:
+  # 3 минуты на бой, дальше ничья (в bo3 побеждает тот, кто ведёт по раундам)
   time-limit-seconds: 300
-  tournament-draw: "sudden-death"
+  # ничья и в турнирной сетке: победителя решает монетка, сетка не зависает
+  tournament-draw: "draw"
   sudden-death-seconds: 60
   countdown-seconds: 3
   broadcast-results: true

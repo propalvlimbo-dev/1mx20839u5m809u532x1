@@ -60,6 +60,7 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
     private final Duels duels = new Duels(this);
     private final Menus menus = new Menus(this);
     private final Kits kits = new Kits(this);
+    private final ArenaRules arenaRules = new ArenaRules(this, duels);
     /** Оригинальные обработчики /duel из EpicDuels — нужны админам и /duelx. */
     private PluginCommand duelCommand;
     private CommandExecutor duelExecutor;
@@ -136,6 +137,17 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
                 config.set("protection.explosions", true);
                 changed = true;
             }
+            if (config.getString("protection.leave") == null) {
+                config.set("protection.leave", true);
+                config.set("protection.pearl-limit", true);
+                config.set("protection.max-height", 7);
+                config.set("protection.arena-margin", 20);
+                config.set("protection.min-drop", 25);
+                config.set("protection.blocked-commands", Arrays.asList(
+                        "spawn", "hub", "lobby", "tpa", "tpahere", "tpaccept",
+                        "warp", "home", "back"));
+                changed = true;
+            }
             if (changed) saveConfig();
         } catch (RuntimeException error) {
             getLogger().warning("Не удалось обновить config.yml: " + error);
@@ -144,6 +156,8 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(new ArenaGuard(this), this);
         getServer().getPluginManager().registerEvents(new CommandGuard(this), this);
+        getServer().getPluginManager().registerEvents(arenaRules, this);
+        arenaRules.start();
         hijackDuel();
 
         PluginCommand command = getCommand("duelx");
@@ -440,6 +454,25 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
     }
 
     // ------------------------------------------------------------- действия
+
+    /** /duelx bounds — показать границы текущей арены (для настройки). */
+    void boundsInfo(Player player) {
+        ArenaRules.Bounds bounds = arenaRules.resolve(player);
+        if (bounds == null) {
+            msg(player, string("messages.arena-no-duel",
+                    "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &cТы не в бою."));
+            return;
+        }
+        msg(player, "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &fАрена: &f" + bounds.world);
+        msg(player, "&7  центр: &f" + round(bounds.centerX) + " " + round(bounds.centerZ)
+                + " &7| радиус: &f" + round(bounds.radius));
+        msg(player, "&7  высота: &f" + round(bounds.baseY) + " + " + round(bounds.maxY - bounds.baseY)
+                + " &7| низ: &f" + round(bounds.minY));
+    }
+
+    private static String round(double value) {
+        return String.valueOf(Math.round(value * 10) / 10.0);
+    }
 
     /** /duelx kits — создать (или пересоздать) десять готовых наборов. */
     void installKits(Player player, boolean reset) {
