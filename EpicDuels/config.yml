@@ -47,8 +47,8 @@ features:
   rematch: true
   forfeit: true
   best-of-n: true
-  own-inventory-duels: true
-  kit-editor: true
+  own-inventory-duels: false
+  kit-editor: false
   parties: true
   team-duels: true
   tournaments: true

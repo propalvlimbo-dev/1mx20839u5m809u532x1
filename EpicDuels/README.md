@@ -40,7 +40,8 @@
 | `language` | `ru` | русские сообщения |
 | `duel.countdown-seconds` | `3` | быстрый старт |
 | `duel.broadcast-results` | `true` | результат дуэли видят все |
-| `features.own-inventory-duels` | `true` | бои своим инвентарём — для выживания |
+| `features.own-inventory-duels` | `false` | игроки играют только готовыми китами |
+| `features.kit-editor` | `false` | обычные игроки не собирают киты |
 | `duel.time-limit-seconds` | `300` | 5 минут на бой |
 
 Награды (`result-commands`):
@@ -52,6 +53,21 @@
 
 Команды `points give` (PlayerPoints) и `eco give` (EssentialsX/Vault).
 Если экономика называется иначе — поменять здесь, `/duel reload`.
+
+## Оформление
+
+`menus.yml`, `scoreboard.yml` и `lang/messages_ru.yml` переписаны под стиль
+ElytriX:
+
+- префикс `☁ ᴇʟʏᴛʀɪx »`, акцент `#F8BEFB`, разделители `gray` / `dark_gray`;
+- лор: `┃` — данные, `●` — действие;
+- успех `green`, ошибка `red`;
+- заголовки меню `#F8BEFB`, жирные;
+- навигация: назад/далее — `black_dye`, закрыть — `red_dye`, стрелок нет;
+- сообщения без длинных фраз, без скобок и рамок.
+
+Пункты меню, которые генерирует сам плагин (числа в статистике, размер
+группы), остаются от плагина — их нельзя заменить шаблоном.
 
 ## Права
 
