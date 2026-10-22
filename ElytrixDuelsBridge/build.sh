@@ -24,9 +24,9 @@ mkdir -p build/classes build/out
 
 # 3. упаковка: jar из JDK, иначе python-скрипт
 if [ -x "$JAVA_HOME/bin/jar" ]; then
-  "$JAVA_HOME/bin/jar" --create --file ElytrixDuelsBridge-1.12.1.jar \
+  "$JAVA_HOME/bin/jar" --create --file ElytrixDuelsBridge-1.12.2.jar \
     -C resources . -C build/out .
-  echo "готово: $(pwd)/ElytrixDuelsBridge-1.12.1.jar"
+  echo "готово: $(pwd)/ElytrixDuelsBridge-1.12.2.jar"
 else
-  "$PY" tools/mkjar.py build/out ElytrixDuelsBridge-1.12.1.jar resources
+  "$PY" tools/mkjar.py build/out ElytrixDuelsBridge-1.12.2.jar resources
 fi

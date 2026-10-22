@@ -53,6 +53,8 @@ final class Arenas implements Listener {
     private final Map<java.util.UUID, Integer> pending = new HashMap<java.util.UUID, Integer>();
     /** Идущий бой -> номер пары. Освобождается, когда мир-копия выгружается. */
     private final Map<String, Integer> busy = new HashMap<String, Integer>();
+    /** Куда игрок поставлен на своей паре: для возврата после падения. */
+    private final Map<java.util.UUID, Location> spots = new HashMap<java.util.UUID, Location>();
     /** Сколько проверок подряд мир-копия стояла без игроков. */
     private final Map<String, Integer> idle = new HashMap<String, Integer>();
     /** Кэш spawns.yml: читаем с диска только когда файл менялся. */
@@ -255,6 +257,15 @@ final class Arenas implements Listener {
             out.add(copy);
         }
         return out;
+    }
+
+    /** Точка игрока в этом мире боя (куда его поставили), иначе null. */
+    Location spot(java.util.UUID id, String world) {
+        if (id == null || world == null) return null;
+        Location stored = spots.get(id);
+        if (stored == null || stored.getWorld() == null) return null;
+        if (!world.equals(stored.getWorld().getName())) return null;
+        return stored.clone();
     }
 
     /**
@@ -586,8 +597,11 @@ final class Arenas implements Listener {
             dx = 0;
             dz = 0;
         }
-        event.setTo(new Location(to.getWorld(), point.getX() + dx, point.getY(),
-                point.getZ() + dz, point.getYaw(), point.getPitch()));
+        Location target = new Location(to.getWorld(), point.getX() + dx, point.getY(),
+                point.getZ() + dz, point.getYaw(), point.getPitch());
+        event.setTo(target);
+        if (spots.size() > 256) spots.clear();
+        spots.put(teleported.getUniqueId(), target.clone());
     }
 
     /**
@@ -755,6 +769,15 @@ final class Arenas implements Listener {
     private void releaseWorld(String world) {
         Integer number = busy.remove(world);
         pairs.remove(world);
+        java.util.Iterator<java.util.Map.Entry<java.util.UUID, Location>> iterator =
+                spots.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Location value = iterator.next().getValue();
+            if (value == null || value.getWorld() == null
+                    || value.getWorld().getName().equals(world)) {
+                iterator.remove();
+            }
+        }
         if (number == null) return;
         reserved.remove(number);
         clearPending(number.intValue());

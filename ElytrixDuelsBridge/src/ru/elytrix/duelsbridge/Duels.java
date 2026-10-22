@@ -340,6 +340,7 @@ final class Duels {
                     new Class<?>[]{List.class, size.getClass(), arena.getClass(), kit.getClass()},
                     all, size, arena, kit);
             if (!ok) plugin.arenas().release(team);
+            else fixPartyTeams(team, size);
         }
         if (!ok) {
             plugin.msg(player, plugin.string("messages.start-failed",
@@ -553,6 +554,42 @@ final class Duels {
      * возвращаем правильные составы: пара A против пары B. Мир боя ещё
      * грузится, телепорт идёт следующим тиком — составы успевают примениться.
      */
+    /**
+     * 2 на 2 из меню партии: EpicDuels мешает состав случайно, поэтому пару
+     * снова ставим вместе — своя пара против двух других.
+     */
+    private void fixPartyTeams(List<UUID> members, Object size) {
+        Object total = call(size, "getTotalPlayers");
+        if (!(total instanceof Number) || ((Number) total).intValue() != 4) return;
+        if (members.size() < 4) return;
+        List<UUID> four = new ArrayList<UUID>(members.subList(0, 4));
+        UUID first = null;
+        UUID second = null;
+        for (UUID id : four) {
+            UUID mate = plugin.teams().partnerOf(id);
+            if (mate == null || mate.equals(id) || !four.contains(mate)) continue;
+            first = id;
+            second = mate;
+            break;
+        }
+        List<UUID> teamA = new ArrayList<UUID>(2);
+        List<UUID> teamB = new ArrayList<UUID>(2);
+        if (first != null) {
+            teamA.add(first);
+            teamA.add(second);
+            for (UUID id : four) {
+                if (!teamA.contains(id)) teamB.add(id);
+            }
+        } else {
+            teamA.add(four.get(0));
+            teamA.add(four.get(1));
+            teamB.add(four.get(2));
+            teamB.add(four.get(3));
+        }
+        if (teamA.size() != 2 || teamB.size() != 2) return;
+        fixTeams(teamA.get(0), teamA.get(1), teamB.get(0), teamB.get(1));
+    }
+
     boolean fixTeams(UUID a1, UUID a2, UUID b1, UUID b2) {
         Object instance = call(manager("getTeamDuelManager"), "getTeamDuelOf", a1);
         if (instance == null) return false;

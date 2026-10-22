@@ -243,7 +243,9 @@ final class ArenaRules implements Listener {
         Long last = pulledBack.get(id);
         if (last != null && now - last < 1000L) return;
         pulledBack.put(id, now);
-        player.teleport(bounds.nearestSpawn(location));
+        // вернуть на свою точку, а не на ближайшую чужую
+        Location own = plugin.arenas() == null ? null : plugin.arenas().spot(id, bounds.world);
+        player.teleport(own == null ? bounds.nearestSpawn(location) : own);
     }
 
     // -------------------------------------------------------------- события
