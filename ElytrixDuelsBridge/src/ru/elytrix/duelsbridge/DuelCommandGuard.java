@@ -37,8 +37,8 @@ final class DuelCommandGuard implements CommandExecutor, TabCompleter {
      */
     private static final Set<String> OURS = new HashSet<String>(Arrays.asList(
             "menu", "main", "stats", "stat", "pick", "target", "team", "party", "duo",
-            "kitmenu", "rounds", "queue", "matchmaking", "top", "bounds", "confirm",
-            "cancel", "kits", "open", "arena"));
+            "kitmenu", "kitedit", "rounds", "queue", "matchmaking", "top", "bounds",
+            "confirm", "cancel", "kits", "open", "arena"));
 
     private final ElytrixDuelsBridge plugin;
     private final CommandExecutor original;

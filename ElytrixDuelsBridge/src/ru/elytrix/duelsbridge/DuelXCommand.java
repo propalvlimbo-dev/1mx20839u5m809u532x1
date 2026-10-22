@@ -44,7 +44,7 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
      */
     static final List<String> SUBS = Arrays.asList(
             "menu", "main", "stats", "stat", "pick", "target", "team", "kit",
-            "kitmenu", "rounds", "queue", "top", "bounds", "confirm", "cancel",
+            "kitmenu", "kitedit", "rounds", "queue", "top", "bounds", "confirm", "cancel",
             "kits", "open", "arena");
 
     DuelXCommand(ElytrixDuelsBridge plugin) {
@@ -128,7 +128,17 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
             }
             if (sub.equals("kit")) {
                 if (args.length < 2) return usage(player, "/duelx kit <кит>");
+                if (kitEditor(player, args[1], args)) return true;
                 plugin.kit(player, args[1]);
+                return true;
+            }
+            if (sub.equals("kitedit")) {
+                if (!plugin.isAdmin(player)) {
+                    plugin.msg(player, "&#F8BEFBДуэли &8» &cТолько администратор.");
+                    return true;
+                }
+                if (args.length > 1) plugin.kits().edit(player, args[1]);
+                else plugin.kits().editMenu(player);
                 return true;
             }
             if (sub.equals("confirm")) {
@@ -218,12 +228,63 @@ public final class DuelXCommand implements CommandExecutor, TabCompleter {
 
     // ------------------------------------------------------------- tab list
 
+    /**
+     * Редактор наборов: /duelx kit edit|save|create|delete|rename|icon|reset|list.
+     * Действия — только для администраторов, иначе то же имя значит «выбрать кит».
+     */
+    private boolean kitEditor(Player player, String action, String[] args) {
+        String sub = plugin.lower(action);
+        boolean known = sub.equals("edit") || sub.equals("редактор") || sub.equals("save")
+                || sub.equals("create") || sub.equals("сохранить") || sub.equals("delete")
+                || sub.equals("remove") || sub.equals("удалить") || sub.equals("rename")
+                || sub.equals("переименовать") || sub.equals("icon") || sub.equals("иконка")
+                || sub.equals("reset") || sub.equals("сброс") || sub.equals("list")
+                || sub.equals("список");
+        if (!known) return false;
+        if (!plugin.isAdmin(player)) {
+            plugin.msg(player, "&#F8BEFBДуэли &8» &cТолько администратор.");
+            return true;
+        }
+        String name = args.length > 2 ? args[2] : null;
+        if (sub.equals("list") || sub.equals("список")) {
+            plugin.kits().list(player);
+            return true;
+        }
+        if (sub.equals("edit") || sub.equals("редактор")) {
+            if (name == null) plugin.kits().editMenu(player);
+            else plugin.kits().edit(player, name);
+            return true;
+        }
+        if (name == null) {
+            usage(player, "/duelx kit " + sub + " <кит>");
+            return true;
+        }
+        if (sub.equals("save") || sub.equals("create") || sub.equals("сохранить")) {
+            plugin.kits().save(player, name);
+            return true;
+        }
+        if (sub.equals("delete") || sub.equals("remove") || sub.equals("удалить")) {
+            plugin.kits().remove(player, name);
+            return true;
+        }
+        if (sub.equals("rename") || sub.equals("переименовать")) {
+            plugin.kits().rename(player, name, args.length > 3 ? args[3] : null);
+            return true;
+        }
+        if (sub.equals("icon") || sub.equals("иконка")) {
+            plugin.kits().icon(player, name);
+            return true;
+        }
+        plugin.kits().reset(player, name);
+        return true;
+    }
+
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
             return filter(args[0], Arrays.asList("menu", "stats", "pick", "target", "team", "kit",
-                    "kitmenu", "rounds", "queue", "top", "bounds", "confirm", "cancel", "kits",
-                    "open", "arena"));
+                    "kitmenu", "kitedit", "rounds", "queue", "top", "bounds", "confirm", "cancel",
+                    "kits", "open", "arena"));
         }
         if (args.length == 2) {
             String sub = plugin.lower(args[0]);

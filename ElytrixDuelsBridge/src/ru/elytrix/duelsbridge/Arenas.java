@@ -175,6 +175,20 @@ final class Arenas {
         String action = plugin.lower(args[0]);
         String name = args.length > 1 ? args[1] : null;
 
+        // нумерованные точки: setspawn1/2 — арена arena1, setspawn3/4 — arena2…
+        // мир один (duel), поэтому номер точки сам заводит нужную арену
+        java.util.regex.Matcher numbered =
+                java.util.regex.Pattern.compile("^(?:set)?spawn(\\d+)$").matcher(action);
+        if (numbered.matches() && name == null) {
+            spawnNumbered(player, Integer.parseInt(numbered.group(1)));
+            return;
+        }
+        if ((action.equals("setspawn") || action.equals("spawn")) && name != null
+                && name.matches("\\d+")) {
+            spawnNumbered(player, Integer.parseInt(name));
+            return;
+        }
+
         if (action.equals("list") || action.equals("список")) {
             list(player);
             return;
@@ -223,6 +237,29 @@ final class Arenas {
     }
 
     /**
+     * /duel arena setspawn<N>: точки идут парами. 1 и 2 — arena1, 3 и 4 —
+     * arena2, 5 и 6 — arena3. Новый мир не создаётся: всё в общем мире duel,
+     * у каждой арены просто свои две точки.
+     */
+    private void spawnNumbered(Player player, int number) {
+        if (number < 1) {
+            plugin.msg(player, "&#F8BEFBДуэли &8» &cНомер точки — с 1: &f/duel arena setspawn1");
+            return;
+        }
+        ensure();
+        int index = (number + 1) / 2;
+        boolean first = number % 2 == 1;
+        String arena = "arena" + index;
+        Object manager = duels.manager("getArenaManager");
+        if (Duels.call(manager, "getArena", arena) == null) {
+            if (!record(player, arena)) return;
+            plugin.msg(player, "&#F8BEFBДуэли &8» &fАрена &d" + arena
+                    + "&f заведена в мире &d" + sharedWorld() + "&f (новый мир не создаётся)");
+        }
+        spawn(player, arena, first, number);
+    }
+
+    /**
      * Имя арены для команды без аргумента: последняя, с которой работал админ,
      * иначе единственная недостроенная, иначе единственная вообще.
      */
@@ -256,12 +293,11 @@ final class Arenas {
         String world = sharedWorld().isEmpty() ? "не задан" : sharedWorld();
         plugin.msg(player, "&#F8BEFBАрены &8» &fмир: &#F8BEFB" + world
                 + "&7, общий мир арен: " + (applied ? "&aвключён" : "&cвыключен"));
-        plugin.msg(player, "&7● &f/duelx arena create &d<имя> &7— завести арену (миров не создаёт)");
-        plugin.msg(player, "&7● &f/duelx arena spawn1 &d<имя> &7— точка команды 1");
-        plugin.msg(player, "&7● &f/duelx arena spawn2 &d<имя> &7— точка команды 2");
-        plugin.msg(player, "&7● &f/duelx arena ready &d<имя> &7— включить в ротацию");
-        plugin.msg(player, "&7● &f/duel arena list &7· &fdelete &d<имя> &7· &ftp &d<имя>");
-        plugin.msg(player, "&7● &fродные &d/duel arena create|setspawn1|setspawn2|save &7тоже работают");
+        plugin.msg(player, "&7● &f/duel arena setspawn1 &7и &fsetspawn2 &7— точки арены &farena1");
+        plugin.msg(player, "&7● &fsetspawn3 &7и &fsetspawn4 &7— точки арены &farena2&7, &fsetspawn5/6 &7— &farena3");
+        plugin.msg(player, "&7● &f/duel arena list &7· &ftp &d<имя> &7· &fdelete &d<имя> &7· &fcreate &d<имя>");
+        plugin.msg(player, "&7● &fточки ставятся в мире &d" + world + "&7, новые миры не создаются");
+        plugin.msg(player, "&7● &fс именем: &f/duel arena spawn1 &d<имя> &7— точка 1 у своей арены");
     }
 
     private void list(Player player) {
@@ -337,6 +373,31 @@ final class Arenas {
     }
 
     private void spawn(Player player, String name, boolean first) {
+        spawn(player, name, first, 0);
+    }
+
+    /** Номер точки у арены с именем arenaN: 2N-1 и 2N. 0 — имя произвольное. */
+    private int numberedPoint(String name, boolean first) {
+        java.util.regex.Matcher matcher = java.util.regex.Pattern.compile("^arena(\\d+)$")
+                .matcher(name.toLowerCase(Locale.ROOT));
+        if (!matcher.matches()) return 0;
+        int index = Integer.parseInt(matcher.group(1));
+        return index * 2 - (first ? 1 : 0);
+    }
+
+    /** Первый номер точки, которую ещё не поставили (для подсказки). */
+    private int nextFreeNumber() {
+        Object manager = duels.manager("getArenaManager");
+        for (int index = 1; index < 64; index++) {
+            Object arena = Duels.call(manager, "getArena", "arena" + index);
+            if (arena == null) return index * 2 - 1;
+            if (Duels.call(arena, "getSpawn1") == null) return index * 2 - 1;
+            if (Duels.call(arena, "getSpawn2") == null) return index * 2;
+        }
+        return 1;
+    }
+
+    private void spawn(Player player, String name, boolean first, int number) {
         Object manager = duels.manager("getArenaManager");
         Object arena = Duels.call(manager, "getArena", name);
         if (arena == null) {
@@ -370,13 +431,21 @@ final class Arenas {
 
         // вторая точка поставлена — арена сразу в ротации, без отдельного save
         boolean both = Duels.call(arena, "getSpawn1") != null && Duels.call(arena, "getSpawn2") != null;
-        if (both && !Boolean.TRUE.equals(Duels.call(arena, "isReady"))) {
-            Duels.call(arena, "setReady", Boolean.TRUE);
-            Duels.call(manager, "saveArenas");
-            plugin.msg(player, "&#F8BEFBДуэли &8» &fАрена &d" + name
-                    + "&f готова — уже в ротации. Следующая арена: &f/duel arena setspawn1 arena2");
-        } else if (!both) {
-            plugin.msg(player, "&#F8BEFBДуэли &8» &7Осталась вторая точка: &f/duel arena setspawn2 " + name);
+        int current = number > 0 ? number : numberedPoint(name, first);
+        if (both) {
+            if (!Boolean.TRUE.equals(Duels.call(arena, "isReady"))) {
+                Duels.call(arena, "setReady", Boolean.TRUE);
+                Duels.call(manager, "saveArenas");
+                plugin.msg(player, "&#F8BEFBДуэли &8» &fАрена &d" + name
+                        + "&f готова — уже в ротации.");
+            }
+            plugin.msg(player, "&#F8BEFBДуэли &8» &7Следующая точка: &f/duel arena setspawn"
+                    + nextFreeNumber());
+        } else {
+            String hint = current > 0
+                    ? "/duel arena setspawn" + (current + 1)
+                    : "/duel arena spawn" + (first ? "2 " : "1 ") + name;
+            plugin.msg(player, "&#F8BEFBДуэли &8» &7Осталась вторая точка этой арены: &f" + hint);
         }
     }
 

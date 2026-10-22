@@ -16,7 +16,7 @@ plugins/BMenu/menu/elytrix/duel/
 └── confirm.yml      подтверждение боя / постановка пары в очередь
 ```
 
-Плюс мост `ElytrixDuelsBridge-1.8.0.jar`: он подменяет окна самого
+Плюс мост `ElytrixDuelsBridge-1.9.0.jar`: он подменяет окна самого
 EpicDuels на эти меню и рисует своё окно выбора игрока. Без моста `/duel` показывает меню плагина
 (перекрашенное, но без анимации BMenu).
 
@@ -45,11 +45,12 @@ EpicDuels на эти меню и рисует своё окно выбора и
       - дуэлипомощь
 ```
 
-3. Положить `ElytrixDuelsBridge-1.8.0.jar` в `plugins/` (нужны `EpicDuels`
+3. Положить `ElytrixDuelsBridge-1.9.0.jar` в `plugins/` (нужны `EpicDuels`
    и `BMenu`).
 4. Перезагрузить сервер.
 5. Проверить: `/duel` — должно открыться наше меню с анимацией.
-6. `/duelx kits reset` — киты 2.0 (3–5 предметов, у каждого свой перк); обычно накатываются сами.
+6. `/duelx kits reset` — киты 3.0 (полные сеты, зелья, лук/арбалет); обычно накатываются сами.
+   Состав правится в игре: `/duelx kit edit <кит>` или `/duelx kit save <кит>`.
 
 Топы для сайта мост пишет сам: `plugins/ElytrixDuelsBridge/tops.json`.
 Для кода — `ru.elytrix.duelsbridge.TopsApi.topByWins(10)`.

@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
@@ -25,7 +26,7 @@ final class Kits {
      * и в меню, и в сообщениях, и на скорборде.
      */
     /** Версия состава: при изменении киты пересоздаются сами (см. config kits.revision). */
-    static final int REVISION = 2;
+    static final int REVISION = 3;
 
     static final String[] NAMES = {
             "Классика", "УХК", "Гаппли", "Сумо", "Лучник",
@@ -223,125 +224,168 @@ final class Kits {
         };
     }
 
+    /** Питьевое зелье с одним эффектом: strength II = 90 секунд, уровень 2. */
+    private static ItemStack potion(Material type, int amount,
+                                    org.bukkit.potion.PotionEffectType effect, int seconds, int level) {
+        ItemStack stack = item(type, amount);
+        try {
+            org.bukkit.inventory.meta.ItemMeta raw = stack.getItemMeta();
+            if (!(raw instanceof org.bukkit.inventory.meta.PotionMeta)) return stack;
+            org.bukkit.inventory.meta.PotionMeta meta = (org.bukkit.inventory.meta.PotionMeta) raw;
+            meta.addCustomEffect(new org.bukkit.potion.PotionEffect(
+                    effect, Math.max(20, seconds * 20), Math.max(0, level - 1)), true);
+            stack.setItemMeta(meta);
+        } catch (Throwable ignored) {
+            // зелье без эффекта — не повод не выдать кит
+        }
+        return stack;
+    }
+
+    private static ItemStack drink(int amount, org.bukkit.potion.PotionEffectType effect,
+                                   int seconds, int level) {
+        return potion(Material.POTION, amount, effect, seconds, level);
+    }
+
     /**
-     * Состав наборов 2.0: 3–5 предметов вместо трёх стаков.
-     * Каждый кит решает одну задачу, поэтому в руках нет ничего «на всякий случай».
+     * Состав наборов 3.0: полные комплекты топ-уровня — незерит и алмаз
+     * с защитой 3–4, острота 4–5, тотемы, зелья и лук/арбалет почти везде.
+     * Сервер с лёгким развитием: в железе тут никто не воюет.
      */
     private static ItemStack[] contents(String name) {
         if (name.equals("sword")) {
-            // Классика: чистый бой на мечах — меч, яблоки, пёрлы
             return new ItemStack[]{
-                    boost(boost(item(Material.NETHERITE_SWORD, 1), "SHARPNESS", 3), "UNBREAKING", 3),
-                    item(Material.GOLDEN_APPLE, 6),
-                    item(Material.ENDER_PEARL, 3)};
+                    boost(boost(item(Material.NETHERITE_SWORD, 1), "SHARPNESS", 5), "UNBREAKING", 3),
+                    boost(item(Material.BOW, 1), "POWER", 3),
+                    item(Material.ARROW, 16),
+                    item(Material.GOLDEN_APPLE, 8),
+                    item(Material.ENDER_PEARL, 4),
+                    item(Material.TOTEM_OF_UNDYING, 1),
+                    drink(2, org.bukkit.potion.PotionEffectType.STRENGTH, 90, 2),
+                    drink(2, org.bukkit.potion.PotionEffectType.SPEED, 120, 2)};
         }
         if (name.equals("uhc")) {
-            // УХК: меч + лук, как в выживании
             return new ItemStack[]{
-                    boost(boost(item(Material.DIAMOND_SWORD, 1), "SHARPNESS", 3), "UNBREAKING", 3),
-                    boost(item(Material.BOW, 1), "POWER", 3),
-                    item(Material.ARROW, 12),
-                    item(Material.GOLDEN_APPLE, 3),
-                    item(Material.ENDER_PEARL, 3)};
+                    boost(boost(item(Material.DIAMOND_SWORD, 1), "SHARPNESS", 4), "UNBREAKING", 3),
+                    boost(boost(item(Material.BOW, 1), "POWER", 4), "PUNCH", 1),
+                    boost(item(Material.CROSSBOW, 1), "QUICK_CHARGE", 2),
+                    item(Material.ARROW, 32),
+                    item(Material.GOLDEN_APPLE, 6),
+                    item(Material.ENDER_PEARL, 4),
+                    item(Material.TOTEM_OF_UNDYING, 1),
+                    drink(1, org.bukkit.potion.PotionEffectType.REGENERATION, 45, 2)};
         }
         if (name.equals("gapple")) {
-            // Гаппли: один стак яблок решает бой
             return new ItemStack[]{
-                    boost(boost(item(Material.DIAMOND_SWORD, 1), "SHARPNESS", 3), "UNBREAKING", 3),
-                    item(Material.GOLDEN_APPLE, 24),
-                    item(Material.ENDER_PEARL, 3)};
+                    boost(boost(item(Material.DIAMOND_SWORD, 1), "SHARPNESS", 4), "UNBREAKING", 3),
+                    boost(boost(item(Material.CROSSBOW, 1), "QUICK_CHARGE", 3), "MULTISHOT", 1),
+                    item(Material.ARROW, 16),
+                    item(Material.GOLDEN_APPLE, 32),
+                    item(Material.ENDER_PEARL, 6),
+                    item(Material.TOTEM_OF_UNDYING, 1),
+                    drink(2, org.bukkit.potion.PotionEffectType.STRENGTH, 90, 2)};
         }
         if (name.equals("sumo")) {
-            // Сумо: без брони, только отбрасывание
+            // без брони, один только отбрасывающий удар
             return new ItemStack[]{
-                    boost(item(Material.STONE_SWORD, 1), "KNOCKBACK", 2),
-                    item(Material.ENDER_PEARL, 2)};
+                    boost(item(Material.NETHERITE_SWORD, 1), "KNOCKBACK", 2),
+                    item(Material.ENDER_PEARL, 4),
+                    drink(2, org.bukkit.potion.PotionEffectType.SPEED, 120, 2),
+                    drink(2, org.bukkit.potion.PotionEffectType.JUMP_BOOST, 120, 2)};
         }
         if (name.equals("archer")) {
-            // Лучник: держит дистанцию, вблизи слабый меч
             return new ItemStack[]{
-                    boost(boost(item(Material.BOW, 1), "POWER", 4), "PUNCH", 1),
-                    item(Material.ARROW, 16),
-                    boost(item(Material.STONE_SWORD, 1), "SHARPNESS", 2),
-                    item(Material.ENDER_PEARL, 4)};
+                    boost(boost(boost(item(Material.BOW, 1), "POWER", 5), "PUNCH", 2), "FLAME", 1),
+                    item(Material.ARROW, 48),
+                    boost(item(Material.DIAMOND_SWORD, 1), "SHARPNESS", 3),
+                    item(Material.ENDER_PEARL, 6),
+                    item(Material.GOLDEN_APPLE, 4),
+                    item(Material.TOTEM_OF_UNDYING, 1),
+                    drink(2, org.bukkit.potion.PotionEffectType.SPEED, 120, 2)};
         }
         if (name.equals("mace")) {
-            // Булава: прыжок сверху и ветряные заряды
             return new ItemStack[]{
-                    boost(boost(item(Material.MACE, 1), "DENSITY", 4), "UNBREAKING", 3),
-                    item(Material.WIND_CHARGE, 8),
-                    item(Material.GOLDEN_APPLE, 3),
-                    item(Material.ENDER_PEARL, 3)};
+                    boost(boost(item(Material.MACE, 1), "DENSITY", 5), "UNBREAKING", 3),
+                    item(Material.WIND_CHARGE, 16),
+                    boost(item(Material.BOW, 1), "POWER", 3),
+                    item(Material.ARROW, 16),
+                    item(Material.GOLDEN_APPLE, 6),
+                    item(Material.ENDER_PEARL, 4),
+                    item(Material.TOTEM_OF_UNDYING, 1),
+                    drink(1, org.bukkit.potion.PotionEffectType.STRENGTH, 90, 2)};
         }
         if (name.equals("axe")) {
-            // Топор: щит в левой руке и пробивающий удар
             return new ItemStack[]{
-                    boost(boost(item(Material.NETHERITE_AXE, 1), "SHARPNESS", 3), "UNBREAKING", 3),
-                    item(Material.GOLDEN_APPLE, 4),
-                    item(Material.ENDER_PEARL, 3)};
+                    boost(boost(item(Material.NETHERITE_AXE, 1), "SHARPNESS", 5), "UNBREAKING", 3),
+                    boost(item(Material.CROSSBOW, 1), "QUICK_CHARGE", 3),
+                    item(Material.ARROW, 16),
+                    item(Material.GOLDEN_APPLE, 6),
+                    item(Material.ENDER_PEARL, 4),
+                    item(Material.TOTEM_OF_UNDYING, 1),
+                    drink(1, org.bukkit.potion.PotionEffectType.SPEED, 120, 2)};
         }
         if (name.equals("trident")) {
-            // Тризуб: дальний удар и возврат копья
             return new ItemStack[]{
                     boost(boost(boost(item(Material.TRIDENT, 1), "IMPALING", 5), "LOYALTY", 3),
                             "UNBREAKING", 3),
-                    item(Material.ENDER_PEARL, 4),
-                    item(Material.GOLDEN_APPLE, 3)};
+                    boost(item(Material.BOW, 1), "POWER", 3),
+                    item(Material.ARROW, 16),
+                    item(Material.ENDER_PEARL, 6),
+                    item(Material.GOLDEN_APPLE, 4),
+                    item(Material.TOTEM_OF_UNDYING, 1),
+                    drink(2, org.bukkit.potion.PotionEffectType.SPEED, 120, 2)};
         }
         if (name.equals("crossbow")) {
-            // Арбалет: три болта за выстрел на быстрой перезарядке
             return new ItemStack[]{
                     boost(boost(boost(item(Material.CROSSBOW, 1), "QUICK_CHARGE", 3), "MULTISHOT", 1),
-                            "UNBREAKING", 3),
-                    item(Material.ARROW, 12),
-                    boost(item(Material.STONE_SWORD, 1), "SHARPNESS", 2),
-                    item(Material.GOLDEN_APPLE, 2)};
+                            "PIERCING", 4),
+                    item(Material.ARROW, 32),
+                    boost(item(Material.DIAMOND_SWORD, 1), "SHARPNESS", 3),
+                    item(Material.ENDER_PEARL, 6),
+                    item(Material.GOLDEN_APPLE, 4),
+                    item(Material.TOTEM_OF_UNDYING, 1),
+                    drink(2, org.bukkit.potion.PotionEffectType.SPEED, 120, 2)};
         }
-        // Незерит: танк — сет, тотем и яблоки
+        // Незерит: танк
         return new ItemStack[]{
-                boost(boost(item(Material.NETHERITE_SWORD, 1), "SHARPNESS", 3), "UNBREAKING", 3),
-                item(Material.GOLDEN_APPLE, 4),
-                item(Material.ENDER_PEARL, 2)};
+                boost(boost(item(Material.NETHERITE_SWORD, 1), "SHARPNESS", 4), "UNBREAKING", 3),
+                boost(item(Material.BOW, 1), "POWER", 3),
+                item(Material.ARROW, 16),
+                item(Material.GOLDEN_APPLE, 8),
+                item(Material.ENDER_PEARL, 4),
+                item(Material.TOTEM_OF_UNDYING, 1),
+                drink(2, org.bukkit.potion.PotionEffectType.FIRE_RESISTANCE, 180, 1),
+                drink(1, org.bukkit.potion.PotionEffectType.REGENERATION, 45, 2)};
     }
 
     private static ItemStack[] armor(String name) {
         if (name.equals("sumo")) {
             return new ItemStack[0];
         }
-        if (name.equals("gapple") || name.equals("axe")) {
-            return suit(Material.DIAMOND_BOOTS, Material.DIAMOND_LEGGINGS,
-                    Material.DIAMOND_CHESTPLATE, Material.DIAMOND_HELMET, "PROTECTION", 2);
-        }
         if (name.equals("netherite")) {
             return suit(Material.NETHERITE_BOOTS, Material.NETHERITE_LEGGINGS,
-                    Material.NETHERITE_CHESTPLATE, Material.NETHERITE_HELMET, "PROTECTION", 3);
+                    Material.NETHERITE_CHESTPLATE, Material.NETHERITE_HELMET, "PROTECTION", 4);
+        }
+        if (name.equals("sword") || name.equals("axe") || name.equals("mace")) {
+            return boot(suit(Material.NETHERITE_BOOTS, Material.NETHERITE_LEGGINGS,
+                    Material.NETHERITE_CHESTPLATE, Material.NETHERITE_HELMET, "PROTECTION", 3),
+                    "FEATHER_FALLING", name.equals("mace") ? 4 : 3);
         }
         if (name.equals("archer")) {
-            return suit(Material.LEATHER_BOOTS, Material.LEATHER_LEGGINGS,
-                    Material.LEATHER_CHESTPLATE, Material.LEATHER_HELMET, "PROTECTION", 2);
-        }
-        if (name.equals("crossbow")) {
-            return suit(Material.CHAINMAIL_BOOTS, Material.CHAINMAIL_LEGGINGS,
-                    Material.CHAINMAIL_CHESTPLATE, Material.CHAINMAIL_HELMET, "PROTECTION", 2);
-        }
-        if (name.equals("mace")) {
-            // падать сверху безопасно: ботинки с перьевым падением
-            return boot(suit(Material.IRON_BOOTS, Material.IRON_LEGGINGS,
-                    Material.IRON_CHESTPLATE, Material.IRON_HELMET, "PROTECTION", 2),
-                    "FEATHER_FALLING", 4);
-        }
-        if (name.equals("uhc")) {
-            return boot(suit(Material.IRON_BOOTS, Material.IRON_LEGGINGS,
-                    Material.IRON_CHESTPLATE, Material.IRON_HELMET, "PROTECTION", 2),
-                    "FEATHER_FALLING", 3);
+            return suit(Material.DIAMOND_BOOTS, Material.DIAMOND_LEGGINGS,
+                    Material.DIAMOND_CHESTPLATE, Material.DIAMOND_HELMET, "PROTECTION", 3);
         }
         if (name.equals("trident")) {
-            return boot(suit(Material.IRON_BOOTS, Material.IRON_LEGGINGS,
-                    Material.IRON_CHESTPLATE, Material.IRON_HELMET, "PROTECTION", 2),
+            return boot(suit(Material.DIAMOND_BOOTS, Material.DIAMOND_LEGGINGS,
+                    Material.DIAMOND_CHESTPLATE, Material.DIAMOND_HELMET, "PROTECTION", 4),
                     "DEPTH_STRIDER", 3);
         }
-        return suit(Material.IRON_BOOTS, Material.IRON_LEGGINGS,
-                Material.IRON_CHESTPLATE, Material.IRON_HELMET, "PROTECTION", 2);
+        if (name.equals("uhc")) {
+            return boot(suit(Material.DIAMOND_BOOTS, Material.DIAMOND_LEGGINGS,
+                    Material.DIAMOND_CHESTPLATE, Material.DIAMOND_HELMET, "PROTECTION", 4),
+                    "FEATHER_FALLING", 4);
+        }
+        return suit(Material.DIAMOND_BOOTS, Material.DIAMOND_LEGGINGS,
+                Material.DIAMOND_CHESTPLATE, Material.DIAMOND_HELMET, "PROTECTION", 4);
     }
 
     private static ItemStack[] boot(ItemStack[] suit, String enchant, int level) {
@@ -353,5 +397,186 @@ final class Kits {
         if (name.equals("axe")) return item(Material.SHIELD, 1);
         if (name.equals("netherite")) return item(Material.TOTEM_OF_UNDYING, 1);
         return null;
+    }
+
+    // ----------------------------------------------------------- редактор китов
+
+    /** Все киты сервера списком: имя и сколько предметов в наборе. */
+    void list(Player player) {
+        Object manager = plugin.duels().manager("getKitManager");
+        if (manager == null) {
+            plugin.msg(player, "&#F8BEFBДуэли &8» &cEpicDuels не отдал KitManager.");
+            return;
+        }
+        Object names = Duels.call(manager, "getKitNames");
+        if (!(names instanceof java.util.List) || ((java.util.List<?>) names).isEmpty()) {
+            plugin.msg(player, "&#F8BEFBДуэли &8» &cКитов нет: /duelx kits reset");
+            return;
+        }
+        plugin.msg(player, "&#F8BEFBКиты &8» &fвсего &d" + ((java.util.List<?>) names).size());
+        for (Object row : (java.util.List<?>) names) {
+            if (row == null) continue;
+            String name = String.valueOf(row);
+            Object kit = Duels.call(manager, "getKit", name);
+            ItemStack[] contents = kit == null ? null : (ItemStack[]) Duels.call(kit, "getContents");
+            int count = 0;
+            if (contents != null) {
+                for (ItemStack stack : contents) {
+                    if (stack != null) count++;
+                }
+            }
+            plugin.msg(player, "&7● &f" + name + " &7— предметов: &f" + count);
+        }
+        plugin.msg(player, "&7ред.: &f/duelx kit edit <кит> &7· сохранить из инвентаря: &f/duelx kit save <кит>");
+    }
+
+    /** Полноценный редактор EpicDuels: перетащить вещи и нажать «Save Kit». */
+    void edit(Player player, String name) {
+        Object kit = kitOf(name);
+        if (kit == null) {
+            plugin.msg(player, "&#F8BEFBДуэли &8» &cКита &f" + name + "&c нет.");
+            return;
+        }
+        if (!openedBoolean(plugin.duels().gui(), player, kit)) {
+            plugin.msg(player, "&#F8BEFBДуэли &8» &cРедактор EpicDuels недоступен: обнови EpicDuels-ElyTriX.");
+        }
+    }
+
+    /** Список китов в родном редакторе EpicDuels (страницы). */
+    void editMenu(Player player) {
+        Object gui = plugin.duels().gui();
+        Duels.call(gui, "openKitEditorList", player, Integer.valueOf(0));
+    }
+
+    /** Сохранить кит из своего инвентаря: 36 слотов, броня и левая рука. */
+    void save(Player player, String name) {
+        Object manager = plugin.duels().manager("getKitManager");
+        if (manager == null) {
+            plugin.msg(player, "&#F8BEFBДуэли &8» &cEpicDuels не отдал KitManager.");
+            return;
+        }
+        String kitName = canonical(name);
+        org.bukkit.inventory.PlayerInventory inventory = player.getInventory();
+        if (inventory == null) return;
+        ItemStack[] contents = inventory.getContents();
+        ItemStack[] armor = inventory.getArmorContents();
+        ItemStack offHand = inventory.getItemInOffHand();
+        boolean empty = true;
+        if (contents != null) {
+            for (ItemStack stack : contents) {
+                if (stack != null && stack.getType() != Material.AIR) empty = false;
+            }
+        }
+        if (empty) {
+            plugin.msg(player, "&#F8BEFBДуэли &8» &cВозьми в инвентарь вещи для набора и повтори: &f/duelx kit save " + kitName);
+            return;
+        }
+        Object existing = Duels.call(manager, "getKit", kitName);
+        if (existing == null) {
+            Duels.call(manager, "createKit", kitName, (Object) contents, (Object) armor, offHand);
+        } else {
+            Duels.call(existing, "setContents", (Object) contents);
+            Duels.call(existing, "setArmorContents", (Object) armor);
+            Duels.call(existing, "setOffHand", offHand);
+            Duels.call(manager, "updateKit", existing);
+        }
+        Duels.call(manager, "saveKits");
+        plugin.msg(player, "&#F8BEFBДуэли &8» &fКит &d" + kitName + "&f сохранён из инвентаря.");
+    }
+
+    /** Удалить кит. */
+    void remove(Player player, String name) {
+        Object manager = plugin.duels().manager("getKitManager");
+        String kitName = canonical(name);
+        if (manager == null || Duels.call(manager, "getKit", kitName) == null) {
+            plugin.msg(player, "&#F8BEFBДуэли &8» &cКита &f" + name + "&c нет.");
+            return;
+        }
+        Duels.call(manager, "deleteKit", kitName);
+        Duels.call(manager, "saveKits");
+        plugin.msg(player, "&#F8BEFBДуэли &8» &fКит &d" + kitName + "&f удалён.");
+    }
+
+    /** Переименовать кит (имя — это и есть id). */
+    void rename(Player player, String from, String to) {
+        if (to == null || to.trim().isEmpty()) {
+            plugin.msg(player, "&#F8BEFBДуэли &8» &cУкажи новое имя: &f/duelx kit rename <старое> <новое>");
+            return;
+        }
+        Object manager = plugin.duels().manager("getKitManager");
+        Object error = Duels.call(manager, "renameKit", canonical(from), to.trim());
+        if (error != null) {
+            plugin.msg(player, "&#F8BEFBДуэли &8» &cНе вышло: &f" + error);
+            return;
+        }
+        plugin.msg(player, "&#F8BEFBДуэли &8» &fКит &d" + canonical(from) + "&f теперь &d" + to.trim());
+    }
+
+    /** Иконка кита — предмет из руки (видно только родному меню EpicDuels). */
+    void icon(Player player, String name) {
+        Object kit = kitOf(name);
+        if (kit == null) {
+            plugin.msg(player, "&#F8BEFBДуэли &8» &cКита &f" + name + "&c нет.");
+            return;
+        }
+        org.bukkit.inventory.PlayerInventory inventory = player.getInventory();
+        ItemStack hand = inventory == null ? null : inventory.getItemInMainHand();
+        if (hand == null || hand.getType() == null || hand.getType() == Material.AIR) {
+            plugin.msg(player, "&#F8BEFBДуэли &8» &cВозьми предмет в руку.");
+            return;
+        }
+        Duels.call(kit, "setIcon", hand.getType());
+        Duels.call(plugin.duels().manager("getKitManager"), "saveKits");
+        plugin.msg(player, "&#F8BEFBДуэли &8» &fИконка кита &d" + canonical(name) + "&f: &d" + hand.getType());
+    }
+
+    /** Вернуть стандартный состав одного кита из этой версии моста. */
+    void reset(Player player, String name) {
+        Object manager = plugin.duels().manager("getKitManager");
+        String kitName = canonical(name);
+        String legacy = legacyOf(kitName);
+        if (legacy == null) {
+            plugin.msg(player, "&#F8BEFBДуэли &8» &cСтандартный состав есть только у десяти базовых: &f"
+                    + String.join(", ", NAMES));
+            return;
+        }
+        Duels.call(manager, "deleteKit", kitName);
+        Duels.call(manager, "createKit", kitName, (Object) contents(legacy), (Object) armor(legacy), offhand(legacy));
+        Object created = Duels.call(manager, "getKit", kitName);
+        if (created != null) {
+            for (int index = 0; index < NAMES.length; index++) {
+                if (NAMES[index].equalsIgnoreCase(kitName)) Duels.call(created, "setIcon", ICONS[index]);
+            }
+        }
+        Duels.call(manager, "saveKits");
+        plugin.msg(player, "&#F8BEFBДуэли &8» &fКит &d" + kitName + "&f снова стандартный.");
+    }
+
+    /** Кит по русскому или английскому имени. */
+    Object kitOf(String name) {
+        Object manager = plugin.duels().manager("getKitManager");
+        if (manager == null || name == null) return null;
+        Object kit = Duels.call(manager, "getKit", canonical(name));
+        if (kit == null) kit = Duels.call(manager, "getKit", name.trim());
+        return kit;
+    }
+
+    /** Родной openKitEdit ничего не возвращает — отличаем «нет метода» от «открыл». */
+    private boolean openedBoolean(Object gui, Player player, Object kit) {
+        try {
+            java.lang.reflect.Method method = null;
+            for (java.lang.reflect.Method candidate : gui.getClass().getMethods()) {
+                if (candidate.getName().equals("openKitEdit") && candidate.getParameterCount() == 2) {
+                    method = candidate;
+                    break;
+                }
+            }
+            if (method == null) return false;
+            method.setAccessible(true);
+            method.invoke(gui, player, kit);
+            return true;
+        } catch (Throwable error) {
+            return false;
+        }
     }
 }

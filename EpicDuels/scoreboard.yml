@@ -18,7 +18,6 @@ views:
       - '<#F8BEFB><bold>┃</bold> <gray>● <white><opponent>'
       - ''
       - '<#F8BEFB><bold>┃</bold> <white>Кит: <#F8BEFB><kit>'
-      - '<#F8BEFB><bold>┃</bold> <white>Карта: <#F8BEFB><arena>'
       - '<#F8BEFB><bold>┃</bold> <white>Раунд: <#F8BEFB><round> <dark_gray>/ <best_of>'
       - '<#F8BEFB><bold>┃</bold> <white>Счёт: <green><score> <dark_gray>: <red><opponent_score>'
       - ''

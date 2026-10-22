@@ -34,19 +34,20 @@ final class Effects implements Listener {
     private static final Map<String, String[]> DEFAULTS = new HashMap<String, String[]>();
 
     /**
-     * Перки 2.0: у каждого кита своя роль, а не «скорость всем».
-     *   Классика — ровный бой; Гаппли — живучесть; Сумо — мобильность;
-     *   Лучник и Тризуб — дистанция; Булава — вертикаль; Незерит — танк.
+     * Перки 3.0: постоянный бонус слабее зелий из набора — зелья дают
+     * всплеск на 1–3 минуты, перк работает весь бой.
+     *   Гаппли — поглощение, Сумо — мобильность, Незерит — танк,
+     *   остальные — ровная скорость I.
      */
     static {
         DEFAULTS.put("классика", new String[]{"SPEED:1"});
         DEFAULTS.put("ухк", new String[]{"SPEED:1"});
         DEFAULTS.put("гаппли", new String[]{"ABSORPTION:1"});
         DEFAULTS.put("сумо", new String[]{"SPEED:2", "JUMP_BOOST:1"});
-        DEFAULTS.put("лучник", new String[]{"SPEED:2"});
+        DEFAULTS.put("лучник", new String[]{"SPEED:1"});
         DEFAULTS.put("булава", new String[]{"SPEED:1"});
         DEFAULTS.put("топор", new String[]{"SPEED:1"});
-        DEFAULTS.put("тризуб", new String[]{"SPEED:2"});
+        DEFAULTS.put("тризуб", new String[]{"SPEED:1"});
         DEFAULTS.put("арбалет", new String[]{"SPEED:1"});
         DEFAULTS.put("незерит", new String[]{"RESISTANCE:1"});
     }

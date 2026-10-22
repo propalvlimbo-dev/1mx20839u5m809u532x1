@@ -866,6 +866,10 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         return menus;
     }
 
+    Kits kits() {
+        return kits;
+    }
+
     String string(String path, String fallback) {
         String value = getConfig().getString(path);
         return value == null ? fallback : value;

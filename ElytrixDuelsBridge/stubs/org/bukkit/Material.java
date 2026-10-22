@@ -1,9 +1,12 @@
 package org.bukkit;
 public enum Material {
+    AIR,
     PLAYER_HEAD,
     PAPER,
     GRASS_BLOCK,
     ARROW,
+    POTION,
+    SPLASH_POTION,
     SHIELD,
     BOW,
     CROSSBOW,

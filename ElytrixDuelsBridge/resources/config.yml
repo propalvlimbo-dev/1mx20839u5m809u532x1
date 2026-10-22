@@ -23,6 +23,7 @@ menus:
 # Пересоздать: /duelx kits reset
 kits:
   auto-install: true
+  revision: 3             # служебное: при смене состава киты пересоздаются один раз
   names:
     - Классика
     - УХК
@@ -82,10 +83,11 @@ buffs:
   enabled: true
   duration-seconds: 900      # 15 минут — дольше любого боя
   clear-on-leave: true
-  # свои значения на кит, например:
+  # Уровень = римская цифра (SPEED:2 — скорость II).
+  # Свои значения на кит, например:
   # per-kit:
   #   булава: [SPEED:2]
-  #   сумо: [SPEED:3, JUMP_BOOST:2]
+  #   сумо: [SPEED:2, JUMP_BOOST:2]
 
 # Правила на боевых копиях арен (arena_instance_*),
 # в шаблонах arena_template_* строительство остаётся доступным.
