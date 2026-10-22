@@ -113,6 +113,30 @@ final class CommandGuard implements Listener {
         });
     }
 
+    /**
+     * EpicDuels на время боя держит слепок инвентаря и глушит ВСЕ команды,
+     * включая админские. Администраторам не мешаем: гасим событие и
+     * выполняем команду сами (следующим тиком).
+     */
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onAdminCommand(PlayerCommandPreprocessEvent event) {
+        Player player = event.getPlayer();
+        if (player == null || !plugin.isAdmin(player)) return;
+        if (!plugin.duels().hasBackup(player)) return;
+        String message = event.getMessage();
+        if (message == null || !message.startsWith("/")) return;
+        final String command = message.substring(1).trim();
+        if (command.isEmpty()) return;
+        event.setCancelled(true);
+        final Player who = player;
+        Bukkit.getScheduler().runTask(plugin, new Runnable() {
+            @Override
+            public void run() {
+                who.performCommand(command);
+            }
+        });
+    }
+
     @EventHandler
     public void onSend(PlayerCommandSendEvent event) {
         if (!enabled() || !plugin.getConfig().getBoolean("command-guard.hide-tab", true)) return;

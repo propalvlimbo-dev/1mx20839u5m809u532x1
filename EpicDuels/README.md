@@ -18,7 +18,7 @@
 | `lang/messages_ru.yml` | `plugins/EpicDuels/lang/messages_ru.yml` |
 | `КИТЫ.md` | инструкция: 10 китов |
 | `АРЕНЫ.md` | инструкция: перенос арен из мира `duel` |
-| `downloads/EpicDuels-ElyTriX-3.1.1.jar` | `plugins/EpicDuels-ElyTriX-3.1.1.jar` |
+| `downloads/EpicDuels-ElyTriX-3.1.2.jar` | `plugins/EpicDuels-ElyTriX-3.1.2.jar` |
 
 ## Установка
 

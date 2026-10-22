@@ -41,6 +41,29 @@ final class Duels {
         return call(epic(), getter);
     }
 
+    /**
+     * EpicDuels держит слепок инвентаря (backup) с начала боя до возврата в
+     * лобби и на это время глушит все команды. Так узнаём это состояние.
+     */
+    boolean hasBackup(Player player) {
+        if (player == null) return false;
+        Object manager = manager("getInventoryBackupManager");
+        if (manager == null) return inDuel(player);
+        Object value = call(manager, "hasBackup", player.getUniqueId());
+        if (value instanceof Boolean) return ((Boolean) value).booleanValue();
+        return inDuel(player);
+    }
+
+    /** Идёт ли у игрока бой. */
+    boolean inDuel(Player player) {
+        if (player == null) return false;
+        Object duel = call(manager("getDuelManager"), "getDuel", player.getUniqueId());
+        if (duel == null) {
+            duel = call(manager("getTeamDuelManager"), "getTeamDuelOf", player.getUniqueId());
+        }
+        return duel != null;
+    }
+
     static Object call(Object target, String method, Object... args) {
         if (target == null) return null;
         try {

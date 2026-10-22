@@ -57,6 +57,7 @@ final class ArenaGuard implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
         if (!plugin.getConfig().getBoolean("protection.block-place", true)) return;
+        if (plugin.isAdmin(event.getPlayer())) return;
         if (!arena(event.getBlock().getWorld().getName())) return;
         event.setCancelled(true);
         warn(event.getPlayer());
@@ -65,6 +66,7 @@ final class ArenaGuard implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBucketEmpty(PlayerBucketEmptyEvent event) {
         if (!plugin.getConfig().getBoolean("protection.block-place", true)) return;
+        if (plugin.isAdmin(event.getPlayer())) return;
         if (!arena(event.getBlock().getWorld().getName())) return;
         event.setCancelled(true);
         warn(event.getPlayer());

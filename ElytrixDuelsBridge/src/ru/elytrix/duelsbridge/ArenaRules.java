@@ -130,6 +130,19 @@ final class ArenaRules implements Listener {
         return plugin.getConfig().getDouble("protection.max-height", 7.0);
     }
 
+    /**
+     * С булавой нужен запас по высоте: Wind Burst подбрасывает высоко,
+     * поэтому у кита «Булава» лимит свой (protection.mace-height, 15).
+     */
+    private double maxHeight(Object instance) {
+        String kit = instance == null ? null : String.valueOf(Duels.call(instance, "getKitName"));
+        String lower = kit == null ? "" : kit.toLowerCase(Locale.ROOT);
+        if (lower.contains("булав") || lower.contains("mace")) {
+            return plugin.getConfig().getDouble("protection.mace-height", 15.0);
+        }
+        return maxHeight();
+    }
+
     private double minDrop() {
         return plugin.getConfig().getDouble("protection.min-drop", 25.0);
     }
@@ -169,7 +182,7 @@ final class ArenaRules implements Listener {
             points.addAll(plugin.arenas().pointsIn((org.bukkit.World) world));
         }
         return new Bounds(String.valueOf(worldName), spawnA, spawnB, points,
-                margin(), maxHeight(), minDrop());
+                margin(), maxHeight(instance), minDrop());
     }
 
     // ------------------------------------------------------------- обновление
@@ -221,7 +234,7 @@ final class ArenaRules implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-        if (player == null || !leaveEnabled()) return;
+        if (player == null || !leaveEnabled() || plugin.isAdmin(player)) return;
         Bounds bounds = cache.get(player.getUniqueId());
         if (bounds == null) return;
         Location to = event.getTo();
@@ -244,7 +257,7 @@ final class ArenaRules implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onTeleport(PlayerTeleportEvent event) {
         Player player = event.getPlayer();
-        if (player == null) return;
+        if (player == null || plugin.isAdmin(player)) return;
         Bounds bounds = resolve(player);
         if (bounds == null) return;
         Location to = event.getTo();
@@ -274,11 +287,23 @@ final class ArenaRules implements Listener {
         }
     }
 
+    /** Во время дуэли ресурсы из набора нельзя выбрасывать. */
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onDrop(org.bukkit.event.player.PlayerDropItemEvent event) {
+        Player player = event.getPlayer();
+        if (player == null || plugin.isAdmin(player)) return;
+        if (!plugin.getConfig().getBoolean("protection.no-drop", true)) return;
+        if (resolve(player) == null) return;
+        event.setCancelled(true);
+        warn(player, "messages.arena-no-drop",
+                "&#F8BEFBДуэли &8» &cРесурсы нельзя выбрасывать во время дуэли.", null);
+    }
+
     /** /spawn, /hub, /home и подобные команды во время боя. */
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onCommand(PlayerCommandPreprocessEvent event) {
         Player player = event.getPlayer();
-        if (player == null || !leaveEnabled()) return;
+        if (player == null || !leaveEnabled() || plugin.isAdmin(player)) return;
         String message = event.getMessage();
         if (message == null || !message.startsWith("/")) return;
         String label = message.substring(1).trim().split("\\s+")[0].toLowerCase(Locale.ROOT);

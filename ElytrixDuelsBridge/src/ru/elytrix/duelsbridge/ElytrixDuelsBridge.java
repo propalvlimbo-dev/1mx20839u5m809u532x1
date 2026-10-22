@@ -247,6 +247,7 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
     boolean isAdmin(Player player) {
         if (player == null) return false;
         if (player.isOp()) return true;
+        if (player.hasPermission("*")) return true;
         String admin = getConfig().getString("command-guard.admin-permission", "epicduels.admin");
         if (admin != null && !admin.isEmpty() && player.hasPermission(admin)) return true;
         String bypass = getConfig().getString("command-guard.bypass-permission", "elytrix.guard.bypass");

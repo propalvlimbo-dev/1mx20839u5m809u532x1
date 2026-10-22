@@ -24,7 +24,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
  * Одна арена в готовом мире и сколько угодно точек спавна.
  *
  * Обычный EpicDuels требует по миру на арену. В нашем билде
- * EpicDuels-ElyTriX-3.1.1 у Arena есть общий мир, поэтому арена одна —
+ * EpicDuels-ElyTriX-3.1.2 у Arena есть общий мир, поэтому арена одна —
  * arena1 в мире duel, — а точек спавна сколько угодно. Мост хранит их в
  * spawns.yml (номер точки = строка списка) и на каждый бой выбирает
  * случайную пару: телепорт EpicDuels подменяется на выбранные точки.
@@ -101,7 +101,7 @@ final class Arenas implements Listener {
             Class<?> arena = Class.forName("dev.epicduels.model.Arena");
             arena.getMethod("setDefaultWorld", String.class).invoke(null, world);
         } catch (Throwable error) {
-            plugin.getLogger().warning("Арены: нужен EpicDuels-ElyTriX-3.1.1.jar "
+            plugin.getLogger().warning("Арены: нужен EpicDuels-ElyTriX-3.1.2.jar "
                     + "(в старом билде нет общего мира арен): " + error);
             return false;
         }
@@ -451,7 +451,7 @@ final class Arenas implements Listener {
         String world = sharedWorld();
         if (world.isEmpty()) {
             plugin.msg(player, "&#F8BEFBДуэли &8» &cОбщий мир арен не включён: нужен "
-                    + "&fEpicDuels-ElyTriX-3.1.1.jar&c и загруженный мир &fduel&c.");
+                    + "&fEpicDuels-ElyTriX-3.1.2.jar&c и загруженный мир &fduel&c.");
             return;
         }
         if (!player.getWorld().getName().equals(world)) {
@@ -537,14 +537,10 @@ final class Arenas implements Listener {
             return;
         }
 
+        int[] pair = pair(world);
+        if (pair == null) return;
         List<Location> points = points();
-        List<Integer> numbers = new ArrayList<Integer>();
-        for (int index = 0; index < points.size(); index++) {
-            if (points.get(index) != null) numbers.add(Integer.valueOf(index));
-        }
-        if (numbers.size() < 2) return;
-        int[] pair = pair(world, numbers.size());
-        Location point = points.get(numbers.get(sideOne ? pair[0] : pair[1]).intValue());
+        Location point = points.get(sideOne ? pair[0] : pair[1]);
 
         double dx = to.getX() - base.getX();
         double dz = to.getZ() - base.getZ();
@@ -560,16 +556,28 @@ final class Arenas implements Listener {
                 point.getZ() + dz, point.getYaw(), point.getPitch()));
     }
 
-    /** Пара точек на бой: считается один раз на мир-копию, у всех игроков одна. */
-    private int[] pair(String world, int count) {
+    /**
+     * Пара точек на бой: считается один раз на мир-копию, у всех игроков одна.
+     * Точки связаны парами — 1 и 2, 3 и 4, 5 и 6: бой начинается на одной
+     * из готовых пар, а не на любых двух точках.
+     */
+    private int[] pair(String world) {
+        List<Location> points = points();
+        List<Integer> ready = new ArrayList<Integer>();
+        for (int start = 0; start + 1 < points.size(); start += 2) {
+            if (points.get(start) != null && points.get(start + 1) != null) {
+                ready.add(Integer.valueOf(start));
+            }
+        }
+        if (ready.isEmpty()) return null;
         int[] pair = pairs.get(world);
-        if (pair != null && pair[0] < count && pair[1] < count) return pair;
+        if (pair != null && pair[0] + 1 < points.size()
+                && points.get(pair[0]) != null && points.get(pair[1]) != null) {
+            return pair;
+        }
         if (pairs.size() > 256) pairs.clear();
-        java.util.Random random = new java.util.Random();
-        int first = random.nextInt(count);
-        int second = random.nextInt(count - 1);
-        if (second >= first) second++;
-        pair = new int[]{first, second};
+        int start = ready.get(new java.util.Random().nextInt(ready.size())).intValue();
+        pair = new int[]{start, start + 1};
         pairs.put(world, pair);
         return pair;
     }
