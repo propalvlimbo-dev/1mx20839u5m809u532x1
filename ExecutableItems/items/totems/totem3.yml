@@ -1,0 +1,59 @@
+name: '§x§F§8§B§E§F§B« §x§F§8§B§E§F§BТ§x§F§5§B§E§F§Bо§x§F§2§B§E§F§Bт§x§E§F§B§F§F§Bе§x§E§C§B§F§F§Bм §x§E§9§B§F§F§Bб§x§E§6§B§F§F§Bо§x§E§3§B§F§F§Bг§x§E§0§C§0§F§Bа§x§D§D§C§0§F§Bт§x§D§A§C§0§F§Bы§x§D§7§C§0§F§Bр§x§D§4§C§0§F§Bя §x§F§8§B§E§F§B»'
+lore:
+  - '§x§F§8§B§E§F§B§l┃ '
+  - '§x§F§8§B§E§F§B§l┃ §fУсловие: §x§F§8§B§E§F§BВ левой руке'
+  - '§x§F§8§B§E§F§B§l┃ §fБонус: §x§F§8§B§E§F§B+3 к броне'
+  - '§x§F§8§B§E§F§B§l┃ '
+material: TOTEM_OF_UNDYING
+glow: true
+disableStack: false
+keepItemOnDeath: false
+canBeUsedOnlyByTheOwner: false
+cancelEventIfNotOwner: false
+onlyOwnerBlackListedActivators: []
+storeItemInfo: false
+unbreakable: false
+usage: 1
+usageLimit: -1
+cancelEventIfNoPerm: false
+disabledWorlds: []
+recognitions: []
+config_5: true
+config_update: false
+config_5_98: true
+dropFeatures:
+  glowDrop: false
+  glowDropColor: WHITE
+  displayNameDrop: false
+hiders:
+  hideEnchantments: false
+  hideUnbreakable: false
+  hideAttributes: true
+  hidePotionEffects: false
+  hideUsage: true
+  hideDestroys: false
+  hidePlacedOn: false
+enchantments: {}
+giveFirstJoinFeatures:
+  giveFirstJoin: false
+  giveFirstJoinAmount: 1
+  giveFirstJoinSlot: 0
+restrictions: {}
+variables: {}
+activators: {}
+displayConditions:
+  playerConditions:
+    ifIsOnTheBlock:
+      blocks: []
+  worldConditions: {}
+  itemConditions: {}
+  placeholdersConditions: {}
+  enableFeature: false
+attributes:
+  attribute0:
+    attribute: GENERIC_ARMOR
+    operation: ADD_NUMBER
+    amount: 3.0
+    slot: OFF_HAND
+    name: generic.armor
+    uuid: 98109494-62d7-4f66-83c4-a2042411114e

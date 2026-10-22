@@ -1,0 +1,71 @@
+name: '§x§F§8§B§E§F§B« §x§F§8§B§E§F§BС§x§F§4§B§E§F§Bт§x§F§0§B§F§F§Bр§x§E§C§B§F§F§Bе§x§E§8§B§F§F§Bл§x§E§4§B§F§F§Bа §x§E§0§C§0§F§Bп§x§D§C§C§0§F§Bс§x§D§8§C§0§F§Bи§x§D§4§C§0§F§Bх§x§D§0§C§0§F§Bа §x§F§8§B§E§F§B»'
+lore:
+  - '§x§F§8§B§E§F§B§l┃ '
+  - '§x§F§8§B§E§F§B§l┃ §fЭффект: §x§F§8§B§E§F§BТошнота II §8(§x§F§8§B§E§F§B0:10§8)'
+  - '§x§F§8§B§E§F§B§l┃ §fЭффект: §x§F§8§B§E§F§BОтравление II §8(§x§F§8§B§E§F§B0:10§8)'
+  - '§x§F§8§B§E§F§B§l┃ '
+material: TIPPED_ARROW
+glow: false
+disableStack: false
+keepItemOnDeath: false
+canBeUsedOnlyByTheOwner: false
+cancelEventIfNotOwner: false
+onlyOwnerBlackListedActivators: []
+storeItemInfo: false
+unbreakable: false
+usage: 0
+usageLimit: -1
+cancelEventIfNoPermission: false
+whitelistedWorlds: []
+recognitions: []
+keepDefaultAttributes: false
+ignoreKeepDefaultAttributesFeature: true
+config_5: true
+config_update: true
+dropFeatures:
+  glowDrop: false
+  glowDropColor: WHITE
+  displayNameDrop: false
+hiders:
+  hideEnchantments: false
+  hideUnbreakable: false
+  hideAttributes: false
+  hidePotionEffects: true
+  hideUsage: false
+  hideDestroys: false
+  hidePlacedOn: false
+enchantments: {}
+giveFirstJoinFeatures:
+  giveFirstJoin: false
+  giveFirstJoinAmount: 1
+  giveFirstJoinSlot: 0
+restrictions: {}
+variables: {}
+activators: {}
+displayConditions:
+  playerConditions: {}
+  worldConditions: {}
+  itemConditions: {}
+  placeholdersConditions: {}
+  enableFeature: false
+potionFeatures:
+  potionColor: 6194613
+  potionType: WATER
+  potionExtended: false
+  potionUpgraded: false
+  potionEffects:
+    pEffect0:
+      isAmbient: false
+      duration: 200
+      potionEffectType: CONFUSION
+      amplifier: 1
+      hasParticles: true
+      hasIcon: true
+    pEffect1:
+      isAmbient: false
+      duration: 200
+      potionEffectType: POISON
+      amplifier: 1
+      hasParticles: true
+      hasIcon: true
+attributes: {}

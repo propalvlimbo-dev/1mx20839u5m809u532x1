@@ -1,0 +1,61 @@
+name: §x§F§8§B§E§F§B« §x§F§8§B§E§F§BМ§x§F§3§B§E§F§Bе§x§E§E§B§F§F§Bч §x§E§9§B§F§F§Bш§x§E§4§B§F§F§Bа§x§D§F§C§0§F§Bл§x§D§A§C§0§F§Bк§x§D§5§C§0§F§Bе§x§D§0§C§0§F§Bр§x§C§B§C§1§F§Bа§x§F§8§B§E§F§B »
+lore: []
+material: NETHERITE_SWORD
+glow: false
+disableStack: false
+keepItemOnDeath: false
+canBeUsedOnlyByTheOwner: false
+cancelEventIfNotOwner: false
+onlyOwnerBlackListedActivators: []
+storeItemInfo: false
+unbreakable: false
+cancelEventIfNoPermission: false
+whitelistedWorlds: []
+keepDefaultAttributes: false
+ignoreKeepDefaultAttributesFeature: true
+config_5: true
+config_update: true
+usageFeatures:
+  usage: 1
+  isRefreshableClean: true
+  usageLimit: -1
+dropFeatures:
+  glowDrop: false
+  glowDropColor: WHITE
+  displayNameDrop: false
+enchantments:
+  enchantment0:
+    enchantment: Fire_aspect
+    level: 2
+  enchantment1:
+    enchantment: Mending
+    level: 1
+  enchantment2:
+    enchantment: Sharpness
+    level: 6
+  enchantment3:
+    enchantment: Unbreaking
+    level: 4
+hiders:
+  hideEnchantments: false
+  hideUnbreakable: false
+  hideAttributes: false
+  hideUsage: true
+  hideDestroys: false
+  hidePlacedOn: false
+  hidePotionEffects: false
+giveFirstJoinFeatures:
+  giveFirstJoin: false
+  giveFirstJoinAmount: 1
+  giveFirstJoinSlot: 0
+restrictions:
+  locked-in-inventory: false
+variables: {}
+activators: {}
+displayConditions:
+  playerConditions: {}
+  worldConditions: {}
+  itemConditions: {}
+  placeholdersConditions: {}
+  enableFeature: false
+attributes: {}

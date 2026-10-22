@@ -1,0 +1,61 @@
+name: §§x§F§8§B§E§F§B« §x§F§8§B§E§F§BК§x§F§3§B§E§F§Bи§x§E§E§B§F§F§Bр§x§E§9§B§F§F§Bк§x§E§4§B§F§F§Bа §x§D§F§C§0§F§Bш§x§D§A§C§0§F§Bа§x§D§5§C§0§F§Bл§x§D§0§C§0§F§Bк§x§C§B§C§1§F§Bе§x§C§6§C§1§F§Bр§x§C§1§C§1§F§Bа§x§F§8§B§E§F§B »
+lore: []
+material: NETHERITE_PICKAXE
+glow: false
+disableStack: false
+keepItemOnDeath: false
+canBeUsedOnlyByTheOwner: false
+cancelEventIfNotOwner: false
+onlyOwnerBlackListedActivators: []
+storeItemInfo: false
+unbreakable: false
+cancelEventIfNoPermission: false
+whitelistedWorlds: []
+keepDefaultAttributes: false
+ignoreKeepDefaultAttributesFeature: true
+config_5: true
+config_update: true
+usageFeatures:
+  usage: 1
+  isRefreshableClean: true
+  usageLimit: -1
+dropFeatures:
+  glowDrop: false
+  glowDropColor: WHITE
+  displayNameDrop: false
+enchantments:
+  enchantment0:
+    enchantment: Efficiency
+    level: 6
+  enchantment1:
+    enchantment: Fortune
+    level: 3
+  enchantment2:
+    enchantment: Mending
+    level: 1
+  enchantment3:
+    enchantment: Unbreaking
+    level: 4
+hiders:
+  hideEnchantments: false
+  hideUnbreakable: false
+  hideAttributes: false
+  hideUsage: true
+  hideDestroys: false
+  hidePlacedOn: false
+  hidePotionEffects: false
+giveFirstJoinFeatures:
+  giveFirstJoin: false
+  giveFirstJoinAmount: 1
+  giveFirstJoinSlot: 0
+restrictions:
+  locked-in-inventory: false
+variables: {}
+activators: {}
+displayConditions:
+  playerConditions: {}
+  worldConditions: {}
+  itemConditions: {}
+  placeholdersConditions: {}
+  enableFeature: false
+attributes: {}

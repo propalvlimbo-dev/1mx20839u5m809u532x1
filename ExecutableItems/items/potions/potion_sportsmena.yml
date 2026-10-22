@@ -1,0 +1,83 @@
+name: §x§F§8§B§E§F§B« §x§F§8§B§E§F§BЗ§x§F§4§B§E§F§Bе§x§F§0§B§F§F§Bл§x§E§C§B§F§F§Bь§x§E§8§B§F§F§Bе
+  §x§E§4§B§F§F§BС§x§E§0§C§0§F§Bп§x§D§C§C§0§F§Bо§x§D§8§C§0§F§Bр§x§D§4§C§0§F§Bт§x§D§0§C§0§F§Bс§x§C§C§C§1§F§Bм§x§C§8§C§1§F§Bе§x§C§4§C§1§F§Bн§x§C§0§C§1§F§Bа
+  §x§F§8§B§E§F§B»
+lore: []
+material: POTION
+glow: false
+disableStack: false
+keepItemOnDeath: false
+canBeUsedOnlyByTheOwner: false
+cancelEventIfNotOwner: false
+onlyOwnerBlackListedActivators: []
+storeItemInfo: false
+unbreakable: false
+usage: 0
+usageLimit: -1
+cancelEventIfNoPerm: false
+disabledWorlds: []
+config_5: true
+config_update: true
+config_5_98: true
+usageFeatures:
+  usage: 1
+  isRefreshableClean: true
+  usageLimit: -1
+dropFeatures:
+  glowDrop: false
+  glowDropColor: WHITE
+  displayNameDrop: false
+enchantments: {}
+hiders:
+  hideEnchantments: false
+  hideUnbreakable: false
+  hideAttributes: false
+  hideUsage: true
+  hideDestroys: false
+  hidePlacedOn: false
+  hidePotionEffects: false
+giveFirstJoinFeatures:
+  giveFirstJoin: false
+  giveFirstJoinAmount: 1
+  giveFirstJoinSlot: 0
+restrictions:
+  locked-in-inventory: false
+cancelEventIfNoPermission: false
+whitelistedWorlds: []
+variables: {}
+activators: {}
+displayConditions:
+  playerConditions: {}
+  worldConditions: {}
+  itemConditions: {}
+  placeholdersConditions: {}
+  enableFeature: false
+attributes: {}
+keepDefaultAttributes: false
+ignoreKeepDefaultAttributesFeature: true
+potionFeatures:
+  potionColor: 3846578
+  potionType: WATER
+  potionExtended: false
+  potionUpgraded: false
+  potionEffects:
+    pEffect0:
+      isAmbient: false
+      duration: 2100
+      potionEffectType: REGENERATION
+      amplifier: 1
+      hasParticles: true
+      hasIcon: true
+    pEffect1:
+      isAmbient: false
+      duration: 900
+      potionEffectType: FAST_DIGGING
+      amplifier: 1
+      hasParticles: true
+      hasIcon: true
+    pEffect2:
+      isAmbient: false
+      duration: 9600
+      potionEffectType: FIRE_RESISTANCE
+      amplifier: 0
+      hasParticles: true
+      hasIcon: true
