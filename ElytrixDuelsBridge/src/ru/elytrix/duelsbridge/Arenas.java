@@ -26,8 +26,8 @@ import org.bukkit.event.player.PlayerTeleportEvent;
  * Обычный EpicDuels требует по миру на арену. В нашем билде
  * EpicDuels-ElyTriX-3.1.2 у Arena есть общий мир, поэтому арена одна —
  * arena1 в мире duel, — а точек спавна сколько угодно. Мост хранит их в
- * spawns.yml (номер точки = строка списка) и на каждый бой выбирает
- * случайную пару: телепорт EpicDuels подменяется на выбранные точки.
+ * spawns.yml (номер точки = строка списка). Пары идут по порядку — 1-2,
+ * 3-4, 5-6, — телепорт EpicDuels подменяется на точки текущей пары.
  *
  *   /duel arena setspawn1     — поставить точку 1
  *   /duel arena setspawn2     — точку 2 (после неё арена в ротации)
@@ -408,7 +408,7 @@ final class Arenas implements Listener {
         plugin.msg(player, "&#F8BEFBАрена &8» &fмир: &#F8BEFB" + world
                 + "&7, общий мир арен: " + (applied ? "&aвключён" : "&cвыключен"));
         plugin.msg(player, "&7● &f/duel arena setspawn1 &7· &fsetspawn2 &7— две точки, арена в ротации");
-        plugin.msg(player, "&7● &f/duel arena setspawn3 &7· &fsetspawn4 … &7— ещё точки, на бой берётся случайная пара");
+        plugin.msg(player, "&7● &f/duel arena setspawn3 &7· &fsetspawn4 … &7— ещё пара: бои идут по очереди 1-2, 3-4, 5-6");
         plugin.msg(player, "&7● &f/duel arena list &7· &ftp &d<номер> &7· &fdelete &d<номер> &7· &fclear");
         plugin.msg(player, "&7● &fточки ставятся в мире &d" + world + "&7, новые миры не создаются");
     }
@@ -467,7 +467,7 @@ final class Arenas implements Listener {
         int free = freeNumber();
         if (pointAt(1) != null && pointAt(2) != null) {
             plugin.msg(player, "&#F8BEFBДуэли &8» &fАрена &d" + arenaName()
-                    + "&f в ротации: на бой берётся случайная пара точек. "
+                    + "&f в ротации: пары точек идут по порядку 1-2, 3-4, 5-6. "
                     + "Ещё точка: &f/duel arena setspawn" + free);
         } else {
             plugin.msg(player, "&#F8BEFBДуэли &8» &7Нужна вторая точка: &f/duel arena setspawn"
@@ -509,7 +509,8 @@ final class Arenas implements Listener {
 
     /**
      * EpicDuels телепортирует бойцов на spawn1/spawn2 арены. Если это наша
-     * арена — подменяем место на случайную пару точек. Смещение внутри
+     * арена — подменяем место на точки текущей пары (1-2, 3-4, 5-6 по
+     * кругу). Смещение внутри
      * команды (2 на 2) сохраняем, только ужимаем с 1.5 до 0.5 блока.
      */
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
@@ -558,8 +559,8 @@ final class Arenas implements Listener {
 
     /**
      * Пара точек на бой: считается один раз на мир-копию, у всех игроков одна.
-     * Точки связаны парами — 1 и 2, 3 и 4, 5 и 6: бой начинается на одной
-     * из готовых пар, а не на любых двух точках.
+     * Пары идут строго по порядку — 1 и 2, потом 3 и 4, потом 5 и 6, — и
+     * после последней снова с первой. Никакого рандома.
      */
     private int[] pair(String world) {
         List<Location> points = points();
@@ -576,10 +577,32 @@ final class Arenas implements Listener {
             return pair;
         }
         if (pairs.size() > 256) pairs.clear();
-        int start = ready.get(new java.util.Random().nextInt(ready.size())).intValue();
+        int number = nextPairNumber();
+        int start = ready.get((number - 1) % ready.size()).intValue();
+        rememberPair(number);
         pair = new int[]{start, start + 1};
         pairs.put(world, pair);
         return pair;
+    }
+
+    /** Номер пары, с которой начнётся следующий бой (хранится в spawns.yml). */
+    private int nextPairNumber() {
+        try {
+            return Math.max(1, pointsConfig().getInt("next", 1));
+        } catch (RuntimeException error) {
+            return 1;
+        }
+    }
+
+    private void rememberPair(int number) {
+        YamlConfiguration config = pointsConfig();
+        config.set("next", Integer.valueOf(number + 1));
+        try {
+            config.save(pointsFile());
+        } catch (Exception error) {
+            plugin.getLogger().warning("Арена: не смог записать spawns.yml: " + error);
+        }
+        dropCache();
     }
 
     private double horizontal(Location one, Location two) {

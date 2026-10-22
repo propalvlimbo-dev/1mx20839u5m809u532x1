@@ -1,5 +1,5 @@
 name: ElytrixDuelsBridge
-version: 1.11.0
+version: 1.11.1
 main: ru.elytrix.duelsbridge.ElytrixDuelsBridge
 api-version: '1.21'
 description: Меню EpicDuels в стиле ElytriX на BMenu
