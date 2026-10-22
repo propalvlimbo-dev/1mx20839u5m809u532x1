@@ -1,0 +1,11 @@
+name: ElytrixSubscribe
+version: '1.0'
+main: ru.rooyzee.elytrixsubscribe.Main
+depend: [ PlaceholderAPI, LuckPerms, VirtualEntityApi ]
+api-version: '1.16'
+
+commands:
+  subscribe:
+    description: Управление подпиской
+    usage: /subscribe [add|remove|delay|toggle|menu]
+    aliases: [sub]
