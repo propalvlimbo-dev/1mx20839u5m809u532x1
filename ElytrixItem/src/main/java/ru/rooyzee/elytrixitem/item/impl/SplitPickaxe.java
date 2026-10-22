@@ -40,7 +40,7 @@ public final class SplitPickaxe implements CustomItem {
         ItemMeta meta = item.getItemMeta();
 
         if (meta != null) {
-            meta.setDisplayName(ColorUtil.color("&7« &#F8BEFBКирка Раскола &7»"));
+            meta.setDisplayName(ColorUtil.gradient("« Кирка Раскола »"));
 
             List<String> lore = Arrays.asList(
                     ColorUtil.color("&#F8BEFB&l┃ "),
@@ -49,7 +49,7 @@ public final class SplitPickaxe implements CustomItem {
                     ColorUtil.color("&#F8BEFB&l┃ &fИспользований: &#F8BEFB1"),
                     ColorUtil.color("&#F8BEFB&l┃ &fЗачарования: &#F8BEFBнет"),
                     ColorUtil.color("&#F8BEFB&l┃ "),
-                    ColorUtil.color("&7● &fМоб в спавнер &#cне возвращается"),
+                    ColorUtil.color("&7● &fМоб в спавнер &cне возвращается"),
                     ColorUtil.color("&7● &fПосле добычи кирка ломается")
             );
 

@@ -69,7 +69,7 @@ public final class GearItem implements CustomItem {
         ItemMeta meta = item.getItemMeta();
 
         if (meta != null) {
-            meta.setDisplayName(ColorUtil.color("&7« &f" + name + " &7»"));
+            meta.setDisplayName(ColorUtil.gradient("« " + name + " »"));
 
             List<String> lore = new ArrayList<>();
             lore.add(ColorUtil.color("&#F8BEFB&l┃ "));

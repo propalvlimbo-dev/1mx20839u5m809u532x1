@@ -199,7 +199,7 @@ items:
       - '[update]'
   kirkaraskola:
     material: iron_pickaxe
-    name: '&7« &#F8BEFBКирка Раскола &7»'
+    name: '§x§F§8§B§E§F§B«§x§F§5§B§E§F§B §x§F§2§B§E§F§BК§x§F§0§B§F§F§Bи§x§E§D§B§F§F§Bр§x§E§A§B§F§F§Bк§x§E§7§B§F§F§Bа§x§E§4§B§F§F§B §x§E§2§C§0§F§BР§x§D§F§C§0§F§Bа§x§D§C§C§0§F§Bс§x§D§9§C§0§F§Bк§x§D§6§C§0§F§Bо§x§D§3§C§0§F§Bл§x§D§1§C§1§F§Bа§x§C§E§C§1§F§B §x§C§B§C§1§F§B»'
     lore:
     - '&#F8BEFB&l┃'
     - '&#F8BEFB&l┃ &fТип: &#F8BEFBУникальный инструмент'
@@ -334,5 +334,5 @@ animation:
       - st: experience_pot 32
       - sound: 'block.amethyst_block.chime 0.45 1.4'
   - opcodes:
-      - st: kirkaraskola 15
+      - st: kirkaraskola 31
       - sound: 'block.note_block.pling 0.29 1.09'

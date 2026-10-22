@@ -41,9 +41,8 @@ public interface Player extends HumanEntity, OfflinePlayer, CommandSender {
     Player getPlayer();
     org.bukkit.inventory.Inventory getEnderChest();
 
-    interface Spigot {
-        void sendMessage(net.md_5.bungee.api.ChatMessageType type, net.md_5.bungee.api.chat.BaseComponent... components);
-        void sendMessage(net.md_5.bungee.api.chat.BaseComponent component);
+    class Spigot extends org.bukkit.command.CommandSender.Spigot {
+        public void sendMessage(net.md_5.bungee.api.ChatMessageType type, net.md_5.bungee.api.chat.BaseComponent... components) { }
     }
 
     boolean performCommand(String command);

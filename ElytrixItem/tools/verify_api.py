@@ -77,6 +77,11 @@ def normalize_type(t):
     t = re.sub(r"\bfinal\b", "", t).strip()
     t = t.replace("...", "[]")
     t = strip_generics(t)
+    t = " ".join(t.split())
+    if " " in t:  # аннотация или мусор перед типом
+        t = t.split()[-1]
+    if re.fullmatch(r"[A-Z]", t.split(".")[-1].replace("[]", "")):
+        return "__ANY__" + ("[]" if t.endswith("[]") else "")
     return t
 
 
@@ -98,6 +103,8 @@ def same_type(real, needle):
     """Сравнение типов: тип-переменная в настоящем API подходит к любому ссылочному."""
     if real == needle:
         return True
+    if real.startswith("__ANY__") or needle.startswith("__ANY__"):
+        return real.endswith("[]") == needle.endswith("[]")
     if re.fullmatch(r"[A-Z]{1,2}", real.split(".")[-1]):
         return not needle.startswith(("[", "int", "long", "double", "float", "boolean", "byte", "short", "char", "void"))
     return False
@@ -128,7 +135,7 @@ def descriptor_types(desc):
                 i += 1
             if body[i] == "L":
                 j = body.index(";", i)
-                out.append(body[i:j].replace("/", ".") + "[]")
+                out.append(body[i + 1:j].replace("/", ".") + "[]")
                 i = j + 1
             else:
                 out.append(body[start:i + 1] + PRIM[body[i]])
@@ -212,6 +219,8 @@ def parse_source(fqn, text):
             t = t.strip()
         if t in ("int", "long", "double", "float", "boolean", "byte", "short", "char", "void"):
             return t + arr
+        if t in nested:
+            return pkg + "." + simple + "$" + t + arr + generics
         if t in imports:
             return imports[t] + arr + generics
         if t in JAVA_LANG:
@@ -221,6 +230,9 @@ def parse_source(fqn, text):
         if "." in t:
             return t + arr + generics
         return pkg + "." + t + arr + generics
+
+    nested = set(re.findall(r"\b(?:class|interface|enum|record)\s+([A-Z]\w*)", text))
+    nested.discard(simple)
 
     m = re.search(r"\b(?:class|interface|enum|record)\s+" + re.escape(simple) + r"\b([^{]*)\{", text)
     parents, is_enum = [], False
@@ -247,7 +259,11 @@ def parse_source(fqn, text):
         # константы перечислений
         for name, _ in scan_enum_constants(text, body_start):
             fields.add(name)
-    return parents, methods, fields
+    return parents, methods, fields, is_interface(text, simple)
+
+
+def is_interface(text, simple):
+    return bool(re.search(r"\binterface\s+" + re.escape(simple) + r"\b", text))
 
 
 def scan_enum_constants(text, start):
@@ -353,7 +369,7 @@ def scan_body(text, start, resolve):
                     name = mm.group(3)
                     if name not in KEYWORDS:
                         plist = tuple(resolve(param_type(p)) for p in split_top(params) if p.strip())
-                        rtype = re.sub(r"@[\w.]+(\([^)]*\))?", "", mm.group(2)).strip()
+                        rtype = strip_generics(re.sub(r"@[\w.]+(\([^)]*\))?", "", mm.group(2))).strip()
                         rtype = re.sub(r"\b(public|protected|private|static|final|abstract|default|synchronized|native|strictfp)\b", "", rtype).strip()
                         rtype = resolve(rtype) if rtype else "void"
                         methods.add((name, plist, rtype))
@@ -398,7 +414,7 @@ def api(fqn, cache_dir, seen=None):
     if text is None:
         INDEX[fqn] = None
         return None
-    parents, methods, fields = parse_source(fqn, text)
+    parents, methods, fields, iface = parse_source(fqn, text)
     methods = {(n, tuple(normalize_type(p) for p in ps), normalize_type(r)) for n, ps, r in methods}
     all_m, all_f = set(methods), set(fields)
     for p in parents:
@@ -406,7 +422,7 @@ def api(fqn, cache_dir, seen=None):
         if pdata:
             all_m |= pdata[0]
             all_f |= pdata[1]
-    INDEX[fqn] = (all_m, all_f, parents)
+    INDEX[fqn] = (all_m, all_f, parents, iface)
     return INDEX[fqn]
 
 
@@ -423,8 +439,14 @@ def main():
                 data = api(owner, cache_dir)
                 if data is None:
                     continue
-                methods, fields, _ = data
+                methods, fields, _, iface = data
                 checked += 1
+                if isinstance(iface, bool) and kind in (10, 11) and (kind == 11) != iface:
+                    key = ("KIND", owner, "interface" if iface else "class", "")
+                    if key not in seen:
+                        seen.add(key)
+                        problems.append(key)
+                    continue
                 if kind == 9:
                     if name not in fields:
                         key = ("FIELD", owner, name, desc)
@@ -436,7 +458,9 @@ def main():
                 if name in ("<init>", "<clinit>"):
                     continue
                 rtype = normalize_type(descriptor_type(desc[desc.rindex(")") + 1:]))
-                if any(m[0] == name and m[1] == params and same_type(m[2], rtype) for m in methods):
+                if any(m[0] == name and len(m[1]) == len(params)
+                       and all(same_type(a, b) for a, b in zip(m[1], params))
+                       and same_type(m[2], rtype) for m in methods):
                     continue
                 same = sorted(m for m in methods if m[0] == name)
                 key = ("METHOD", owner, name, desc,
@@ -445,7 +469,10 @@ def main():
                     seen.add(key)
                     problems.append(key)
     for p in problems:
-        if p[0] == "FIELD":
+        if p[0] == "KIND":
+            print("НЕВЕРНЫЙ ТИП %s — в API это %s, а вызов скомпилирован как обращение к %s" %
+                  (p[1], p[2], "интерфейсу" if p[2] == "class" else "классу"))
+        elif p[0] == "FIELD":
             print("НЕТ ПОЛЯ   %s.%s" % (p[1], p[2]))
         else:
             print("НЕТ МЕТОДА %s.%s%s\n           есть: %s" % (p[1], p[2], p[3], p[4]))

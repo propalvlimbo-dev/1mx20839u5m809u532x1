@@ -66,7 +66,7 @@ public final class SplitPickaxeListener implements Listener {
         breakTool(player, tool);
         world.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
         player.sendMessage(ColorUtil.color("&#F8BEFB&l┃ &fСпавнер добыт, &#F8BEFBКирка Раскола &fсломалась"));
-        player.sendMessage(ColorUtil.color("&#F8BEFB&l┃ &fМоб из спавнера &#cне возвращается"));
+        player.sendMessage(ColorUtil.color("&#F8BEFB&l┃ &fМоб из спавнера &cне возвращается"));
     }
 
     private boolean isSplitPickaxe(ItemStack item) {
