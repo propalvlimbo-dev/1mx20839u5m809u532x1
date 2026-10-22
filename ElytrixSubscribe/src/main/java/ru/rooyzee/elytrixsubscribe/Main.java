@@ -24,6 +24,7 @@ import ru.rooyzee.elytrixsubscribe.service.SubService;
 import ru.rooyzee.elytrixsubscribe.sub.PlayerSub;
 import ru.rooyzee.elytrixsubscribe.sub.SubManager;
 import ru.rooyzee.elytrixsubscribe.utils.ChatInput;
+import ru.rooyzee.elytrixsubscribe.utils.SignInput;
 import ru.rooyzee.elytrixsubscribe.utils.Utils;
 
 /**
@@ -43,6 +44,7 @@ public final class Main extends JavaPlugin {
     private Menus menus;
     private CustomPlaceHolder placeholder;
     private ChatInput chatInput;
+    private SignInput signInput;
 
     @Override
     public void onEnable() {
@@ -64,6 +66,13 @@ public final class Main extends JavaPlugin {
         this.storage = new Storage(this);
         this.service = new SubService(this);
         this.subManager = new SubManager(this);
+
+        this.signInput = new SignInput(this);
+        try {
+            Bukkit.getPluginManager().registerEvents(this.signInput, this);
+        } catch (Throwable error) {
+            this.getLogger().warning("Табличка для ввода недоступна: " + error);
+        }
 
         this.chatInput = new ChatInput(this);
         try {
@@ -99,6 +108,9 @@ public final class Main extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (this.signInput != null) {
+            this.signInput.shutdown();
+        }
         if (this.petManager != null) {
             this.petManager.shutdown();
         }
@@ -205,6 +217,10 @@ public final class Main extends JavaPlugin {
 
     public ChatInput getChatInput() {
         return this.chatInput;
+    }
+
+    public SignInput getSignInput() {
+        return this.signInput;
     }
 
     /** Файл настроек меню — нужен, чтобы не открывать несуществующее меню. */

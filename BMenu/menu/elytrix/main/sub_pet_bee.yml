@@ -59,8 +59,8 @@ items:
     - '&#F8BEFB&l┃ &fСвоё имя видно над питомцем.'
     - '&#F8BEFB&l┃ &fСейчас: &f%slidesubscribe_pet_bee_name%'
     - '&#F8BEFB&l┃ '
-    - '&7● &fНажмите и напишите имя в чат'
-    - '&7● &fЧтобы убрать — напишите &#F8BEFBсброс'
+    - '&7● &fНажмите — откроется табличка'
+    - '&7● &fПустая табличка или &#F8BEFBсброс &f— убрать имя'
     on_click:
     - player: 'subscribe pet bee name'
   info:

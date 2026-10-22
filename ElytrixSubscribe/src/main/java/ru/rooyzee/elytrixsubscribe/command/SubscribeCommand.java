@@ -182,29 +182,27 @@ public class SubscribeCommand implements CommandExecutor, TabCompleter {
                 if (name.length() > 0) name.append(' ');
                 name.append(args[index]);
             }
-            String value = name.toString();
-            if (value.equalsIgnoreCase("сброс") || value.equalsIgnoreCase("reset")) value = "";
-            this.plugin.getPetManager().setName(player, type, value);
-            this.plugin.msg(player, "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» "
-                    + "&fИмя питомца: &#F8BEFB"
-                    + (value.isEmpty() ? "сброшено" : value));
-            this.plugin.getMenuService().openPet(player, type);
+            this.applyName(player, type, name.toString());
             return;
         }
         PetData data = this.plugin.getPetManager().data(player, type);
         player.closeInventory();
-        this.plugin.getChatInput().request(player,
-                "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» "
-                        + "&fНапиши имя для питомца &f" + type.displayName() + "&f в чат."
-                        + "&7 (сейчас: " + (data.name() == null ? "не задано" : data.name()) + "). "
-                        + "&7Не ловит чат — &f/subscribe pet " + type.id() + " name <имя>",
-                name -> {
-                    String value = name.equalsIgnoreCase("сброс") ? "" : name;
-                    this.plugin.getPetManager().setName(player, type, value);
-                    this.plugin.msg(player, "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» "
-                            + "&fИмя питомца: &#F8BEFB" + (value.isEmpty() ? "сброшено" : value));
-                    this.plugin.getMenuService().openPet(player, type);
-                });
+        final String prompt = "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» "
+                + "&fНапиши имя для питомца &f" + type.displayName() + "&f на табличке."
+                + "&7 (сейчас: " + (data.name() == null ? "не задано" : data.name()) + ")";
+        java.util.function.Consumer<String> callback = name -> this.applyName(player, type, name);
+        if (this.plugin.getSignInput().request(player, callback)) return;
+        this.plugin.getChatInput().request(player, prompt, callback);
+    }
+
+    /** Сохранить имя и обновить меню питомца. */
+    private void applyName(Player player, PetType type, String name) {
+        String value = name == null ? "" : name.trim();
+        if (value.equalsIgnoreCase("сброс") || value.equalsIgnoreCase("reset")) value = "";
+        this.plugin.getPetManager().setName(player, type, value);
+        this.plugin.msg(player, "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» "
+                + "&fИмя питомца: &#F8BEFB" + (value.isEmpty() ? "сброшено" : value));
+        this.plugin.getMenuService().openPet(player, type);
     }
 
     // ------------------------------------------------------------- функции

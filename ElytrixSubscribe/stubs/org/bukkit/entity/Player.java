@@ -29,5 +29,6 @@ public interface Player extends HumanEntity, OfflinePlayer, CommandSender {
     float getPitch();
     Location getEyeLocation();
     void sendTitle(String title, String subtitle, int fadeIn, int stay, int fadeOut);
+    void openSign(org.bukkit.block.Sign sign);
     float getYaw();
 }
