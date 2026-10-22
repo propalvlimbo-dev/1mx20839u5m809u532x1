@@ -33,17 +33,22 @@ final class Effects implements Listener {
     /** Если в конфиге ничего нет — работают эти перки. */
     private static final Map<String, String[]> DEFAULTS = new HashMap<String, String[]>();
 
+    /**
+     * Перки 2.0: у каждого кита своя роль, а не «скорость всем».
+     *   Классика — ровный бой; Гаппли — живучесть; Сумо — мобильность;
+     *   Лучник и Тризуб — дистанция; Булава — вертикаль; Незерит — танк.
+     */
     static {
         DEFAULTS.put("классика", new String[]{"SPEED:1"});
-        DEFAULTS.put("ухк", new String[]{"SPEED:1", "REGENERATION:1"});
-        DEFAULTS.put("гаппли", new String[]{"SPEED:1", "ABSORPTION:1"});
+        DEFAULTS.put("ухк", new String[]{"SPEED:1"});
+        DEFAULTS.put("гаппли", new String[]{"ABSORPTION:1"});
         DEFAULTS.put("сумо", new String[]{"SPEED:2", "JUMP_BOOST:1"});
-        DEFAULTS.put("лучник", new String[]{"SPEED:1", "NIGHT_VISION:1"});
-        DEFAULTS.put("булава", new String[]{"SPEED:1", "STRENGTH:1"});
-        DEFAULTS.put("топор", new String[]{"SPEED:1", "RESISTANCE:1"});
-        DEFAULTS.put("тризуб", new String[]{"SPEED:1", "WATER_BREATHING:1"});
-        DEFAULTS.put("арбалет", new String[]{"SPEED:1", "REGENERATION:1"});
-        DEFAULTS.put("незерит", new String[]{"SPEED:1", "RESISTANCE:1"});
+        DEFAULTS.put("лучник", new String[]{"SPEED:2"});
+        DEFAULTS.put("булава", new String[]{"SPEED:1"});
+        DEFAULTS.put("топор", new String[]{"SPEED:1"});
+        DEFAULTS.put("тризуб", new String[]{"SPEED:2"});
+        DEFAULTS.put("арбалет", new String[]{"SPEED:1"});
+        DEFAULTS.put("незерит", new String[]{"RESISTANCE:1"});
     }
 
     private final ElytrixDuelsBridge plugin;

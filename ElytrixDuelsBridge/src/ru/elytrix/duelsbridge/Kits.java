@@ -24,6 +24,9 @@ final class Kits {
      * Русские, потому что EpicDuels показывает имя набора как есть —
      * и в меню, и в сообщениях, и на скорборде.
      */
+    /** Версия состава: при изменении киты пересоздаются сами (см. config kits.revision). */
+    static final int REVISION = 2;
+
     static final String[] NAMES = {
             "Классика", "УХК", "Гаппли", "Сумо", "Лучник",
             "Булава", "Топор", "Тризуб", "Арбалет", "Незерит"
@@ -210,8 +213,8 @@ final class Kits {
         }
     }
 
-    private static ItemStack[] armor(Material boots, Material leggings, Material chestplate,
-                                     Material helmet, String protection, int level) {
+    private static ItemStack[] suit(Material boots, Material leggings, Material chestplate,
+                                    Material helmet, String protection, int level) {
         return new ItemStack[]{
                 boost(item(boots, 1), protection, level),
                 boost(item(leggings, 1), protection, level),
@@ -220,92 +223,130 @@ final class Kits {
         };
     }
 
+    /**
+     * Состав наборов 2.0: 3–5 предметов вместо трёх стаков.
+     * Каждый кит решает одну задачу, поэтому в руках нет ничего «на всякий случай».
+     */
     private static ItemStack[] contents(String name) {
         if (name.equals("sword")) {
+            // Классика: чистый бой на мечах — меч, яблоки, пёрлы
             return new ItemStack[]{
-                    boost(boost(item(Material.NETHERITE_SWORD, 1), "SHARPNESS", 4), "UNBREAKING", 3),
-                    item(Material.GOLDEN_APPLE, 5),
-                    item(Material.ENDER_PEARL, 8)};
+                    boost(boost(item(Material.NETHERITE_SWORD, 1), "SHARPNESS", 3), "UNBREAKING", 3),
+                    item(Material.GOLDEN_APPLE, 6),
+                    item(Material.ENDER_PEARL, 3)};
         }
         if (name.equals("uhc")) {
+            // УХК: меч + лук, как в выживании
             return new ItemStack[]{
-                    boost(item(Material.DIAMOND_SWORD, 1), "SHARPNESS", 3),
+                    boost(boost(item(Material.DIAMOND_SWORD, 1), "SHARPNESS", 3), "UNBREAKING", 3),
                     boost(item(Material.BOW, 1), "POWER", 3),
-                    item(Material.ARROW, 24),
-                    item(Material.GOLDEN_APPLE, 4),
-                    item(Material.ENDER_PEARL, 6)};
+                    item(Material.ARROW, 12),
+                    item(Material.GOLDEN_APPLE, 3),
+                    item(Material.ENDER_PEARL, 3)};
         }
         if (name.equals("gapple")) {
+            // Гаппли: один стак яблок решает бой
             return new ItemStack[]{
-                    boost(item(Material.DIAMOND_SWORD, 1), "SHARPNESS", 3),
-                    item(Material.GOLDEN_APPLE, 12),
-                    item(Material.ENDER_PEARL, 6)};
+                    boost(boost(item(Material.DIAMOND_SWORD, 1), "SHARPNESS", 3), "UNBREAKING", 3),
+                    item(Material.GOLDEN_APPLE, 24),
+                    item(Material.ENDER_PEARL, 3)};
         }
         if (name.equals("sumo")) {
-            return new ItemStack[]{item(Material.ENDER_PEARL, 2)};
+            // Сумо: без брони, только отбрасывание
+            return new ItemStack[]{
+                    boost(item(Material.STONE_SWORD, 1), "KNOCKBACK", 2),
+                    item(Material.ENDER_PEARL, 2)};
         }
         if (name.equals("archer")) {
+            // Лучник: держит дистанцию, вблизи слабый меч
             return new ItemStack[]{
                     boost(boost(item(Material.BOW, 1), "POWER", 4), "PUNCH", 1),
-                    item(Material.ARROW, 48),
+                    item(Material.ARROW, 16),
                     boost(item(Material.STONE_SWORD, 1), "SHARPNESS", 2),
-                    item(Material.ENDER_PEARL, 8)};
+                    item(Material.ENDER_PEARL, 4)};
         }
         if (name.equals("mace")) {
+            // Булава: прыжок сверху и ветряные заряды
             return new ItemStack[]{
                     boost(boost(item(Material.MACE, 1), "DENSITY", 4), "UNBREAKING", 3),
-                    item(Material.WIND_CHARGE, 16),
+                    item(Material.WIND_CHARGE, 8),
                     item(Material.GOLDEN_APPLE, 3),
-                    item(Material.ENDER_PEARL, 6)};
+                    item(Material.ENDER_PEARL, 3)};
         }
         if (name.equals("axe")) {
+            // Топор: щит в левой руке и пробивающий удар
             return new ItemStack[]{
-                    boost(item(Material.NETHERITE_AXE, 1), "SHARPNESS", 3),
-                    item(Material.GOLDEN_APPLE, 3),
-                    item(Material.ENDER_PEARL, 8)};
+                    boost(boost(item(Material.NETHERITE_AXE, 1), "SHARPNESS", 3), "UNBREAKING", 3),
+                    item(Material.GOLDEN_APPLE, 4),
+                    item(Material.ENDER_PEARL, 3)};
         }
         if (name.equals("trident")) {
+            // Тризуб: дальний удар и возврат копья
             return new ItemStack[]{
-                    boost(boost(item(Material.TRIDENT, 1), "IMPALING", 4), "UNBREAKING", 3),
-                    item(Material.GOLDEN_APPLE, 3),
-                    item(Material.ENDER_PEARL, 8)};
+                    boost(boost(boost(item(Material.TRIDENT, 1), "IMPALING", 5), "LOYALTY", 3),
+                            "UNBREAKING", 3),
+                    item(Material.ENDER_PEARL, 4),
+                    item(Material.GOLDEN_APPLE, 3)};
         }
         if (name.equals("crossbow")) {
+            // Арбалет: три болта за выстрел на быстрой перезарядке
             return new ItemStack[]{
-                    boost(boost(item(Material.CROSSBOW, 1), "QUICK_CHARGE", 3), "MULTISHOT", 1),
-                    item(Material.ARROW, 48),
+                    boost(boost(boost(item(Material.CROSSBOW, 1), "QUICK_CHARGE", 3), "MULTISHOT", 1),
+                            "UNBREAKING", 3),
+                    item(Material.ARROW, 12),
                     boost(item(Material.STONE_SWORD, 1), "SHARPNESS", 2),
-                    item(Material.ENDER_PEARL, 6)};
+                    item(Material.GOLDEN_APPLE, 2)};
         }
+        // Незерит: танк — сет, тотем и яблоки
         return new ItemStack[]{
-                boost(boost(item(Material.NETHERITE_SWORD, 1), "SHARPNESS", 4), "UNBREAKING", 3),
-                item(Material.GOLDEN_APPLE, 6),
-                item(Material.ENDER_PEARL, 8),
-                item(Material.TOTEM_OF_UNDYING, 1)};
+                boost(boost(item(Material.NETHERITE_SWORD, 1), "SHARPNESS", 3), "UNBREAKING", 3),
+                item(Material.GOLDEN_APPLE, 4),
+                item(Material.ENDER_PEARL, 2)};
     }
 
     private static ItemStack[] armor(String name) {
         if (name.equals("sumo")) {
             return new ItemStack[0];
         }
-        if (name.equals("gapple")) {
-            return armor(Material.DIAMOND_BOOTS, Material.DIAMOND_LEGGINGS,
-                    Material.DIAMOND_CHESTPLATE, Material.DIAMOND_HELMET, "PROTECTION", 3);
+        if (name.equals("gapple") || name.equals("axe")) {
+            return suit(Material.DIAMOND_BOOTS, Material.DIAMOND_LEGGINGS,
+                    Material.DIAMOND_CHESTPLATE, Material.DIAMOND_HELMET, "PROTECTION", 2);
+        }
+        if (name.equals("netherite")) {
+            return suit(Material.NETHERITE_BOOTS, Material.NETHERITE_LEGGINGS,
+                    Material.NETHERITE_CHESTPLATE, Material.NETHERITE_HELMET, "PROTECTION", 3);
         }
         if (name.equals("archer")) {
-            return armor(Material.LEATHER_BOOTS, Material.LEATHER_LEGGINGS,
+            return suit(Material.LEATHER_BOOTS, Material.LEATHER_LEGGINGS,
                     Material.LEATHER_CHESTPLATE, Material.LEATHER_HELMET, "PROTECTION", 2);
         }
         if (name.equals("crossbow")) {
-            return armor(Material.CHAINMAIL_BOOTS, Material.CHAINMAIL_LEGGINGS,
+            return suit(Material.CHAINMAIL_BOOTS, Material.CHAINMAIL_LEGGINGS,
                     Material.CHAINMAIL_CHESTPLATE, Material.CHAINMAIL_HELMET, "PROTECTION", 2);
         }
-        if (name.equals("netherite")) {
-            return armor(Material.NETHERITE_BOOTS, Material.NETHERITE_LEGGINGS,
-                    Material.NETHERITE_CHESTPLATE, Material.NETHERITE_HELMET, "PROTECTION", 3);
+        if (name.equals("mace")) {
+            // падать сверху безопасно: ботинки с перьевым падением
+            return boot(suit(Material.IRON_BOOTS, Material.IRON_LEGGINGS,
+                    Material.IRON_CHESTPLATE, Material.IRON_HELMET, "PROTECTION", 2),
+                    "FEATHER_FALLING", 4);
         }
-        return armor(Material.IRON_BOOTS, Material.IRON_LEGGINGS,
+        if (name.equals("uhc")) {
+            return boot(suit(Material.IRON_BOOTS, Material.IRON_LEGGINGS,
+                    Material.IRON_CHESTPLATE, Material.IRON_HELMET, "PROTECTION", 2),
+                    "FEATHER_FALLING", 3);
+        }
+        if (name.equals("trident")) {
+            return boot(suit(Material.IRON_BOOTS, Material.IRON_LEGGINGS,
+                    Material.IRON_CHESTPLATE, Material.IRON_HELMET, "PROTECTION", 2),
+                    "DEPTH_STRIDER", 3);
+        }
+        return suit(Material.IRON_BOOTS, Material.IRON_LEGGINGS,
                 Material.IRON_CHESTPLATE, Material.IRON_HELMET, "PROTECTION", 2);
+    }
+
+    private static ItemStack[] boot(ItemStack[] suit, String enchant, int level) {
+        suit[0] = boost(suit[0], enchant, level);
+        return suit;
     }
 
     private static ItemStack offhand(String name) {

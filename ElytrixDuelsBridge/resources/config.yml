@@ -84,7 +84,8 @@ buffs:
   clear-on-leave: true
   # свои значения на кит, например:
   # per-kit:
-  #   булава: [SPEED:2, STRENGTH:2]
+  #   булава: [SPEED:2]
+  #   сумо: [SPEED:3, JUMP_BOOST:2]
 
 # Правила на боевых копиях арен (arena_instance_*),
 # в шаблонах arena_template_* строительство остаётся доступным.

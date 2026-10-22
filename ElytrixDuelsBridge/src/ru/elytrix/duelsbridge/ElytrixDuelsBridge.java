@@ -202,7 +202,14 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
             getLogger().warning("BMenu не найден: окна EpicDuels будут открываться как есть.");
         }
         if (getConfig().getBoolean("kits.auto-install", true)) {
-            int created = kits.install(false);
+            // новый состав китов накатывается один раз сам: kits.revision в конфиге
+            int revision = getConfig().getInt("kits.revision", 0);
+            boolean refresh = revision < Kits.REVISION;
+            int created = kits.install(refresh);
+            if (refresh && created >= 0) {
+                getConfig().set("kits.revision", Kits.REVISION);
+                saveConfig();
+            }
             if (created > 0) {
                 getLogger().info("ElytriX: добавлено наборов — " + created
                         + " (всего в kits.yml " + Kits.NAMES.length + ")");
