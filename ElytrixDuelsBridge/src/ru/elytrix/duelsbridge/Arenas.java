@@ -564,6 +564,12 @@ final class Arenas implements Listener {
         if (!ourDuel(world)) return;
         Player teleported = event.getPlayer();
         if (teleported == null || !participant(world, teleported.getUniqueId())) return;
+        // Подменяем только телепорт самого EpicDuels (спавн боя и новый раунд).
+        // Пёрл, хорус, команды и наблюдатель — это полёт игрока: приземлился
+        // рядом с точкой — не приклеиваем к ней и не разворачиваем на её yaw.
+        PlayerTeleportEvent.TeleportCause cause = event.getCause();
+        if (cause != PlayerTeleportEvent.TeleportCause.PLUGIN
+                && cause != PlayerTeleportEvent.TeleportCause.UNKNOWN) return;
         Location first = pointAt(1);
         Location second = pointAt(2);
         if (first == null || second == null) return;

@@ -41,7 +41,7 @@ REPLACE_DIRS = {
 
 ADD = {
     "downloads/EpicDuels-ElyTriX-3.1.2.jar": "plugins/EpicDuels-ElyTriX-3.1.2.jar",
-    "downloads/ElytrixDuelsBridge-1.12.2.jar": "plugins/ElytrixDuelsBridge-1.12.2.jar",
+    "downloads/ElytrixDuelsBridge-1.12.3.jar": "plugins/ElytrixDuelsBridge-1.12.3.jar",
 }
 
 
