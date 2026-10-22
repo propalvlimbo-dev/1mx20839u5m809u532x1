@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import org.bukkit.configuration.ConfigurationSection;
 
-public class FileConfiguration implements ConfigurationSection {
+public class FileConfiguration implements org.bukkit.configuration.Configuration {
     public String getString(String path) { return null; }
     public String getString(String path, String def) { return def; }
     public int getInt(String path) { return 0; }
@@ -29,7 +29,9 @@ public class FileConfiguration implements ConfigurationSection {
     public java.util.Set<String> getKeys(boolean deep) { return java.util.Collections.emptySet(); }
     public java.util.Map<String, Object> getValues(boolean deep) { return java.util.Collections.emptyMap(); }
     public void addDefault(String path, Object value) { }
-    public void setDefaults(FileConfiguration defaults) { }
+    public void setDefaults(org.bukkit.configuration.Configuration defaults) { }
+    public org.bukkit.configuration.Configuration getDefaults() { return null; }
+    public void addDefaults(org.bukkit.configuration.Configuration defaults) { }
     public void save(File file) throws IOException { }
     public void saveAs(File file) throws IOException { }
     public String saveToString() { return ""; }

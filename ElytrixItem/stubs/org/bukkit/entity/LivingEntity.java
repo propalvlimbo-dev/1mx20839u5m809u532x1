@@ -25,7 +25,7 @@ public interface LivingEntity extends Entity {
     boolean addPotionEffect(PotionEffect effect);
     boolean addPotionEffect(PotionEffect effect, boolean force);
     PotionEffect getPotionEffect(PotionEffectType type);
-    boolean removePotionEffect(PotionEffectType type);
+    void removePotionEffect(PotionEffectType type);
     Collection<PotionEffect> getActivePotionEffects();
     EntityEquipment getEquipment();
     float getFallDistance();

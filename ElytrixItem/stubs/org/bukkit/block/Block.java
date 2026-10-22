@@ -37,7 +37,7 @@ public interface Block {
     Block getRelative(BlockFace face);
     Block getRelative(BlockFace face, int distance);
     Block getRelative(int modX, int modY, int modZ);
-    Collection<ItemStack> getDrops(ItemStack tool, Player player);
+    Collection<ItemStack> getDrops(ItemStack tool, org.bukkit.entity.Entity entity);
     Collection<ItemStack> getDrops(ItemStack tool);
     boolean breakNaturally();
     boolean breakNaturally(ItemStack tool);

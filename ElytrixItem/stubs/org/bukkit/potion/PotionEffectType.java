@@ -2,7 +2,7 @@ package org.bukkit.potion;
 
 public class PotionEffectType {
     public static final PotionEffectType SPEED = null;
-    public static final PotionEffectType SLOW = null;
+    public static final PotionEffectType SLOWNESS = null;
     public static final PotionEffectType MINING_FATIGUE = null;
     public static final PotionEffectType REGENERATION = null;
     public static final PotionEffectType FIRE_RESISTANCE = null;

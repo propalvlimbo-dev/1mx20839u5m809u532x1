@@ -74,7 +74,6 @@ public enum Material {
     REDSTONE_ORE,
     RED_DYE,
     REPEATING_COMMAND_BLOCK,
-    SIGN,
     STONE,
     STONE_PICKAXE,
     STONE_SWORD,

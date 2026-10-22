@@ -31,6 +31,6 @@ public interface ItemMeta {
     void setUnbreakable(boolean unbreakable);
     void setCustomModelData(Integer data);
     Integer getCustomModelData();
-    void addAttributeModifier(Attribute attribute, AttributeModifier modifier);
+    boolean addAttributeModifier(Attribute attribute, AttributeModifier modifier);
     Set<AttributeModifier> getAttributeModifiers(Attribute attribute);
 }
