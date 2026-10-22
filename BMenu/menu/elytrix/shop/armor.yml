@@ -348,6 +348,45 @@ items:
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
       - '[update]'
+  bulava:
+    material: mace
+    name: '§x§F§8§B§E§F§B«§x§F§5§B§E§F§B §x§F§2§B§E§F§BБ§x§F§0§B§F§F§Bу§x§E§D§B§F§F§Bл§x§E§A§B§F§F§Bа§x§E§7§B§F§F§Bв§x§E§4§B§F§F§Bа§x§E§2§C§0§F§B §x§D§F§C§0§F§BТ§x§D§C§C§0§F§Bи§x§D§9§C§0§F§Bт§x§D§6§C§0§F§Bа§x§D§3§C§0§F§Bн§x§D§1§C§1§F§Bа§x§C§E§C§1§F§B §x§C§B§C§1§F§B»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fПлотность V'
+    - '&#F8BEFB&l┃ &fПробой IV'
+    - '&#F8BEFB&l┃ &fВихрь II'
+    - '&#F8BEFB&l┃ &fПрочность IV'
+    - '&#F8BEFB&l┃ &fПочинка'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЦена: &#F8BEFB1499 коинов'
+    - '&#F8BEFB&l┃ &fБаланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    enchantments:
+      unbreaking: 3
+    item_flags:
+    - hide_enchants
+    - hide_attributes
+    - hide_additional_tooltip
+    on_click:
+    - if: '%playerpoints_points% >= 1499'
+      do:
+      - '[console] eitems give %player_name% bulava 1'
+      - '[console] p take %player_name% 1499'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
   info:
     material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0=
     name: '&7« &#F8BEFBНаши сообщества &7»'
@@ -460,3 +499,6 @@ animation:
   - opcodes:
       - st: skull3 40
       - sound: 'block.amethyst_block.chime 0.45 1.4'
+  - opcodes:
+      - st: bulava 24
+      - sound: 'block.note_block.pling 0.36 1.14'

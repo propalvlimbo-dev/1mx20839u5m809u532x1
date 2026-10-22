@@ -196,38 +196,6 @@ items:
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
       - '[update]'
-  bulava:
-    material: mace
-    name: '&7« &bБулава Титана &7»'
-    lore:
-    - '&#F8BEFB&l┃'
-    - '&#F8BEFB&l┃ &fТип: &bРеликвия'
-    - '&#F8BEFB&l┃ &fСвойство: &bСокрушительный удар и отбрасывание'
-    - '&#F8BEFB&l┃ &fЗачарования: &bПлотность V, Пробой IV'
-    - '&#F8BEFB&l┃ &fЗачарования: &bВихрь II, Прочность IV, Починка'
-    - '&#F8BEFB&l┃'
-    - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB1599 коинов'
-    - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
-    - '&#F8BEFB&l┃ '
-    - '&7● &fНажмите для покупки'
-    on_click:
-    - if: '%playerpoints_points% >= 1599'
-      do:
-      - '[console] eitems give %player_name% bulava 1'
-      - '[console] p take %player_name% 1599'
-      - '[message]'
-      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
-      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
-      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
-      - '[message]'
-      - '[update]'
-      else:
-      - '[message]'
-      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
-      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
-      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
-      - '[message]'
-      - '[update]'
   kirkaslime:
     material: netherite_pickaxe
     name: '&7« &bКирка Слаймера &7»'
@@ -394,9 +362,6 @@ animation:
   - opcodes:
       - st: experience_pot 32
       - sound: 'block.amethyst_block.chime 0.45 1.4'
-  - opcodes:
-      - st: bulava 14
-      - sound: 'block.note_block.pling 0.27 1.05'
   - opcodes:
       - st: kirkaslime 31
       - sound: 'block.note_block.pling 0.35 1.55'

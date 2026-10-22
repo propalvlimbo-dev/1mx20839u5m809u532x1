@@ -3,8 +3,7 @@ version: '2.0.0'
 main: ru.rooyzee.elytrixitem.Main
 api-version: '1.21'
 authors: [rooyzee]
-depend: [WorldGuard]
-softdepend: [Vault]
+softdepend: [WorldGuard, Vault]
 description: плагин на кастомные предметы для Elytrix
 website: https://elytrix.pw
 
