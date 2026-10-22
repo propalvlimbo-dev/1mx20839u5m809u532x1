@@ -77,6 +77,7 @@ public final class Main extends JavaPlugin {
         this.chatInput = new ChatInput(this);
         try {
             Bukkit.getPluginManager().registerEvents(this.chatInput, this);
+            this.chatInput.registerPaper(Bukkit.getPluginManager());
             this.chatInput.markRegistered();
         } catch (Throwable error) {
             // не Paper — ввода имени в чате не будет, работает команда с именем

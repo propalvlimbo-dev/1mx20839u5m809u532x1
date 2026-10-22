@@ -59,8 +59,9 @@ items:
     - '&#F8BEFB&l┃ &fСвоё имя видно над питомцем.'
     - '&#F8BEFB&l┃ &fСейчас: &f%slidesubscribe_pet_parrot_name%'
     - '&#F8BEFB&l┃ '
-    - '&7● &fНажмите — откроется табличка'
-    - '&7● &fПустая табличка или &#F8BEFBсброс &f— убрать имя'
+    - '&7● &fНажмите и напишите имя в чат'
+    - '&7● &fРаботают цветокоды &f&c&c &f&a&a &7и hex &f#F8BEFB'
+    - '&7● &fЧтобы убрать — напишите &#F8BEFBсброс'
     on_click:
     - player: 'subscribe pet parrot name'
   info:

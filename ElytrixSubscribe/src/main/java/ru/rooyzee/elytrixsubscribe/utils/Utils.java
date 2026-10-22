@@ -39,6 +39,14 @@ public class Utils {
         return totalMinutes + " мин";
     }
 
+    /** Приводим ввод игрока к единому виду: § -> &, #RRGGBB -> &#RRGGBB. */
+    public static String normalizeColors(String text) {
+        if (text == null) return null;
+        String value = text.replace('\u00a7', '&');
+        value = value.replaceAll("(?<!&)#([A-Fa-f0-9]{6})", "&#$1");
+        return value;
+    }
+
     public static String color(String text) {
         if (text == null) {
             return "";

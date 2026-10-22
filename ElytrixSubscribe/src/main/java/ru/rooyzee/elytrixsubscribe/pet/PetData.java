@@ -22,7 +22,16 @@ public class PetData {
     }
 
     public void setName(String name) {
-        this.name = name == null || name.trim().isEmpty() ? null : name.trim();
+        if (name == null) {
+            this.name = null;
+            return;
+        }
+        String value = ru.rooyzee.elytrixsubscribe.utils.Utils.normalizeColors(name.trim());
+        if (value == null || value.isEmpty()) {
+            this.name = null;
+            return;
+        }
+        this.name = value.length() > 48 ? value.substring(0, 48) : value;
     }
 
     public int variant() {

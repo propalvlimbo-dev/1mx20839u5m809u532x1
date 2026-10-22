@@ -191,6 +191,11 @@ public class SubscribeCommand implements CommandExecutor, TabCompleter {
                 + "&fНапиши имя для питомца &f" + type.displayName() + "&f на табличке."
                 + "&7 (сейчас: " + (data.name() == null ? "не задано" : data.name()) + ")";
         java.util.function.Consumer<String> callback = name -> this.applyName(player, type, name);
+        // основной способ — просто написать в чат
+        if (this.plugin.getChatInput().supported()) {
+            this.plugin.getChatInput().request(player, prompt, callback);
+            return;
+        }
         if (this.plugin.getSignInput().request(player, callback)) return;
         this.plugin.getChatInput().request(player, prompt, callback);
     }

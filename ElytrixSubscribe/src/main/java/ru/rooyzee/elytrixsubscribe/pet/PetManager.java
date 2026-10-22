@@ -420,6 +420,8 @@ public final class PetManager implements Listener {
         entity.setNoGravity(true);
         entity.setOnGround(false);
         entity.setSilent(true);
+        // свечение — единственная настройка внешнего вида у аллея
+        if (row.type() == PetType.ALLAY) entity.setGlowing(row.variant() > 0);
         if (row.name() != null && !row.name().isEmpty()) {
             entity.setCustomName(this.component(row.name()));
             entity.setCustomNameVisible(true);
@@ -746,7 +748,8 @@ public final class PetManager implements Listener {
 
     public String nameLine(Player player, PetType type) {
         String name = this.data(player, type).name();
-        return name == null ? "&7не задано" : name;
+        return name == null ? "&7не задано"
+                : ru.rooyzee.elytrixsubscribe.utils.Utils.color(name);
     }
 
     public String behaviorLine(Player player, PetType type) {
