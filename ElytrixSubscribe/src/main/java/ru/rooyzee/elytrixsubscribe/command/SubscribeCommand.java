@@ -188,7 +188,7 @@ public class SubscribeCommand implements CommandExecutor, TabCompleter {
         PetData data = this.plugin.getPetManager().data(player, type);
         player.closeInventory();
         final String prompt = "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» "
-                + "&fНапиши имя для питомца &f" + type.displayName() + "&f на табличке."
+                + "&fНапиши имя для питомца &f" + type.displayName() + "&f в чат."
                 + "&7 (сейчас: " + (data.name() == null ? "не задано" : data.name()) + ")";
         java.util.function.Consumer<String> callback = name -> this.applyName(player, type, name);
         // основной способ — просто написать в чат
