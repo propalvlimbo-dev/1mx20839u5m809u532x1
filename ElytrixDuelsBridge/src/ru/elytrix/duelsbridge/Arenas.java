@@ -367,6 +367,17 @@ final class Arenas {
         plugin.msg(player, "&#F8BEFBДуэли &8» &fТочка &d" + point + "&f арены &d" + name
                 + "&f: &d" + location.getBlockX() + " " + location.getBlockY() + " "
                 + location.getBlockZ());
+
+        // вторая точка поставлена — арена сразу в ротации, без отдельного save
+        boolean both = Duels.call(arena, "getSpawn1") != null && Duels.call(arena, "getSpawn2") != null;
+        if (both && !Boolean.TRUE.equals(Duels.call(arena, "isReady"))) {
+            Duels.call(arena, "setReady", Boolean.TRUE);
+            Duels.call(manager, "saveArenas");
+            plugin.msg(player, "&#F8BEFBДуэли &8» &fАрена &d" + name
+                    + "&f готова — уже в ротации. Следующая арена: &f/duel arena setspawn1 arena2");
+        } else if (!both) {
+            plugin.msg(player, "&#F8BEFBДуэли &8» &7Осталась вторая точка: &f/duel arena setspawn2 " + name);
+        }
     }
 
     private void ready(Player player, String name) {
@@ -377,7 +388,10 @@ final class Arenas {
             return;
         }
         if (Duels.call(arena, "getSpawn1") == null || Duels.call(arena, "getSpawn2") == null) {
-            plugin.msg(player, "&#F8BEFBДуэли &8» &cСначала поставь обе точки.");
+            boolean first = Duels.call(arena, "getSpawn1") != null;
+            plugin.msg(player, "&#F8BEFBДуэли &8» &cУ арены &f" + name + "&c нет "
+                    + (first ? "точки 2" : "точки 1") + ": &f/duel arena setspawn"
+                    + (first ? "2 " : "1 ") + name);
             return;
         }
         Duels.call(arena, "setReady", Boolean.TRUE);

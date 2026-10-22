@@ -153,6 +153,12 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
                         "warp", "home", "back"));
                 changed = true;
             }
+            // в старом сообщении не было списка арен — дописываем
+            String noArenas = config.getString("messages.no-arenas");
+            if (noArenas != null && !noArenas.contains("%arenas%")) {
+                config.set("messages.no-arenas", noArenas + " Арены: %arenas%");
+                changed = true;
+            }
             // один общий мир для всех арен: по умолчанию — уже готовый duel
             if (config.getString("arenas.world") == null) {
                 config.set("arenas.world", Bukkit.getWorld("duel") == null ? "" : "duel");

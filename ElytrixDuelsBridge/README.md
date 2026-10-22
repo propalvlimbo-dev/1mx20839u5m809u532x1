@@ -421,7 +421,7 @@ api:
 ## Установка
 
 1. `EpicDuels-ElyTriX-3.1.1.jar` → `plugins/` (заменяет обычный EpicDuels 3.1.x)
-2. `ElytrixDuelsBridge-1.7.3.jar` → `plugins/`
+2. `ElytrixDuelsBridge-1.7.4.jar` → `plugins/`
 3. Папка меню BMenu `elytrix/duel/*.yml` → `plugins/BMenu/menu/elytrix/duel/`
 4. Запустить сервер (или `/reload confirm` — не рекомендуется) и проверить `/duel`.
 5. Если наборы уже были — `/duelx kits reset`, чтобы применить усиленный состав.

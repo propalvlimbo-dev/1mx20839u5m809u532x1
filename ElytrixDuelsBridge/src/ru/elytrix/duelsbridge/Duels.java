@@ -298,13 +298,14 @@ final class Duels {
                         "&#F8BEFBДуэли &8» &cСначала выбери размер команд."));
                 return false;
             }
-            Object arenas = call(manager("getArenaManager"), "getReadyArenas");
-            if (!(arenas instanceof List) || ((List<?>) arenas).isEmpty()) {
+            List<Object> list = readyArenas();
+            if (list.isEmpty()) {
                 plugin.msg(player, plugin.string("messages.no-arenas",
-                        "&#F8BEFBДуэли &8» &cНет готовых арен — сообщи администратору."));
+                        "&#F8BEFBДуэли &8» &cНет готовых арен — сообщи администратору.")
+                        .replace("%arenas%", arenasReport()));
+                plugin.getLogger().warning("Арены: запуск боя невозможен — " + arenasReport());
                 return false;
             }
-            List<?> list = (List<?>) arenas;
             Object arena = list.get(random.nextInt(list.size()));
             Object all = members instanceof List ? members : new ArrayList<Object>();
             ok = invoke(manager("getTeamDuelManager"), "startTeamDuel",
@@ -332,18 +333,76 @@ final class Duels {
                     "&#F8BEFBДуэли &8» &cСначала выбери игрока и кит."));
             return false;
         }
-        Object arenas = call(manager("getArenaManager"), "getReadyArenas");
-        if (!(arenas instanceof List) || ((List<?>) arenas).isEmpty()) {
+        List<Object> ready = readyArenas();
+        if (ready.isEmpty()) {
             plugin.msg(player, plugin.string("messages.no-arenas",
-                    "&#F8BEFBДуэли &8» &cНет готовых арен — сообщи администратору."));
+                    "&#F8BEFBДуэли &8» &cНет готовых арен — сообщи администратору.")
+                    .replace("%arenas%", arenasReport()));
+            plugin.getLogger().warning("Арены: запуск боя невозможен — " + arenasReport());
             return false;
         }
-        List<?> ready = (List<?>) arenas;
         Object arena = ready.get(random.nextInt(ready.size()));
         Object name = call(arena, "getName");
         if (name == null) return false;
         call(gui(), "finishChallengeWithArena", player, String.valueOf(name));
         return true;
+    }
+
+    /**
+     * Готовые арены. Если EpicDuels не видит ни одной, но у арен есть обе
+     * точки спавна, включаем их сами: точки = арена готова, и забытый
+     * /duel arena save не должен ломать запуск боя.
+     */
+    List<Object> readyArenas() {
+        Object manager = manager("getArenaManager");
+        List<Object> ready = rows(call(manager, "getReadyArenas"));
+        if (!ready.isEmpty()) return ready;
+
+        Object all = call(manager, "getAllArenas");
+        if (!(all instanceof java.util.Collection)) return ready;
+        List<Object> promoted = new ArrayList<Object>();
+        for (Object arena : (java.util.Collection<?>) all) {
+            if (arena == null) continue;
+            if (call(arena, "getSpawn1") == null || call(arena, "getSpawn2") == null) continue;
+            call(arena, "setReady", Boolean.TRUE);
+            promoted.add(arena);
+            plugin.getLogger().info("Арены: \"" + call(arena, "getName")
+                    + "\" включена сама — у неё есть обе точки спавна");
+        }
+        if (!promoted.isEmpty()) call(manager, "saveArenas");
+        return promoted;
+    }
+
+    /** Что с аренами: короткая строка для сообщения админу. */
+    String arenasReport() {
+        Object all = call(manager("getArenaManager"), "getAllArenas");
+        if (!(all instanceof java.util.Collection)) return "";
+        StringBuilder out = new StringBuilder();
+        int count = 0;
+        for (Object arena : (java.util.Collection<?>) all) {
+            if (arena == null) continue;
+            count++;
+            if (out.length() > 0) out.append("&7, &f");
+            out.append(String.valueOf(call(arena, "getName"))).append("&7 — ");
+            boolean first = call(arena, "getSpawn1") != null;
+            boolean second = call(arena, "getSpawn2") != null;
+            if (!first && !second) out.append("&cнет точек");
+            else if (!first) out.append("&cнет точки 1");
+            else if (!second) out.append("&cнет точки 2");
+            else out.append("&aготова");
+        }
+        if (count == 0) return "&cарен нет вовсе";
+        return out.toString();
+    }
+
+    private static List<Object> rows(Object value) {
+        List<Object> out = new ArrayList<Object>();
+        if (value instanceof java.util.Collection) {
+            for (Object row : (java.util.Collection<?>) value) {
+                if (row != null) out.add(row);
+            }
+        }
+        return out;
     }
 
     /** Случайная готовая арена или null. */
@@ -392,11 +451,8 @@ final class Duels {
         Class<?> sizeClass = secondArg(gui, "setPartyFlowTeamSize");
         Object size = sizeClass == null ? null : enumOf(sizeClass, sizeName);
         Object kit = call(manager("getKitManager"), "getKit", kitName);
-        Object arenas = call(manager("getArenaManager"), "getReadyArenas");
-        if (size == null || kit == null || !(arenas instanceof List) || ((List<?>) arenas).isEmpty()) {
-            return false;
-        }
-        List<?> ready = (List<?>) arenas;
+        List<Object> ready = readyArenas();
+        if (size == null || kit == null || ready.isEmpty()) return false;
         Object arena = ready.get(random.nextInt(ready.size()));
         return invoke(manager("getTeamDuelManager"), "startTeamDuel",
                 new Class<?>[]{List.class, size.getClass(), arena.getClass(), kit.getClass()},
