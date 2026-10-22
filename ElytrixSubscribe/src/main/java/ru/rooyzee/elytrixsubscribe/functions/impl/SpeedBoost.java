@@ -1,18 +1,21 @@
 package ru.rooyzee.elytrixsubscribe.functions.impl;
 
+import java.util.UUID;
+import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerQuitEvent;
+import ru.rooyzee.elytrixsubscribe.Main;
 import ru.rooyzee.elytrixsubscribe.functions.Function;
 
-import java.util.UUID;
-
+/**
+ * Скорость: +10% к базовой скорости.
+ *
+ * Модификатор на 1.21 хранится по NamespacedKey, поэтому его можно наложить
+ * заново после перезахода и не получить второй такой же.
+ */
 public class SpeedBoost extends Function {
-    private static final UUID MODIFIER_UUID = UUID.fromString("f8a3c1e2-0d4f-4e2f-8a1c-9b0d5e7f3a11");
-    private static final String MODIFIER_NAME = "elytrix_speed_boost";
     private static final double BOOST = 0.10;
 
     public SpeedBoost() {
@@ -20,35 +23,28 @@ public class SpeedBoost extends Function {
     }
 
     @Override
-    public void onEnable(Player player) {
-        applyModifier(player);
-        super.onEnable(player);
+    public void apply(Player player) {
+        AttributeInstance attribute = player.getAttribute(Attribute.MOVEMENT_SPEED);
+        if (attribute == null) return;
+        this.clear(player);
+        attribute.addModifier(new AttributeModifier(this.key(),
+                BOOST, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
     }
 
     @Override
-    public void onDisable(Player player) {
-        removeModifier(player);
-        super.onDisable(player);
+    public void clear(Player player) {
+        AttributeInstance attribute = player.getAttribute(Attribute.MOVEMENT_SPEED);
+        if (attribute == null) return;
+        NamespacedKey key = this.key();
+        for (AttributeModifier modifier : attribute.getModifiers()) {
+            if (key.equals(modifier.getKey())) {
+                attribute.removeModifier(modifier);
+                return;
+            }
+        }
     }
 
-    @EventHandler
-    public void onQuit(PlayerQuitEvent e) {
-        removeModifier(e.getPlayer());
-    }
-
-    private void applyModifier(Player player) {
-        AttributeInstance attr = player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
-        if (attr == null) return;
-        removeModifier(player);
-        attr.addModifier(new AttributeModifier(MODIFIER_UUID, MODIFIER_NAME, BOOST, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
-    }
-
-    private void removeModifier(Player player) {
-        AttributeInstance attr = player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
-        if (attr == null) return;
-        attr.getModifiers().stream()
-                .filter(m -> m.getUniqueId().equals(MODIFIER_UUID))
-                .findFirst()
-                .ifPresent(attr::removeModifier);
+    private NamespacedKey key() {
+        return new NamespacedKey(Main.getInstance(), "elytrix_speed_boost");
     }
 }

@@ -1,53 +1,61 @@
 package ru.rooyzee.elytrixsubscribe.functions;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.Plugin;
+import ru.rooyzee.elytrixsubscribe.Main;
 import ru.rooyzee.elytrixsubscribe.exceptions.AgainFunctionRegisterException;
 import ru.rooyzee.elytrixsubscribe.exceptions.NoneFunctionException;
 import ru.rooyzee.elytrixsubscribe.functions.impl.AntiFall;
 import ru.rooyzee.elytrixsubscribe.functions.impl.AntiFood;
 import ru.rooyzee.elytrixsubscribe.functions.impl.AutoTotem;
-import ru.rooyzee.elytrixsubscribe.functions.impl.ParrotFunction;
 import ru.rooyzee.elytrixsubscribe.functions.impl.SpeedBoost;
-import ru.rooyzee.elytrixsubscribe.sub.PlayerSub;
 
+/** Функции подписки. Питомцы живут отдельно — в PetManager. */
 public class FunctionManager {
-    private final List<Function> functionList = new ArrayList<>();
+    private final List<Function> functions = new ArrayList<Function>();
 
-    public FunctionManager(Plugin plugin) {
+    public FunctionManager(Main plugin) {
         try {
-            this.registerFunction(new ParrotFunction(), plugin);
-            this.registerFunction(new AntiFood(), plugin);
-            this.registerFunction(new AutoTotem(), plugin);
-            this.registerFunction(new AntiFall(), plugin);
-            this.registerFunction(new SpeedBoost(), plugin);
-        } catch (AgainFunctionRegisterException var3) {
-            throw new RuntimeException(var3);
+            this.register(new AntiFood(), plugin);
+            this.register(new AutoTotem(), plugin);
+            this.register(new AntiFall(), plugin);
+            this.register(new SpeedBoost(), plugin);
+        } catch (AgainFunctionRegisterException error) {
+            throw new RuntimeException(error);
         }
     }
 
-    public void registerFunction(Function function, Plugin plugin) throws AgainFunctionRegisterException {
-        if (this.functionList.stream().anyMatch((f) -> f.getName().equals(function.getName()))) {
-            throw new AgainFunctionRegisterException("Duplicate registration: " + function.getName());
-        } else {
-            this.functionList.add(function);
-            Bukkit.getPluginManager().registerEvents(function, plugin);
+    public void register(Function function, Main plugin) throws AgainFunctionRegisterException {
+        for (Function other : this.functions) {
+            if (other.getName().equalsIgnoreCase(function.getName())) {
+                throw new AgainFunctionRegisterException("Duplicate: " + function.getName());
+            }
         }
+        this.functions.add(function);
+        Bukkit.getPluginManager().registerEvents(function, plugin);
     }
 
-    public boolean hasFunction(String name) {
-        return this.functionList.stream().anyMatch((f) -> f.getName().equals(name));
+    public boolean has(String name) {
+        return this.find(name) != null;
+    }
+
+    public Function find(String name) {
+        if (name == null) return null;
+        for (Function function : this.functions) {
+            if (function.getName().equalsIgnoreCase(name)) return function;
+        }
+        return null;
     }
 
     public Function getFunction(String name) throws NoneFunctionException {
-        return this.functionList.stream().filter((f) -> f.getName().equals(name)).findFirst().orElseThrow(() ->
-                new NoneFunctionException("Function " + name + " not found")
-        );
+        Function function = this.find(name);
+        if (function == null) throw new NoneFunctionException("Function " + name + " not found");
+        return function;
     }
 
-    public boolean isFunctionEnable(PlayerSub player, Function function) {
-        return player.getEnabledFunctions().contains(function);
+    public List<Function> all() {
+        return Collections.unmodifiableList(this.functions);
     }
 }

@@ -1,0 +1,116 @@
+id: elytrix:sub_pets
+provider: default
+type: chest
+size: 45
+title: '&#F8BEFB&lПитомцы'
+items:
+  header:
+    material: parrot_spawn_egg
+    name: '&7« &#F8BEFBПитомцы подписки &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fВключить можно &fтолько одного&f питомца.'
+    - '&#F8BEFB&l┃ &fСейчас включён: &#F8BEFB%slidesubscribe_pet%'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fЛКМ — включить или выключить'
+    - '&7● &fПКМ — открыть настройки'
+  parrot:
+    material: parrot_spawn_egg
+    name: '&7« &#F8BEFBПопугай &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЛетает по кругу, сидит на плече'
+    - '&#F8BEFB&l┃ &fили висит рядом.'
+    - '&#F8BEFB&l┃ &fРежим: &#F8BEFB%slidesubscribe_pet_parrot_behavior%'
+    - '&#F8BEFB&l┃ &fОкрас: &#F8BEFB%slidesubscribe_pet_parrot_look%'
+    - '&#F8BEFB&l┃ &fИмя: &f%slidesubscribe_pet_parrot_name%'
+    - '&#F8BEFB&l┃ &fСтатус: %slidesubscribe_pet_parrot_status%'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fЛКМ — включить или выключить'
+    - '&7● &fПКМ — настройки'
+    on_left_click:
+    - player: 'subscribe pet toggle parrot'
+    on_right_click:
+    - player: 'subscribe menu parrot'
+  allay:
+    material: allay_spawn_egg
+    name: '&7« &#F8BEFBАллей &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fКружит рядом, светится и танцует.'
+    - '&#F8BEFB&l┃ &fРежим: &#F8BEFB%slidesubscribe_pet_allay_behavior%'
+    - '&#F8BEFB&l┃ &fСвечение: &#F8BEFB%slidesubscribe_pet_allay_look%'
+    - '&#F8BEFB&l┃ &fИмя: &f%slidesubscribe_pet_allay_name%'
+    - '&#F8BEFB&l┃ &fСтатус: %slidesubscribe_pet_allay_status%'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fЛКМ — включить или выключить'
+    - '&7● &fПКМ — настройки'
+    on_left_click:
+    - player: 'subscribe pet toggle allay'
+    on_right_click:
+    - player: 'subscribe menu allay'
+  bee:
+    material: bee_spawn_egg
+    name: '&7« &#F8BEFBПчела &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЛетает зигзагом и кувыркается.'
+    - '&#F8BEFB&l┃ &fРежим: &#F8BEFB%slidesubscribe_pet_bee_behavior%'
+    - '&#F8BEFB&l┃ &fРазмер: &#F8BEFB%slidesubscribe_pet_bee_look%'
+    - '&#F8BEFB&l┃ &fИмя: &f%slidesubscribe_pet_bee_name%'
+    - '&#F8BEFB&l┃ &fСтатус: %slidesubscribe_pet_bee_status%'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fЛКМ — включить или выключить'
+    - '&7● &fПКМ — настройки'
+    on_left_click:
+    - player: 'subscribe pet toggle bee'
+    on_right_click:
+    - player: 'subscribe menu bee'
+  back:
+    material: red_dye
+    name: '&7« &#F8BEFBНазад &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fВернуться в меню подписки.'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для перехода'
+    on_click:
+    - open: 'elytrix:sub'
+  design_purple_panel:
+    material: purple_stained_glass_pane
+    name: '&r'
+  design_black_panel:
+    material: black_stained_glass_pane
+    name: '&r'
+animation:
+  - tick: 0
+    opcodes:
+      - st: back 40
+      - st: header 4
+      - st: design_purple_panel 19,21
+      - sound: 'block.enchantment_table.use 0.3 1.5'
+  - opcodes:
+      - st: design_purple_panel 18,26
+      - sound: 'block.note_block.chime 0.2 0.88'
+  - opcodes:
+      - st: design_purple_panel 23,25
+  - opcodes:
+      - st: design_black_panel 9-17
+      - sound: 'block.note_block.chime 0.23 1.0'
+  - opcodes:
+      - st: design_black_panel 27-35
+  - opcodes:
+      - st: design_black_panel 36-39,41-44
+      - sound: 'block.note_block.chime 0.27 1.15'
+  - opcodes:
+      - st: design_black_panel 0-3,5-8
+      - sound: 'block.note_block.chime 0.3 1.3'
+  - opcodes:
+      - st: parrot 20
+      - sound: 'block.note_block.pling 0.3 1.1'
+  - opcodes:
+      - st: allay 22
+      - sound: 'block.note_block.pling 0.32 1.25'
+  - opcodes:
+      - st: bee 24
+      - sound: 'block.amethyst_block.chime 0.45 1.4'

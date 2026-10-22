@@ -1,0 +1,117 @@
+id: elytrix:sub_pet_parrot
+provider: default
+type: chest
+size: 27
+title: '&#F8BEFB&lПопугай'
+items:
+  header:
+    material: parrot_spawn_egg
+    name: '&7« &#F8BEFBПопугай &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fПиратский попугай с пятью окрасами.'
+    - '&#F8BEFB&l┃ &fРежимы: &#F8BEFBКруг · Рядом · На плече'
+    - '&#F8BEFB&l┃ &fСтатус: %slidesubscribe_pet_parrot_status%'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fПКМ по питомцу в мире тоже открывает это меню'
+  toggle:
+    material: lime_dye
+    name: '&7« &#F8BEFBВключить / выключить &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fОдновременно может быть включён'
+    - '&#F8BEFB&l┃ &fтолько один питомец.'
+    - '&#F8BEFB&l┃ &fСтатус: %slidesubscribe_pet_parrot_status%'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для переключения'
+    on_click:
+    - player: 'subscribe pet toggle parrot'
+    - update: ''
+  behavior:
+    material: blaze_rod
+    name: '&7« &#F8BEFBПоведение &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fКак питомец двигается рядом с вами.'
+    - '&#F8BEFB&l┃ &fРежимы: &#F8BEFBКруг · Рядом · На плече'
+    - '&#F8BEFB&l┃ &fСейчас: &#F8BEFB%slidesubscribe_pet_parrot_behavior%'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите, чтобы сменить режим'
+    on_click:
+    - player: 'subscribe pet parrot behavior'
+  look:
+    material: name_tag
+    name: '&7« &#F8BEFBОкрас &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fВнешний вид питомца.'
+    - '&#F8BEFB&l┃ &fСейчас: &#F8BEFB%slidesubscribe_pet_parrot_look%'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите, чтобы сменить окрас'
+    on_click:
+    - player: 'subscribe pet parrot variant'
+  name:
+    material: paper
+    name: '&7« &#F8BEFBИмя питомца &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fСвоё имя видно над питомцем.'
+    - '&#F8BEFB&l┃ &fСейчас: &f%slidesubscribe_pet_parrot_name%'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите и напишите имя в чат'
+    - '&7● &fЧтобы убрать — напишите &#F8BEFBсброс'
+    on_click:
+    - player: 'subscribe pet parrot name'
+  back:
+    material: red_dye
+    name: '&7« &#F8BEFBНазад &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fВернуться к выбору питомца.'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для перехода'
+    on_click:
+    - open: 'elytrix:sub_pets'
+  design_purple_panel:
+    material: purple_stained_glass_pane
+    name: '&r'
+  design_black_panel:
+    material: black_stained_glass_pane
+    name: '&r'
+animation:
+  - tick: 0
+    opcodes:
+      - st: back 22
+      - st: header 4
+      - st: design_purple_panel 13,15
+      - sound: 'block.enchantment_table.use 0.3 1.5'
+  - opcodes:
+      - st: design_purple_panel 11,17
+      - sound: 'block.note_block.chime 0.2 0.88'
+  - opcodes:
+      - st: design_purple_panel 10,18
+  - opcodes:
+      - st: design_black_panel 19,20
+      - sound: 'block.note_block.chime 0.23 1.0'
+  - opcodes:
+      - st: design_black_panel 21,23
+  - opcodes:
+      - st: design_black_panel 24,25
+      - sound: 'block.note_block.chime 0.27 1.15'
+  - opcodes:
+      - st: design_black_panel 26,9
+  - opcodes:
+      - st: design_black_panel 0-3,5-8
+      - sound: 'block.note_block.chime 0.3 1.3'
+  - opcodes:
+      - st: toggle 10
+      - sound: 'block.note_block.pling 0.3 1.1'
+  - opcodes:
+      - st: behavior 12
+      - sound: 'block.note_block.pling 0.32 1.2'
+  - opcodes:
+      - st: look 14
+      - sound: 'block.note_block.pling 0.33 1.32'
+  - opcodes:
+      - st: name 16
+      - sound: 'block.amethyst_block.chime 0.45 1.4'

@@ -1,22 +1,50 @@
+# ElytrixSubscribe 2.0 — подписка ElytriX+
+#
+# Меню рисует BMenu: файлы лежат в plugins/BMenu/menu/elytrix/main/sub.yml
+# (главное) и plugins/BMenu/menu/elytrix/sub/*.yml (питомцы и функции).
+# Если переименовал меню — поправь id здесь.
+
+menus:
+  main: elytrix:sub
+  pets: elytrix:sub_pets
+  functions: elytrix:sub
+  pet-parrot: elytrix:sub_pet_parrot
+  pet-allay: elytrix:sub_pet_allay
+  pet-bee: elytrix:sub_pet_bee
+
+pets:
+  enabled: true          # выключить питомцев совсем
+  tick-interval: 2       # как часто двигаются (в тиках)
+  view-distance: 64      # с какого расстояния питомца видно
+
 messages:
   help: |-
     &f
     &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &fСписок доступных команд:
-    &7» &#F8BEFB/sub add [ник] [время в днях] &7— выдать подписку
-    &7» &#F8BEFB/sub remove [ник] &7— забрать подписку
-    &7» &#F8BEFB/sub delay &7— время до конца подписки
-    &7» &#F8BEFB/sub toggle [функция] &7— переключить функцию
+    &7» &#F8BEFB/subscribe &7— меню подписки
+    &7» &#F8BEFB/subscribe pets &7— питомцы
+    &7» &#F8BEFB/subscribe delay &7— время до конца подписки
+    &7» &#F8BEFB/subscribe toggle [функция] &7— переключить функцию
+    &7» &#F8BEFB/subscribe add [ник] [дни] &7— выдать подписку (админ)
+    &7» &#F8BEFB/subscribe remove [ник] &7— забрать подписку (админ)
     &f
   useNumberFormat: '&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &fОшибка: используйте числа в аргументе времени.'
   playerTakeItSubscribe: '&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &fВам была успешно выдана подписка!'
   noneSubscribe: '&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &fУ вас нет активной подписки.'
   delayMessage: '&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &fДо конца вашей подписки осталось: &#F8BEFB%cooldown'
-  subscribeHasExpired: '&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &fСрок действия вашей подписки подошел к концу.'
+  subscribeHasExpired: '&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &fСрок действия вашей подписки подошёл к концу.'
   moduleEnable: '&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &fФункция &#F8BEFB%functionName &fбыла &aвключена&f.'
   moduleDisable: '&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &fФункция &#F8BEFB%functionName &fбыла &cвыключена&f.'
+  pet-enabled: '&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &fПитомец &#F8BEFB%pet% &fвключён.'
+  pet-disabled: '&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &fПитомец &#F8BEFB%pet% &fвыключен.'
+  auto-totem: '&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &fАвто-тотем сработал! Перезарядка: &#F8BEFB30 сек.'
+  input-cancel: '&7● &fЧтобы отменить — напиши &fотмена&7.'
+  input-aborted: '&7Ввод отменён.'
 
 settings:
-  permissions: playerpoints.pay;cmi.command.fly
+  # Права через LuckPerms, которые выдаются на время подписки (через ;).
+  # Пусто — ничего не выдаём.
+  permissions: ''
   hasSubscribePlaceholder: '&#F8BEFBДа'
   noHaveSubscribePlaceholder: '&7Нет'
   noHaveSubscribePlaceholderDelay: '&cИстекла'

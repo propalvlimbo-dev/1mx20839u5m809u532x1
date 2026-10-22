@@ -1,0 +1,4 @@
+package org.bukkit;
+public enum Material {
+    TOTEM_OF_UNDYING, AIR, STONE, PARROT_SPAWN_EGG, ALLAY_SPAWN_EGG, BEE_SPAWN_EGG, PLAYER_HEAD
+}

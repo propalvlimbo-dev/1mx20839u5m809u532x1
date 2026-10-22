@@ -1,6 +1,5 @@
 package ru.rooyzee.elytrixsubscribe.utils;
 
-import net.md_5.bungee.api.ChatColor;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Matcher;
@@ -55,6 +54,17 @@ public class Utils {
             matcher.appendReplacement(sb, replacement.toString());
         }
         matcher.appendTail(sb);
-        return ChatColor.translateAlternateColorCodes('&', sb.toString());
+        String translated = sb.toString();
+        char[] chars = translated.toCharArray();
+        for (int index = 0; index + 1 < chars.length; index++) {
+            if (chars[index] != '&') continue;
+            char code = Character.toLowerCase(chars[index + 1]);
+            if ((code >= '0' && code <= '9') || (code >= 'a' && code <= 'f')
+                    || code == 'k' || code == 'l' || code == 'm' || code == 'n'
+                    || code == 'o' || code == 'r' || code == 'x') {
+                chars[index] = '\u00a7';
+            }
+        }
+        return new String(chars);
     }
 }

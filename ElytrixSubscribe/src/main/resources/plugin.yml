@@ -1,11 +1,19 @@
 name: ElytrixSubscribe
-version: '1.0'
+version: '2.0'
 main: ru.rooyzee.elytrixsubscribe.Main
-depend: [ PlaceholderAPI, LuckPerms, VirtualEntityApi ]
-api-version: '1.16'
+api-version: '1.21'
+description: Подписка ElytriX+ — меню на BMenu, функции и три питомца
+author: ElytriX
+depend: [PlaceholderAPI, LuckPerms, BMenu]
+softdepend: [VirtualEntityApi, BLib]
 
 commands:
   subscribe:
-    description: Управление подпиской
-    usage: /subscribe [add|remove|delay|toggle|menu]
-    aliases: [sub]
+    description: Меню подписки и служебные команды
+    usage: /subscribe [menu|pets|pet|toggle|delay|add|remove|reload]
+    aliases: [elytrixsubscribe, esub]
+
+permissions:
+  elytrixsubscribe.add:
+    description: Выдавать и забирать подписку
+    default: op

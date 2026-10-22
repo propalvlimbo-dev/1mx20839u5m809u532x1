@@ -1,92 +1,173 @@
 package ru.rooyzee.elytrixsubscribe;
 
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
+import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandExecutor;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 import ru.rooyzee.elytrixsubscribe.command.SubscribeCommand;
-import ru.rooyzee.elytrixsubscribe.database.SQLite;
+import ru.rooyzee.elytrixsubscribe.database.Storage;
 import ru.rooyzee.elytrixsubscribe.exceptions.ConvertPlayerException;
 import ru.rooyzee.elytrixsubscribe.functions.Function;
 import ru.rooyzee.elytrixsubscribe.functions.FunctionManager;
-import ru.rooyzee.elytrixsubscribe.menu.ParrotMenu;
-import ru.rooyzee.elytrixsubscribe.menu.ParrotNameMenu;
+import ru.rooyzee.elytrixsubscribe.menu.MenuService;
+import ru.rooyzee.elytrixsubscribe.menu.Menus;
+import ru.rooyzee.elytrixsubscribe.pet.PetManager;
 import ru.rooyzee.elytrixsubscribe.placeholder.CustomPlaceHolder;
 import ru.rooyzee.elytrixsubscribe.service.SubService;
 import ru.rooyzee.elytrixsubscribe.sub.PlayerSub;
 import ru.rooyzee.elytrixsubscribe.sub.SubManager;
+import ru.rooyzee.elytrixsubscribe.utils.ChatInput;
+import ru.rooyzee.elytrixsubscribe.utils.Utils;
 
+/**
+ * ElytrixSubscribe 2.0 — подписка ElytriX+.
+ *
+ * Что внутри: меню на BMenu, три питомца (попугай, аллей, пчела) со своими
+ * режимами поведения, функции подписки и хранение настроек в data.yml.
+ */
 public final class Main extends JavaPlugin {
     private static Main instance;
     private SubService service;
-    private SQLite sqlite;
+    private Storage storage;
     private SubManager subManager;
     private FunctionManager functionsManager;
-    private CommandExecutor subscribeCommand;
-    private ProtocolManager protocolManager;
+    private PetManager petManager;
+    private MenuService menuService;
+    private Menus menus;
+    private CustomPlaceHolder placeholder;
+    private ChatInput chatInput;
 
+    @Override
     public void onEnable() {
-        if (this.checkPlugin("LuckPerms") && this.checkPlugin("PlaceholderAPI")) {
-            instance = this;
-            this.saveDefaultConfig();
-            this.sqlite = new SQLite(this);
-            this.protocolManager = ProtocolLibrary.getProtocolManager();
-            this.functionsManager = new FunctionManager(this);
-            this.service = new SubService(this);
-            this.service.createTable();
-            this.subManager = new SubManager(this);
+        instance = this;
+        this.saveDefaultConfig();
+        this.mergeDefaults();
 
-            // Регистрация команды
-            this.subscribeCommand = new SubscribeCommand();
-            if (getCommand("subscribe") != null) {
-                getCommand("subscribe").setExecutor(this.subscribeCommand);
-            }
-
-            // Регистрация меню (слушателей инвентаря)
-            new ParrotMenu();
-            new ParrotNameMenu();
-
-            // Регистрация плейсхолдеров
-            (new CustomPlaceHolder()).register();
-        } else {
+        if (!this.checkPlugin("LuckPerms") || !this.checkPlugin("PlaceholderAPI")) {
             this.setEnabled(false);
+            return;
         }
+        if (!this.checkPlugin("BMenu")) {
+            this.getLogger().warning("BMenu не найден: меню подписки не откроются.");
+        }
+        if (!this.checkPlugin("VirtualEntityApi", false)) {
+            this.getLogger().warning("VirtualEntityApi не найден: питомцы выключены.");
+        }
+
+        this.storage = new Storage(this);
+        this.service = new SubService(this);
+        this.subManager = new SubManager(this);
+
+        this.chatInput = new ChatInput(this);
+        try {
+            Bukkit.getPluginManager().registerEvents(this.chatInput, this);
+        } catch (Throwable error) {
+            // не Paper — ввода имени в чате не будет, работает команда с именем
+            this.getLogger().warning("Ввод в чате недоступен: " + error);
+        }
+
+        this.functionsManager = new FunctionManager(this);
+        this.petManager = new PetManager(this);
+        this.petManager.start();
+        Bukkit.getPluginManager().registerEvents(this.petManager, this);
+
+        this.menus = new Menus(this);
+        this.menuService = new MenuService(this);
+
+        SubscribeCommand command = new SubscribeCommand(this);
+        this.getCommand("subscribe").setExecutor(command);
+        this.getCommand("subscribe").setTabCompleter(command);
+
+        this.placeholder = new CustomPlaceHolder(this);
+        try {
+            this.placeholder.register();
+        } catch (Throwable error) {
+            this.getLogger().warning("Плейсхолдеры не зарегистрированы: " + error);
+        }
+
+        this.getLogger().info("ElytriX: подписка включена, питомцев: "
+                + PetManager.types().size());
     }
 
-    private boolean checkPlugin(String name) {
-        if (!Bukkit.getPluginManager().isPluginEnabled(name)) {
-            System.err.println("Please, install " + name + "!");
-            return false;
-        }
-        return true;
-    }
-
+    @Override
     public void onDisable() {
+        if (this.petManager != null) {
+            this.petManager.shutdown();
+        }
         if (this.subManager != null) {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 try {
                     PlayerSub sub = this.subManager.convertPlayer(player);
-                    List<Function> functionsCopy = new ArrayList<>(sub.getEnabledFunctions());
-                    for (Function function : functionsCopy) {
+                    List<Function> copy = new ArrayList<Function>(sub.functions(this.functionsManager));
+                    for (Function function : copy) {
                         try {
-                            function.onDisable(player);
-                        } catch (Exception ignored) {}
+                            function.clear(player);
+                        } catch (RuntimeException ignored) {
+                        }
                     }
-                } catch (ConvertPlayerException ignored) {}
+                } catch (ConvertPlayerException ignored) {
+                }
             }
-            HandlerList.unregisterAll(this.subManager);
+            this.subManager.saveAll();
         }
+        if (this.placeholder != null) {
+            try {
+                this.placeholder.unregister();
+            } catch (RuntimeException ignored) {
+            }
+        }
+        if (this.storage != null) {
+            this.storage.saveNow();
+        }
+        instance = null;
+    }
+
+    /**
+     * Дописывает в config.yml ключи, которых там ещё нет (после обновления
+     * плагина старый конфиг не должен ломать меню и питомцев).
+     */
+    private void mergeDefaults() {
+        InputStream stream = null;
         try {
-            (new CustomPlaceHolder()).unregister();
-        } catch (Exception ignored) {}
-        if (this.sqlite != null) {
-            this.sqlite.close();
+            stream = this.getResource("config.yml");
+            if (stream == null) return;
+            Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
+            YamlConfiguration defaults = YamlConfiguration.loadConfiguration(reader);
+            boolean changed = false;
+            for (String key : defaults.getKeys(true)) {
+                if (defaults.isConfigurationSection(key)) continue;
+                if (this.getConfig().isSet(key)) continue;
+                this.getConfig().set(key, defaults.get(key));
+                changed = true;
+            }
+            if (changed) this.saveConfig();
+        } catch (RuntimeException error) {
+            this.getLogger().warning("Не удалось обновить config.yml: " + error);
+        } finally {
+            try {
+                if (stream != null) stream.close();
+            } catch (Exception ignored) {
+            }
         }
+    }
+
+    private boolean checkPlugin(String name) {
+        return this.checkPlugin(name, true);
+    }
+
+    private boolean checkPlugin(String name, boolean required) {
+        if (Bukkit.getPluginManager().isPluginEnabled(name)) return true;
+        if (required) {
+            this.getLogger().severe("Установи " + name + " — без него подписка не работает.");
+        }
+        return false;
     }
 
     public static Main getInstance() {
@@ -97,8 +178,8 @@ public final class Main extends JavaPlugin {
         return this.service;
     }
 
-    public SQLite getSQLite() {
-        return this.sqlite;
+    public Storage getStorage() {
+        return this.storage;
     }
 
     public SubManager getSubManager() {
@@ -109,11 +190,39 @@ public final class Main extends JavaPlugin {
         return this.functionsManager;
     }
 
-    public CommandExecutor getSubscribeCommand() {
-        return this.subscribeCommand;
+    public PetManager getPetManager() {
+        return this.petManager;
     }
 
-    public ProtocolManager getProtocolManager() {
-        return this.protocolManager;
+    public MenuService getMenuService() {
+        return this.menuService;
+    }
+
+    public Menus getMenus() {
+        return this.menus;
+    }
+
+    public ChatInput getChatInput() {
+        return this.chatInput;
+    }
+
+    /** Файл настроек меню — нужен, чтобы не открывать несуществующее меню. */
+    public File menusFolder() {
+        return new File(this.getDataFolder().getParentFile(), "BMenu/menu");
+    }
+
+    public void msg(Player player, String text) {
+        if (player == null || text == null) return;
+        player.sendMessage(Utils.color(text));
+    }
+
+    public String message(String key, String fallback) {
+        String value = this.getConfig().getString("messages." + key);
+        return value == null ? fallback : value;
+    }
+
+    public String setting(String key, String fallback) {
+        String value = this.getConfig().getString("settings." + key);
+        return value == null ? fallback : value;
     }
 }
