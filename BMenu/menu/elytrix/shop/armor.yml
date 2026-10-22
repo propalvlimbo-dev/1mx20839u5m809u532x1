@@ -35,12 +35,14 @@ items:
       - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
+      - '[update]'
       else:
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
       - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
+      - '[update]'
   skull1:
     material: netherite_chestplate
     name: §x§F§8§B§E§F§B« §x§F§8§B§E§F§BН§x§F§5§B§E§F§Bа§x§F§2§B§E§F§Bг§x§E§F§B§F§F§Bр§x§E§C§B§F§F§Bу§x§E§9§B§F§F§Bд§x§E§6§B§F§F§Bн§x§E§3§B§F§F§Bи§x§E§0§C§0§F§Bк §x§D§D§C§0§F§Bш§x§D§A§C§0§F§Bа§x§D§7§C§0§F§Bл§x§D§4§C§0§F§Bк§x§D§1§C§0§F§Bе§x§C§E§C§0§F§Bр§x§C§B§C§1§F§Bа
@@ -72,12 +74,14 @@ items:
       - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
+      - '[update]'
       else:
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
       - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
+      - '[update]'
   skull2:
     material: netherite_leggings
     name: §x§F§8§B§E§F§B« §x§F§8§B§E§F§BП§x§F§4§B§E§F§Bо§x§F§0§B§F§F§Bн§x§E§C§B§F§F§Bо§x§E§8§B§F§F§Bж§x§E§4§B§F§F§Bи §x§E§0§C§0§F§Bш§x§D§C§C§0§F§Bа§x§D§8§C§0§F§Bл§x§D§4§C§0§F§Bк§x§D§0§C§0§F§Bе§x§C§C§C§1§F§Bр§x§C§8§C§1§F§Bа
@@ -108,12 +112,14 @@ items:
       - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
+      - '[update]'
       else:
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
       - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
+      - '[update]'
   skull3:
     material: netherite_boots
     name: §x§F§8§B§E§F§B« §x§F§8§B§E§F§BБ§x§F§4§B§E§F§Bо§x§F§0§B§F§F§Bт§x§E§C§B§F§F§Bи§x§E§8§B§F§F§Bн§x§E§4§B§F§F§Bк§x§E§0§C§0§F§Bи §x§D§C§C§0§F§Bш§x§D§8§C§0§F§Bа§x§D§4§C§0§F§Bл§x§D§0§C§0§F§Bк§x§C§C§C§1§F§Bе§x§C§8§C§1§F§Bр§x§C§4§C§1§F§Bа
@@ -146,12 +152,14 @@ items:
       - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
+      - '[update]'
       else:
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
       - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
+      - '[update]'
   skull4:
     material: netherite_sword
     name: §x§F§8§B§E§F§B« §x§F§8§B§E§F§BМ§x§F§3§B§E§F§Bе§x§E§E§B§F§F§Bч §x§E§9§B§F§F§Bш§x§E§4§B§F§F§Bа§x§D§F§C§0§F§Bл§x§D§A§C§0§F§Bк§x§D§5§C§0§F§Bе§x§D§0§C§0§F§Bр§x§C§B§C§1§F§Bа §x§F§8§B§E§F§B»
@@ -182,12 +190,14 @@ items:
       - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
+      - '[update]'
       else:
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
       - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
+      - '[update]'
   s312kull4:
     material: netherite_sword
     name: §x§F§8§B§E§F§B« §x§F§8§B§E§F§BМ§x§F§4§B§E§F§Bе§x§F§0§B§F§F§Bч §x§E§C§B§F§F§Bф§x§E§8§B§F§F§Bа§x§E§4§B§F§F§Bр§x§E§0§C§0§F§Bм§x§D§C§C§0§F§Bи§x§D§8§C§0§F§Bл§x§D§4§C§0§F§Bа §x§F§8§B§E§F§B»
@@ -219,12 +229,14 @@ items:
       - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
+      - '[update]'
       else:
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
       - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
+      - '[update]'
   skul32432:
     material: elytra
     name: §x§F§8§B§E§F§B« §x§F§8§B§E§F§BЭ§x§F§5§B§E§F§Bл§x§F§2§B§E§F§Bи§x§E§F§B§F§F§Bт§x§E§C§B§F§F§Bр§x§E§9§B§F§F§Bа §x§E§6§B§F§F§BШ§x§E§3§B§F§F§Bа§x§E§0§C§0§F§Bл§x§D§D§C§0§F§Bк§x§D§A§C§0§F§Bе§x§D§7§C§0§F§Bр§x§D§4§C§0§F§Bа
@@ -254,12 +266,14 @@ items:
       - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
+      - '[update]'
       else:
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
       - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
+      - '[update]'
   вфывыфвф:
     material: elytra
     name: §x§F§8§B§E§F§B« §x§F§8§B§E§F§BЭ§x§F§5§B§E§F§Bл§x§F§2§B§E§F§Bи§x§E§F§B§F§F§Bт§x§E§C§B§F§F§Bр§x§E§9§B§F§F§Bа §x§E§6§B§F§F§BБ§x§E§3§B§F§F§Bо§x§E§0§C§0§F§Bг§x§D§D§C§0§F§Bа§x§D§A§C§0§F§Bт§x§D§7§C§0§F§Bы§x§D§4§C§0§F§Bр§x§D§1§C§0§F§Bя
@@ -288,12 +302,14 @@ items:
       - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
+      - '[update]'
       else:
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
       - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
+      - '[update]'
   skul31231232432:
     material: netherite_pickaxe
     name: §x§F§8§B§E§F§B«§x§F§8§B§E§F§BК§x§F§3§B§E§F§Bи§x§E§E§B§F§F§Bр§x§E§9§B§F§F§Bк§x§E§4§B§F§F§Bа §x§D§F§C§0§F§Bш§x§D§A§C§0§F§Bа§x§D§5§C§0§F§Bл§x§D§0§C§0§F§Bк§x§C§B§C§1§F§Bе§x§C§6§C§1§F§Bр§x§C§1§C§1§F§Bа§x§F§8§B§E§F§B»
@@ -324,12 +340,14 @@ items:
       - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
+      - '[update]'
       else:
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
       - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
+      - '[update]'
   info:
     material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0=
     name: '&7« &#F8BEFBНаши сообщества &7»'
