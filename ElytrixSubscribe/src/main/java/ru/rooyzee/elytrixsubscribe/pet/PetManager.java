@@ -66,6 +66,7 @@ public final class PetManager implements Listener {
     private boolean hitboxesBroken;
     /** Последняя ошибка создания питомца — показываем её игроку при включении. */
     private String lastError;
+    private boolean errorLogged;
 
     public PetManager(Main plugin) {
         this.plugin = plugin;
@@ -331,11 +332,15 @@ public final class PetManager implements Listener {
             this.spawnHitbox(player, instance, start);
             return true;
         } catch (Throwable error) {
-            this.unavailable = true;
+            // не блокируем питомцев навсегда: VirtualEntityApi мог ещё не
+            // зарегистрировать фабрику — следующий клик попробует снова
             this.lastError = String.valueOf(error);
-            this.plugin.getLogger().warning("Питомцы недоступны (" + error
-                    + ") — проверь VirtualEntityApi и BLib.");
-            error.printStackTrace();
+            if (!this.errorLogged) {
+                this.errorLogged = true;
+                this.plugin.getLogger().warning("Питомцы не создались (" + error
+                        + ") — проверь VirtualEntityApi и BLib.");
+                error.printStackTrace();
+            }
             return false;
         }
     }
@@ -660,6 +665,10 @@ public final class PetManager implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         Bukkit.getScheduler().runTaskLater(this.plugin, () -> this.spawn(player), 10L);
+        // вторая попытка: VirtualEntityApi иногда дорегистрирует фабрику позже
+        Bukkit.getScheduler().runTaskLater(this.plugin, () -> {
+            if (!this.pets.containsKey(player.getUniqueId())) this.spawn(player);
+        }, 100L);
     }
 
     @EventHandler
