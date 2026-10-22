@@ -24,9 +24,15 @@ import ru.rooyzee.elytrixsubscribe.Main;
 public class ChatInput implements Listener {
     private final Main plugin;
     private final Map<UUID, Consumer<String>> waiting = new ConcurrentHashMap<UUID, Consumer<String>>();
+    /** Слушатель реально зарегистрирован (на Paper всегда да). */
+    private volatile boolean registered;
 
     public ChatInput(Main plugin) {
         this.plugin = plugin;
+    }
+
+    public void markRegistered() {
+        this.registered = true;
     }
 
     /** Ждём строку от игрока. Повторный вызов заменяет прошлое ожидание. */
@@ -38,13 +44,23 @@ public class ChatInput implements Listener {
             return;
         }
         this.waiting.put(player.getUniqueId(), callback);
+        this.plugin.msg(player, "");
         this.plugin.msg(player, prompt);
         this.plugin.msg(player, this.plugin.message("input-cancel",
                 "&7● &fЧтобы отменить — напиши &fотмена&7."));
+        this.plugin.msg(player, "");
+        try {
+            player.sendTitle(Utils.color("&fИмя питомца"),
+                    Utils.color("&7напиши в чат · отмена — «отмена»"), 5, 100, 10);
+        } catch (Throwable ignored) {
+            // старые ядра без title — хватит сообщения в чате
+        }
+        this.plugin.getLogger().info("Жду имя питомца в чате от " + player.getName());
     }
 
-    /** Есть ли на сервере Paper-событие чата. */
+    /** Работает ли ввод в чате: и класс есть, и слушатель зарегистрирован. */
     public boolean supported() {
+        if (!this.registered) return false;
         try {
             Class.forName("io.papermc.paper.event.player.AsyncChatEvent");
             return true;
@@ -61,13 +77,14 @@ public class ChatInput implements Listener {
         return this.waiting.containsKey(uuid);
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onChat(AsyncChatEvent event) {
         Player player = event.getPlayer();
         Consumer<String> callback = this.waiting.remove(player.getUniqueId());
         if (callback == null) return;
         event.setCancelled(true);
         String text = PlainTextComponentSerializer.plainText().serialize(event.message()).trim();
+        this.plugin.getLogger().info("Имя из чата от " + player.getName() + ": " + text);
         if (text.isEmpty() || text.equalsIgnoreCase("отмена") || text.equalsIgnoreCase("cancel")) {
             Bukkit.getScheduler().runTask(this.plugin, () ->
                     this.plugin.msg(player, this.plugin.message("input-aborted", "&7Ввод отменён.")));

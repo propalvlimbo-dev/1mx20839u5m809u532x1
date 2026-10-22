@@ -270,10 +270,27 @@ public final class PetManager implements Listener {
         PetData row = this.data(player, type);
         row.setName(name);
         this.save(player, type);
-        if (row.active()) {
-            this.despawn(player.getUniqueId());
-            this.spawn(player);
+        this.plugin.getLogger().info("Питомец " + type.id() + " игрока " + player.getName()
+                + ": имя = " + row.name() + ", включён = " + row.active());
+        if (!row.active()) return;
+        PetInstance instance = this.pets.get(player.getUniqueId());
+        if (instance != null && instance.type == type) {
+            // имя меняем на живой сущности: без мигания и без риска не заспавниться
+            try {
+                if (row.name() == null) {
+                    instance.entity.setCustomNameVisible(false);
+                } else {
+                    instance.entity.setCustomName(this.component(row.name()));
+                    instance.entity.setCustomNameVisible(true);
+                }
+                instance.entity.tick(instance.viewers);
+                return;
+            } catch (RuntimeException ignored) {
+                // не получилось на живой — пересоздадим ниже
+            }
         }
+        this.despawn(player.getUniqueId());
+        this.spawn(player);
     }
 
     // -------------------------------------------------------------- сущность
