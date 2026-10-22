@@ -277,7 +277,7 @@ public final class ExplosiveTrapListener implements Listener {
         if (pluginSchematic.isFile()) {
             ClipboardFormat format = ClipboardFormats.findByFile(pluginSchematic);
             if (format == null) {
-                throw new IOException("Р¤РѕСЂРјР°С‚ .schem РЅРµ СЂР°СЃРїРѕР·РЅР°РЅ");
+                throw new IOException("Формат .schem не распознан");
             }
             try (InputStream input = new FileInputStream(pluginSchematic);
                  ClipboardReader reader = format.getReader(input)) {
@@ -292,7 +292,7 @@ public final class ExplosiveTrapListener implements Listener {
                     format = ClipboardFormats.findByAlias("schem");
                 }
                 if (format == null) {
-                    throw new IOException("WorldEdit РЅРµ Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°Р» Sponge Schematic format");
+                    throw new IOException("WorldEdit не зарегистрировал Sponge Schematic format");
                 }
                 try (ClipboardReader reader = format.getReader(input)) {
                     return reader.read();
@@ -304,7 +304,7 @@ public final class ExplosiveTrapListener implements Listener {
         if (projectSchematic.isFile()) {
             ClipboardFormat format = ClipboardFormats.findByFile(projectSchematic);
             if (format == null) {
-                throw new IOException("Р¤РѕСЂРјР°С‚ .schem РЅРµ СЂР°СЃРїРѕР·РЅР°РЅ");
+                throw new IOException("Формат .schem не распознан");
             }
             try (InputStream input = new FileInputStream(projectSchematic);
                  ClipboardReader reader = format.getReader(input)) {
@@ -314,7 +314,7 @@ public final class ExplosiveTrapListener implements Listener {
         return null;
     }
 
-    /** Р—Р°РїРѕР»РЅСЏРµС‚ РЅРµР±РѕР»СЊС€РёРµ РЅРµСЂРѕРІРЅРѕСЃС‚Рё РїРѕРґ РєСЂР°РµРј РїРѕСЃС‚СЂРѕР№РєРё, РјР°С‚РµСЂРёР°Р» Р±РµСЂС‘С‚ СЃ СЃРѕСЃРµРґРЅРµРіРѕ РіСЂСѓРЅС‚Р°. */
+    /** Заполняет небольшие неровности под краем постройки, материал берёт с соседнего грунта. */
     private void addPerimeterSupports(World world, int minX, int maxX, int minY, int maxY,
                                       int minZ, int maxZ, Location center,
                                       Map<Block, BlockData> plannedBlocks) {

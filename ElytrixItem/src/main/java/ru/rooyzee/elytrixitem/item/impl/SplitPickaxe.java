@@ -16,8 +16,8 @@ import java.util.List;
 /**
  * Кирка Раскола — железная кирка без зачарований.
  *
- * Единственное, что умеет: один раз добыть спавнер (вместе с мобом внутри),
- * после чего сразу ломается. Обычные кирки спавнер не добывают.
+ * Единственное, что умеет: один раз добыть спавнер, после чего сразу ломается.
+ * Обычные кирки спавнер не добывают.
  */
 public final class SplitPickaxe implements CustomItem {
 
@@ -49,7 +49,7 @@ public final class SplitPickaxe implements CustomItem {
                     ColorUtil.color("&#F8BEFB&l┃ &fИспользований: &#F8BEFB1"),
                     ColorUtil.color("&#F8BEFB&l┃ &fЗачарования: &#F8BEFBнет"),
                     ColorUtil.color("&#F8BEFB&l┃ "),
-                    ColorUtil.color("&7● &fСпавнер сохраняет своего моба"),
+                    ColorUtil.color("&7● &fМоб в спавнер &#cне возвращается"),
                     ColorUtil.color("&7● &fПосле добычи кирка ломается")
             );
 

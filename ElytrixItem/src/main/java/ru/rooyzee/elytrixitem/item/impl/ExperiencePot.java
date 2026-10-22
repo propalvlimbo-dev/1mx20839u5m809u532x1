@@ -8,7 +8,6 @@ import org.bukkit.persistence.PersistentDataType;
 import ru.rooyzee.elytrixitem.Main;
 import ru.rooyzee.elytrixitem.item.CustomItem;
 import ru.rooyzee.elytrixitem.util.ColorUtil;
-import ru.rooyzee.elytrixitem.util.ExperienceUtil;
 import ru.rooyzee.elytrixitem.util.ItemStackUtil;
 
 import java.util.Arrays;
@@ -18,11 +17,11 @@ import java.util.UUID;
 public final class ExperiencePot implements CustomItem {
 
     public static final String ID = "experience_pot";
+    public static final int RELEASE_PER_CLICK = 250;
     private static final String ITEM_KEY = "custom_item_id";
     private static final String STORED_KEY = "experience_pot_stored_xp";
     private static final String INSTANCE_KEY = "custom_item_instance";
-    private static final int MAX_LEVEL = 100;
-    private static final int MAX_STORED_EXPERIENCE = ExperienceUtil.getTotalExperienceForLevel(MAX_LEVEL);
+    private static final int MAX_STORED_EXPERIENCE = 1000;
 
     private final Main plugin;
 
@@ -99,16 +98,13 @@ public final class ExperiencePot implements CustomItem {
     }
 
     private static List<String> buildLore(int storedExperience) {
-        int level = ExperienceUtil.getLevelFromTotalExperience(storedExperience);
-
         return Arrays.asList(
                 ColorUtil.color("&#F8BEFB&l┃ "),
-                ColorUtil.color("&#F8BEFB&l┃ &fТип: &#8B7D6BАртефакт"),
-                ColorUtil.color("&#F8BEFB&l┃ &fОпыт: &#F8BEFB" + level + "∫100"),
-                ColorUtil.color("&#F8BEFB&l┃ &fХранение: &#F8BEFBДо 100 уровней"),
+                ColorUtil.color("&#F8BEFB&l┃ &fОпыт: &#F8BEFB" + storedExperience + " / " + MAX_STORED_EXPERIENCE),
+                ColorUtil.color("&#F8BEFB&l┃ &fХранение: &#F8BEFBдо " + MAX_STORED_EXPERIENCE + " опыта"),
                 ColorUtil.color("&#F8BEFB&l┃ "),
                 ColorUtil.color("&7● &fДержите во второй руке для сбора"),
-                ColorUtil.color("&7● &fSHIFT + ПКМ в основной руке для выдачи")
+                ColorUtil.color("&7● &fSHIFT + ПКМ в основной руке: выдать " + RELEASE_PER_CLICK + " опыта")
         );
     }
 }

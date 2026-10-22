@@ -172,7 +172,8 @@ items:
     lore:
     - '&#F8BEFB&l┃'
     - '&#F8BEFB&l┃ &fТип: &#8B7D6BАртефакт'
-    - '&#F8BEFB&l┃ &fХранение: &#F8BEFBДо 100 уровней'
+    - '&#F8BEFB&l┃ &fХранение: &#F8BEFBдо 1000 опыта'
+    - '&#F8BEFB&l┃ &fВыдача: &#F8BEFB250 опыта за клик'
     - '&#F8BEFB&l┃'
     - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB1299 коинов'
     - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
@@ -196,37 +197,6 @@ items:
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
       - '[update]'
-  kirkaslime:
-    material: netherite_pickaxe
-    name: '&7« &bКирка Слаймера &7»'
-    lore:
-    - '&#F8BEFB&l┃'
-    - '&#F8BEFB&l┃ &fТип: &bИнструмент'
-    - '&#F8BEFB&l┃ &fЗачарования: &bЭффективность V, Удача III'
-    - '&#F8BEFB&l┃ &fЗачарования: &bПрочность IV, Починка'
-    - '&#F8BEFB&l┃'
-    - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB1099 коинов'
-    - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
-    - '&#F8BEFB&l┃ '
-    - '&7● &fНажмите для покупки'
-    on_click:
-    - if: '%playerpoints_points% >= 1099'
-      do:
-      - '[console] eitems give %player_name% kirkaslime 1'
-      - '[console] p take %player_name% 1099'
-      - '[message]'
-      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
-      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
-      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
-      - '[message]'
-      - '[update]'
-      else:
-      - '[message]'
-      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
-      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
-      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
-      - '[message]'
-      - '[update]'
   kirkaraskola:
     material: iron_pickaxe
     name: '&7« &#F8BEFBКирка Раскола &7»'
@@ -236,6 +206,7 @@ items:
     - '&#F8BEFB&l┃ &fДобывает: &#F8BEFBспавнер'
     - '&#F8BEFB&l┃ &fИспользований: &#F8BEFB1'
     - '&#F8BEFB&l┃ &fЗачарования: &#F8BEFBнет'
+    - '&#F8BEFB&l┃ &fМоб: &cне возвращается'
     - '&#F8BEFB&l┃'
     - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB1299 коинов'
     - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
@@ -362,9 +333,6 @@ animation:
   - opcodes:
       - st: experience_pot 32
       - sound: 'block.amethyst_block.chime 0.45 1.4'
-  - opcodes:
-      - st: kirkaslime 31
-      - sound: 'block.note_block.pling 0.35 1.55'
   - opcodes:
       - st: kirkaraskola 15
       - sound: 'block.note_block.pling 0.29 1.09'

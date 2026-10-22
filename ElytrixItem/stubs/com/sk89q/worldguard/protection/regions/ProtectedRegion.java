@@ -1,7 +1,7 @@
 package com.sk89q.worldguard.protection.regions;
 import com.sk89q.worldedit.math.BlockVector3;
-public class ProtectedRegion {
+public abstract class ProtectedRegion {
     public String getId() { return ""; }
-    public BlockVector3 getMinimumPoint() { return null; }
-    public BlockVector3 getMaximumPoint() { return null; }
+    public BlockVector3 getMinimumPoint() { return BlockVector3.ZERO; }
+    public BlockVector3 getMaximumPoint() { return BlockVector3.ZERO; }
 }

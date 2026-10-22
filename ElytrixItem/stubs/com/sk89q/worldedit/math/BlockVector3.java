@@ -1,5 +1,6 @@
 package com.sk89q.worldedit.math;
 public class BlockVector3 {
+    public static final BlockVector3 ZERO = new BlockVector3();
     public int getX() { return 0; }
     public int getY() { return 0; }
     public int getZ() { return 0; }

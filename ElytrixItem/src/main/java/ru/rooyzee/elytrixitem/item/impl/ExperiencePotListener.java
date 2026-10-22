@@ -99,16 +99,15 @@ public final class ExperiencePotListener implements Listener {
 
         int stored = ExperiencePot.getStoredExperience(plugin, mainHand);
         if (stored <= 0) {
-            player.setCooldown(Material.FLOWER_POT, 10);
+            player.setCooldown(Material.FLOWER_POT, 2);
             return;
         }
 
-        int give = Math.max(1, (int) Math.floor(stored * 0.03D));
-        give = Math.min(give, stored);
+        int give = Math.min(ExperiencePot.RELEASE_PER_CLICK, stored);
 
         ExperiencePot.setStoredExperience(plugin, mainHand, stored - give);
         player.getInventory().setItemInMainHand(mainHand);
-        player.setCooldown(Material.FLOWER_POT, 10);
+        player.setCooldown(Material.FLOWER_POT, 2);
 
         releaseBypassUntil.put(player.getUniqueId(), System.currentTimeMillis() + 1000L);
 

@@ -28,23 +28,29 @@ public final class GearItem implements CustomItem {
     private final String id;
     private final Material material;
     private final String name;
-    private final String type;
-    private final String set;
     private final Map<Enchantment, Integer> enchantments = new LinkedHashMap<>();
+    private final List<String> enchantmentLore = new ArrayList<>();
 
-    public GearItem(Main plugin, String id, Material material, String name, String type, String set) {
+    public GearItem(Main plugin, String id, Material material, String name) {
         this.key = new NamespacedKey(plugin, "custom_item_id");
         this.id = id;
         this.material = material;
         this.name = name;
-        this.type = type;
-        this.set = set;
     }
 
     /** Добавить зачарование (уровни выше ванильных разрешены). */
-    public GearItem enchant(Enchantment enchantment, int level) {
+    public GearItem enchant(Enchantment enchantment, int level, String russianName) {
         this.enchantments.put(enchantment, level);
+        this.enchantmentLore.add(level > 1 ? russianName + " " + roman(level) : russianName);
         return this;
+    }
+
+    private static String roman(int value) {
+        String[] ones = {"", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"};
+        if (value >= 1 && value <= 10) {
+            return ones[value];
+        }
+        return String.valueOf(value);
     }
 
     @Override
@@ -67,11 +73,10 @@ public final class GearItem implements CustomItem {
 
             List<String> lore = new ArrayList<>();
             lore.add(ColorUtil.color("&#F8BEFB&l┃ "));
-            lore.add(ColorUtil.color("&#F8BEFB&l┃ &fНабор: &#F8BEFB" + set));
-            lore.add(ColorUtil.color("&#F8BEFB&l┃ &fТип: &#F8BEFB" + type));
+            for (String line : enchantmentLore) {
+                lore.add(ColorUtil.color("&#F8BEFB&l┃ &f" + line));
+            }
             lore.add(ColorUtil.color("&#F8BEFB&l┃ "));
-            lore.add(ColorUtil.color("&7● &fЗачарования уже вложены"));
-            lore.add(ColorUtil.color("&7● &fРемонт не требуется"));
             meta.setLore(lore);
 
             for (Map.Entry<Enchantment, Integer> entry : enchantments.entrySet()) {
