@@ -480,7 +480,7 @@ public final class PetManager implements Listener {
             instance.center[0] = playerLoc.getX();
             instance.center[1] = playerLoc.getY();
             instance.center[2] = playerLoc.getZ();
-            this.syncHitbox(instance);
+            this.syncHitbox(player, instance);
             instance.entity.tick(instance.viewers);
             return;
         }
@@ -515,7 +515,7 @@ public final class PetManager implements Listener {
         }
 
         this.extras(instance, row);
-        this.syncHitbox(instance);
+        this.syncHitbox(player, instance);
         instance.entity.tick(instance.viewers);
     }
 
@@ -612,15 +612,23 @@ public final class PetManager implements Listener {
     }
 
     /** Держим хитбокс под питомцем (телепорт только если реально сдвинулся). */
-    private void syncHitbox(PetInstance instance) {
-        if (instance.hitbox == null) return;
+    private void syncHitbox(Player player, PetInstance instance) {
+        Vec3d pos = instance.entity.getPos();
+        Location at = new Location(player.getWorld(), pos.getX(), pos.getY(), pos.getZ());
+        if (instance.hitbox != null && !instance.hitbox.isValid()) {
+            // чанк выгрузился или хитбокс убили — ставим заново
+            this.hitboxes.remove(instance.hitbox.getUniqueId());
+            instance.hitbox = null;
+        }
+        if (instance.hitbox == null) {
+            this.spawnHitbox(player, instance, at);
+            return;
+        }
         try {
-            Vec3d pos = instance.entity.getPos();
-            Location at = new Location(instance.hitbox.getWorld(), pos.getX(), pos.getY(), pos.getZ());
             if (instance.hitbox.getLocation().distanceSquared(at) < 0.01) return;
             instance.hitbox.teleport(at);
         } catch (RuntimeException ignored) {
-            // чанк выгрузился или хитбокс уже убран — пересоздастся при спавне
+            // мир успел смениться — хитбокс пересоздастся при респавне питомца
         }
     }
 
