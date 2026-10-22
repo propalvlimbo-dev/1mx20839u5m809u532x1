@@ -196,7 +196,8 @@ public class SubscribeCommand implements CommandExecutor, TabCompleter {
         this.plugin.getChatInput().request(player,
                 "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» "
                         + "&fНапиши имя для питомца &f" + type.displayName() + "&f в чат."
-                        + "&7 (сейчас: " + (data.name() == null ? "не задано" : data.name()) + ")",
+                        + "&7 (сейчас: " + (data.name() == null ? "не задано" : data.name()) + "). "
+                        + "&7Не ловит чат — &f/subscribe pet " + type.id() + " name <имя>",
                 name -> {
                     String value = name.equalsIgnoreCase("сброс") ? "" : name;
                     this.plugin.getPetManager().setName(player, type, value);

@@ -62,12 +62,7 @@ items:
     - '&7● &fНажмите и напишите имя в чат'
     - '&7● &fЧтобы убрать — напишите &#F8BEFBсброс'
     on_click:
-    - input_chat_str:
-        param: 'pet_name'
-        on_pass:
-        - player: 'subscribe pet allay name {pet_name}'
-        on_failed:
-        - message: '&7● &fИмя не изменено.'
+    - player: 'subscribe pet allay name'
   info:
     material: paper
     name: '&7« &#F8BEFBРежимы &7»'

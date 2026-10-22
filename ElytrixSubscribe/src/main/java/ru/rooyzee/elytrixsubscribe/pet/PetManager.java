@@ -284,6 +284,8 @@ public final class PetManager implements Listener {
                     instance.entity.setCustomNameVisible(true);
                 }
                 instance.entity.tick(instance.viewers);
+                // переслать сущность с уже новым именем: так табличка точно обновится
+                instance.entity.respawn();
                 return;
             } catch (RuntimeException ignored) {
                 // не получилось на живой — пересоздадим ниже

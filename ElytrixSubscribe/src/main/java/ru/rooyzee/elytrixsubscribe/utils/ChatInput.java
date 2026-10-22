@@ -1,11 +1,10 @@
 package ru.rooyzee.elytrixsubscribe.utils;
 
-import io.papermc.paper.event.player.AsyncChatEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,8 +17,8 @@ import ru.rooyzee.elytrixsubscribe.Main;
  * Ввод текста в чате вместо таблички: игрок нажимает кнопку в меню, пишет
  * имя питомца в чат, сообщение не уходит в общий чат.
  *
- * Слушатель подключается только если сервер отдал AsyncChatEvent (Paper).
- * На чистом Spigot имя задаётся командой: /subscribe pet name <питомец> <имя>.
+ * Если чат перехватывает другой плагин, имя всегда можно задать командой:
+ * /subscribe pet <питомец> name <имя>.
  */
 public class ChatInput implements Listener {
     private final Main plugin;
@@ -58,15 +57,9 @@ public class ChatInput implements Listener {
         this.plugin.getLogger().info("Жду имя питомца в чате от " + player.getName());
     }
 
-    /** Работает ли ввод в чате: и класс есть, и слушатель зарегистрирован. */
+    /** Работает ли ввод в чате: слушатель зарегистрирован. */
     public boolean supported() {
-        if (!this.registered) return false;
-        try {
-            Class.forName("io.papermc.paper.event.player.AsyncChatEvent");
-            return true;
-        } catch (Throwable error) {
-            return false;
-        }
+        return this.registered;
     }
 
     public void cancel(UUID uuid) {
@@ -77,13 +70,18 @@ public class ChatInput implements Listener {
         return this.waiting.containsKey(uuid);
     }
 
+    /**
+     * Ловим обычный чат. Именно AsyncPlayerChatEvent, а не Paper-событие:
+     * BMenu и большинство чат-плагинов слушают его, поэтому он гарантированно
+     * приходит на любой сборке (на Paper тоже).
+     */
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onChat(AsyncChatEvent event) {
+    public void onChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
         Consumer<String> callback = this.waiting.remove(player.getUniqueId());
         if (callback == null) return;
         event.setCancelled(true);
-        String text = PlainTextComponentSerializer.plainText().serialize(event.message()).trim();
+        String text = event.getMessage() == null ? "" : event.getMessage().trim();
         this.plugin.getLogger().info("Имя из чата от " + player.getName() + ": " + text);
         if (text.isEmpty() || text.equalsIgnoreCase("отмена") || text.equalsIgnoreCase("cancel")) {
             Bukkit.getScheduler().runTask(this.plugin, () ->
