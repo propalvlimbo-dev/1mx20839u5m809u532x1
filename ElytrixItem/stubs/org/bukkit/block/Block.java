@@ -1,0 +1,51 @@
+package org.bukkit.block;
+
+import java.util.Collection;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
+public interface Block {
+    World getWorld();
+    int getX();
+    int getY();
+    int getZ();
+    Location getLocation();
+    Chunk getChunk();
+    Material getType();
+    void setType(Material type);
+    void setType(Material type, boolean applyPhysics);
+    boolean setTypeId(int type);
+    BlockData getBlockData();
+    void setBlockData(BlockData data);
+    void setBlockData(BlockData data, boolean applyPhysics);
+    byte getData();
+    void setData(byte data);
+    void setData(byte data, boolean applyPhysics);
+    boolean isEmpty();
+    boolean isAir();
+    boolean isLiquid();
+    boolean isPassable();
+    boolean isSolid();
+    boolean isBlockPowered();
+    boolean isBlockIndirectlyPowered();
+    BlockState getState();
+    Block getRelative(BlockFace face);
+    Block getRelative(BlockFace face, int distance);
+    Block getRelative(int modX, int modY, int modZ);
+    Collection<ItemStack> getDrops(ItemStack tool, Player player);
+    Collection<ItemStack> getDrops(ItemStack tool);
+    boolean breakNaturally();
+    boolean breakNaturally(ItemStack tool);
+    byte getLightLevel();
+    byte getLightFromSky();
+    Biome getBiome();
+    void setBiome(Biome biome);
+    double getTemperature();
+    double getHumidity();
+    boolean applyBoneMeal(BlockFace face);
+}

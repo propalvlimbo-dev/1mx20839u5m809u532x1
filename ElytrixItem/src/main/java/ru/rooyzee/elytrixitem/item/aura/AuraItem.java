@@ -48,7 +48,7 @@ public abstract class AuraItem implements CustomItem {
             meta.setDisplayName(ColorUtil.color(getDisplayName()));
             meta.setLore(buildLore(true));
             meta.getPersistentDataContainer().set(key, PersistentDataType.STRING, getId());
-            meta.addEnchant(Enchantment.DURABILITY, 1, true);
+            meta.addEnchant(Enchantment.UNBREAKING, 1, true);
             item.setItemMeta(meta);
         }
 

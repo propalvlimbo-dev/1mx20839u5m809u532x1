@@ -25,14 +25,12 @@ items:
       - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
       else:
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
       - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
   '12312123312':
     material: creeper_spawn_egg
     name: '&7« &#F8BEFBЯйцо крипера &7»'
@@ -52,14 +50,12 @@ items:
       - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
       else:
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
       - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
   '12311112312':
     material: zombie_spawn_egg
     name: '&7« &#F8BEFBЯйцо зомби &7»'
@@ -79,14 +75,12 @@ items:
       - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
       else:
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
       - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
   dasdasdasdas:
     material: villager_spawn_egg
     name: '&7« &#F8BEFBЯйцо жителя &7»'
@@ -106,14 +100,12 @@ items:
       - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
       else:
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
       - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
   111dasdasdasdas:
     material: witch_spawn_egg
     name: '&7« &#F8BEFBЯйцо ведьмы &7»'
@@ -133,14 +125,12 @@ items:
       - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
       else:
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
       - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
   111dasdas1dasdas:
     material: pillager_spawn_egg
     name: '&7« &#F8BEFBЯйцо разбойника &7»'
@@ -160,14 +150,12 @@ items:
       - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
       else:
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
       - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
   ы1выфвф:
     material: spider_spawn_egg
     name: '&7« &#F8BEFBЯйцо паука &7»'
@@ -187,14 +175,12 @@ items:
       - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
       else:
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
       - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
   ы1вы11фвф:
     material: ghast_spawn_egg
     name: '&7« &#F8BEFBЯйцо гаста &7»'
@@ -214,14 +200,12 @@ items:
       - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
       else:
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
       - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
   ы1вы11фв111ф:
     material: pig_spawn_egg
     name: '&7« &#F8BEFBЯйцо свиньи &7»'
@@ -241,14 +225,12 @@ items:
       - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
       else:
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
       - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
   delta:
     material: blaze_spawn_egg
     name: '&7« &#F8BEFBЯйцо ифрита &7»'
@@ -268,14 +250,12 @@ items:
       - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
       else:
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
       - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
   info:
     material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0=
     name: '&7« &#F8BEFBНаши сообщества &7»'

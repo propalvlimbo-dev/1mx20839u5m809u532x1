@@ -31,14 +31,12 @@ items:
       - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
       else:
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
       - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
   arrow2:
     material: tipped_arrow
     name: '&7« &#F8BEFBСтрела негатива &7»'
@@ -66,14 +64,12 @@ items:
       - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
       else:
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
       - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
   arrow3:
     material: tipped_arrow
     name: '&7« &#F8BEFBСтрела психа &7»'
@@ -101,14 +97,12 @@ items:
       - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
       else:
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
       - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
   arrow4:
     material: tipped_arrow
     name: '&7« &#F8BEFBСтрела черепахи &7»'
@@ -136,14 +130,12 @@ items:
       - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
       else:
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
       - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
   arrow5:
     material: tipped_arrow
     name: '&7« &#F8BEFBСтрела фантома &7»'
@@ -170,14 +162,12 @@ items:
       - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
       else:
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
       - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
   close:
     material: black_dye
     name: '&7« &#F8BEFBНазад &7»'

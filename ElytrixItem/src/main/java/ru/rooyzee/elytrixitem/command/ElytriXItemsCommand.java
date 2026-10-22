@@ -59,7 +59,7 @@ public final class ElytriXItemsCommand implements TabExecutor {
     }
 
     private boolean handleGive(CommandSender sender, String[] args) {
-        if (args.length < 4) {
+        if (args.length < 3) {
             plugin.getMessages().send(sender, "usage-give");
             return true;
         }
@@ -78,7 +78,7 @@ public final class ElytriXItemsCommand implements TabExecutor {
 
         int amount;
         try {
-            amount = Integer.parseInt(args[3]);
+            amount = args.length >= 4 ? Integer.parseInt(args[3]) : 1;
         } catch (NumberFormatException exception) {
             plugin.getMessages().send(sender, "invalid-amount");
             return true;

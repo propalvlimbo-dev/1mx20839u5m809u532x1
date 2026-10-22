@@ -167,6 +167,6 @@ public final class AntiPearlListener implements Listener {
     }
 
     private void spawnDust(World world, double x, double y, double z, Particle.DustOptions dust) {
-        world.spawnParticle(Particle.REDSTONE, x, y, z, 1, 0.0D, 0.0D, 0.0D, 0.0D, dust, true);
+        world.spawnParticle(Particle.DUST, x, y, z, 1, 0.0D, 0.0D, 0.0D, 0.0D, dust, true);
     }
 }

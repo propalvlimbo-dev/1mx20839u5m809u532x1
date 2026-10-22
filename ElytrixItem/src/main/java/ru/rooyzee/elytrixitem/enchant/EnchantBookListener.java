@@ -1,6 +1,7 @@
 package ru.rooyzee.elytrixitem.enchant;
 
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
@@ -11,7 +12,7 @@ import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.inventory.AnvilInventory;
-import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -19,7 +20,6 @@ import ru.rooyzee.elytrixitem.Main;
 import ru.rooyzee.elytrixitem.enchant.impl.SunShacklesEnchant;
 
 import java.util.Map;
-import java.util.UUID;
 
 public final class EnchantBookListener implements Listener {
 
@@ -150,32 +150,29 @@ public final class EnchantBookListener implements Listener {
             goldenMeta.setUnbreakable(true);
 
             AttributeModifier armor = new AttributeModifier(
-                    UUID.randomUUID(),
-                    "elytrix.sun.armor",
+                    new NamespacedKey(plugin, "elytrix.sun.armor"),
                     3.0D,
                     AttributeModifier.Operation.ADD_NUMBER,
-                    EquipmentSlot.HEAD
+                    EquipmentSlotGroup.HEAD
             );
 
             AttributeModifier toughness = new AttributeModifier(
-                    UUID.randomUUID(),
-                    "elytrix.sun.toughness",
+                    new NamespacedKey(plugin, "elytrix.sun.toughness"),
                     3.0D,
                     AttributeModifier.Operation.ADD_NUMBER,
-                    EquipmentSlot.HEAD
+                    EquipmentSlotGroup.HEAD
             );
 
             AttributeModifier knockback = new AttributeModifier(
-                    UUID.randomUUID(),
-                    "elytrix.sun.knockback",
+                    new NamespacedKey(plugin, "elytrix.sun.knockback"),
                     0.1D,
                     AttributeModifier.Operation.ADD_NUMBER,
-                    EquipmentSlot.HEAD
+                    EquipmentSlotGroup.HEAD
             );
 
-            goldenMeta.addAttributeModifier(Attribute.GENERIC_ARMOR, armor);
-            goldenMeta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, toughness);
-            goldenMeta.addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, knockback);
+            goldenMeta.addAttributeModifier(Attribute.ARMOR, armor);
+            goldenMeta.addAttributeModifier(Attribute.ARMOR_TOUGHNESS, toughness);
+            goldenMeta.addAttributeModifier(Attribute.KNOCKBACK_RESISTANCE, knockback);
 
             golden.setItemMeta(goldenMeta);
         }

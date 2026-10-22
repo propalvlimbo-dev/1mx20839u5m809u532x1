@@ -21,21 +21,19 @@ items:
     on_click:
     - if: '%playerpoints_points% >= 1199'
       do:
-      - '[console] elytrixitem:ei give %player_name% tyagun 1'
+      - '[console] eitems give %player_name% tyagun 1'
       - '[console] p take %player_name% 1199'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
       - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
       else:
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
       - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
   collector_sword:
     material: netherite_sword
     name: '&7« &#A8FF78Меч Сбора &7»'
@@ -52,21 +50,19 @@ items:
     on_click:
     - if: '%playerpoints_points% >= 2499'
       do:
-      - '[console] elytrixitem:ei give %player_name% collector_sword 1'
+      - '[console] eitems give %player_name% collector_sword 1'
       - '[console] p take %player_name% 2499'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
       - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
       else:
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
       - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
   infinite_firework:
     material: firework_rocket
     name: '&7« &#D8A6FFБесконечный фейерверк &7»'
@@ -83,21 +79,19 @@ items:
     on_click:
     - if: '%playerpoints_points% >= 999'
       do:
-      - '[console] elytrixitem:ei give %player_name% infinite_firework 1'
+      - '[console] eitems give %player_name% infinite_firework 1'
       - '[console] p take %player_name% 999'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
       - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
       else:
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
       - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
   anti_pearl:
     material: ender_eye
     name: '&7« &#8C5196Анти-Пёрл &7»'
@@ -115,21 +109,19 @@ items:
     on_click:
     - if: '%playerpoints_points% >= 49'
       do:
-      - '[console] elytrixitem:ei give %player_name% anti_pearl 1'
+      - '[console] eitems give %player_name% anti_pearl 1'
       - '[console] p take %player_name% 49'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
       - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
       else:
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
       - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
   explosive_trap:
     material: fire_charge
     name: '&7« &#FF6B6BВзрывная ловушка &7»'
@@ -151,21 +143,19 @@ items:
     on_click:
     - if: '%playerpoints_points% >= 99'
       do:
-      - '[console] elytrixitem:ei give %player_name% explosive_trap 1'
+      - '[console] eitems give %player_name% explosive_trap 1'
       - '[console] p take %player_name% 99'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
       - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
       else:
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
       - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
   experience_pot:
     material: flower_pot
     name: '&7« &#8B7D6BГоршочек с опытом &7»'
@@ -181,21 +171,78 @@ items:
     on_click:
     - if: '%playerpoints_points% >= 1299'
       do:
-      - '[console] elytrixitem:ei give %player_name% experience_pot 1'
+      - '[console] eitems give %player_name% experience_pot 1'
       - '[console] p take %player_name% 1299'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
       - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
       else:
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
       - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
+  bulava:
+    material: mace
+    name: '&7« &bБулава Титана &7»'
+    lore:
+    - '&#F8BEFB&l┃'
+    - '&#F8BEFB&l┃ &fТип: &bРеликвия'
+    - '&#F8BEFB&l┃ &fСвойство: &bСокрушительный удар и отбрасывание'
+    - '&#F8BEFB&l┃ &fЗачарования: &bПлотность V, Пробой IV'
+    - '&#F8BEFB&l┃ &fЗачарования: &bВихрь II, Прочность IV, Починка'
+    - '&#F8BEFB&l┃'
+    - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB1599 коинов'
+    - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    on_click:
+    - if: '%playerpoints_points% >= 1599'
+      do:
+      - '[console] eitems give %player_name% bulava 1'
+      - '[console] p take %player_name% 1599'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+  kirkaslime:
+    material: netherite_pickaxe
+    name: '&7« &bКирка Слаймера &7»'
+    lore:
+    - '&#F8BEFB&l┃'
+    - '&#F8BEFB&l┃ &fТип: &bИнструмент'
+    - '&#F8BEFB&l┃ &fЗачарования: &bЭффективность V, Удача III'
+    - '&#F8BEFB&l┃ &fЗачарования: &bПрочность IV, Починка'
+    - '&#F8BEFB&l┃'
+    - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB1099 коинов'
+    - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    on_click:
+    - if: '%playerpoints_points% >= 1099'
+      do:
+      - '[console] eitems give %player_name% kirkaslime 1'
+      - '[console] p take %player_name% 1099'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
   info:
     material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0=
     name: '&7« &#F8BEFBНаши сообщества &7»'
@@ -299,3 +346,9 @@ animation:
   - opcodes:
       - st: experience_pot 32
       - sound: 'block.amethyst_block.chime 0.45 1.4'
+  - opcodes:
+      - st: bulava 14
+      - sound: 'block.note_block.pling 0.27 1.05'
+  - opcodes:
+      - st: kirkaslime 31
+      - sound: 'block.note_block.pling 0.35 1.55'

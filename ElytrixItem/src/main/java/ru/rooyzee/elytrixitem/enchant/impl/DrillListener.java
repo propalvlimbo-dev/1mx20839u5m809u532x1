@@ -372,11 +372,11 @@ public final class DrillListener implements Listener {
                 && isEnabled(item);
 
         if (shouldSlow) {
-            player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 60, 1, true, false, false));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.MINING_FATIGUE, 60, 1, true, false, false));
         } else {
-            PotionEffect current = player.getPotionEffect(PotionEffectType.SLOW_DIGGING);
+            PotionEffect current = player.getPotionEffect(PotionEffectType.MINING_FATIGUE);
             if (current != null && current.getAmplifier() == 1 && current.getDuration() <= 60 && !current.hasParticles()) {
-                player.removePotionEffect(PotionEffectType.SLOW_DIGGING);
+                player.removePotionEffect(PotionEffectType.MINING_FATIGUE);
             }
         }
     }

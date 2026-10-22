@@ -1,7 +1,7 @@
 name: ElytrixItem
-version: '${project.version}'
+version: '2.0.0'
 main: ru.rooyzee.elytrixitem.Main
-api-version: '1.16'
+api-version: '1.21'
 authors: [rooyzee]
 depend: [WorldGuard]
 softdepend: [Vault]
@@ -10,7 +10,7 @@ website: https://elytrix.pw
 
 commands:
   elytrixitems:
-    aliases: [ei]
+    aliases: [eitems]
 
 permissions:
   elytrixitems.admin:

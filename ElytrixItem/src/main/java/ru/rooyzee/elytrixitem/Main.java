@@ -16,6 +16,7 @@ import ru.rooyzee.elytrixitem.enchant.impl.ExplosiveArrowListener;
 import ru.rooyzee.elytrixitem.enchant.impl.SunShacklesBook;
 import ru.rooyzee.elytrixitem.enchant.impl.SunShacklesEnchant;
 import ru.rooyzee.elytrixitem.hook.EconomyHook;
+import ru.rooyzee.elytrixitem.item.GearItems;
 import ru.rooyzee.elytrixitem.item.ItemRegistry;
 import ru.rooyzee.elytrixitem.item.SpawnItemListener;
 import ru.rooyzee.elytrixitem.item.aura.AuraListener;
@@ -115,6 +116,7 @@ public final class Main extends JavaPlugin {
     }
 
     private void registerItems() {
+        GearItems.register(this, itemRegistry);
         itemRegistry.register(new CollectorSword(this));
         itemRegistry.register(new InfiniteFirework(this));
         itemRegistry.register(new Tyagun(this));

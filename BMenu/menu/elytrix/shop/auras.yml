@@ -20,21 +20,19 @@ items:
     on_click:
     - if: '%playerpoints_points% >= 799'
       do:
-      - '[console] elytrixitem:ei give %player_name% fall_protection_aura 1'
+      - '[console] eitems give %player_name% fall_protection_aura 1'
       - '[console] p take %player_name% 799'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
       - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
       else:
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
       - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
   crystal_protection_aura:
     material: black_dye
     name: '&7« &#5B2C6FАура защиты от кристалла &7»'
@@ -50,21 +48,19 @@ items:
     on_click:
     - if: '%playerpoints_points% >= 1299'
       do:
-      - '[console] elytrixitem:ei give %player_name% crystal_protection_aura 1'
+      - '[console] eitems give %player_name% crystal_protection_aura 1'
       - '[console] p take %player_name% 1299'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
       - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
       else:
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
       - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
   miner_aura:
     material: yellow_dye
     name: '&7« &#FFD98CАура шахтёра &7»'
@@ -80,21 +76,19 @@ items:
     on_click:
     - if: '%playerpoints_points% >= 1499'
       do:
-      - '[console] elytrixitem:ei give %player_name% miner_aura 1'
+      - '[console] eitems give %player_name% miner_aura 1'
       - '[console] p take %player_name% 1499'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
       - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
       else:
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
       - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
       - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
       - '[message]'
-      - '[close]'
   info:
     material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0=
     name: '&7« &#F8BEFBНаши сообщества &7»'

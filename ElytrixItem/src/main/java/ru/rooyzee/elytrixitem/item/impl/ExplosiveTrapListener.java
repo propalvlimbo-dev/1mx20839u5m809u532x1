@@ -120,8 +120,8 @@ public final class ExplosiveTrapListener implements Listener {
         World world = center.getWorld();
         if (world != null) {
             world.playSound(center, Sound.ENTITY_GENERIC_EXPLODE, 1.2F, 0.8F);
-            world.spawnParticle(Particle.EXPLOSION_HUGE, center.clone().add(0.0D, 1.0D, 0.0D), 1);
-            world.spawnParticle(Particle.SMOKE_LARGE, center.clone().add(0.0D, 1.0D, 0.0D),
+            world.spawnParticle(Particle.EXPLOSION_EMITTER, center.clone().add(0.0D, 1.0D, 0.0D), 1);
+            world.spawnParticle(Particle.LARGE_SMOKE, center.clone().add(0.0D, 1.0D, 0.0D),
                     18, 2.0D, 0.4D, 2.0D, 0.04D);
         }
     }
@@ -793,7 +793,7 @@ public final class ExplosiveTrapListener implements Listener {
                 zone.startEjection(now);
                 applySingleEjection(zone, world);
                 world.playSound(zone.getCenter(), Sound.ITEM_TRIDENT_RIPTIDE_1, 1.0F, 0.7F);
-                world.spawnParticle(Particle.EXPLOSION_LARGE,
+                world.spawnParticle(Particle.EXPLOSION,
                         zone.getCenter().clone().add(0.0D, 1.0D, 0.0D), 2);
                 continue;
             }
@@ -828,7 +828,7 @@ public final class ExplosiveTrapListener implements Listener {
             // Схематика может иметь угловые воздушные клетки. Каждый тик
             // проверяем их заново и закрываем блоком из ближайшего окружения.
             repairCornerGaps(zone, world);
-            world.spawnParticle(Particle.SPELL_WITCH, zone.getCenter().clone().add(0.0D, 0.2D, 0.0D),
+            world.spawnParticle(Particle.WITCH, zone.getCenter().clone().add(0.0D, 0.2D, 0.0D),
                     4, 2.5D, 0.1D, 2.5D, 0.0D);
             for (Player player : world.getPlayers()) {
                 if (isInPit(zone, player)) {

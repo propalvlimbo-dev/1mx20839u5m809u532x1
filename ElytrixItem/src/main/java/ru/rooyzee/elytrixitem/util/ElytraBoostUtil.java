@@ -76,7 +76,7 @@ public final class ElytraBoostUtil {
                         .subtract(direction.clone().multiply(0.8D))
                         .add(new Vector(0.0D, 0.2D, 0.0D));
 
-                player.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, trail, 2, 0.05D, 0.05D, 0.05D, 0.01D);
+                player.getWorld().spawnParticle(Particle.FIREWORK, trail, 2, 0.05D, 0.05D, 0.05D, 0.01D);
             }
         }.runTaskTimer(plugin, 1L, 1L);
     }

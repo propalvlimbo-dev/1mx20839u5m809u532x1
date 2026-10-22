@@ -83,7 +83,7 @@ public final class ExplosiveArrowListener implements Listener {
             shooter = (Player) projectile.getShooter();
         }
 
-        center.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, center, 1);
+        center.getWorld().spawnParticle(Particle.EXPLOSION, center, 1);
         center.getWorld().playSound(center, Sound.ENTITY_GENERIC_EXPLODE, 1.0F, 1.2F);
 
         for (Entity nearby : center.getWorld().getNearbyEntities(center, EXPLOSION_RADIUS, EXPLOSION_RADIUS, EXPLOSION_RADIUS)) {

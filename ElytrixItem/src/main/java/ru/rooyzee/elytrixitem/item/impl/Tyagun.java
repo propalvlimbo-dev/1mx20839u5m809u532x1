@@ -61,7 +61,7 @@ public final class Tyagun implements CustomItem {
             meta.addEnchant(Enchantment.LOYALTY, 3, true);
             meta.addEnchant(Enchantment.IMPALING, 5, true);
             meta.addEnchant(Enchantment.CHANNELING, 1, true);
-            meta.addEnchant(Enchantment.DURABILITY, 3, true);
+            meta.addEnchant(Enchantment.UNBREAKING, 3, true);
             meta.addEnchant(Enchantment.MENDING, 1, true);
 
             meta.getPersistentDataContainer().set(key, PersistentDataType.STRING, ID);
