@@ -3,44 +3,53 @@ package ru.elytrix.duelsbridge;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 /**
- * Несколько арен в одном готовом мире.
+ * Одна арена в готовом мире и сколько угодно точек спавна.
  *
- * Обычный EpicDuels требует по миру на арену (arena_template_&lt;имя&gt;), потому
- * что имя мира выводится из имени арены. В нашем билде EpicDuels-ElyTriX-3.1.1
- * у Arena появился общий мир: мост вызывает Arena.setDefaultWorld("duel"), и все
- * арены живут в мире duel, отличаясь только точками спавна.
+ * Обычный EpicDuels требует по миру на арену. В нашем билде
+ * EpicDuels-ElyTriX-3.1.1 у Arena есть общий мир, поэтому арена одна —
+ * arena1 в мире duel, — а точек спавна сколько угодно. Мост хранит их в
+ * spawns.yml (номер точки = строка списка) и на каждый бой выбирает
+ * случайную пару: телепорт EpicDuels подменяется на выбранные точки.
  *
- * Арены создаются правкой plugins/EpicDuels/arenas.yml — без создания миров,
- * чтобы случайно не тронуть сам мир duel.
- *
- *   /duelx arena create <имя>   — завести арену
- *   /duelx arena spawn1 <имя>   — точка первой команды (стоять в мире duel)
- *   /duelx arena spawn2 <имя>   — точка второй команды
- *   /duelx arena ready <имя>    — включить арену в ротацию
- *   /duelx arena list           — что уже есть
- *   /duelx arena remove <имя>   — убрать из списка (мир не трогается)
- *   /duelx arena tp <имя>       — прыгнуть на первую точку
+ *   /duel arena setspawn1     — поставить точку 1
+ *   /duel arena setspawn2     — точку 2 (после неё арена в ротации)
+ *   /duel arena setspawn3 …   — добавить ещё точки
+ *   /duel arena list          — точки и координаты
+ *   /duel arena tp [номер]    — прыгнуть на точку
+ *   /duel arena delete <N>    — убрать точку N
+ *   /duel arena clear         — убрать все точки
  */
-final class Arenas {
+final class Arenas implements Listener {
+
+    private static final Pattern NUMBERED = Pattern.compile("^(?:set)?spawn(\\d+)$");
+    private static final double SPREAD = 0.5;
 
     private final ElytrixDuelsBridge plugin;
     private final Duels duels;
-    /**
-     * Арена, с которой сейчас работает админ: её запоминает create/spawn,
-     * поэтому родная форма «/duel arena setspawn1» без имени тоже работает.
-     */
-    private final java.util.Map<java.util.UUID, String> current =
-            new java.util.HashMap<java.util.UUID, String>();
+
+    /** Пары точек на бой: имя мира-копии -> {точка команды 1, точка команды 2}. */
+    private final Map<String, int[]> pairs = new HashMap<String, int[]>();
+    /** Кэш spawns.yml: читаем с диска только когда файл менялся. */
+    private List<Location> cached;
+    private long cacheStamp = -1;
 
     Arenas(ElytrixDuelsBridge plugin, Duels duels) {
         this.plugin = plugin;
@@ -52,7 +61,7 @@ final class Arenas {
     private String warnedWorld;
 
     /**
-     * Мир, в котором живут все арены. Пусто — обычное поведение EpicDuels.
+     * Мир, в котором живёт арена. Пусто — обычное поведение EpicDuels.
      *
      * Если в config.yml ключа нет (или он пуст), но мир duel на сервере есть,
      * работаем с ним: у владельца мир уже готов, заставлять его что-то
@@ -84,7 +93,7 @@ final class Arenas {
             if (!world.equals(warnedWorld)) {
                 warnedWorld = world;
                 plugin.getLogger().warning("Арены: мир \"" + world + "\" не загружен — "
-                        + "как только он загрузится, арены включатся сами.");
+                        + "как только он загрузится, арена включится сама.");
             }
             return false;
         }
@@ -99,7 +108,9 @@ final class Arenas {
         applied = true;
         warnedWorld = null;
         reload();
-        plugin.getLogger().info("Арены: все арены в мире \"" + world + "\", миров arena_template_* не нужно");
+        sync();
+        plugin.getLogger().info("Арены: арена " + arenaName() + " в мире \"" + world
+                + "\", точек: " + points().size());
         return true;
     }
 
@@ -118,7 +129,7 @@ final class Arenas {
             if (!world.isEmpty() && foreign.contains(name.toLowerCase(Locale.ROOT))) {
                 Duels.call(arena, "setReady", Boolean.FALSE);
                 plugin.getLogger().warning("Арены: у \"" + name + "\" точки из другого мира — "
-                        + "поставь их заново: /duelx arena spawn1 " + name + ", spawn2, ready");
+                        + "поставь их заново: /duel arena setspawn1, setspawn2");
             }
         }
         Duels.call(manager, "saveArenas");
@@ -159,6 +170,177 @@ final class Arenas {
         return keys == null ? new ArrayList<String>() : new ArrayList<String>(keys);
     }
 
+    // --------------------------------------------------------------- точки арены
+
+    /** Имя единственной арены: arenas.name в конфиге, по умолчанию arena1. */
+    String arenaName() {
+        String name = plugin.getConfig().getString("arenas.name", "arena1");
+        name = name == null ? "" : name.trim();
+        return name.isEmpty() ? "arena1" : name;
+    }
+
+    private File pointsFile() {
+        return new File(plugin.getDataFolder(), "spawns.yml");
+    }
+
+    private YamlConfiguration pointsConfig() {
+        return YamlConfiguration.loadConfiguration(pointsFile());
+    }
+
+    private String format(Location location) {
+        return String.format(Locale.ROOT, "%.2f;%.2f;%.2f;%.2f;%.2f",
+                location.getX(), location.getY(), location.getZ(),
+                location.getYaw(), location.getPitch());
+    }
+
+    private Location parse(String row) {
+        if (row == null || row.trim().isEmpty()) return null;
+        String[] parts = row.split(";");
+        if (parts.length < 5) return null;
+        World world = Bukkit.getWorld(sharedWorld());
+        if (world == null) return null;
+        try {
+            return new Location(world,
+                    Double.parseDouble(parts[0].trim()), Double.parseDouble(parts[1].trim()),
+                    Double.parseDouble(parts[2].trim()), Float.parseFloat(parts[3].trim()),
+                    Float.parseFloat(parts[4].trim()));
+        } catch (NumberFormatException error) {
+            return null;
+        }
+    }
+
+    /** Точки по номерам: индекс 0 — точка 1, дырки остаются null. */
+    List<Location> points() {
+        long stamp = pointsFile().exists() ? pointsFile().lastModified() : 0;
+        if (cached != null && stamp == cacheStamp) return cached;
+        List<Location> out = new ArrayList<Location>();
+        try {
+            for (String row : pointsConfig().getStringList("points")) out.add(parse(row));
+        } catch (RuntimeException error) {
+            plugin.getLogger().warning("Арена: не смог прочитать spawns.yml: " + error);
+        }
+        cached = out;
+        cacheStamp = stamp;
+        return out;
+    }
+
+    /** Сбросить кэш точек после записи файла. */
+    private void dropCache() {
+        cached = null;
+        cacheStamp = -1;
+    }
+
+    private Location pointAt(int number) {
+        if (number < 1) return null;
+        List<Location> points = points();
+        return number <= points.size() ? points.get(number - 1) : null;
+    }
+
+    /** Точки этой арены в нужном мире (для границ боя). */
+    List<Location> pointsIn(World world) {
+        List<Location> out = new ArrayList<Location>();
+        if (world == null) return out;
+        for (Location point : points()) {
+            if (point == null) continue;
+            Location copy = point.clone();
+            copy.setWorld(world);
+            out.add(copy);
+        }
+        return out;
+    }
+
+    /** Первый свободный номер точки. */
+    int freeNumber() {
+        List<Location> points = points();
+        for (int index = 0; index < points.size(); index++) {
+            if (points.get(index) == null) return index + 1;
+        }
+        return points.size() + 1;
+    }
+
+    private void savePoints(List<Location> points) {
+        List<String> rows = new ArrayList<String>();
+        for (Location point : points) rows.add(point == null ? "" : format(point));
+        YamlConfiguration config = pointsConfig();
+        config.set("points", rows);
+        try {
+            config.save(pointsFile());
+        } catch (Exception error) {
+            plugin.getLogger().warning("Арена: не смог записать spawns.yml: " + error);
+        }
+        dropCache();
+    }
+
+    private void store(int number, Location location) {
+        List<Location> points = new ArrayList<Location>(points());
+        while (points.size() < number) points.add(null);
+        points.set(number - 1, location);
+        savePoints(points);
+        sync();
+    }
+
+    private void clearPoint(int number) {
+        List<Location> points = new ArrayList<Location>(points());
+        if (number < 1 || number > points.size()) return;
+        points.set(number - 1, null);
+        savePoints(points);
+        sync();
+    }
+
+    private void clearAll() {
+        savePoints(new ArrayList<Location>());
+        sync();
+    }
+
+    /**
+     * Перенести точки в арену EpicDuels: точка 1 — спавн первой команды,
+     * точка 2 — второй. Остальные точки нужны мосту для выбора пары на бой.
+     * Другие арены из arenas.yml выключаются — арена одна.
+     */
+    private void sync() {
+        Object manager = duels.manager("getArenaManager");
+        if (manager == null) return;
+        Object arena = ensureArena();
+        if (arena == null) return;
+        Location first = pointAt(1);
+        Location second = pointAt(2);
+        if (first != null) Duels.call(arena, "setSpawn1", first);
+        if (second != null) Duels.call(arena, "setSpawn2", second);
+        Duels.call(arena, "setReady", Boolean.valueOf(first != null && second != null));
+        String name = arenaName();
+        for (Object other : all(manager)) {
+            Object value = Duels.call(other, "getName");
+            if (value == null || String.valueOf(value).equalsIgnoreCase(name)) continue;
+            if (Boolean.TRUE.equals(Duels.call(other, "isReady"))) {
+                Duels.call(other, "setReady", Boolean.FALSE);
+                plugin.getLogger().info("Арены: \"" + value + "\" выключена — арена одна ("
+                        + name + ")");
+            }
+        }
+        Duels.call(manager, "saveArenas");
+    }
+
+    /** Арена есть в arenas.yml? Если нет — заводим запись и перечитываем файл. */
+    private Object ensureArena() {
+        Object manager = duels.manager("getArenaManager");
+        if (manager == null) return null;
+        String name = arenaName();
+        Object arena = Duels.call(manager, "getArena", name);
+        if (arena != null) return arena;
+        try {
+            YamlConfiguration config = YamlConfiguration.loadConfiguration(file());
+            if (!keys(config).contains(name)) {
+                config.set(name + ".ready", Boolean.FALSE);
+                config.save(file());
+            }
+        } catch (Exception error) {
+            plugin.getLogger().warning("Арены: не смог записать arenas.yml: " + error);
+            return null;
+        }
+        reload();
+        return Duels.call(duels.manager("getArenaManager"), "getArena", name);
+    }
+
     // ------------------------------------------------------------------ команды
 
     void command(Player player, String[] args) {
@@ -175,334 +357,238 @@ final class Arenas {
         String action = plugin.lower(args[0]);
         String name = args.length > 1 ? args[1] : null;
 
-        // нумерованные точки: setspawn1/2 — арена arena1, setspawn3/4 — arena2…
-        // мир один (duel), поэтому номер точки сам заводит нужную арену
-        java.util.regex.Matcher numbered =
-                java.util.regex.Pattern.compile("^(?:set)?spawn(\\d+)$").matcher(action);
-        if (numbered.matches() && name == null) {
-            spawnNumbered(player, Integer.parseInt(numbered.group(1)));
+        Matcher numbered = NUMBERED.matcher(action);
+        if (numbered.matches()) {
+            setPoint(player, Integer.parseInt(numbered.group(1)));
             return;
         }
-        if ((action.equals("setspawn") || action.equals("spawn")) && name != null
-                && name.matches("\\d+")) {
-            spawnNumbered(player, Integer.parseInt(name));
+        if ((action.equals("setspawn") || action.equals("spawn") || action.equals("точка"))
+                && name != null && name.matches("\\d+")) {
+            setPoint(player, Integer.parseInt(name));
             return;
         }
 
-        if (action.equals("list") || action.equals("список")) {
+        if (action.equals("list") || action.equals("список") || action.equals("points")) {
             list(player);
             return;
         }
-        if (action.equals("create") || action.equals("создать")) {
-            if (name == null) {
-                help(player);
-                return;
-            }
-            create(player, name);
-            return;
-        }
-        if (action.equals("spawn1") || action.equals("setspawn1") || action.equals("точка1")) {
-            name = resolve(player, name);
-            if (name == null) return;
-            spawn(player, name, true);
-            return;
-        }
-        if (action.equals("spawn2") || action.equals("setspawn2") || action.equals("точка2")) {
-            name = resolve(player, name);
-            if (name == null) return;
-            spawn(player, name, false);
-            return;
-        }
-        // родная /duel arena save ставит ready — у нас так же
-        if (action.equals("save") || action.equals("ready") || action.equals("сохранить")
-                || action.equals("готово")) {
-            name = resolve(player, name);
-            if (name == null) return;
-            ready(player, name);
-            return;
-        }
-        if (action.equals("remove") || action.equals("delete") || action.equals("удалить")) {
-            name = resolve(player, name);
-            if (name == null) return;
-            remove(player, name);
-            return;
-        }
         if (action.equals("tp") || action.equals("телепорт")) {
-            name = resolve(player, name);
-            if (name == null) return;
-            tp(player, name);
+            tp(player, name != null && name.matches("\\d+") ? Integer.parseInt(name) : 1);
+            return;
+        }
+        if (action.equals("delete") || action.equals("remove") || action.equals("удалить")) {
+            if (name != null && name.matches("\\d+")) {
+                clearPoint(player, Integer.parseInt(name));
+            } else {
+                plugin.msg(player, "&#F8BEFBДуэли &8» &fАрена одна. Убрать точку: &f/duel arena delete &d<номер>");
+            }
+            return;
+        }
+        if (action.equals("clear") || action.equals("reset") || action.equals("сброс")) {
+            clearAll();
+            plugin.msg(player, "&#F8BEFBДуэли &8» &fВсе точки убраны. Ставь заново: &f/duel arena setspawn1");
+            return;
+        }
+        if (action.equals("ready") || action.equals("save") || action.equals("сохранить")
+                || action.equals("готово")) {
+            sync();
+            readyReport(player);
+            return;
+        }
+        if (action.equals("create") || action.equals("создать")) {
+            plugin.msg(player, "&#F8BEFBДуэли &8» &fАрена одна — &d" + arenaName()
+                    + "&f. Новый мир и вторая арена не нужны: просто ставь точки &f/duel arena setspawn1&7, &fsetspawn2&7…");
             return;
         }
         help(player);
     }
 
-    /**
-     * /duel arena setspawn<N>: точки идут парами. 1 и 2 — arena1, 3 и 4 —
-     * arena2, 5 и 6 — arena3. Новый мир не создаётся: всё в общем мире duel,
-     * у каждой арены просто свои две точки.
-     */
-    private void spawnNumbered(Player player, int number) {
+    private void help(Player player) {
+        String world = sharedWorld().isEmpty() ? "не задан" : sharedWorld();
+        plugin.msg(player, "&#F8BEFBАрена &8» &fмир: &#F8BEFB" + world
+                + "&7, общий мир арен: " + (applied ? "&aвключён" : "&cвыключен"));
+        plugin.msg(player, "&7● &f/duel arena setspawn1 &7· &fsetspawn2 &7— две точки, арена в ротации");
+        plugin.msg(player, "&7● &f/duel arena setspawn3 &7· &fsetspawn4 … &7— ещё точки, на бой берётся случайная пара");
+        plugin.msg(player, "&7● &f/duel arena list &7· &ftp &d<номер> &7· &fdelete &d<номер> &7· &fclear");
+        plugin.msg(player, "&7● &fточки ставятся в мире &d" + world + "&7, новые миры не создаются");
+    }
+
+    private void list(Player player) {
+        plugin.msg(player, "&#F8BEFBАрена &8» &f" + arenaName() + "&7, мир &d"
+                + (sharedWorld().isEmpty() ? "не задан" : sharedWorld())
+                + "&7, точек: &f" + countPoints());
+        List<Location> points = points();
+        if (points.isEmpty()) {
+            plugin.msg(player, "&7● &fточек нет: встань на место и напиши &f/duel arena setspawn1");
+            return;
+        }
+        for (int index = 0; index < points.size(); index++) {
+            Location point = points.get(index);
+            if (point == null) continue;
+            plugin.msg(player, "&7● &f" + (index + 1) + " &7— &f"
+                    + Math.round(point.getX()) + " " + Math.round(point.getY()) + " "
+                    + Math.round(point.getZ()) + " &7(поворот " + Math.round(point.getYaw()) + ")");
+        }
+        boolean ready = pointAt(1) != null && pointAt(2) != null;
+        plugin.msg(player, "&7● &f" + (ready
+                ? "&aарена в ротации"
+                : "&cнужно минимум две точки: &fsetspawn1 &7и &fsetspawn2"));
+    }
+
+    private int countPoints() {
+        int count = 0;
+        for (Location point : points()) {
+            if (point != null) count++;
+        }
+        return count;
+    }
+
+    private void setPoint(Player player, int number) {
         if (number < 1) {
             plugin.msg(player, "&#F8BEFBДуэли &8» &cНомер точки — с 1: &f/duel arena setspawn1");
             return;
         }
-        ensure();
-        int index = (number + 1) / 2;
-        boolean first = number % 2 == 1;
-        String arena = "arena" + index;
-        Object manager = duels.manager("getArenaManager");
-        if (Duels.call(manager, "getArena", arena) == null) {
-            if (!record(player, arena)) return;
-            plugin.msg(player, "&#F8BEFBДуэли &8» &fАрена &d" + arena
-                    + "&f заведена в мире &d" + sharedWorld() + "&f (новый мир не создаётся)");
-        }
-        spawn(player, arena, first, number);
-    }
-
-    /**
-     * Имя арены для команды без аргумента: последняя, с которой работал админ,
-     * иначе единственная недостроенная, иначе единственная вообще.
-     */
-    private String resolve(Player player, String name) {
-        if (name != null && !name.isEmpty()) return name;
-        String remembered = current.get(player.getUniqueId());
-        if (remembered != null) return remembered;
-
-        Collection<?> all = all(duels.manager("getArenaManager"));
-        String onlyIncomplete = null;
-        String only = null;
-        int incomplete = 0;
-        for (Object arena : all) {
-            Object value = Duels.call(arena, "getName");
-            if (value == null) continue;
-            String candidate = String.valueOf(value);
-            only = candidate;
-            if (!Boolean.TRUE.equals(Duels.call(arena, "isReady"))) {
-                incomplete++;
-                onlyIncomplete = candidate;
-            }
-        }
-        if (incomplete == 1) return onlyIncomplete;
-        if (all.size() == 1) return only;
-        plugin.msg(player, "&#F8BEFBДуэли &8» &cУкажи арену: &f/duel arena spawn1 <имя>");
-        list(player);
-        return null;
-    }
-
-    private void help(Player player) {
-        String world = sharedWorld().isEmpty() ? "не задан" : sharedWorld();
-        plugin.msg(player, "&#F8BEFBАрены &8» &fмир: &#F8BEFB" + world
-                + "&7, общий мир арен: " + (applied ? "&aвключён" : "&cвыключен"));
-        plugin.msg(player, "&7● &f/duel arena setspawn1 &7и &fsetspawn2 &7— точки арены &farena1");
-        plugin.msg(player, "&7● &fsetspawn3 &7и &fsetspawn4 &7— точки арены &farena2&7, &fsetspawn5/6 &7— &farena3");
-        plugin.msg(player, "&7● &f/duel arena list &7· &ftp &d<имя> &7· &fdelete &d<имя> &7· &fcreate &d<имя>");
-        plugin.msg(player, "&7● &fточки ставятся в мире &d" + world + "&7, новые миры не создаются");
-        plugin.msg(player, "&7● &fс именем: &f/duel arena spawn1 &d<имя> &7— точка 1 у своей арены");
-    }
-
-    private void list(Player player) {
-        Object manager = duels.manager("getArenaManager");
-        plugin.msg(player, "&#F8BEFBАрены &8» &fмир &d"
-                + (sharedWorld().isEmpty() ? "не задан" : sharedWorld())
-                + "&7, общий мир арен: " + (applied ? "&aвключён" : "&cвыключен"));
-        Collection<?> all = all(manager);
-        if (all.isEmpty()) {
-            plugin.msg(player, "&#F8BEFBДуэли &8» &7арен пока нет: &f/duelx arena create <имя>");
-            return;
-        }
-        plugin.msg(player, "&#F8BEFBДуэли &8» &fарены в мире &d" + sharedWorld() + "&f: &d" + all.size());
-        for (Object arena : all) {
-            String name = String.valueOf(Duels.call(arena, "getName"));
-            boolean ready = Boolean.TRUE.equals(Duels.call(arena, "isReady"));
-            Location first = (Location) Duels.call(arena, "getSpawn1");
-            Location second = (Location) Duels.call(arena, "getSpawn2");
-            String points = first == null || second == null
-                    ? "&cточек нет"
-                    : "&7(" + Math.round(first.getX()) + " " + Math.round(first.getY()) + " "
-                            + Math.round(first.getZ()) + ")";
-            plugin.msg(player, (ready ? "&a● " : "&7● ") + "&f" + name + " &7— "
-                    + (ready ? "&aготова " : "&cне готова ") + points);
-            if (strayWorld(name)) {
-                plugin.msg(player, "&7· &cрядом лежит лишний мир &farena_template_" + name
-                        + " &7— он не нужен, папку можно удалить");
-            }
-        }
-    }
-
-    /** Остался мир arena_template_<имя> от старого режима — он только мешает. */
-    private boolean strayWorld(String name) {
-        try {
-            return new File(Bukkit.getWorldContainer(), "arena_template_" + name).exists();
-        } catch (RuntimeException error) {
-            return false;
-        }
-    }
-
-    /** Записать арену в arenas.yml. Мир не создаётся: арены живут в общем мире. */
-    private boolean record(Player player, String name) {
-        try {
-            YamlConfiguration config = YamlConfiguration.loadConfiguration(file());
-            if (!keys(config).contains(name)) config.set(name + ".ready", false);
-            config.save(file());
-            current.put(player.getUniqueId(), name);
-        } catch (Exception error) {
-            plugin.msg(player, "&#F8BEFBДуэли &8» &cНе смог записать arenas.yml: &f" + error);
-            return false;
-        }
-        reload();
-        return true;
-    }
-
-    private void create(Player player, String name) {
-        boolean exists = false;
-        try {
-            exists = keys(YamlConfiguration.loadConfiguration(file())).contains(name);
-        } catch (RuntimeException error) {
-            plugin.msg(player, "&#F8BEFBДуэли &8» &cНе смог прочитать arenas.yml: &f" + error);
-            return;
-        }
-        if (!record(player, name)) return;
-        if (exists) {
-            plugin.msg(player, "&#F8BEFBДуэли &8» &fАрена &d" + name
-                    + "&f уже есть — ставь точки: &f/duel arena setspawn1&7, потом &fsetspawn2&7 и &fsave");
-            return;
-        }
-        plugin.msg(player, "&#F8BEFBДуэли &8» &fАрена &d" + name
-                + "&f создана. Новый мир не создаётся — всё в мире &d" + sharedWorld()
-                + "&f. Встань на точку 1 и напиши &f/duel arena setspawn1 " + name);
-    }
-
-    private void spawn(Player player, String name, boolean first) {
-        spawn(player, name, first, 0);
-    }
-
-    /** Номер точки у арены с именем arenaN: 2N-1 и 2N. 0 — имя произвольное. */
-    private int numberedPoint(String name, boolean first) {
-        java.util.regex.Matcher matcher = java.util.regex.Pattern.compile("^arena(\\d+)$")
-                .matcher(name.toLowerCase(Locale.ROOT));
-        if (!matcher.matches()) return 0;
-        int index = Integer.parseInt(matcher.group(1));
-        return index * 2 - (first ? 1 : 0);
-    }
-
-    /** Первый номер точки, которую ещё не поставили (для подсказки). */
-    private int nextFreeNumber() {
-        Object manager = duels.manager("getArenaManager");
-        for (int index = 1; index < 64; index++) {
-            Object arena = Duels.call(manager, "getArena", "arena" + index);
-            if (arena == null) return index * 2 - 1;
-            if (Duels.call(arena, "getSpawn1") == null) return index * 2 - 1;
-            if (Duels.call(arena, "getSpawn2") == null) return index * 2;
-        }
-        return 1;
-    }
-
-    private void spawn(Player player, String name, boolean first, int number) {
-        Object manager = duels.manager("getArenaManager");
-        Object arena = Duels.call(manager, "getArena", name);
-        if (arena == null) {
-            // арену можно завести прямо точкой: /duel arena setspawn1 arena1
-            if (!record(player, name)) return;
-            arena = Duels.call(duels.manager("getArenaManager"), "getArena", name);
-        }
-        if (arena == null) {
-            plugin.msg(player, "&#F8BEFBДуэли &8» &cНет арены &f" + name
-                    + "&c и создать её не удалось — проверь arenas.yml");
-            return;
-        }
         String world = sharedWorld();
-        if (!applied) {
+        if (world.isEmpty()) {
             plugin.msg(player, "&#F8BEFBДуэли &8» &cОбщий мир арен не включён: нужен "
                     + "&fEpicDuels-ElyTriX-3.1.1.jar&c и загруженный мир &fduel&c.");
+            return;
         }
-        if (!world.isEmpty() && !player.getWorld().getName().equals(world)) {
+        if (!player.getWorld().getName().equals(world)) {
             plugin.msg(player, "&#F8BEFBДуэли &8» &cТы в мире &f" + player.getWorld().getName()
-                    + "&c, а арены в &f" + world + "&c — точки ставятся только там.");
+                    + "&c, а арена в &f" + world + "&c — точки ставятся только там.");
             return;
         }
-        current.put(player.getUniqueId(), name);
         Location location = player.getLocation().clone();
-        Duels.call(arena, first ? "setSpawn1" : "setSpawn2", location);
-        Duels.call(manager, "saveArenas");
-        String point = first ? "1" : "2";
-        plugin.msg(player, "&#F8BEFBДуэли &8» &fТочка &d" + point + "&f арены &d" + name
-                + "&f: &d" + location.getBlockX() + " " + location.getBlockY() + " "
-                + location.getBlockZ());
-
-        // вторая точка поставлена — арена сразу в ротации, без отдельного save
-        boolean both = Duels.call(arena, "getSpawn1") != null && Duels.call(arena, "getSpawn2") != null;
-        int current = number > 0 ? number : numberedPoint(name, first);
-        if (both) {
-            if (!Boolean.TRUE.equals(Duels.call(arena, "isReady"))) {
-                Duels.call(arena, "setReady", Boolean.TRUE);
-                Duels.call(manager, "saveArenas");
-                plugin.msg(player, "&#F8BEFBДуэли &8» &fАрена &d" + name
-                        + "&f готова — уже в ротации.");
-            }
-            plugin.msg(player, "&#F8BEFBДуэли &8» &7Следующая точка: &f/duel arena setspawn"
-                    + nextFreeNumber());
+        store(number, location);
+        plugin.msg(player, "&#F8BEFBДуэли &8» &fТочка &d" + number + "&f: &d"
+                + location.getBlockX() + " " + location.getBlockY() + " "
+                + location.getBlockZ() + " &7(всего точек: &f" + countPoints() + "&7)");
+        int free = freeNumber();
+        if (pointAt(1) != null && pointAt(2) != null) {
+            plugin.msg(player, "&#F8BEFBДуэли &8» &fАрена &d" + arenaName()
+                    + "&f в ротации: на бой берётся случайная пара точек. "
+                    + "Ещё точка: &f/duel arena setspawn" + free);
         } else {
-            String hint = current > 0
-                    ? "/duel arena setspawn" + (current + 1)
-                    : "/duel arena spawn" + (first ? "2 " : "1 ") + name;
-            plugin.msg(player, "&#F8BEFBДуэли &8» &7Осталась вторая точка этой арены: &f" + hint);
+            plugin.msg(player, "&#F8BEFBДуэли &8» &7Нужна вторая точка: &f/duel arena setspawn"
+                    + Math.max(free, 1));
         }
     }
 
-    private void ready(Player player, String name) {
-        Object manager = duels.manager("getArenaManager");
-        Object arena = Duels.call(manager, "getArena", name);
-        if (arena == null) {
-            plugin.msg(player, "&#F8BEFBДуэли &8» &cНет арены &f" + name);
+    private void clearPoint(Player player, int number) {
+        if (pointAt(number) == null) {
+            plugin.msg(player, "&#F8BEFBДуэли &8» &cТочки &f" + number + "&c нет.");
             return;
         }
-        if (Duels.call(arena, "getSpawn1") == null || Duels.call(arena, "getSpawn2") == null) {
-            boolean first = Duels.call(arena, "getSpawn1") != null;
-            plugin.msg(player, "&#F8BEFBДуэли &8» &cУ арены &f" + name + "&c нет "
-                    + (first ? "точки 2" : "точки 1") + ": &f/duel arena setspawn"
-                    + (first ? "2 " : "1 ") + name);
-            return;
-        }
-        Duels.call(arena, "setReady", Boolean.TRUE);
-        Duels.call(manager, "saveArenas");
-        plugin.msg(player, "&#F8BEFBДуэли &8» &fАрена &d" + name + "&f в ротации.");
+        clearPoint(number);
+        plugin.msg(player, "&#F8BEFBДуэли &8» &fТочка &d" + number + "&f убрана, точек: &f"
+                + countPoints());
     }
 
-    private void remove(Player player, String name) {
-        Object manager = duels.manager("getArenaManager");
-        if (Duels.call(manager, "getArena", name) == null) {
-            plugin.msg(player, "&#F8BEFBДуэли &8» &cНет арены &f" + name);
+    private void readyReport(Player player) {
+        if (pointAt(1) == null || pointAt(2) == null) {
+            plugin.msg(player, "&#F8BEFBДуэли &8» &cДля ротации нужно минимум две точки: &f"
+                    + "/duel arena setspawn1 &7и &fsetspawn2");
             return;
         }
-        try {
-            YamlConfiguration config = YamlConfiguration.loadConfiguration(file());
-            for (String key : keys(config)) {
-                if (key.equalsIgnoreCase(name)) config.set(key, null);
-            }
-            config.save(file());
-        } catch (Exception error) {
-            plugin.msg(player, "&#F8BEFBДуэли &8» &cНе смог записать arenas.yml: &f" + error);
-            return;
-        }
-        reload();
-        plugin.msg(player, "&#F8BEFBДуэли &8» &fАрена &d" + name
-                + "&f убрана. Мир &d" + sharedWorld() + "&f не тронут.");
+        plugin.msg(player, "&#F8BEFBДуэли &8» &fАрена &d" + arenaName() + "&f в ротации, точек: &f"
+                + countPoints());
     }
 
-    private void tp(Player player, String name) {
-        Object manager = duels.manager("getArenaManager");
-        Object arena = Duels.call(manager, "getArena", name);
-        if (arena == null) {
-            plugin.msg(player, "&#F8BEFBДуэли &8» &cНет арены &f" + name);
+    private void tp(Player player, int number) {
+        Location point = pointAt(number);
+        if (point == null) {
+            plugin.msg(player, "&#F8BEFBДуэли &8» &cТочки &f" + number + "&c нет.");
             return;
         }
-        Location location = (Location) Duels.call(arena, "getSpawn1");
-        if (location == null || location.getWorld() == null) {
-            plugin.msg(player, "&#F8BEFBДуэли &8» &cУ арены нет первой точки.");
+        player.teleport(point);
+        plugin.msg(player, "&#F8BEFBДуэли &8» &fТелепорт на точку &d" + number);
+    }
+
+    // ------------------------------------------------- телепорт на точке (бой)
+
+    /**
+     * EpicDuels телепортирует бойцов на spawn1/spawn2 арены. Если это наша
+     * арена — подменяем место на случайную пару точек. Смещение внутри
+     * команды (2 на 2) сохраняем, только ужимаем с 1.5 до 0.5 блока.
+     */
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onTeleport(PlayerTeleportEvent event) {
+        Location to = event.getTo();
+        if (to == null || to.getWorld() == null) return;
+        String world = to.getWorld().getName();
+        if (!world.startsWith("arena_instance_")) return;
+        if (!ourDuel(world)) return;
+        Location first = pointAt(1);
+        Location second = pointAt(2);
+        if (first == null || second == null) return;
+
+        double toFirst = horizontal(first, to);
+        double toSecond = horizontal(second, to);
+        Location base;
+        boolean sideOne;
+        if (toFirst <= toSecond && toFirst <= 4.0) {
+            base = first;
+            sideOne = true;
+        } else if (toSecond <= 4.0) {
+            base = second;
+            sideOne = false;
+        } else {
             return;
         }
-        player.teleport(location);
-        plugin.msg(player, "&#F8BEFBДуэли &8» &fТелепорт на &d" + name);
+
+        List<Location> points = points();
+        List<Integer> numbers = new ArrayList<Integer>();
+        for (int index = 0; index < points.size(); index++) {
+            if (points.get(index) != null) numbers.add(Integer.valueOf(index));
+        }
+        if (numbers.size() < 2) return;
+        int[] pair = pair(world, numbers.size());
+        Location point = points.get(numbers.get(sideOne ? pair[0] : pair[1]).intValue());
+
+        double dx = to.getX() - base.getX();
+        double dz = to.getZ() - base.getZ();
+        double length = Math.sqrt(dx * dx + dz * dz);
+        if (length > 1.0E-4) {
+            dx = dx / length * SPREAD;
+            dz = dz / length * SPREAD;
+        } else {
+            dx = 0;
+            dz = 0;
+        }
+        event.setTo(new Location(to.getWorld(), point.getX() + dx, point.getY(),
+                point.getZ() + dz, point.getYaw(), point.getPitch()));
+    }
+
+    /** Пара точек на бой: считается один раз на мир-копию, у всех игроков одна. */
+    private int[] pair(String world, int count) {
+        int[] pair = pairs.get(world);
+        if (pair != null && pair[0] < count && pair[1] < count) return pair;
+        if (pairs.size() > 256) pairs.clear();
+        java.util.Random random = new java.util.Random();
+        int first = random.nextInt(count);
+        int second = random.nextInt(count - 1);
+        if (second >= first) second++;
+        pair = new int[]{first, second};
+        pairs.put(world, pair);
+        return pair;
+    }
+
+    private double horizontal(Location one, Location two) {
+        double dx = one.getX() - two.getX();
+        double dz = one.getZ() - two.getZ();
+        return Math.sqrt(dx * dx + dz * dz);
+    }
+
+    /** Бой в этом мире идёт на нашей арене? */
+    private boolean ourDuel(String world) {
+        Object duel = Duels.call(duels.manager("getDuelManager"), "getDuelByWorld", world);
+        Object name = duel == null ? null : Duels.call(duel, "getArenaName");
+        if (name == null) {
+            Object team = Duels.call(duels.manager("getTeamDuelManager"), "getByWorld", world);
+            name = team == null ? null : Duels.call(team, "getArenaName");
+        }
+        return name != null && arenaName().equalsIgnoreCase(String.valueOf(name));
     }
 
     /** Готовые арены в нижнем регистре — для проверок перед запуском. */

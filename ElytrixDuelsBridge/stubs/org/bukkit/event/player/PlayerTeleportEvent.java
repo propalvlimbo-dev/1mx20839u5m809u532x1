@@ -9,5 +9,6 @@ public class PlayerTeleportEvent extends org.bukkit.event.Event {
     public Player getPlayer() { return null; }
     public Location getFrom() { return null; }
     public Location getTo() { return null; }
+    public void setTo(Location to) { }
     public TeleportCause getCause() { return TeleportCause.UNKNOWN; }
 }

@@ -80,8 +80,7 @@ final class DuelCommandGuard implements CommandExecutor, TabCompleter {
         if (plugin.isAdmin(player) && shared) {
             // родные формы без слова arena: /duel create, /duel setspawn1, /duel save
             if (sub.equals("create") || sub.equals("ready") || sub.equals("save")
-                    || sub.equals("setspawn1") || sub.equals("setspawn2")
-                    || sub.equals("spawn1") || sub.equals("spawn2")) {
+                    || sub.matches("(?:set)?spawn\\d+")) {
                 plugin.arenaCommand(player, args);
                 return true;
             }

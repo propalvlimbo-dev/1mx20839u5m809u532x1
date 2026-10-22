@@ -160,6 +160,10 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
                 changed = true;
             }
             // один общий мир для всех арен: по умолчанию — уже готовый duel
+            if (config.getString("arenas.name") == null) {
+                config.set("arenas.name", "arena1");
+                changed = true;
+            }
             if (config.getString("arenas.world") == null) {
                 config.set("arenas.world", Bukkit.getWorld("duel") == null ? "" : "duel");
                 changed = true;
@@ -180,6 +184,7 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new ArenaGuard(this), this);
         getServer().getPluginManager().registerEvents(new CommandGuard(this), this);
         getServer().getPluginManager().registerEvents(arenaRules, this);
+        getServer().getPluginManager().registerEvents(arenas, this);
         getServer().getPluginManager().registerEvents(new Effects(this, duels), this);
         arenaRules.start();
         arenas.setup();
@@ -285,6 +290,10 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
     }
 
     /** Мир, в котором лежат все арены (пусто — старый режим EpicDuels). */
+    Arenas arenas() {
+        return arenas;
+    }
+
     String sharedArenaWorld() {
         return arenas.sharedWorld();
     }

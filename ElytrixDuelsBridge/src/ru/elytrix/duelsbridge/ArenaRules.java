@@ -64,17 +64,33 @@ final class ArenaRules implements Listener {
         final Location spawnA;
         final Location spawnB;
 
-        Bounds(String world, Location spawnA, Location spawnB, double margin,
-               double maxHeight, double minDrop) {
+        Bounds(String world, Location spawnA, Location spawnB, java.util.List<Location> points,
+               double margin, double maxHeight, double minDrop) {
             this.world = world;
             this.spawnA = spawnA;
             this.spawnB = spawnB;
-            double dx = spawnA.getX() - spawnB.getX();
-            double dz = spawnA.getZ() - spawnB.getZ();
-            this.centerX = (spawnA.getX() + spawnB.getX()) / 2.0;
-            this.centerZ = (spawnA.getZ() + spawnB.getZ()) / 2.0;
-            this.radius = Math.sqrt(dx * dx + dz * dz) / 2.0 + Math.max(0, margin);
-            this.baseY = Math.max(spawnA.getY(), spawnB.getY());
+            double minX = spawnA.getX();
+            double maxX = spawnA.getX();
+            double minZ = spawnA.getZ();
+            double maxZ = spawnA.getZ();
+            double topY = Math.max(spawnA.getY(), spawnB.getY());
+            for (Location point : points) {
+                minX = Math.min(minX, point.getX());
+                maxX = Math.max(maxX, point.getX());
+                minZ = Math.min(minZ, point.getZ());
+                maxZ = Math.max(maxZ, point.getZ());
+                topY = Math.max(topY, point.getY());
+            }
+            this.centerX = (minX + maxX) / 2.0;
+            this.centerZ = (minZ + maxZ) / 2.0;
+            double radius = 0;
+            for (Location point : points) {
+                double dx = point.getX() - centerX;
+                double dz = point.getZ() - centerZ;
+                radius = Math.max(radius, Math.sqrt(dx * dx + dz * dz));
+            }
+            this.radius = radius + Math.max(0, margin);
+            this.baseY = topY;
             this.maxY = baseY + Math.max(0, maxHeight);
             this.minY = baseY - Math.max(0, minDrop);
         }
@@ -145,7 +161,15 @@ final class ArenaRules implements Listener {
         Location spawnB = ((Location) second).clone();
         spawnA.setWorld((org.bukkit.World) world);
         spawnB.setWorld((org.bukkit.World) world);
-        return new Bounds(String.valueOf(worldName), spawnA, spawnB, margin(), maxHeight(), minDrop());
+        // все точки арены: бой может начаться с любой пары
+        java.util.List<Location> points = new java.util.ArrayList<Location>();
+        points.add(spawnA);
+        points.add(spawnB);
+        if (plugin.arenas() != null) {
+            points.addAll(plugin.arenas().pointsIn((org.bukkit.World) world));
+        }
+        return new Bounds(String.valueOf(worldName), spawnA, spawnB, points,
+                margin(), maxHeight(), minDrop());
     }
 
     // ------------------------------------------------------------- обновление
