@@ -39,6 +39,8 @@ messages:
   pet-disabled: '&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &fПитомец &#F8BEFB%pet% &fвыключен.'
   auto-totem: '&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &fАвто-тотем сработал! Перезарядка: &#F8BEFB30 сек.'
   input-cancel: '&7● &fЧтобы отменить — напиши &fотмена&7.'
+  input-colors: '&7● &fМожно цветокоды: &f&c&c &f&a&a &7и hex &f#F8BEFB'
+  input-unsupported: '&7● &fНапиши имя командой: &f/subscribe pet <питомец> name <имя>'
   input-aborted: '&7Ввод отменён.'
 
 settings:
