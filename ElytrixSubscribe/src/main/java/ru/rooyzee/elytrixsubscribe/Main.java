@@ -103,8 +103,6 @@ public final class Main extends JavaPlugin {
             this.getLogger().warning("Плейсхолдеры не зарегистрированы: " + error);
         }
 
-        this.getLogger().info("ElytriX: подписка включена, питомцев: "
-                + PetManager.types().size());
     }
 
     @Override

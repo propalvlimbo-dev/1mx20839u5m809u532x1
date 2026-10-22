@@ -92,7 +92,6 @@ public class ChatInput implements Listener {
     }
 
     private void finish(Player player, String text, Consumer<String> callback) {
-        this.plugin.getLogger().info("Имя из чата от " + player.getName() + ": " + text);
         if (text.isEmpty() || text.equalsIgnoreCase("отмена") || text.equalsIgnoreCase("cancel")) {
             Bukkit.getScheduler().runTask(this.plugin, () ->
                     this.plugin.msg(player, this.plugin.message("input-aborted", "&7Ввод отменён.")));

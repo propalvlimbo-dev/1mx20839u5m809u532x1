@@ -270,8 +270,6 @@ public final class PetManager implements Listener {
         PetData row = this.data(player, type);
         row.setName(name);
         this.save(player, type);
-        this.plugin.getLogger().info("Питомец " + type.id() + " игрока " + player.getName()
-                + ": имя = " + row.name() + ", включён = " + row.active());
         if (!row.active()) return;
         PetInstance instance = this.pets.get(player.getUniqueId());
         if (instance != null && instance.type == type) {
@@ -358,7 +356,6 @@ public final class PetManager implements Listener {
                 this.errorLogged = true;
                 this.plugin.getLogger().warning("Питомцы не создались (" + error
                         + ") — проверь VirtualEntityApi и BLib.");
-                error.printStackTrace();
             }
             return false;
         }
@@ -423,7 +420,6 @@ public final class PetManager implements Listener {
         // свечение — единственная настройка внешнего вида у аллея
         if (row.type() == PetType.ALLAY) {
             entity.setGlowing(row.variant() > 0);
-            this.plugin.getLogger().info("Аллей игрока: свечение = " + (row.variant() > 0));
         }
         if (row.name() != null && !row.name().isEmpty()) {
             entity.setCustomName(this.component(row.name()));
