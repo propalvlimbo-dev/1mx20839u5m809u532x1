@@ -11,4 +11,6 @@ public class ItemStack {
     public int getAmount() { return 0; }
     public void setAmount(int amount) { }
     public void addUnsafeEnchantment(Enchantment enchantment, int level) { }
+    @Override
+    public ItemStack clone() { return this; }
 }

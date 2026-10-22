@@ -189,6 +189,7 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new Effects(this, duels), this);
         arenaRules.start();
         arenas.setup();
+        arenas.start();
         Tops.start(this, duels);
         teams.start();
         queue.start();
@@ -619,6 +620,11 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         if (duels.busy(target.getUniqueId())) {
             msg(player, string("messages.target-busy", "&#F8BEFBДуэли &8» &c%name%&c сейчас в бою.")
                     .replace("%name%", target.getName()));
+            return;
+        }
+        if (arenas.full()) {
+            msg(player, string("messages.arenas-busy",
+                    "&#F8BEFBДуэли &8» &cВсе арены заняты — подожди, скоро освободится."));
             return;
         }
         intents.remove(player.getUniqueId());

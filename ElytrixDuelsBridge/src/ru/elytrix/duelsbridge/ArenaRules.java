@@ -63,12 +63,14 @@ final class ArenaRules implements Listener {
         final double minY;
         final Location spawnA;
         final Location spawnB;
+        final java.util.List<Location> points;
 
         Bounds(String world, Location spawnA, Location spawnB, java.util.List<Location> points,
                double margin, double maxHeight, double minDrop) {
             this.world = world;
             this.spawnA = spawnA;
             this.spawnB = spawnB;
+            this.points = points;
             double minX = spawnA.getX();
             double maxX = spawnA.getX();
             double minZ = spawnA.getZ();
@@ -105,12 +107,20 @@ final class ArenaRules implements Listener {
             return horizontal(location) && location.getY() <= maxY && location.getY() >= minY;
         }
 
+        /** Ближайшая точка арены: упал за границу — вернётся на свою пару, а не на 1-2. */
         Location nearestSpawn(Location from) {
-            Location a = spawnA.clone();
-            Location b = spawnB.clone();
-            double da = Math.abs(from.getX() - a.getX()) + Math.abs(from.getZ() - a.getZ());
-            double db = Math.abs(from.getX() - b.getX()) + Math.abs(from.getZ() - b.getZ());
-            return da <= db ? a : b;
+            Location best = spawnA.clone();
+            double bestDistance = Double.MAX_VALUE;
+            for (Location point : points) {
+                double dx = from.getX() - point.getX();
+                double dz = from.getZ() - point.getZ();
+                double distance = dx * dx + dz * dz;
+                if (distance < bestDistance) {
+                    bestDistance = distance;
+                    best = point.clone();
+                }
+            }
+            return best;
         }
     }
 
@@ -174,12 +184,20 @@ final class ArenaRules implements Listener {
         Location spawnB = ((Location) second).clone();
         spawnA.setWorld((org.bukkit.World) world);
         spawnB.setWorld((org.bukkit.World) world);
-        // все точки арены: бой может начаться с любой пары
+        // границы — по точкам своей пары: бой идёт только на ней, и убежать
+        // на соседнюю пару нельзя
         java.util.List<Location> points = new java.util.ArrayList<Location>();
-        points.add(spawnA);
-        points.add(spawnB);
         if (plugin.arenas() != null) {
-            points.addAll(plugin.arenas().pointsIn((org.bukkit.World) world));
+            points.addAll(plugin.arenas().pairPointsIn((org.bukkit.World) world));
+        }
+        if (points.size() != 2) {
+            // пара ещё не выбрана — считаем по всем точкам арены
+            points.clear();
+            points.add(spawnA);
+            points.add(spawnB);
+            if (plugin.arenas() != null) {
+                points.addAll(plugin.arenas().pointsIn((org.bukkit.World) world));
+            }
         }
         return new Bounds(String.valueOf(worldName), spawnA, spawnB, points,
                 margin(), maxHeight(instance), minDrop());
@@ -244,7 +262,7 @@ final class ArenaRules implements Listener {
         if (to.getY() > bounds.maxY) {
             event.setTo(event.getFrom());
             warn(player, "messages.arena-height", "&#F8BEFBДуэли &8» &cВыше &f%block%&c блоков не подняться.",
-                    String.valueOf((int) Math.round(maxHeight())));
+                    String.valueOf((int) Math.round(bounds.maxY - bounds.baseY)));
             return;
         }
         if (to.getY() < bounds.minY || !bounds.horizontal(to)) {

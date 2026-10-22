@@ -477,13 +477,14 @@ final class Queue {
             teamA.add(pairA.owner);
             if (pairA.mate != null) teamA.add(pairA.mate);
         }
-        if (soloA != null) {
-            teamA.add(soloA.owner);
-            if (soloB != null) teamA.add(soloB.owner);
-        }
         if (pairB != null) {
             teamB.add(pairB.owner);
             if (pairB.mate != null) teamB.add(pairB.mate);
+        }
+        // два одиночки всегда играют против пары, а не дополняют её
+        if (soloA != null) {
+            teamB.add(soloA.owner);
+            if (soloB != null) teamB.add(soloB.owner);
         }
         startTeams(teamA, teamB, pairA == null ? pairB.kit : pairA.kit);
     }

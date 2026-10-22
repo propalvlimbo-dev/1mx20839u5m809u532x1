@@ -17,6 +17,7 @@ menus:
   ROUNDS_SELECT: "elytrix:duel_rounds"
   PARTY_KIT: "elytrix:duel_kit"
   PARTY_CONFIRM: "elytrix:duel_confirm"
+  debug: false                 # писать в консоль, почему окно не подменилось
 
 # Десять готовых наборов. Мост создаёт их сам при запуске, если таких
 # китов ещё нет в kits.yml EpicDuels. Английские id (sword, uhc, ...) при
@@ -119,6 +120,7 @@ messages:
   no-target: "&#F8BEFBДуэли &8» &cСначала выбери соперника: &f/duel ник"
   player-gone: "&#F8BEFBДуэли &8» &cИгрок уже вышел."
   target-busy: "&#F8BEFBДуэли &8» &c%name%&c сейчас в бою."
+  arenas-busy: "&#F8BEFBДуэли &8» &cВсе арены заняты — подожди, скоро освободится."
   self: "&#F8BEFBДуэли &8» &cНельзя вызвать самого себя."
   kit-gone: "&#F8BEFBДуэли &8» &cКит &f%kit%&c не найден."
   feature-off: "&#F8BEFBДуэли &8» &cВыключено на сервере: &f%name%"

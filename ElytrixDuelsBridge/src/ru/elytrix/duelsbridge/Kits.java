@@ -455,22 +455,27 @@ final class Kits implements Listener {
         ItemStack[] contents = (ItemStack[]) Duels.call(kit, "getContents");
         if (contents != null) {
             for (int slot = 0; slot < contents.length && slot < 36; slot++) {
-                inventory.setItem(slot, contents[slot]);
+                ItemStack stack = contents[slot];
+                inventory.setItem(slot, cloneOrNull(stack));
             }
         }
         ItemStack[] armor = (ItemStack[]) Duels.call(kit, "getArmorContents");
         if (armor != null && armor.length >= 4) {
             // в Bukkit броня идёт снизу вверх: ботинки, штаны, нагрудник, шлем
-            inventory.setItem(39, armor[0]);
-            inventory.setItem(38, armor[1]);
-            inventory.setItem(37, armor[2]);
-            inventory.setItem(36, armor[3]);
+            inventory.setItem(39, cloneOrNull(armor[0]));
+            inventory.setItem(38, cloneOrNull(armor[1]));
+            inventory.setItem(37, cloneOrNull(armor[2]));
+            inventory.setItem(36, cloneOrNull(armor[3]));
         }
-        inventory.setItem(40, (ItemStack) Duels.call(kit, "getOffHand"));
+        inventory.setItem(40, cloneOrNull((ItemStack) Duels.call(kit, "getOffHand")));
         player.openInventory(inventory);
         plugin.msg(player, "&#F8BEFBДуэли &8» &fРедактор набора &d" + kitName + "&f открыт.");
         plugin.msg(player, "&7● &f1-36 &7— инвентарь, &f37-40 &7— шлем, нагрудник, штаны, ботинки, &f41 &7— левая рука");
         plugin.msg(player, "&7● &fзакрой окно — набор сохранится сам");
+    }
+
+    private static ItemStack cloneOrNull(ItemStack stack) {
+        return stack == null ? null : stack.clone();
     }
 
     /** Список китов в чате: без GUI и лишних кнопок. */
@@ -548,7 +553,16 @@ final class Kits implements Listener {
         String kitName = canonical(name);
         org.bukkit.inventory.PlayerInventory inventory = player.getInventory();
         if (inventory == null) return;
-        ItemStack[] contents = inventory.getContents();
+        // getStorageContents — ровно 36 слотов, как у EpicDuels; getContents
+        // в 1.21 отдаёт 41 и затаскивает броню в сам набор
+        ItemStack[] contents = inventory.getStorageContents();
+        if (contents == null || contents.length != 36) {
+            ItemStack[] all = inventory.getContents();
+            contents = new ItemStack[36];
+            if (all != null) {
+                for (int slot = 0; slot < 36 && slot < all.length; slot++) contents[slot] = all[slot];
+            }
+        }
         ItemStack[] armor = inventory.getArmorContents();
         ItemStack offHand = inventory.getItemInOffHand();
         boolean empty = true;

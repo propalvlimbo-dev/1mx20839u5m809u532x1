@@ -53,6 +53,8 @@ final class Arenas implements Listener {
     private final Map<java.util.UUID, Integer> pending = new HashMap<java.util.UUID, Integer>();
     /** Идущий бой -> номер пары. Освобождается, когда мир-копия выгружается. */
     private final Map<String, Integer> busy = new HashMap<String, Integer>();
+    /** Сколько проверок подряд мир-копия стояла без игроков. */
+    private final Map<String, Integer> idle = new HashMap<String, Integer>();
     /** Кэш spawns.yml: читаем с диска только когда файл менялся. */
     private List<Location> cached;
     private long cacheStamp = -1;
@@ -247,6 +249,27 @@ final class Arenas implements Listener {
         List<Location> out = new ArrayList<Location>();
         if (world == null) return out;
         for (Location point : points()) {
+            if (point == null) continue;
+            Location copy = point.clone();
+            copy.setWorld(world);
+            out.add(copy);
+        }
+        return out;
+    }
+
+    /**
+     * Точки пары, которая идёт в этом мире-копии: по ним считаются границы
+     * боя. Пусто — пара ещё не выбрана, тогда годятся все точки.
+     */
+    List<Location> pairPointsIn(World world) {
+        List<Location> out = new ArrayList<Location>(2);
+        if (world == null) return out;
+        int[] pair = pairs.get(world.getName());
+        if (pair == null) return out;
+        List<Location> points = points();
+        for (int index : pair) {
+            if (index < 0 || index >= points.size()) continue;
+            Location point = points.get(index);
             if (point == null) continue;
             Location copy = point.clone();
             copy.setWorld(world);
@@ -528,6 +551,8 @@ final class Arenas implements Listener {
         String world = to.getWorld().getName();
         if (!world.startsWith("arena_instance_")) return;
         if (!ourDuel(world)) return;
+        Player teleported = event.getPlayer();
+        if (teleported == null || !participant(world, teleported.getUniqueId())) return;
         Location first = pointAt(1);
         Location second = pointAt(2);
         if (first == null || second == null) return;
@@ -546,8 +571,7 @@ final class Arenas implements Listener {
             return;
         }
 
-        Player teleported = event.getPlayer();
-        int[] pair = pair(world, teleported == null ? null : teleported.getUniqueId());
+        int[] pair = pair(world, teleported.getUniqueId());
         if (pair == null) return;
         List<Location> points = points();
         Location point = points.get(sideOne ? pair[0] : pair[1]);
@@ -681,19 +705,78 @@ final class Arenas implements Listener {
     @EventHandler
     public void onWorldUnload(org.bukkit.event.world.WorldUnloadEvent event) {
         if (event.getWorld() == null) return;
-        String world = event.getWorld().getName();
+        releaseWorld(event.getWorld().getName());
+    }
+
+    /** Раз в 5 секунд: страховка от навсегда занятых пар. */
+    void start() {
+        Bukkit.getScheduler().runTaskTimer(plugin, new Runnable() {
+            @Override
+            public void run() {
+                sweep();
+            }
+        }, 100L, 100L);
+    }
+
+    /**
+     * Мир-копия удалена без выгрузки или давно пуста — освобождаем пару.
+     * Идущий бой всегда держит хотя бы одного игрока в мире, поэтому
+     * 30 секунд без игроков означают, что пару можно отдавать.
+     */
+    private void sweep() {
+        purge();
+        if (busy.isEmpty()) return;
+        java.util.Set<String> occupied = new java.util.HashSet<String>();
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (player.getWorld() != null) occupied.add(player.getWorld().getName());
+        }
+        for (String world : new ArrayList<String>(busy.keySet())) {
+            if (Bukkit.getWorld(world) == null) {
+                releaseWorld(world);
+                idle.remove(world);
+                continue;
+            }
+            if (occupied.contains(world)) {
+                idle.remove(world);
+                continue;
+            }
+            Integer seen = idle.get(world);
+            int next = seen == null ? 1 : seen.intValue() + 1;
+            if (next >= 6) {
+                releaseWorld(world);
+                idle.remove(world);
+            } else {
+                idle.put(world, Integer.valueOf(next));
+            }
+        }
+        idle.keySet().retainAll(busy.keySet());
+    }
+
+    private void releaseWorld(String world) {
         Integer number = busy.remove(world);
         pairs.remove(world);
-        if (number != null) {
-            reserved.remove(number);
-            clearPending(number.intValue());
-        }
+        if (number == null) return;
+        reserved.remove(number);
+        clearPending(number.intValue());
     }
 
     private double horizontal(Location one, Location two) {
         double dx = one.getX() - two.getX();
         double dz = one.getZ() - two.getZ();
         return Math.sqrt(dx * dx + dz * dz);
+    }
+
+    /** Игрок реально участник этого боя (а не спектатор). */
+    private boolean participant(String world, java.util.UUID id) {
+        if (id == null) return false;
+        Object duel = Duels.call(duels.manager("getDuelManager"), "getDuel", id);
+        if (duel != null && world.equals(String.valueOf(
+                Duels.call(duel, "getInstanceWorldName")))) {
+            return true;
+        }
+        Object team = Duels.call(duels.manager("getTeamDuelManager"), "getTeamDuelOf", id);
+        return team != null && world.equals(String.valueOf(
+                Duels.call(team, "getInstanceWorldName")));
     }
 
     /** Бой в этом мире идёт на нашей арене? */

@@ -371,7 +371,7 @@ final class Duels {
             return false;
         }
         if (plugin.arenas().full()) {
-            plugin.msg(player, BUSY);
+            plugin.msg(player, busyText());
             return false;
         }
         Object arena = ready.get(random.nextInt(ready.size()));
@@ -458,17 +458,30 @@ final class Duels {
         return out;
     }
 
+    private final java.util.Map<UUID, Long> busyNotified = new java.util.HashMap<UUID, Long>();
+
     private void busy(List<UUID> players) {
         busyRefusal = true;
-        for (UUID id : players) plugin.msg(Bukkit.getPlayer(id), BUSY);
+        long now = System.currentTimeMillis();
+        if (busyNotified.size() > 512) busyNotified.clear();
+        for (UUID id : players) {
+            if (id == null) continue;
+            Long last = busyNotified.get(id);
+            if (last != null && now - last.longValue() < 15000L) continue;
+            busyNotified.put(id, Long.valueOf(now));
+            plugin.msg(Bukkit.getPlayer(id), busyText());
+        }
     }
 
-    private static final String BUSY = "&#F8BEFBДуэли &8» &cВсе арены заняты — подожди, скоро освободится.";
+    String busyText() {
+        return plugin.string("messages.arenas-busy",
+                "&#F8BEFBДуэли &8» &cВсе арены заняты — подожди, скоро освободится.");
+    }
 
     Object randomArena() {
-        Object arenas = call(manager("getArenaManager"), "getReadyArenas");
-        if (!(arenas instanceof List) || ((List<?>) arenas).isEmpty()) return null;
-        List<?> ready = (List<?>) arenas;
+        // readyArenas() сам включает арену, у которой есть обе точки спавна
+        List<Object> ready = readyArenas();
+        if (ready.isEmpty()) return null;
         return ready.get(random.nextInt(ready.size()));
     }
 

@@ -105,6 +105,14 @@ final class DuelCommandGuard implements CommandExecutor, TabCompleter {
             plugin.pickTeam(player);
             return true;
         }
+        // принимаем вызов только если есть свободная пара точек
+        if (sub.equals("accept") && !plugin.arenas().full()) {
+            return original != null && original.onCommand(sender, command, label, args);
+        }
+        if (sub.equals("accept")) {
+            plugin.msg(player, plugin.duels().busyText());
+            return true;
+        }
         if (GAMEPLAY.contains(sub) && original != null) {
             return original.onCommand(sender, command, label, args);
         }

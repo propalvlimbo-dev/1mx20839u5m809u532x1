@@ -240,7 +240,8 @@ final class Teams {
             return;
         }
         partner.remove(other);
-        plugin.queue().leave(player);
+        // молча: игрок выходит из пары, а не «отменяет поиск»
+        plugin.queue().leave(player, false);
         plugin.msg(player, pair("messages.team-left",
                 "&#F8BEFBДуэли &8» &7Ты вышел из пары."));
         Player partnerPlayer = Bukkit.getPlayer(other);
