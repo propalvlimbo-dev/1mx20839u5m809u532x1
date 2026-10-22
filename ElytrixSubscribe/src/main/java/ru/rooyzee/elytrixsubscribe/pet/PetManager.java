@@ -62,6 +62,8 @@ public final class PetManager implements Listener {
     private final Map<UUID, UUID> hitboxes = new ConcurrentHashMap<UUID, UUID>();
     private int task = -1;
     private boolean unavailable;
+    /** Interaction-хитбоксы не создаются (старое ядро) — не спамим в лог. */
+    private boolean hitboxesBroken;
 
     public PetManager(Main plugin) {
         this.plugin = plugin;
@@ -332,6 +334,7 @@ public final class PetManager implements Listener {
      * открываем личные настройки этого питомца.
      */
     private void spawnHitbox(Player player, PetInstance instance, Location at) {
+        if (this.hitboxesBroken) return;
         if (!this.plugin.getConfig().getBoolean("pets.clickable", true)) return;
         try {
             Interaction hitbox = player.getWorld().spawn(at, Interaction.class);
@@ -341,6 +344,7 @@ public final class PetManager implements Listener {
             instance.hitbox = hitbox;
             this.hitboxes.put(hitbox.getUniqueId(), player.getUniqueId());
         } catch (Throwable error) {
+            this.hitboxesBroken = true;
             this.plugin.getLogger().warning("ПКМ по питомцу недоступен: " + error);
         }
     }
