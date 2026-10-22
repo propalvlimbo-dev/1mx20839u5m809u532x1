@@ -5,6 +5,7 @@ import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.Node;
 import org.bukkit.Bukkit;
+import java.util.UUID;
 import org.bukkit.OfflinePlayer;
 
 /**
@@ -26,18 +27,26 @@ public final class LPUtil {
     }
 
     public static boolean addPermission(OfflinePlayer player, String[] permissions) {
-        return change(player, permissions, true);
+        return player != null && change(player.getUniqueId(), permissions, true);
     }
 
     public static boolean removePermissions(OfflinePlayer player, String[] permissions) {
-        return change(player, permissions, false);
+        return player != null && change(player.getUniqueId(), permissions, false);
     }
 
-    private static boolean change(OfflinePlayer player, String[] permissions, boolean add) {
+    public static boolean addPermission(UUID uuid, String[] permissions) {
+        return change(uuid, permissions, true);
+    }
+
+    public static boolean removePermissions(UUID uuid, String[] permissions) {
+        return change(uuid, permissions, false);
+    }
+
+    private static boolean change(UUID uuid, String[] permissions, boolean add) {
         LuckPerms api = luckPerms();
-        if (api == null || player == null || permissions == null) return false;
+        if (api == null || uuid == null || permissions == null) return false;
         try {
-            User user = api.getUserManager().getUser(player.getUniqueId());
+            User user = api.getUserManager().getUser(uuid);
             if (user == null) return false;
             for (String permission : permissions) {
                 if (permission == null || permission.trim().isEmpty()) continue;

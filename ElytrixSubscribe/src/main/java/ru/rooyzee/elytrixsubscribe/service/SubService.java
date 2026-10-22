@@ -48,6 +48,13 @@ public class SubService implements ISubService {
                 Bukkit.getPluginManager().callEvent(new PlayerGoneSubscribeEvent(player)));
     }
 
+    /** Забрать подписку у игрока, которого нет в сети (истекла к моменту входа). */
+    public void removeOffline(UUID uuid) {
+        this.cache.remove(uuid);
+        this.storage.remove("subs." + uuid);
+        this.storage.saveAsync();
+    }
+
     @Override
     public void insertSub(Player player, long time, Consumer<Boolean> callback) {
         UUID uuid = player.getUniqueId();

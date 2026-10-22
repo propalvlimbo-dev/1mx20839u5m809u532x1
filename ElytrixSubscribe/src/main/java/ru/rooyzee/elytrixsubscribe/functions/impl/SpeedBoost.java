@@ -16,7 +16,7 @@ import ru.rooyzee.elytrixsubscribe.functions.Function;
  * заново после перезахода и не получить второй такой же.
  */
 public class SpeedBoost extends Function {
-    private static final double BOOST = 0.10;
+    private static final double BOOST = 0.20;
 
     public SpeedBoost() {
         super("speed", "Скорость");

@@ -45,8 +45,8 @@ messages:
 
 settings:
   # Права через LuckPerms, которые выдаются на время подписки (через ;).
-  # Пусто — ничего не выдаём.
-  permissions: ''
+  # Убираются, когда подписка кончилась или её забрали.
+  permissions: 'playerpoints.pay;essentials.god;elytrixcore.warp.description.color;elytrixcore.broadcast.color;playerkits.kit.plus'
   hasSubscribePlaceholder: '&#F8BEFBДа'
   noHaveSubscribePlaceholder: '&7Нет'
   noHaveSubscribePlaceholderDelay: '&cИстекла'

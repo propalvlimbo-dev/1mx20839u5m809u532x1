@@ -12,10 +12,16 @@ items:
     - '&#F8BEFB&l┃ &fСтатус подписки: %slidesubscribe_sub_status%'
     - '&#F8BEFB&l┃ &fОсталось: &#F8BEFB%slidesubscribe_hassubscribe%'
     - '&#F8BEFB&l┃ '
-    - '&#F8BEFB&l┃ &fДополнительные команды:'
+    - '&#F8BEFB&l┃ &fЧто даёт подписка:'
     - '&#F8BEFB&l┃ &7● &fРежим бессмертия: &#F8BEFB/god'
     - '&#F8BEFB&l┃ &7● &fПеревод коинов: &#F8BEFB/p pay'
-    - '&#F8BEFB&l┃ &7● &fУникальный набор: &#F8BEFB/kit plus'
+    - '&#F8BEFB&l┃ &7● &fНабор plus: &#F8BEFB/kit plus'
+    - '&#F8BEFB&l┃ &7● &fЦветное описание варпов'
+    - '&#F8BEFB&l┃ &7● &fСвои цвета в чате'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЦены:'
+    - '&#F8BEFB&l┃ &7● &f30 дней: &#F8BEFB299₽'
+    - '&#F8BEFB&l┃ &7● &f90 дней: &#F8BEFB699₽'
     - '&#F8BEFB&l┃ '
     - '&7● &fНажмите для закрытия'
     on_click:
@@ -50,7 +56,7 @@ items:
     name: '&7« &#F8BEFBСкорость &7»'
     lore:
     - '&#F8BEFB&l┃ '
-    - '&#F8BEFB&l┃ &fБонус: &#F8BEFB+10% к базовой скорости'
+    - '&#F8BEFB&l┃ &fБонус: &#F8BEFB+20% к базовой скорости'
     - '&#F8BEFB&l┃ &fСтатус: %slidesubscribe_fn_speed%'
     - '&#F8BEFB&l┃ '
     - '&7● &fНажмите для переключения'
@@ -81,6 +87,43 @@ items:
     on_click:
     - player: 'subscribe toggle antifood'
     - update: ''
+  plan_30:
+    material: emerald
+    name: '&7« &#F8BEFB30 дней &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fВсе возможности подписки'
+    - '&#F8BEFB&l┃ &fна 30 дней.'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЦена: &#F8BEFB299₽'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите, чтобы узнать, как купить'
+    on_click:
+    - message: ''
+    - message: '&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBПодписка на 30 дней'
+    - message: '&#F8BEFB&l┃ &fЦена: &#F8BEFB299₽'
+    - message: '&#F8BEFB&l┃ &fКупить: &#F8BEFBelytrix.pw'
+    - message: ''
+    - close: ''
+  plan_90:
+    material: diamond
+    name: '&7« &#F8BEFB90 дней &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fВсе возможности подписки'
+    - '&#F8BEFB&l┃ &fна 90 дней.'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЦена: &#F8BEFB699₽'
+    - '&#F8BEFB&l┃ &fВыгода: &#F8BEFB22%'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите, чтобы узнать, как купить'
+    on_click:
+    - message: ''
+    - message: '&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBПодписка на 90 дней'
+    - message: '&#F8BEFB&l┃ &fЦена: &#F8BEFB699₽'
+    - message: '&#F8BEFB&l┃ &fКупить: &#F8BEFBelytrix.pw'
+    - message: ''
+    - close: ''
   info:
     material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0=
     name: '&7« &#F8BEFBНаши сообщества &7»'
@@ -171,3 +214,9 @@ animation:
   - opcodes:
       - st: anti-food 24
       - sound: 'block.amethyst_block.chime 0.45 1.4'
+  - opcodes:
+      - st: plan_30 30
+      - sound: 'block.note_block.pling 0.36 1.6'
+  - opcodes:
+      - st: plan_90 32
+      - sound: 'block.note_block.pling 0.38 1.7'

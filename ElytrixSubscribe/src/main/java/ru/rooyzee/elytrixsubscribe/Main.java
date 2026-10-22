@@ -34,6 +34,9 @@ import ru.rooyzee.elytrixsubscribe.utils.Utils;
  * режимами поведения, функции подписки и хранение настроек в data.yml.
  */
 public final class Main extends JavaPlugin {
+    /** Права подписки по умолчанию — старый набор ElytriX+. */
+    public static final String DEFAULT_PERMISSIONS = "playerpoints.pay;essentials.god;"
+            + "elytrixcore.warp.description.color;elytrixcore.broadcast.color;playerkits.kit.plus";
     private static Main instance;
     private SubService service;
     private Storage storage;
@@ -157,6 +160,12 @@ public final class Main extends JavaPlugin {
                 if (defaults.isConfigurationSection(key)) continue;
                 if (this.getConfig().isSet(key)) continue;
                 this.getConfig().set(key, defaults.get(key));
+                changed = true;
+            }
+            // у старых конфигов settings.permissions пустой — подставляем набор
+            String permissions = this.getConfig().getString("settings.permissions", "");
+            if (permissions == null || permissions.trim().isEmpty()) {
+                this.getConfig().set("settings.permissions", DEFAULT_PERMISSIONS);
                 changed = true;
             }
             if (changed) this.saveConfig();

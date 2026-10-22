@@ -48,6 +48,12 @@ public class SubManager implements Listener {
     public void onAsyncLogin(AsyncPlayerPreLoginEvent e) {
         UUID uuid = e.getUniqueId();
         this.plugin.getService().loadToCache(uuid);
+        if (this.plugin.getService().hasSub(uuid)
+                && System.currentTimeMillis() >= this.plugin.getService().getTimeToEnd(uuid)) {
+            // подписка кончилась, пока игрока не было: снимаем права до входа
+            this.plugin.getService().removeOffline(uuid);
+            LPUtil.removePermissions(uuid, this.permissions());
+        }
         this.loadFunctions(uuid);
     }
 
