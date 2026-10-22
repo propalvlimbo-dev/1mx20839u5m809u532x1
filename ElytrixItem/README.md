@@ -29,13 +29,14 @@ ExecutableItems (броня, мечи, кирки), теперь своё — п
 | `elytra` | Элитра шалкера | Прочность V, Починка |
 | `elytra1` | Элитра богатыря | Прочность III, Починка |
 | `bulava` | Булава Титана | Плотность V, Пробой IV, Вихрь II, Прочность IV, Починка |
+| `kirkaraskola` | Кирка Раскола | железная кирка без зачарований: один раз добывает спавнер (с мобом внутри) и сразу ломается |
 
 Булава — `MACE`: обычная булава с усиленными зачарованиями, ничего
 дополнительного не накладывает.
 
 ## Остальные предметы
 
-`collector_sword`, `tyagun`, `infinite_firework`, `experience_pot`,
+`kirkaraskola` (Кирка Раскола), `collector_sword`, `tyagun`, `infinite_firework`, `experience_pot`,
 `anti_pearl`, `explosive_trap`, ауры (`miner_aura`, `fall_protection_aura`,
 `crystal_protection_aura`) и книги зачарований (`enchant_byr`,
 `enchant_explosive_arrow`, `enchant_sun_shackles`) — как раньше.
@@ -44,7 +45,7 @@ ExecutableItems (броня, мечи, кирки), теперь своё — п
 
 `/shop` в BMenu выдаёт новые предметы командой `eitems give` и **не
 закрывает меню** после покупки. Булава и кирка слаймера — в разделе
-«Уникальные предметы».
+«Уникальные предметы»; Кирка Раскола — там же.
 
 ## Сборка
 

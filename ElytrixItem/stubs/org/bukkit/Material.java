@@ -1,6 +1,7 @@
 package org.bukkit;
 
 public enum Material {
+    SPAWNER,
     NETHER_QUARTZ_ORE, NETHER_GOLD_ORE, LAPIS_ORE,
     AIR,
     ALLAY_SPAWN_EGG,

@@ -35,6 +35,8 @@ import ru.rooyzee.elytrixitem.item.impl.ExplosiveTrap;
 import ru.rooyzee.elytrixitem.item.impl.ExplosiveTrapListener;
 import ru.rooyzee.elytrixitem.item.impl.InfiniteFirework;
 import ru.rooyzee.elytrixitem.item.impl.InfiniteFireworkListener;
+import ru.rooyzee.elytrixitem.item.impl.SplitPickaxe;
+import ru.rooyzee.elytrixitem.item.impl.SplitPickaxeListener;
 import ru.rooyzee.elytrixitem.item.impl.Tyagun;
 import ru.rooyzee.elytrixitem.item.impl.TyagunListener;
 import ru.rooyzee.elytrixitem.menu.MenuListener;
@@ -87,6 +89,7 @@ public final class Main extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new EnchantBookListener(this), this);
         getServer().getPluginManager().registerEvents(new DrillListener(this), this);
         getServer().getPluginManager().registerEvents(new ExplosiveArrowListener(this), this);
+        getServer().getPluginManager().registerEvents(new SplitPickaxeListener(this), this);
     }
 
     @Override
@@ -129,6 +132,7 @@ public final class Main extends JavaPlugin {
         itemRegistry.register(new DrillBook(this));
         itemRegistry.register(new ExplosiveArrowBook(this));
         itemRegistry.register(new SunShacklesBook(this));
+        itemRegistry.register(new SplitPickaxe(this));
     }
 
     private void createResource(String fileName) {
