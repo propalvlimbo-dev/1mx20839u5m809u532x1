@@ -5,6 +5,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
@@ -18,7 +24,7 @@ import org.bukkit.plugin.Plugin;
  * Правило подбора: набор должен работать без установки блоков — на аренах
  * ставить блоки запрещено, поэтому кристаллов и «обсидиановых» китов тут нет.
  */
-final class Kits {
+final class Kits implements Listener {
 
     /**
      * Имена наборов, которые видит игрок (они же id в kits.yml EpicDuels).
@@ -430,22 +436,106 @@ final class Kits {
         plugin.msg(player, "&7ред.: &f/duelx kit edit <кит> &7· сохранить из инвентаря: &f/duelx kit save <кит>");
     }
 
-    /** Полноценный редактор EpicDuels: перетащить вещи и нажать «Save Kit». */
+    /**
+     * Редактор набора: обычное окно без стёкол и кнопок. Разложи предметы
+     * как надо и просто закрой окно — набор сохранится сам.
+     *
+     * Слоты 1–36 — инвентарь, 37–40 — шлем, нагрудник, штаны, ботинки,
+     * 41 — левая рука. Пустые слоты означают «ничего».
+     */
     void edit(Player player, String name) {
         Object kit = kitOf(name);
         if (kit == null) {
             plugin.msg(player, "&#F8BEFBДуэли &8» &cКита &f" + name + "&c нет.");
             return;
         }
-        if (!openedBoolean(plugin.duels().gui(), player, kit)) {
-            plugin.msg(player, "&#F8BEFBДуэли &8» &cРедактор EpicDuels недоступен: обнови EpicDuels-ElyTriX.");
+        String kitName = String.valueOf(Duels.call(kit, "getName"));
+        String title = "&8Редактор набора: " + kitName;
+        Inventory inventory = Bukkit.createInventory(new EditorHolder(kitName), 45, title);
+        ItemStack[] contents = (ItemStack[]) Duels.call(kit, "getContents");
+        if (contents != null) {
+            for (int slot = 0; slot < contents.length && slot < 36; slot++) {
+                inventory.setItem(slot, contents[slot]);
+            }
+        }
+        ItemStack[] armor = (ItemStack[]) Duels.call(kit, "getArmorContents");
+        if (armor != null && armor.length >= 4) {
+            // в Bukkit броня идёт снизу вверх: ботинки, штаны, нагрудник, шлем
+            inventory.setItem(39, armor[0]);
+            inventory.setItem(38, armor[1]);
+            inventory.setItem(37, armor[2]);
+            inventory.setItem(36, armor[3]);
+        }
+        inventory.setItem(40, (ItemStack) Duels.call(kit, "getOffHand"));
+        player.openInventory(inventory);
+        plugin.msg(player, "&#F8BEFBДуэли &8» &fРедактор набора &d" + kitName + "&f открыт.");
+        plugin.msg(player, "&7● &f1-36 &7— инвентарь, &f37-40 &7— шлем, нагрудник, штаны, ботинки, &f41 &7— левая рука");
+        plugin.msg(player, "&7● &fзакрой окно — набор сохранится сам");
+    }
+
+    /** Список китов в чате: без GUI и лишних кнопок. */
+    void editMenu(Player player) {
+        Object manager = plugin.duels().manager("getKitManager");
+        Object names = manager == null ? null : Duels.call(manager, "getKitNames");
+        if (!(names instanceof java.util.List) || ((java.util.List<?>) names).isEmpty()) {
+            plugin.msg(player, "&#F8BEFBДуэли &8» &cКитов нет: /duelx kits reset");
+            return;
+        }
+        plugin.msg(player, "&#F8BEFBКиты &8» &fоткрыть редактор: &f/duelx kit edit <кит>");
+        for (Object row : (java.util.List<?>) names) {
+            if (row != null) plugin.msg(player, "&7● &f" + row);
         }
     }
 
-    /** Список китов в родном редакторе EpicDuels (страницы). */
-    void editMenu(Player player) {
-        Object gui = plugin.duels().gui();
-        Duels.call(gui, "openKitEditorList", player, Integer.valueOf(0));
+    /** Набор, который сейчас редактируют: окно -> имя кита. */
+    static final class EditorHolder implements InventoryHolder {
+        private final String kit;
+
+        EditorHolder(String kit) {
+            this.kit = kit;
+        }
+
+        String kit() {
+            return kit;
+        }
+
+        @Override
+        public Inventory getInventory() {
+            return null;
+        }
+    }
+
+    /** Закрыл окно редактора — сразу сохранили набор. */
+    @EventHandler
+    public void onClose(InventoryCloseEvent event) {
+        Inventory inventory = event.getInventory();
+        if (inventory == null || !(inventory.getHolder() instanceof EditorHolder)) return;
+        if (!(event.getPlayer() instanceof Player)) return;
+        Player player = (Player) event.getPlayer();
+        store(player, ((EditorHolder) inventory.getHolder()).kit(), inventory);
+    }
+
+    /** Разложить содержимое окна обратно в кит и сохранить kits.yml. */
+    private void store(Player player, String name, Inventory inventory) {
+        Object manager = plugin.duels().manager("getKitManager");
+        Object kit = Duels.call(manager, "getKit", name);
+        if (kit == null) {
+            plugin.msg(player, "&#F8BEFBДуэли &8» &cКит &f" + name + "&c пропал — сохранение отменено.");
+            return;
+        }
+        ItemStack[] contents = new ItemStack[36];
+        for (int slot = 0; slot < 36; slot++) contents[slot] = inventory.getItem(slot);
+        ItemStack[] armor = new ItemStack[]{
+                inventory.getItem(39), inventory.getItem(38),
+                inventory.getItem(37), inventory.getItem(36)
+        };
+        ItemStack offHand = inventory.getItem(40);
+        Duels.call(kit, "setContents", (Object) contents);
+        Duels.call(kit, "setArmorContents", (Object) armor);
+        Duels.call(kit, "setOffHand", offHand);
+        Duels.call(manager, "updateKit", kit);
+        Duels.call(manager, "saveKits");
+        plugin.msg(player, "&#F8BEFBДуэли &8» &fКит &d" + name + "&f сохранён.");
     }
 
     /** Сохранить кит из своего инвентаря: 36 слотов, броня и левая рука. */

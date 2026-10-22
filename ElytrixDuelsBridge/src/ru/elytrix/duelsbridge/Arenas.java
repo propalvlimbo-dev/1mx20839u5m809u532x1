@@ -47,6 +47,12 @@ final class Arenas implements Listener {
 
     /** Пары точек на бой: имя мира-копии -> {точка команды 1, точка команды 2}. */
     private final Map<String, int[]> pairs = new HashMap<String, int[]>();
+    /** Занятые пары: номер пары -> время брони. */
+    private final Map<Integer, Long> reserved = new HashMap<Integer, Long>();
+    /** Кто ждёт свою пару: игрок -> номер пары (на время запуска боя). */
+    private final Map<java.util.UUID, Integer> pending = new HashMap<java.util.UUID, Integer>();
+    /** Идущий бой -> номер пары. Освобождается, когда мир-копия выгружается. */
+    private final Map<String, Integer> busy = new HashMap<String, Integer>();
     /** Кэш spawns.yml: читаем с диска только когда файл менялся. */
     private List<Location> cached;
     private long cacheStamp = -1;
@@ -433,6 +439,8 @@ final class Arenas implements Listener {
         plugin.msg(player, "&7● &f" + (ready
                 ? "&aарена в ротации"
                 : "&cнужно минимум две точки: &fsetspawn1 &7и &fsetspawn2"));
+        plugin.msg(player, "&7● &fпар точек: &d" + readyPairs() + "&7, занято: &d"
+                + busy.size() + "&7, свободно: &d" + Math.max(0, readyPairs() - busy.size()));
     }
 
     private int countPoints() {
@@ -538,7 +546,8 @@ final class Arenas implements Listener {
             return;
         }
 
-        int[] pair = pair(world);
+        Player teleported = event.getPlayer();
+        int[] pair = pair(world, teleported == null ? null : teleported.getUniqueId());
         if (pair == null) return;
         List<Location> points = points();
         Location point = points.get(sideOne ? pair[0] : pair[1]);
@@ -562,14 +571,9 @@ final class Arenas implements Listener {
      * Пары идут строго по порядку — 1 и 2, потом 3 и 4, потом 5 и 6, — и
      * после последней снова с первой. Никакого рандома.
      */
-    private int[] pair(String world) {
+    private int[] pair(String world, java.util.UUID player) {
         List<Location> points = points();
-        List<Integer> ready = new ArrayList<Integer>();
-        for (int start = 0; start + 1 < points.size(); start += 2) {
-            if (points.get(start) != null && points.get(start + 1) != null) {
-                ready.add(Integer.valueOf(start));
-            }
-        }
+        List<Integer> ready = completePairs(points);
         if (ready.isEmpty()) return null;
         int[] pair = pairs.get(world);
         if (pair != null && pair[0] + 1 < points.size()
@@ -577,32 +581,113 @@ final class Arenas implements Listener {
             return pair;
         }
         if (pairs.size() > 256) pairs.clear();
-        int number = nextPairNumber();
-        int start = ready.get((number - 1) % ready.size()).intValue();
-        rememberPair(number);
+        Integer number = busy.get(world);
+        if (number == null) {
+            number = player == null ? null : pending.remove(player);
+            if (number == null || number.intValue() < 1 || number.intValue() > ready.size()) {
+                number = Integer.valueOf(freePair(ready.size()));
+            }
+            if (number.intValue() < 1) number = Integer.valueOf(1);
+            busy.put(world, number);
+            clearPending(number.intValue());
+        }
+        int start = ready.get((number.intValue() - 1) % ready.size()).intValue();
         pair = new int[]{start, start + 1};
         pairs.put(world, pair);
         return pair;
     }
 
-    /** Номер пары, с которой начнётся следующий бой (хранится в spawns.yml). */
-    private int nextPairNumber() {
-        try {
-            return Math.max(1, pointsConfig().getInt("next", 1));
-        } catch (RuntimeException error) {
-            return 1;
+    /** Начала полных пар точек: 1-2, 3-4, 5-6… */
+    private List<Integer> completePairs(List<Location> points) {
+        List<Integer> ready = new ArrayList<Integer>();
+        for (int start = 0; start + 1 < points.size(); start += 2) {
+            if (points.get(start) != null && points.get(start + 1) != null) {
+                ready.add(Integer.valueOf(start));
+            }
+        }
+        return ready;
+    }
+
+    /** Сколько готовых пар точек. */
+    int readyPairs() {
+        return completePairs(points()).size();
+    }
+
+    /** Все пары заняты идущими боями? */
+    boolean full() {
+        purge();
+        int count = readyPairs();
+        return count == 0 || freePair(count) == 0;
+    }
+
+    /**
+     * Занять свободную пару под бой. @return номер пары или 0, если все заняты.
+     */
+    int reserve(java.util.List<java.util.UUID> players) {
+        purge();
+        int count = readyPairs();
+        if (count == 0) return 0;
+        int number = freePair(count);
+        if (number == 0) return 0;
+        reserved.put(Integer.valueOf(number), Long.valueOf(System.currentTimeMillis()));
+        if (players != null) {
+            for (java.util.UUID id : players) {
+                if (id != null) pending.put(id, Integer.valueOf(number));
+            }
+        }
+        return number;
+    }
+
+    /** Бой не стартовал — вернуть бронь. */
+    void release(java.util.List<java.util.UUID> players) {
+        if (players == null) return;
+        for (java.util.UUID id : players) {
+            Integer number = pending.remove(id);
+            if (number != null && !busy.containsValue(number)) reserved.remove(number);
         }
     }
 
-    private void rememberPair(int number) {
-        YamlConfiguration config = pointsConfig();
-        config.set("next", Integer.valueOf(number + 1));
-        try {
-            config.save(pointsFile());
-        } catch (Exception error) {
-            plugin.getLogger().warning("Арена: не смог записать spawns.yml: " + error);
+    private int freePair(int count) {
+        java.util.Set<Integer> taken = new java.util.HashSet<Integer>(reserved.keySet());
+        taken.addAll(busy.values());
+        for (int number = 1; number <= count; number++) {
+            if (!taken.contains(Integer.valueOf(number))) return number;
         }
-        dropCache();
+        return 0;
+    }
+
+    private void clearPending(int number) {
+        java.util.Iterator<java.util.Map.Entry<java.util.UUID, Integer>> iterator =
+                pending.entrySet().iterator();
+        while (iterator.hasNext()) {
+            if (iterator.next().getValue().intValue() == number) iterator.remove();
+        }
+    }
+
+    /** Бронь без боя (запуск не удался) не должна занимать арену вечно. */
+    private void purge() {
+        long now = System.currentTimeMillis();
+        java.util.Iterator<java.util.Map.Entry<Integer, Long>> iterator =
+                reserved.entrySet().iterator();
+        while (iterator.hasNext()) {
+            java.util.Map.Entry<Integer, Long> entry = iterator.next();
+            if (now - entry.getValue().longValue() < 120000L) continue;
+            iterator.remove();
+            clearPending(entry.getKey().intValue());
+        }
+    }
+
+    /** Мир-копия выгружен (бой кончился) — пара снова свободна. */
+    @EventHandler
+    public void onWorldUnload(org.bukkit.event.world.WorldUnloadEvent event) {
+        if (event.getWorld() == null) return;
+        String world = event.getWorld().getName();
+        Integer number = busy.remove(world);
+        pairs.remove(world);
+        if (number != null) {
+            reserved.remove(number);
+            clearPending(number.intValue());
+        }
     }
 
     private double horizontal(Location one, Location two) {

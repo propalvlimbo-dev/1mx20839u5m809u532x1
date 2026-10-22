@@ -457,6 +457,7 @@ final class Queue {
         Player b = Bukkit.getPlayer(second.owner);
         if (!plugin.duels().startQueue1v1(a, b, first.kit)) {
             requeue(first, second);
+            if (plugin.duels().consumeBusyRefusal()) return;
             String text = msg("messages.start-failed",
                     "&#F8BEFBДуэли &8» &cБой не стартовал (нет готовой арены?) — продолжаем искать.");
             plugin.msg(a, text);
@@ -504,6 +505,7 @@ final class Queue {
         if (!ok) {
             // бой не стартовал — возвращаем всех в поиск, чтобы не «выкидывало» из очереди
             requeueIds(all, kit, true);
+            if (plugin.duels().consumeBusyRefusal()) return;
             String text = msg("messages.start-failed",
                     "&#F8BEFBДуэли &8» &cБой не стартовал (нет готовой арены?) — продолжаем искать.");
             for (UUID id : all) plugin.msg(Bukkit.getPlayer(id), text);

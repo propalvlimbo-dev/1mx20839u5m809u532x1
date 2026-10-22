@@ -185,6 +185,7 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new CommandGuard(this), this);
         getServer().getPluginManager().registerEvents(arenaRules, this);
         getServer().getPluginManager().registerEvents(arenas, this);
+        getServer().getPluginManager().registerEvents(kits, this);
         getServer().getPluginManager().registerEvents(new Effects(this, duels), this);
         arenaRules.start();
         arenas.setup();

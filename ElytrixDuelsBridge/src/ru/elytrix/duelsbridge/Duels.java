@@ -329,11 +329,17 @@ final class Duels {
                 plugin.getLogger().warning("Арены: запуск боя невозможен — " + arenasReport());
                 return false;
             }
-            Object arena = list.get(random.nextInt(list.size()));
             Object all = members instanceof List ? members : new ArrayList<Object>();
+            List<UUID> team = ids(all);
+            if (plugin.arenas().reserve(team) == 0) {
+                busy(team);
+                return false;
+            }
+            Object arena = list.get(random.nextInt(list.size()));
             ok = invoke(manager("getTeamDuelManager"), "startTeamDuel",
                     new Class<?>[]{List.class, size.getClass(), arena.getClass(), kit.getClass()},
                     all, size, arena, kit);
+            if (!ok) plugin.arenas().release(team);
         }
         if (!ok) {
             plugin.msg(player, plugin.string("messages.start-failed",
@@ -362,6 +368,10 @@ final class Duels {
                     "&#F8BEFBДуэли &8» &cНет готовых арен — сообщи администратору.")
                     .replace("%arenas%", arenasReport()));
             plugin.getLogger().warning("Арены: запуск боя невозможен — " + arenasReport());
+            return false;
+        }
+        if (plugin.arenas().full()) {
+            plugin.msg(player, BUSY);
             return false;
         }
         Object arena = ready.get(random.nextInt(ready.size()));
@@ -429,6 +439,32 @@ final class Duels {
     }
 
     /** Случайная готовая арена или null. */
+    /** Последний отказ был из-за занятых арен — очередь не должна писать своё. */
+    private boolean busyRefusal;
+
+    boolean consumeBusyRefusal() {
+        boolean value = busyRefusal;
+        busyRefusal = false;
+        return value;
+    }
+
+    private static java.util.List<UUID> ids(Object value) {
+        java.util.List<UUID> out = new ArrayList<UUID>();
+        if (value instanceof Iterable) {
+            for (Object row : (Iterable<?>) value) {
+                if (row instanceof UUID) out.add((UUID) row);
+            }
+        }
+        return out;
+    }
+
+    private void busy(List<UUID> players) {
+        busyRefusal = true;
+        for (UUID id : players) plugin.msg(Bukkit.getPlayer(id), BUSY);
+    }
+
+    private static final String BUSY = "&#F8BEFBДуэли &8» &cВсе арены заняты — подожди, скоро освободится.";
+
     Object randomArena() {
         Object arenas = call(manager("getArenaManager"), "getReadyArenas");
         if (!(arenas instanceof List) || ((List<?>) arenas).isEmpty()) return null;
@@ -445,10 +481,21 @@ final class Duels {
         Object arena = randomArena();
         Object kitObject = kitOf(kitName);
         if (arena == null || kitObject == null) return false;
+        List<UUID> pair = new ArrayList<UUID>();
+        pair.add(first.getUniqueId());
+        pair.add(second.getUniqueId());
+        if (plugin.arenas().reserve(pair) == 0) {
+            busy(pair);
+            return false;
+        }
         Object started = invokeRaw(manager("getDuelManager"), "startDirectDuel",
                 new Class<?>[]{Player.class, Player.class, arena.getClass(), kitObject.getClass(), int.class},
                 first, second, arena, kitObject, Integer.valueOf(1));
-        return started != null;
+        if (started == null) {
+            plugin.arenas().release(pair);
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -476,10 +523,16 @@ final class Duels {
         Object kit = call(manager("getKitManager"), "getKit", kitName);
         List<Object> ready = readyArenas();
         if (size == null || kit == null || ready.isEmpty()) return false;
+        if (plugin.arenas().reserve(members) == 0) {
+            busy(members);
+            return false;
+        }
         Object arena = ready.get(random.nextInt(ready.size()));
-        return invoke(manager("getTeamDuelManager"), "startTeamDuel",
+        boolean ok = invoke(manager("getTeamDuelManager"), "startTeamDuel",
                 new Class<?>[]{List.class, size.getClass(), arena.getClass(), kit.getClass()},
                 new ArrayList<UUID>(members), size, arena, kit);
+        if (!ok) plugin.arenas().release(members);
+        return ok;
     }
 
     /**

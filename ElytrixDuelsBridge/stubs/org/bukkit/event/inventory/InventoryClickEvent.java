@@ -6,5 +6,6 @@ public class InventoryClickEvent {
     public int getSlot() { return 0; }
     public HumanEntity getWhoClicked() { return null; }
     public boolean isCancelled() { return false; }
+    public boolean isShiftClick() { return false; }
     public void setCancelled(boolean cancel) { }
 }
