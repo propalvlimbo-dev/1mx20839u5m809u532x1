@@ -275,11 +275,6 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         return arenas.sharedWorld();
     }
 
-    /** Подсказка на родные команды арен EpicDuels (в общем мире не работают). */
-    void arenaHint(Player player, String sub) {
-        arenas.hint(player, sub);
-    }
-
     /** /duelx arena — арены в одном мире. */
     void arenaCommand(Player player, String[] args) {
         arenas.command(player, args);

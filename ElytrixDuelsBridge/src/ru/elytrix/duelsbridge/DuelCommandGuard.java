@@ -65,16 +65,24 @@ final class DuelCommandGuard implements CommandExecutor, TabCompleter {
         // опасны (delete снёс бы папку мира duel) — отправляем в мост
         boolean shared = !plugin.sharedArenaWorld().isEmpty();
         if (plugin.isAdmin(player) && shared) {
-            if (sub.equals("create") || sub.equals("ready") || sub.equals("setspawn1")
-                    || sub.equals("setspawn2") || sub.equals("spawn1") || sub.equals("spawn2")) {
-                plugin.arenaHint(player, sub);
-                return true;
-            }
-            if (sub.equals("arena") && args.length > 1) {
-                String action = plugin.lower(args[1]);
+            // /duel arena create|setspawn1|setspawn2|save|list|tp|delete — ведём
+            // сами: в общем мире родные команды ищут мир arena_template_*
+            if (sub.equals("arena")) {
+                String action = args.length > 1 ? plugin.lower(args[1]) : "";
                 if (action.equals("rename") || action.equals("seticon")) {
                     return original != null && original.onCommand(sender, command, label, args);
                 }
+                String[] rest = new String[Math.max(0, args.length - 1)];
+                System.arraycopy(args, 1, rest, 0, rest.length);
+                plugin.arenaCommand(player, rest);
+                return true;
+            }
+            // родные формы без слова arena: /duel create, /duel setspawn1, /duel save
+            if (sub.equals("create") || sub.equals("ready") || sub.equals("save")
+                    || sub.equals("setspawn1") || sub.equals("setspawn2")
+                    || sub.equals("spawn1") || sub.equals("spawn2")) {
+                plugin.arenaCommand(player, args);
+                return true;
             }
         }
         if (plugin.isAdmin(player) && !OURS.contains(sub)) {

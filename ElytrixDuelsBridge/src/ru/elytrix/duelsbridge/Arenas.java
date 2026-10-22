@@ -35,6 +35,12 @@ final class Arenas {
 
     private final ElytrixDuelsBridge plugin;
     private final Duels duels;
+    /**
+     * Арена, с которой сейчас работает админ: её запоминает create/spawn,
+     * поэтому родная форма «/duel arena setspawn1» без имени тоже работает.
+     */
+    private final java.util.Map<java.util.UUID, String> current =
+            new java.util.HashMap<java.util.UUID, String>();
 
     Arenas(ElytrixDuelsBridge plugin, Duels duels) {
         this.plugin = plugin;
@@ -145,35 +151,43 @@ final class Arenas {
             list(player);
             return;
         }
-        if (name == null) {
-            help(player);
-            return;
-        }
         if (action.equals("create") || action.equals("создать")) {
+            if (name == null) {
+                help(player);
+                return;
+            }
             create(player, name);
             return;
         }
         if (action.equals("spawn1") || action.equals("setspawn1") || action.equals("точка1")) {
+            name = resolve(player, name);
+            if (name == null) return;
             spawn(player, name, true);
             return;
         }
         if (action.equals("spawn2") || action.equals("setspawn2") || action.equals("точка2")) {
+            name = resolve(player, name);
+            if (name == null) return;
             spawn(player, name, false);
             return;
         }
-        if (action.equals("save") || action.equals("сохранить")) {
-            plugin.msg(player, "&#F8BEFBДуэли &8» &7Точки сохраняются сразу — /save не нужен.");
-            return;
-        }
-        if (action.equals("ready") || action.equals("готово")) {
+        // родная /duel arena save ставит ready — у нас так же
+        if (action.equals("save") || action.equals("ready") || action.equals("сохранить")
+                || action.equals("готово")) {
+            name = resolve(player, name);
+            if (name == null) return;
             ready(player, name);
             return;
         }
         if (action.equals("remove") || action.equals("delete") || action.equals("удалить")) {
+            name = resolve(player, name);
+            if (name == null) return;
             remove(player, name);
             return;
         }
         if (action.equals("tp") || action.equals("телепорт")) {
+            name = resolve(player, name);
+            if (name == null) return;
             tp(player, name);
             return;
         }
@@ -181,35 +195,33 @@ final class Arenas {
     }
 
     /**
-     * Подсказка, если игрок по привычке пишет родные команды EpicDuels
-     * (/duel create, /duel arena setspawn1): в общем мире они не работают.
+     * Имя арены для команды без аргумента: последняя, с которой работал админ,
+     * иначе единственная недостроенная, иначе единственная вообще.
      */
-    void hint(Player player, String sub) {
-        String action = sub == null ? "" : sub.toLowerCase(Locale.ROOT);
-        String name = "<имя>";
-        if (action.equals("create") || action.equals("создать")) {
-            plugin.msg(player, "&#F8BEFBДуэли &8» &fСоздать арену: &d/duelx arena create " + name);
-            return;
+    private String resolve(Player player, String name) {
+        if (name != null && !name.isEmpty()) return name;
+        String remembered = current.get(player.getUniqueId());
+        if (remembered != null) return remembered;
+
+        Collection<?> all = all(duels.manager("getArenaManager"));
+        String onlyIncomplete = null;
+        String only = null;
+        int incomplete = 0;
+        for (Object arena : all) {
+            Object value = Duels.call(arena, "getName");
+            if (value == null) continue;
+            String candidate = String.valueOf(value);
+            only = candidate;
+            if (!Boolean.TRUE.equals(Duels.call(arena, "isReady"))) {
+                incomplete++;
+                onlyIncomplete = candidate;
+            }
         }
-        if (action.equals("spawn1") || action.equals("setspawn1") || action.equals("точка1")) {
-            plugin.msg(player, "&#F8BEFBДуэли &8» &fТочка команды 1: &d/duelx arena spawn1 " + name
-                    + "&7 (стоя в мире " + sharedWorld() + ")");
-            return;
-        }
-        if (action.equals("spawn2") || action.equals("setspawn2") || action.equals("точка2")) {
-            plugin.msg(player, "&#F8BEFBДуэли &8» &fТочка команды 2: &d/duelx arena spawn2 " + name
-                    + "&7 (стоя в мире " + sharedWorld() + ")");
-            return;
-        }
-        if (action.equals("ready") || action.equals("готово")) {
-            plugin.msg(player, "&#F8BEFBДуэли &8» &fВключить арену: &d/duelx arena ready " + name);
-            return;
-        }
-        if (action.equals("save")) {
-            plugin.msg(player, "&#F8BEFBДуэли &8» &7Точки сохраняются сразу, /save не нужен.");
-            return;
-        }
-        help(player);
+        if (incomplete == 1) return onlyIncomplete;
+        if (all.size() == 1) return only;
+        plugin.msg(player, "&#F8BEFBДуэли &8» &cУкажи арену: &f/duel arena spawn1 <имя>");
+        list(player);
+        return null;
     }
 
     private void help(Player player) {
@@ -219,7 +231,8 @@ final class Arenas {
         plugin.msg(player, "&7● &f/duelx arena spawn1 &d<имя> &7— точка команды 1");
         plugin.msg(player, "&7● &f/duelx arena spawn2 &d<имя> &7— точка команды 2");
         plugin.msg(player, "&7● &f/duelx arena ready &d<имя> &7— включить в ротацию");
-        plugin.msg(player, "&7● &f/duelx arena list &7· &fremove &d<имя> &7· &ftp &d<имя>");
+        plugin.msg(player, "&7● &f/duel arena list &7· &fdelete &d<имя> &7· &ftp &d<имя>");
+        plugin.msg(player, "&7● &fродные &d/duel arena create|setspawn1|setspawn2|save &7тоже работают");
     }
 
     private void list(Player player) {
@@ -249,19 +262,22 @@ final class Arenas {
             YamlConfiguration config = YamlConfiguration.loadConfiguration(file());
             for (String key : keys(config)) {
                 if (key.equalsIgnoreCase(name)) {
-                    plugin.msg(player, "&#F8BEFBДуэли &8» &cАрена &f" + name + "&c уже есть.");
+                    current.put(player.getUniqueId(), name);
+                    plugin.msg(player, "&#F8BEFBДуэли &8» &fАрена &d" + name
+                            + "&f уже есть — ставь точки: &f/duel arena setspawn1&7, потом &fsetspawn2&7 и &fsave");
                     return;
                 }
             }
             config.set(name + ".ready", false);
             config.save(file());
+            current.put(player.getUniqueId(), name);
         } catch (Exception error) {
             plugin.msg(player, "&#F8BEFBДуэли &8» &cНе смог записать arenas.yml: &f" + error);
             return;
         }
         reload();
         plugin.msg(player, "&#F8BEFBДуэли &8» &fАрена &d" + name + "&f создана. "
-                + "Встань на точку 1 и напиши &f/duelx arena spawn1 " + name);
+                + "Встань на точку 1 и напиши &f/duel arena setspawn1 " + name);
     }
 
     private void spawn(Player player, String name, boolean first) {
@@ -278,6 +294,7 @@ final class Arenas {
                     + "&c — точки ставятся только там.");
             return;
         }
+        current.put(player.getUniqueId(), name);
         Location location = player.getLocation().clone();
         Duels.call(arena, first ? "setSpawn1" : "setSpawn2", location);
         Duels.call(manager, "saveArenas");

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Собирает jar без JDK (когда в JRE нет утилиты jar).
 
-Запуск: python3 tools/mkjar.py build/out ElytrixDuelsBridge-1.7.1.jar resources
+Запуск: python3 tools/mkjar.py build/out ElytrixDuelsBridge-1.7.2.jar resources
 """
 from __future__ import annotations
 
