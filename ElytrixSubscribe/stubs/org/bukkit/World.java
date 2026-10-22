@@ -6,6 +6,7 @@ public interface World {
     org.bukkit.block.Block getBlockAt(int x, int y, int z);
     int getMaxHeight();
     int getMinHeight();
+    boolean isChunkLoaded(int x, int z);
     java.util.UUID getUID();
     Location getSpawnLocation();
 }

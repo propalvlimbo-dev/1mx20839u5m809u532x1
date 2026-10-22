@@ -79,17 +79,29 @@ public class SignInput implements Listener {
         return true;
     }
 
-    /** Свободное место над игроком в том же (загруженном) чанке. */
+    /**
+     * Свободное место рядом с игроком в загруженном чанке: сначала сверху,
+     * потом чуть в сторону (в пещере сверху камень, зато рядом воздух).
+     */
     private Block findSpot(Player player) {
         World world = player.getWorld();
         Location base = player.getLocation();
         int max = world.getMaxHeight() - 2;
-        int[] offsets = {20, 12, 8, 30, 4, 40};
-        for (int offset : offsets) {
-            int y = base.getBlockY() + offset;
-            if (y < world.getMinHeight() + 1 || y > max) continue;
-            Block block = world.getBlockAt(base.getBlockX(), y, base.getBlockZ());
-            if (block.getType() == Material.AIR) return block;
+        int[] heights = {4, 8, 12, 20, 30, 3};
+        int[] sides = {0, 2, -2, 4, -4};
+        for (int height : heights) {
+            for (int side : sides) {
+                for (int sideZ : sides) {
+                    int y = base.getBlockY() + height;
+                    if (y < world.getMinHeight() + 1 || y > max) continue;
+                    int x = base.getBlockX() + side;
+                    int z = base.getBlockZ() + sideZ;
+                    // не грузим чужие чанки синхронно — только уже загруженные
+                    if (!world.isChunkLoaded(x >> 4, z >> 4)) continue;
+                    Block block = world.getBlockAt(x, y, z);
+                    if (block.getType() == Material.AIR) return block;
+                }
+            }
         }
         return null;
     }
