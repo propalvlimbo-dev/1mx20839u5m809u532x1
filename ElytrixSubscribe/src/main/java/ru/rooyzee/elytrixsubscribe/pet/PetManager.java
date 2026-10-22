@@ -64,6 +64,8 @@ public final class PetManager implements Listener {
     private boolean unavailable;
     /** Interaction-хитбоксы не создаются (старое ядро) — не спамим в лог. */
     private boolean hitboxesBroken;
+    /** Последняя ошибка создания питомца — показываем её игроку при включении. */
+    private String lastError;
 
     public PetManager(Main plugin) {
         this.plugin = plugin;
@@ -200,6 +202,12 @@ public final class PetManager implements Listener {
                     "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &fПитомец "
                             + "&#F8BEFB%pet% &fвключён.")
                     .replace("%pet%", type.displayName()));
+        } else {
+            row.setActive(false);
+            this.save(player, type);
+            String reason = this.lastError == null ? "нет VirtualEntityApi/BLib" : this.lastError;
+            this.plugin.msg(player, "&cПитомец не появился: &7" + reason);
+            this.plugin.msg(player, "&7Подробности — в консоли сервера.");
         }
     }
 
@@ -277,6 +285,9 @@ public final class PetManager implements Listener {
             Class.forName("dev.by1337.virtualentity.api.VirtualEntityApi");
             Class.forName("org.by1337.blib.geom.Vec3d");
         } catch (Throwable error) {
+            if (this.lastError == null) {
+                this.lastError = "не найдены классы VirtualEntityApi/BLib (" + error + ")";
+            }
             return false;
         }
         return true;
@@ -305,26 +316,28 @@ public final class PetManager implements Listener {
         PetType type = this.activeType(player);
         if (type == null) return false;
         PetData row = this.data(player, type);
-        PetInstance instance = new PetInstance(type, player.getWorld().getName());
         try {
+            PetInstance instance = new PetInstance(type, player.getWorld().getName());
             instance.entity = this.createEntity(row);
+            Location start = player.getLocation().clone().add(ORBIT_RADIUS, 1.2, 0);
+            instance.entity.setPos(new Vec3d(start.getX(), start.getY(), start.getZ()));
+            instance.center[0] = player.getLocation().getX();
+            instance.center[1] = player.getLocation().getY();
+            instance.center[2] = player.getLocation().getZ();
+            instance.last = player.getLocation().clone();
+            instance.viewers = this.viewers(player);
+            instance.entity.tick(instance.viewers);
+            this.pets.put(player.getUniqueId(), instance);
+            this.spawnHitbox(player, instance, start);
+            return true;
         } catch (Throwable error) {
             this.unavailable = true;
+            this.lastError = String.valueOf(error);
             this.plugin.getLogger().warning("Питомцы недоступны (" + error
                     + ") — проверь VirtualEntityApi и BLib.");
+            error.printStackTrace();
             return false;
         }
-        Location start = player.getLocation().clone().add(ORBIT_RADIUS, 1.2, 0);
-        instance.entity.setPos(new Vec3d(start.getX(), start.getY(), start.getZ()));
-        instance.center[0] = player.getLocation().getX();
-        instance.center[1] = player.getLocation().getY();
-        instance.center[2] = player.getLocation().getZ();
-        instance.last = player.getLocation().clone();
-        instance.viewers = this.viewers(player);
-        instance.entity.tick(instance.viewers);
-        this.pets.put(player.getUniqueId(), instance);
-        this.spawnHitbox(player, instance, start);
-        return true;
     }
 
     /**

@@ -24,7 +24,8 @@
 2. Зависимости на сервере: **Paper 1.21.11**, **BMenu**, **PlaceholderAPI**,
    **LuckPerms**, **VirtualEntityApi** + **BLib** (без них питомцы отключатся).
 3. Скопировать 5 файлов меню из `BMenu/menu/elytrix/main/` в
-   `plugins/BMenu/menu/elytrix/main/`.
+   `plugins/BMenu/menu/elytrix/main/` (`sub.yml`, `sub_pets.yml`,
+   `sub_pet_parrot.yml`, `sub_pet_allay.yml`, `sub_pet_bee.yml`).
 4. Перезапустить сервер: создастся `config.yml` и `data.yml`.
 
 ## Команды
@@ -51,6 +52,12 @@
 `%slidesubscribe_pet_parrot_status%`, `%slidesubscribe_pet_parrot_name%`,
 `%slidesubscribe_pet_parrot_behavior%`, `%slidesubscribe_pet_parrot_look%`
 (то же для `allay` и `bee`).
+
+## Если питомец не появился
+
+В чат придёт `Питомец не появился: <причина>`, а в консоли — полный стек.
+Самые частые причины: нет `VirtualEntityApi`/`BLib`, у игрока нет подписки,
+`pets.enabled: false` в `config.yml`.
 
 ## Важно при обновлении
 

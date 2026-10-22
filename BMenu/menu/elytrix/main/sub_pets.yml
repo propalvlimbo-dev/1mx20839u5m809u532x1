@@ -1,7 +1,7 @@
 id: elytrix:sub_pets
 provider: default
 type: chest
-size: 45
+size: 54
 title: '&#F8BEFB&lПитомцы'
 items:
   header:
@@ -19,8 +19,8 @@ items:
     name: '&7« &#F8BEFBПопугай &7»'
     lore:
     - '&#F8BEFB&l┃ '
-    - '&#F8BEFB&l┃ &fЛетает по кругу, сидит на плече'
-    - '&#F8BEFB&l┃ &fили висит рядом.'
+    - '&#F8BEFB&l┃ &fПиратский попугай: пять окрасов,'
+    - '&#F8BEFB&l┃ &fлетает по кругу или сидит на плече.'
     - '&#F8BEFB&l┃ &fРежим: &#F8BEFB%slidesubscribe_pet_parrot_behavior%'
     - '&#F8BEFB&l┃ &fОкрас: &#F8BEFB%slidesubscribe_pet_parrot_look%'
     - '&#F8BEFB&l┃ &fИмя: &f%slidesubscribe_pet_parrot_name%'
@@ -29,7 +29,8 @@ items:
     - '&7● &fЛКМ — включить или выключить'
     - '&7● &fПКМ — настройки'
     on_left_click:
-    - player: 'subscribe pet toggle parrot'
+    - player: 'subscribe pet parrot toggle'
+    - update: ''
     on_right_click:
     - player: 'subscribe menu parrot'
   allay:
@@ -37,7 +38,8 @@ items:
     name: '&7« &#F8BEFBАллей &7»'
     lore:
     - '&#F8BEFB&l┃ '
-    - '&#F8BEFB&l┃ &fКружит рядом, светится и танцует.'
+    - '&#F8BEFB&l┃ &fГолубой аллей: светится рядом,'
+    - '&#F8BEFB&l┃ &fлетит позади и танцует.'
     - '&#F8BEFB&l┃ &fРежим: &#F8BEFB%slidesubscribe_pet_allay_behavior%'
     - '&#F8BEFB&l┃ &fСвечение: &#F8BEFB%slidesubscribe_pet_allay_look%'
     - '&#F8BEFB&l┃ &fИмя: &f%slidesubscribe_pet_allay_name%'
@@ -46,7 +48,8 @@ items:
     - '&7● &fЛКМ — включить или выключить'
     - '&7● &fПКМ — настройки'
     on_left_click:
-    - player: 'subscribe pet toggle allay'
+    - player: 'subscribe pet allay toggle'
+    - update: ''
     on_right_click:
     - player: 'subscribe menu allay'
   bee:
@@ -54,7 +57,8 @@ items:
     name: '&7« &#F8BEFBПчела &7»'
     lore:
     - '&#F8BEFB&l┃ '
-    - '&#F8BEFB&l┃ &fЛетает зигзагом и кувыркается.'
+    - '&#F8BEFB&l┃ &fПчела без жала: летает зигзагом,'
+    - '&#F8BEFB&l┃ &fкувыркается и бывает малышом.'
     - '&#F8BEFB&l┃ &fРежим: &#F8BEFB%slidesubscribe_pet_bee_behavior%'
     - '&#F8BEFB&l┃ &fРазмер: &#F8BEFB%slidesubscribe_pet_bee_look%'
     - '&#F8BEFB&l┃ &fИмя: &f%slidesubscribe_pet_bee_name%'
@@ -63,9 +67,25 @@ items:
     - '&7● &fЛКМ — включить или выключить'
     - '&7● &fПКМ — настройки'
     on_left_click:
-    - player: 'subscribe pet toggle bee'
+    - player: 'subscribe pet bee toggle'
+    - update: ''
     on_right_click:
     - player: 'subscribe menu bee'
+  info:
+    material: paper
+    name: '&7« &#F8BEFBКак это работает &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fОдновременно может быть включён'
+    - '&#F8BEFB&l┃ &fтолько один питомец.'
+    - '&#F8BEFB&l┃ &fВключил другого — первый исчезает.'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fПКМ по питомцу в мире открывает'
+    - '&#F8BEFB&l┃ &fего личные настройки.'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для закрытия'
+    on_click:
+    - close: ''
   back:
     material: red_dye
     name: '&7« &#F8BEFBНазад &7»'
@@ -85,32 +105,55 @@ items:
 animation:
   - tick: 0
     opcodes:
-      - st: back 40
-      - st: header 4
-      - st: design_purple_panel 19,21
+      - st: back 45
+      - st: info 49
+      - st: design_purple_panel 46,47
       - sound: 'block.enchantment_table.use 0.3 1.5'
   - opcodes:
-      - st: design_purple_panel 18,26
-      - sound: 'block.note_block.chime 0.2 0.88'
+      - st: design_purple_panel 48,50
+      - sound: 'block.note_block.chime 0.2 0.85'
   - opcodes:
-      - st: design_purple_panel 23,25
+      - st: design_purple_panel 51,52
   - opcodes:
-      - st: design_black_panel 9-17
-      - sound: 'block.note_block.chime 0.23 1.0'
+      - st: design_purple_panel 53,36
+      - sound: 'block.note_block.chime 0.22 0.91'
   - opcodes:
-      - st: design_black_panel 27-35
+      - st: design_purple_panel 37,43
   - opcodes:
-      - st: design_black_panel 36-39,41-44
-      - sound: 'block.note_block.chime 0.27 1.15'
+      - st: design_purple_panel 44,27
+      - sound: 'block.note_block.chime 0.23 0.98'
   - opcodes:
-      - st: design_black_panel 0-3,5-8
+      - st: design_purple_panel 35
+  - opcodes:
+      - st: design_black_panel 18,9
+      - sound: 'block.note_block.chime 0.25 1.05'
+  - opcodes:
+      - st: design_black_panel 10,0
+  - opcodes:
+      - st: design_black_panel 1,2
+      - sound: 'block.note_block.chime 0.27 1.13'
+  - opcodes:
+      - st: design_black_panel 3,5
+  - opcodes:
+      - st: design_black_panel 6,7
+      - sound: 'block.note_block.chime 0.28 1.21'
+  - opcodes:
+      - st: design_black_panel 8,16
+  - opcodes:
+      - st: design_black_panel 17,26
       - sound: 'block.note_block.chime 0.3 1.3'
   - opcodes:
+      - st: header 4
+      - sound: 'block.note_block.pling 0.26 1.0'
+  - opcodes:
       - st: parrot 20
-      - sound: 'block.note_block.pling 0.3 1.1'
+      - sound: 'block.note_block.pling 0.28 1.11'
   - opcodes:
       - st: allay 22
-      - sound: 'block.note_block.pling 0.32 1.25'
+      - sound: 'block.note_block.pling 0.3 1.22'
   - opcodes:
       - st: bee 24
+      - sound: 'block.note_block.pling 0.32 1.36'
+  - opcodes:
+      - st: info 49
       - sound: 'block.amethyst_block.chime 0.45 1.4'

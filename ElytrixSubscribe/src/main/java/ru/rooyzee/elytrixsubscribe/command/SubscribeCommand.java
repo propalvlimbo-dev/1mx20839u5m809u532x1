@@ -119,20 +119,26 @@ public class SubscribeCommand implements CommandExecutor, TabCompleter {
             this.plugin.getMenuService().openPets(player);
             return;
         }
+        // пишем и «pet parrot toggle», и «pet toggle parrot» — меню шлёт оба варианта
         PetType type = PetType.byId(args[1]);
-        if (type == null) {
-            this.plugin.msg(player, "&7Питомцы: &f" + PetType.ids());
-            return;
+        String action;
+        if (type != null) {
+            action = args.length > 2 ? args[2].toLowerCase(Locale.ROOT) : "menu";
+        } else {
+            PetType swapped = args.length > 2 ? PetType.byId(args[2]) : null;
+            if (swapped == null) {
+                this.plugin.msg(player, "&7Питомцы: &f" + PetType.ids()
+                        + " &7— /subscribe pet <питомец> toggle");
+                return;
+            }
+            type = swapped;
+            action = args[1].toLowerCase(Locale.ROOT);
         }
         if (!this.plugin.getSubManager().hasSub(player)) {
-            this.plugin.msg(player, this.plugin.message("noneSubscribe", "&fУ вас нет подписки."));
+            this.plugin.msg(player, this.plugin.message("noneSubscribe",
+                    "&fУ вас нет активной подписки."));
             return;
         }
-        if (!this.plugin.getPetManager().available()) {
-            this.plugin.msg(player, "&7Питомцы выключены на сервере (&fVirtualEntityApi&7).");
-            return;
-        }
-        String action = args.length > 2 ? args[2].toLowerCase(Locale.ROOT) : "menu";
 
         if (action.equals("enable") || action.equals("включить")) {
             this.plugin.getPetManager().enable(player, type);
