@@ -1,6 +1,5 @@
 package ru.rooyzee.elytrixsubscribe.functions.impl;
 
-import java.util.UUID;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -10,7 +9,7 @@ import ru.rooyzee.elytrixsubscribe.Main;
 import ru.rooyzee.elytrixsubscribe.functions.Function;
 
 /**
- * Скорость: +10% к базовой скорости.
+ * Скорость: +20% к базовой скорости, как в старой версии.
  *
  * Модификатор на 1.21 хранится по NamespacedKey, поэтому его можно наложить
  * заново после перезахода и не получить второй такой же.
