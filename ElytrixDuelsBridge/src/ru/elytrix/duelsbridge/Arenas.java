@@ -47,10 +47,31 @@ final class Arenas {
         this.duels = duels;
     }
 
-    /** Мир, в котором живут все арены. Пусто — обычное поведение EpicDuels. */
+    /** Патч арен уже применён (setDefaultWorld сделан). */
+    private boolean applied;
+    private String warnedWorld;
+
+    /**
+     * Мир, в котором живут все арены. Пусто — обычное поведение EpicDuels.
+     *
+     * Если в config.yml ключа нет (или он пуст), но мир duel на сервере есть,
+     * работаем с ним: у владельца мир уже готов, заставлять его что-то
+     * дописывать в конфиг не нужно.
+     */
     String sharedWorld() {
         String world = plugin.getConfig().getString("arenas.world", "");
-        return world == null ? "" : world.trim();
+        world = world == null ? "" : world.trim();
+        if (!world.isEmpty()) return world;
+        return Bukkit.getWorld("duel") != null ? "duel" : "";
+    }
+
+    /** Применить патч арен, если он ещё не применён (мир мог загрузиться позже). */
+    void ensure() {
+        if (!applied) setup();
+    }
+
+    boolean ready() {
+        return applied;
     }
 
     /**
@@ -60,7 +81,11 @@ final class Arenas {
         String world = sharedWorld();
         if (world.isEmpty()) return false;
         if (Bukkit.getWorld(world) == null) {
-            plugin.getLogger().warning("Арены: мир \"" + world + "\" не загружен — оставляю арены как есть.");
+            if (!world.equals(warnedWorld)) {
+                warnedWorld = world;
+                plugin.getLogger().warning("Арены: мир \"" + world + "\" не загружен — "
+                        + "как только он загрузится, арены включатся сами.");
+            }
             return false;
         }
         try {
@@ -71,6 +96,8 @@ final class Arenas {
                     + "(в старом билде нет общего мира арен): " + error);
             return false;
         }
+        applied = true;
+        warnedWorld = null;
         reload();
         plugin.getLogger().info("Арены: все арены в мире \"" + world + "\", миров arena_template_* не нужно");
         return true;
@@ -140,6 +167,7 @@ final class Arenas {
             plugin.msg(player, "&#F8BEFBДуэли &8» &cТолько администратор.");
             return;
         }
+        ensure();
         if (args.length == 0) {
             help(player);
             return;
@@ -226,7 +254,8 @@ final class Arenas {
 
     private void help(Player player) {
         String world = sharedWorld().isEmpty() ? "не задан" : sharedWorld();
-        plugin.msg(player, "&#F8BEFBАрены &8» &fмир: &#F8BEFB" + world);
+        plugin.msg(player, "&#F8BEFBАрены &8» &fмир: &#F8BEFB" + world
+                + "&7, общий мир арен: " + (applied ? "&aвключён" : "&cвыключен"));
         plugin.msg(player, "&7● &f/duelx arena create &d<имя> &7— завести арену (миров не создаёт)");
         plugin.msg(player, "&7● &f/duelx arena spawn1 &d<имя> &7— точка команды 1");
         plugin.msg(player, "&7● &f/duelx arena spawn2 &d<имя> &7— точка команды 2");
@@ -237,6 +266,9 @@ final class Arenas {
 
     private void list(Player player) {
         Object manager = duels.manager("getArenaManager");
+        plugin.msg(player, "&#F8BEFBАрены &8» &fмир &d"
+                + (sharedWorld().isEmpty() ? "не задан" : sharedWorld())
+                + "&7, общий мир арен: " + (applied ? "&aвключён" : "&cвыключен"));
         Collection<?> all = all(manager);
         if (all.isEmpty()) {
             plugin.msg(player, "&#F8BEFBДуэли &8» &7арен пока нет: &f/duelx arena create <имя>");
@@ -254,44 +286,77 @@ final class Arenas {
                             + Math.round(first.getZ()) + ")";
             plugin.msg(player, (ready ? "&a● " : "&7● ") + "&f" + name + " &7— "
                     + (ready ? "&aготова " : "&cне готова ") + points);
+            if (strayWorld(name)) {
+                plugin.msg(player, "&7· &cрядом лежит лишний мир &farena_template_" + name
+                        + " &7— он не нужен, папку можно удалить");
+            }
         }
     }
 
-    private void create(Player player, String name) {
+    /** Остался мир arena_template_<имя> от старого режима — он только мешает. */
+    private boolean strayWorld(String name) {
+        try {
+            return new File(Bukkit.getWorldContainer(), "arena_template_" + name).exists();
+        } catch (RuntimeException error) {
+            return false;
+        }
+    }
+
+    /** Записать арену в arenas.yml. Мир не создаётся: арены живут в общем мире. */
+    private boolean record(Player player, String name) {
         try {
             YamlConfiguration config = YamlConfiguration.loadConfiguration(file());
-            for (String key : keys(config)) {
-                if (key.equalsIgnoreCase(name)) {
-                    current.put(player.getUniqueId(), name);
-                    plugin.msg(player, "&#F8BEFBДуэли &8» &fАрена &d" + name
-                            + "&f уже есть — ставь точки: &f/duel arena setspawn1&7, потом &fsetspawn2&7 и &fsave");
-                    return;
-                }
-            }
-            config.set(name + ".ready", false);
+            if (!keys(config).contains(name)) config.set(name + ".ready", false);
             config.save(file());
             current.put(player.getUniqueId(), name);
         } catch (Exception error) {
             plugin.msg(player, "&#F8BEFBДуэли &8» &cНе смог записать arenas.yml: &f" + error);
-            return;
+            return false;
         }
         reload();
-        plugin.msg(player, "&#F8BEFBДуэли &8» &fАрена &d" + name + "&f создана. "
-                + "Встань на точку 1 и напиши &f/duel arena setspawn1 " + name);
+        return true;
+    }
+
+    private void create(Player player, String name) {
+        boolean exists = false;
+        try {
+            exists = keys(YamlConfiguration.loadConfiguration(file())).contains(name);
+        } catch (RuntimeException error) {
+            plugin.msg(player, "&#F8BEFBДуэли &8» &cНе смог прочитать arenas.yml: &f" + error);
+            return;
+        }
+        if (!record(player, name)) return;
+        if (exists) {
+            plugin.msg(player, "&#F8BEFBДуэли &8» &fАрена &d" + name
+                    + "&f уже есть — ставь точки: &f/duel arena setspawn1&7, потом &fsetspawn2&7 и &fsave");
+            return;
+        }
+        plugin.msg(player, "&#F8BEFBДуэли &8» &fАрена &d" + name
+                + "&f создана. Новый мир не создаётся — всё в мире &d" + sharedWorld()
+                + "&f. Встань на точку 1 и напиши &f/duel arena setspawn1 " + name);
     }
 
     private void spawn(Player player, String name, boolean first) {
         Object manager = duels.manager("getArenaManager");
         Object arena = Duels.call(manager, "getArena", name);
         if (arena == null) {
+            // арену можно завести прямо точкой: /duel arena setspawn1 arena1
+            if (!record(player, name)) return;
+            arena = Duels.call(duels.manager("getArenaManager"), "getArena", name);
+        }
+        if (arena == null) {
             plugin.msg(player, "&#F8BEFBДуэли &8» &cНет арены &f" + name
-                    + "&c. Сначала &f/duelx arena create " + name);
+                    + "&c и создать её не удалось — проверь arenas.yml");
             return;
         }
         String world = sharedWorld();
+        if (!applied) {
+            plugin.msg(player, "&#F8BEFBДуэли &8» &cОбщий мир арен не включён: нужен "
+                    + "&fEpicDuels-ElyTriX-3.1.1.jar&c и загруженный мир &fduel&c.");
+        }
         if (!world.isEmpty() && !player.getWorld().getName().equals(world)) {
-            plugin.msg(player, "&#F8BEFBДуэли &8» &cТы не в мире &f" + world
-                    + "&c — точки ставятся только там.");
+            plugin.msg(player, "&#F8BEFBДуэли &8» &cТы в мире &f" + player.getWorld().getName()
+                    + "&c, а арены в &f" + world + "&c — точки ставятся только там.");
             return;
         }
         current.put(player.getUniqueId(), name);

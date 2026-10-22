@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -76,6 +77,40 @@ final class CommandGuard implements Listener {
         event.setCancelled(true);
         plugin.msg(player, plugin.string("messages.command-blocked",
                 "&#F8BEFBДуэли &8» &cНеизвестная команда."));
+    }
+
+    /**
+     * Страховка: даже если /duel перехватил кто-то другой (или команда пришла
+     * как /minecraft:duel), команды арен обслуживаем сами. Родные
+     * setspawn1/setspawn2/save в общем мире не работают вообще — они ищут
+     * мир arena_template_<имя> и отвечают «Нужно быть в мире арены».
+     */
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onArenaCommand(PlayerCommandPreprocessEvent event) {
+        Player player = event.getPlayer();
+        if (player == null || !plugin.isAdmin(player)) return;
+        if (plugin.sharedArenaWorld().isEmpty()) return;
+        String message = event.getMessage();
+        if (message == null || message.length() < 7 || message.charAt(0) != '/') return;
+        String[] parts = message.substring(1).trim().split("\\s+");
+        if (parts.length < 2) return;
+        String command = plain(parts[0]);
+        if (!command.equals("duel") && !command.equals("duelx")) return;
+        if (!"arena".equals(plain(parts[1]))) return;
+        if (parts.length > 2) {
+            String action = plain(parts[2]);
+            // rename и seticon не зависят от мира — пусть делает EpicDuels
+            if (action.equals("rename") || action.equals("seticon")) return;
+        }
+        String[] rest = new String[Math.max(0, parts.length - 2)];
+        System.arraycopy(parts, 2, rest, 0, rest.length);
+        event.setCancelled(true);
+        Bukkit.getScheduler().runTask(plugin, new Runnable() {
+            @Override
+            public void run() {
+                plugin.arenaCommand(player, rest);
+            }
+        });
     }
 
     @EventHandler

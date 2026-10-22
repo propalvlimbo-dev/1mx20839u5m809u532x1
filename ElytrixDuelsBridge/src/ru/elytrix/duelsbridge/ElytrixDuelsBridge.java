@@ -25,6 +25,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -273,6 +274,13 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
     /** Мир, в котором лежат все арены (пусто — старый режим EpicDuels). */
     String sharedArenaWorld() {
         return arenas.sharedWorld();
+    }
+
+    /** Мир арен загрузился позже (Multiverse и т.п.) — включаем режим арен. */
+    @EventHandler
+    public void onWorldLoad(WorldLoadEvent event) {
+        if (event.getWorld() == null) return;
+        if (event.getWorld().getName().equals(arenas.sharedWorld())) arenas.ensure();
     }
 
     /** /duelx arena — арены в одном мире. */

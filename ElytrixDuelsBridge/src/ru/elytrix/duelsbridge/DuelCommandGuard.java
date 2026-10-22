@@ -38,7 +38,7 @@ final class DuelCommandGuard implements CommandExecutor, TabCompleter {
     private static final Set<String> OURS = new HashSet<String>(Arrays.asList(
             "menu", "main", "stats", "stat", "pick", "target", "team", "party", "duo",
             "kitmenu", "rounds", "queue", "matchmaking", "top", "bounds", "confirm",
-            "cancel", "kits", "open"));
+            "cancel", "kits", "open", "arena"));
 
     private final ElytrixDuelsBridge plugin;
     private final CommandExecutor original;
@@ -64,19 +64,20 @@ final class DuelCommandGuard implements CommandExecutor, TabCompleter {
         // общий мир арен: родные setspawn/save/create/delete бесполезны или
         // опасны (delete снёс бы папку мира duel) — отправляем в мост
         boolean shared = !plugin.sharedArenaWorld().isEmpty();
-        if (plugin.isAdmin(player) && shared) {
+        if (plugin.isAdmin(player) && sub.equals("arena")) {
             // /duel arena create|setspawn1|setspawn2|save|list|tp|delete — ведём
-            // сами: в общем мире родные команды ищут мир arena_template_*
-            if (sub.equals("arena")) {
-                String action = args.length > 1 ? plugin.lower(args[1]) : "";
-                if (action.equals("rename") || action.equals("seticon")) {
-                    return original != null && original.onCommand(sender, command, label, args);
-                }
-                String[] rest = new String[Math.max(0, args.length - 1)];
-                System.arraycopy(args, 1, rest, 0, rest.length);
-                plugin.arenaCommand(player, rest);
-                return true;
+            // сами: в общем мире родные команды ищут мир arena_template_*, а его
+            // больше нет, поэтому они отвечают «Нужно быть в мире арены»
+            String action = args.length > 1 ? plugin.lower(args[1]) : "";
+            if (action.equals("rename") || action.equals("seticon")) {
+                return original != null && original.onCommand(sender, command, label, args);
             }
+            String[] rest = new String[Math.max(0, args.length - 1)];
+            System.arraycopy(args, 1, rest, 0, rest.length);
+            plugin.arenaCommand(player, rest);
+            return true;
+        }
+        if (plugin.isAdmin(player) && shared) {
             // родные формы без слова arena: /duel create, /duel setspawn1, /duel save
             if (sub.equals("create") || sub.equals("ready") || sub.equals("save")
                     || sub.equals("setspawn1") || sub.equals("setspawn2")
