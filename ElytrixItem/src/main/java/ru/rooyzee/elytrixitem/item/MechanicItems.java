@@ -69,7 +69,6 @@ public final class MechanicItems {
                 .drawback(OffhandBonusItem.Drawback.reflect(0.05D))
                 .awaken(PotionEffectType.STRENGTH, 2, "Сила")
                 .awaken(PotionEffectType.SPEED, 2, "Скорость")
-                .awaken(PotionEffectType.REGENERATION, 1, "Регенерация")
                 .awaken(PotionEffectType.RESISTANCE, 1, "Сопротивление")
                 .awaken(PotionEffectType.FIRE_RESISTANCE, 1, "Огнестойкость"));
     }
