@@ -31,15 +31,6 @@ import java.util.Map;
 
 public class RouletteGui implements Listener {
 
-    private static final List<Material> BET_ICONS = Arrays.asList(
-            Material.GOLD_NUGGET,
-            Material.RAW_GOLD,
-            Material.GOLD_INGOT,
-            Material.AMETHYST_SHARD,
-            Material.EMERALD,
-            Material.DIAMOND
-    );
-
     private final Main plugin;
 
     public RouletteGui(Main plugin) {
@@ -53,10 +44,9 @@ public class RouletteGui implements Listener {
 
         RouletteHolder holder = new RouletteHolder(roulette.getId());
         Inventory inventory = Bukkit.createInventory(holder, size,
-                Text.color(gui.getString("title", "&#F8BEFB&lРУЛЕТКА &8┃ &7Выбор ставки")));
+                Text.color(gui.getString("title", "&#F8BEFB&lРулетка")));
         holder.setInventory(inventory);
 
-        ItemStack bottomInfo = gui.getBoolean("info-enabled", true) ? createInfoItem(gui) : null;
         Map<Integer, ItemStack> actionButtons = new LinkedHashMap<>();
 
         List<Long> bets = new ArrayList<>();
@@ -72,10 +62,9 @@ public class RouletteGui implements Listener {
 
         List<Integer> betSlots = gui.getIntegerList("bet-slots");
         if (betSlots.isEmpty()) {
-            betSlots = Arrays.asList(21, 22, 23, 30, 31, 32);
+            betSlots = Arrays.asList(20, 21, 22, 23, 24);
         }
-        List<String> customIcons = gui.getStringList("bet-icons");
-        Material fallbackMaterial = gui.getMaterial("bet-item", Material.GOLD_INGOT);
+        Material betMaterial = gui.getMaterial("bet-item", Material.GOLD_INGOT);
 
         for (int i = 0; i < bets.size() && i < betSlots.size(); i++) {
             int slot = betSlots.get(i);
@@ -83,39 +72,11 @@ public class RouletteGui implements Listener {
                 continue;
             }
             long bet = bets.get(i);
-            Material mat = fallbackMaterial;
-            if (i < customIcons.size()) {
-                Material matched = Material.matchMaterial(customIcons.get(i));
-                if (matched != null && matched.isItem()) {
-                    mat = matched;
-                }
-            } else if (i < BET_ICONS.size()) {
-                mat = BET_ICONS.get(i);
-            }
-            boolean glow = i >= bets.size() - 2;
-            actionButtons.put(slot, createBetItem(mat, bet, glow));
+            actionButtons.put(slot, createBetItem(betMaterial, bet));
             holder.getBets().put(slot, bet);
         }
 
-        plugin.getAnimator().openStandardMenu(player, inventory, closeItem(), bottomInfo, actionButtons);
-    }
-
-    private ItemStack createInfoItem(GuiConfig gui) {
-        Material mat = gui.getMaterial("info-item", Material.AMETHYST_SHARD);
-        ItemStack item = new ItemStack(mat, 1);
-        ItemMeta meta = item.getItemMeta();
-        if (meta != null) {
-            meta.setDisplayName(Text.color(gui.getString("info-name", "&7« &#F8BEFBКолесо удачи &7»")));
-            List<String> lore = new ArrayList<>();
-            for (String line : gui.getStringList("info-lore")) {
-                lore.add(Text.color(line));
-            }
-            meta.setLore(lore);
-            GuiGuard.applyGlow(meta);
-            meta.addItemFlags(ItemFlag.values());
-            item.setItemMeta(meta);
-        }
-        return GuiGuard.mark(plugin, item);
+        plugin.getAnimator().openStandardMenu(player, inventory, closeItem(), null, actionButtons);
     }
 
     private ItemStack closeItem() {
@@ -143,37 +104,35 @@ public class RouletteGui implements Listener {
         return List.of(plugin.getSettings().getMinBet());
     }
 
-    private ItemStack createBetItem(Material material, long bet, boolean glow) {
+    private ItemStack createBetItem(Material material, long bet) {
         ItemStack item = new ItemStack(material, 1);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             GuiConfig gui = plugin.getRouletteGuiConfig();
-            String formattedBet = Text.formatMoney(bet);
-            String name = gui.getString("bet-name", "&7« &#F8BEFBСтавка %bet% ⛂ &7»");
-            meta.setDisplayName(Text.color(name.replace("%bet%", formattedBet)));
+            String name = gui.getString("bet-name", "&7« &#F8BEFBСтавка %bet% &7»");
+            meta.setDisplayName(Text.color(name.replace("%bet%", String.valueOf(bet))));
 
             List<String> lore = new ArrayList<>();
             for (String line : gui.getStringList("bet-lore")) {
-                lore.add(Text.color(line.replace("%bet%", formattedBet)));
+                lore.add(Text.color(line.replace("%bet%", String.valueOf(bet))));
             }
-            if (gui.getBoolean("show-chances", true)) {
+            if (gui.getBoolean("show-chances", false)) {
                 int totalWeight = plugin.getSettings().getTotalWeight();
                 if (totalWeight > 0) {
-                    lore.add(Text.color("&#F8BEFB&l┃ "));
+                    if (!lore.isEmpty() && lore.get(lore.size() - 1).contains("●")) {
+                        lore.remove(lore.size() - 1);
+                    }
                     for (Sector sector : plugin.getSettings().getSectors()) {
                         double percent = 100.0D * sector.getWeight() / totalWeight;
                         String payout = sector.getMultiplier() > 0.0D
-                                ? "&#F8BEFB+" + Text.formatMoney(Math.round(bet * sector.getMultiplier())) + " ⛂"
-                                : "&8проигрыш";
+                                ? "&#F8BEFB" + Math.round(bet * sector.getMultiplier())
+                                : "&c—";
                         lore.add(Text.color("&#F8BEFB&l┃ &f" + sector.getLabel() + ": " + payout
-                                + " &8(" + Text.formatPercent(percent) + "%)"));
+                                + " &8| &#F8BEFB" + Text.formatPercent(percent) + "%"));
                     }
-                    lore.add("");
+                    lore.add(Text.color("&#F8BEFB&l┃ "));
                     lore.add(Text.color("&7● &fНажмите, чтобы крутить"));
                 }
-            }
-            if (glow) {
-                GuiGuard.applyGlow(meta);
             }
             meta.addItemFlags(ItemFlag.values());
             meta.setLore(lore);
@@ -217,7 +176,7 @@ public class RouletteGui implements Listener {
         if (active != null) {
             plugin.send(player, "already-has-active-bet",
                     "%game%", active.getGameType().getDisplayName(),
-                    "%amount%", Text.formatMoney(active.getAmount()));
+                    "%amount%", String.valueOf(active.getAmount()));
             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.85F, 1.0F);
             return;
         }

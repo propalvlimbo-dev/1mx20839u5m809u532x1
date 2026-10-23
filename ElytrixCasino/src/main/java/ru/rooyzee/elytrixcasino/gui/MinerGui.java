@@ -28,25 +28,18 @@ import ru.rooyzee.elytrixcasino.miner.MinerSession;
 import ru.rooyzee.elytrixcasino.util.Text;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Меню ставок и игровое поле «Минёра»:
- * - открытие меню ставок 1:1 с покадровой анимацией /menu (BMenu ElytriX),
- * - поле 45 серых стёкол (слоты 0..44): пустые клетки, клетки с аккуратными множителями и мины,
- * - кнопка «СЫГРАТЬ ЕЩЁ РАЗ» (слот 49) сразу запускает новую партию на ту же ставку,
- *   а кнопка в слоте 47 позволяет сменить номинал ставки.
- */
 public final class MinerGui implements Listener {
 
     private static final int CLOSE_SLOT = 45;
     private static final int CHANGE_BET_SLOT = 47;
     private static final int ACTION_SLOT = 49;
-    private static final int INFO_SLOT = 53;
 
     private final Main plugin;
     private final GuiConfig config;
@@ -79,12 +72,11 @@ public final class MinerGui implements Listener {
     public void openBetMenu(Player player, String minerId) {
         int size = 54;
         MinerBetHolder holder = new MinerBetHolder(minerId);
-        String title = Text.color(config.getString("title", "&#F8BEFB&lМИНЁР &8┃ &7Выбор ставки"));
+        String title = Text.color(config.getString("title", "&#F8BEFB&lМинёр"));
         Inventory inv = Bukkit.createInventory(holder, size, title);
         holder.setInventory(inv);
 
         ItemStack closeButton = buildCloseButton();
-        ItemStack bottomInfo = config.getBoolean("info.enabled", true) ? buildMenuInfoItem() : null;
         Map<Integer, ItemStack> buttons = new LinkedHashMap<>();
 
         ConfigurationSection betsSection = config.raw().getConfigurationSection("bets");
@@ -98,8 +90,8 @@ public final class MinerGui implements Listener {
                 }
                 Material mat = config.getMaterial(base + ".material", Material.GOLD_INGOT);
                 boolean glow = config.getBoolean(base + ".glow", false);
-                String formatted = Text.formatMoney(amount);
-                String name = config.getString(base + ".name", "&#F8BEFB&l%amount% ⛂")
+                String formatted = String.valueOf(amount);
+                String name = config.getString(base + ".name", "&7« &#F8BEFBСтавка %amount% &7»")
                         .replace("%amount%", formatted);
                 List<String> lore = new ArrayList<>();
                 for (String line : config.getStringList(base + ".lore")) {
@@ -111,7 +103,7 @@ public final class MinerGui implements Listener {
             }
         }
 
-        plugin.getAnimator().openStandardMenu(player, inv, closeButton, bottomInfo, buttons);
+        plugin.getAnimator().openStandardMenu(player, inv, closeButton, null, buttons);
     }
 
     private void startNewGame(Player player, String minerId, long bet) {
@@ -120,7 +112,7 @@ public final class MinerGui implements Listener {
         if (existing != null) {
             plugin.send(player, "already-has-active-bet",
                     "%game%", existing.getGameType().getDisplayName(),
-                    "%amount%", Text.formatMoney(existing.getAmount()));
+                    "%amount%", String.valueOf(existing.getAmount()));
             playSound(player, Sound.ENTITY_VILLAGER_NO, 0.85F, 1.0F);
             return;
         }
@@ -135,7 +127,7 @@ public final class MinerGui implements Listener {
         if (!plugin.getActiveBets().tryAcquire(uuid, GameType.MINER, minerId, bet)) {
             plugin.send(player, "already-has-active-bet",
                     "%game%", GameType.MINER.getDisplayName(),
-                    "%amount%", Text.formatMoney(bet));
+                    "%amount%", String.valueOf(bet));
             playSound(player, Sound.ENTITY_VILLAGER_NO, 0.85F, 1.0F);
             return;
         }
@@ -152,12 +144,12 @@ public final class MinerGui implements Listener {
         sessions.put(uuid, session);
 
         plugin.send(player, "miner-started",
-                "%amount%", Text.formatMoney(bet),
+                "%amount%", String.valueOf(bet),
                 "%mines%", String.valueOf(session.getTotalMines()));
 
         MinerGameHolder holder = new MinerGameHolder(session);
-        String title = Text.color(config.getString("game.title", "&#F8BEFB&lМИНЁР &8┃ &fСтавка: &#F8BEFB%amount% ⛂")
-                .replace("%amount%", Text.formatMoney(bet)));
+        String title = Text.color(config.getString("game.title", "&#F8BEFB&lМинёр")
+                .replace("%amount%", String.valueOf(bet)));
         Inventory inv = Bukkit.createInventory(holder, 54, title);
         holder.setInventory(inv);
 
@@ -168,8 +160,8 @@ public final class MinerGui implements Listener {
 
     private void resumeBoard(Player player, MinerSession session) {
         MinerGameHolder holder = new MinerGameHolder(session);
-        String title = Text.color(config.getString("game.title", "&#F8BEFB&lМИНЁР &8┃ &fСтавка: &#F8BEFB%amount% ⛂")
-                .replace("%amount%", Text.formatMoney(session.getBet())));
+        String title = Text.color(config.getString("game.title", "&#F8BEFB&lМинёр")
+                .replace("%amount%", String.valueOf(session.getBet())));
         Inventory inv = Bukkit.createInventory(holder, 54, title);
         holder.setInventory(inv);
 
@@ -183,7 +175,7 @@ public final class MinerGui implements Listener {
         }
 
         ItemStack purple = GuiGuard.pane(plugin, Material.PURPLE_STAINED_GLASS_PANE);
-        for (int slot = 46; slot <= 52; slot++) {
+        for (int slot = 46; slot <= 53; slot++) {
             inv.setItem(slot, purple);
         }
         Map<Integer, ItemStack> controls = buildBottomControls(session);
@@ -256,7 +248,6 @@ public final class MinerGui implements Listener {
             if (slot == CLOSE_SLOT) {
                 player.closeInventory();
             } else if (slot == ACTION_SLOT) {
-                // Сразу запускаем новую партию на ту же самую ставку!
                 startNewGame(player, session.getMinerId(), session.getBet());
             } else if (slot == CHANGE_BET_SLOT) {
                 openBetMenu(player, session.getMinerId());
@@ -302,7 +293,7 @@ public final class MinerGui implements Listener {
             refreshFinishedControls(top, session, false, 0L);
 
             plugin.send(player, "miner-exploded",
-                    "%amount%", Text.formatMoney(session.getBet()));
+                    "%amount%", String.valueOf(session.getBet()));
             playSound(player, Sound.ENTITY_GENERIC_EXPLODE, 0.75F, 1.05F);
             return;
         }
@@ -332,8 +323,8 @@ public final class MinerGui implements Listener {
             plugin.getEconomy().depositPlayer(player, payout);
         }
         plugin.send(player, "miner-win",
-                "%amount%", Text.formatMoney(payout),
-                "%bet%", Text.formatMoney(session.getBet()));
+                "%amount%", String.valueOf(payout),
+                "%bet%", String.valueOf(session.getBet()));
         playSound(player, Sound.ENTITY_PLAYER_LEVELUP, 0.85F, 1.25F);
 
         if (closeAfter) {
@@ -348,7 +339,7 @@ public final class MinerGui implements Listener {
         for (int i = 0; i < session.size(); i++) {
             MinerSession.Cell cell = session.getCell(i);
             if (i == explodedSlot) {
-                inv.setItem(i, buildExplodedMineItem());
+                inv.setItem(i, buildItem(Material.TNT, "&cМина", Collections.emptyList(), true));
             } else if (session.isRevealed(i)) {
                 inv.setItem(i, buildRevealedCellItem(cell, false));
             } else {
@@ -368,9 +359,9 @@ public final class MinerGui implements Listener {
         inv.setItem(CLOSE_SLOT, buildCloseButton());
 
         List<String> changeBetLore = new ArrayList<>();
-        changeBetLore.add("&#F8BEFB&l┃ &fТекущая ставка: &#F8BEFB" + Text.formatMoney(session.getBet()) + " ⛂");
-        changeBetLore.add("");
-        changeBetLore.add("&7● &fНажмите, чтобы выбрать другую ставку");
+        changeBetLore.add("&#F8BEFB&l┃ &fСтавка: &#F8BEFB" + session.getBet() + " монет");
+        changeBetLore.add("&#F8BEFB&l┃ ");
+        changeBetLore.add("&7● &fНажмите для выбора ставки");
         inv.setItem(CHANGE_BET_SLOT, buildItem(
                 Material.GOLD_INGOT,
                 "&7« &#F8BEFBСменить ставку &7»",
@@ -379,138 +370,82 @@ public final class MinerGui implements Listener {
         ));
 
         List<String> lore = new ArrayList<>();
+        lore.add("&#F8BEFB&l┃ ");
         if (won) {
-            lore.add("&#F8BEFB&l┃ &fВы забрали: &#55FF99+" + Text.formatMoney(payout) + " ⛂");
+            lore.add("&#F8BEFB&l┃ &fВыигрыш: &a" + payout + " монет");
         } else {
-            lore.add("&#F8BEFB&l┃ &fВы наткнулись на мину!");
+            lore.add("&#F8BEFB&l┃ &fРезультат: &cмина");
         }
-        lore.add("&#F8BEFB&l┃ &fСтавка: &#F8BEFB" + Text.formatMoney(session.getBet()) + " ⛂");
-        lore.add("");
-        lore.add("&7● &fНажмите — сразу новая игра (&#F8BEFB" + Text.formatMoney(session.getBet()) + " ⛂&f)");
+        lore.add("&#F8BEFB&l┃ &fСтавка: &#F8BEFB" + session.getBet() + " монет");
+        lore.add("&#F8BEFB&l┃ ");
+        lore.add("&7● &fНажмите, чтобы играть");
         inv.setItem(ACTION_SLOT, buildItem(
-                won ? Material.EMERALD : Material.TNT,
-                "&#F8BEFB&lСЫГРАТЬ ЕЩЁ РАЗ",
+                won ? Material.PINK_DYE : Material.TNT,
+                "&7« &#F8BEFBИграть ещё &7»",
                 lore,
                 true
         ));
-        inv.setItem(INFO_SLOT, buildBoardStatsItem(session));
     }
 
     private Map<Integer, ItemStack> buildBottomControls(MinerSession session) {
         Map<Integer, ItemStack> controls = new LinkedHashMap<>();
         long collected = session.getCollectedCoins();
+        controls.put(CLOSE_SLOT, buildCloseButton());
 
         if (collected > 0L) {
-            List<String> closeLore = new ArrayList<>();
-            closeLore.add("&#F8BEFB&l┃ &fЗабрать &#55FF99+" + Text.formatMoney(collected) + " ⛂ &fи выйти");
-            controls.put(CLOSE_SLOT, buildItem(Material.RED_DYE, "&cЗабрать и закрыть", closeLore, false));
-
             List<String> cashLore = new ArrayList<>();
-            cashLore.add("&#F8BEFB&l┃ &fНакоплено: &#55FF99+" + Text.formatMoney(collected) + " ⛂");
-            cashLore.add("&#F8BEFB&l┃ &fСтавка: &#F8BEFB" + Text.formatMoney(session.getBet()) + " ⛂");
-            cashLore.add("");
-            cashLore.add("&#55FF99▶ &fНажмите, чтобы забрать монеты!");
+            cashLore.add("&#F8BEFB&l┃ ");
+            cashLore.add("&#F8BEFB&l┃ &fНаграда: &a" + collected + " монет");
+            cashLore.add("&#F8BEFB&l┃ &fСтавка: &#F8BEFB" + session.getBet() + " монет");
+            cashLore.add("&#F8BEFB&l┃ ");
+            cashLore.add("&7● &fНажмите, чтобы забрать");
             controls.put(ACTION_SLOT, buildItem(
                     Material.LIME_DYE,
-                    "&#55FF99&lЗАБРАТЬ ВЫИГРЫШ: &f" + Text.formatMoney(collected) + " ⛂",
+                    "&7« &aЗабрать " + collected + " монет &7»",
                     cashLore,
                     true
             ));
         } else {
-            List<String> closeLore = new ArrayList<>();
-            closeLore.add("&#F8BEFB&l┃ &7Свернуть поле (можно продолжить");
-            closeLore.add("&#F8BEFB&l┃ &7при клике по NPC Минёр)");
-            controls.put(CLOSE_SLOT, buildItem(Material.RED_DYE, "&cЗакрыть", closeLore, false));
-
             List<String> waitLore = new ArrayList<>();
-            waitLore.add("&#F8BEFB&l┃ &fНакоплено: &70 ⛂");
-            waitLore.add("&#F8BEFB&l┃ &7Откройте серые стёкла сверху,");
-            waitLore.add("&#F8BEFB&l┃ &7чтобы найти монеты!");
+            waitLore.add("&#F8BEFB&l┃ ");
+            waitLore.add("&#F8BEFB&l┃ &fСтавка: &#F8BEFB" + session.getBet() + " монет");
+            waitLore.add("&#F8BEFB&l┃ ");
+            waitLore.add("&7● &fОткройте клетку с монетами");
             controls.put(ACTION_SLOT, buildItem(
                     Material.GRAY_DYE,
-                    "&#F8BEFB&lБАНК ПУСТ",
+                    "&7« &fЗабрать &7»",
                     waitLore,
                     false
             ));
         }
-
-        controls.put(INFO_SLOT, buildBoardStatsItem(session));
         return controls;
     }
 
     private ItemStack buildHiddenCell(long bet) {
-        String name = config.getString("game.hidden-cell.name", "&7Неизвестная клетка");
+        String name = config.getString("game.hidden-cell.name", "&7Клетка");
         List<String> lore = new ArrayList<>();
         for (String line : config.getStringList("game.hidden-cell.lore")) {
-            lore.add(line.replace("%bet%", Text.formatMoney(bet))
+            lore.add(line.replace("%bet%", String.valueOf(bet))
                     .replace("%mines%", String.valueOf(plugin.getMinerSettings().getMinesCount())));
-        }
-        if (lore.isEmpty()) {
-            lore.add("&#F8BEFB&l┃ &fПод стеклом скрывается:");
-            lore.add("&#F8BEFB&l┃ &7• Пустая клетка");
-            lore.add("&#F8BEFB&l┃ &e• Монеты &7(от ставки)");
-            lore.add("&#F8BEFB&l┃ &c• Мина &7(сжигает банк)");
-            lore.add("");
-            lore.add("&7● &fНажмите, чтобы открыть");
         }
         return buildItem(Material.GRAY_STAINED_GLASS_PANE, name, lore, false);
     }
 
     private ItemStack buildRevealedCellItem(MinerSession.Cell cell, boolean postGamePreview) {
-        List<String> lore = new ArrayList<>();
         if (cell.getType() == MinerSession.CellType.MINE) {
-            lore.add("&#F8BEFB&l┃ &cОпасная взрывчатка");
-            return buildItem(Material.TNT,
-                    postGamePreview ? "&cМина &8(не открыта)" : "&#FF5555&lМИНА",
-                    lore,
-                    !postGamePreview);
+            return buildItem(Material.TNT, "&cМина", Collections.emptyList(), false);
         }
         if (cell.getType() == MinerSession.CellType.COINS) {
-            String rewardText = Text.formatMoney(cell.getReward());
-            if (postGamePreview) {
-                lore.add("&#F8BEFB&l┃ &7Было спрятано: &f+" + rewardText + " ⛂");
-                return buildItem(cell.getIcon(), "&7" + Text.strip(Text.color(cell.getTitle())) + " &8(не открыто)", lore, false);
-            }
-            lore.add("&#F8BEFB&l┃ &fНаграда: &#55FF99+" + rewardText + " ⛂");
-            return buildItem(cell.getIcon(), cell.getTitle(), lore, true);
+            List<String> lore = new ArrayList<>();
+            lore.add("&#F8BEFB&l┃ &fНаграда: &a" + cell.getReward() + " монет");
+            return buildItem(cell.getIcon(), cell.getTitle(), lore, !postGamePreview);
         }
-        lore.add("&#F8BEFB&l┃ &7Чисто — мин нет!");
-        return buildItem(Material.LIGHT_GRAY_STAINED_GLASS_PANE,
-                postGamePreview ? "&8Пустая клетка" : "&fПустая клетка",
-                lore,
-                false);
-    }
-
-    private ItemStack buildExplodedMineItem() {
-        List<String> lore = new ArrayList<>();
-        lore.add("&#F8BEFB&l┃ &cВы подорвались на этой клетке!");
-        lore.add("&#F8BEFB&l┃ &7Накопленный банк сгорел.");
-        return buildItem(Material.TNT, "&#FF4444&l💥 ВЗРЫВ! МИНА!", lore, true);
-    }
-
-    private ItemStack buildBoardStatsItem(MinerSession session) {
-        List<String> lore = new ArrayList<>();
-        lore.add("&#F8BEFB&l┃ &fСтавка: &#F8BEFB" + Text.formatMoney(session.getBet()) + " ⛂");
-        lore.add("&#F8BEFB&l┃ &fМин на поле: &c" + session.getTotalMines() + " шт.");
-        lore.add("&#F8BEFB&l┃ &fОсталось кладов: &#FFE066" + session.getRemainingCoinCells() + " шт.");
-        lore.add("&#F8BEFB&l┃ &fОткрыто безопасно: &a" + session.getRevealedSafeCells());
-        lore.add("&#F8BEFB&l┃ &fТекущий банк: &#55FF99" + Text.formatMoney(session.getCollectedCoins()) + " ⛂");
-        return buildItem(Material.BOOK, "&#F8BEFB&lСводка поля", lore, false);
-    }
-
-    private ItemStack buildMenuInfoItem() {
-        Material mat = config.getMaterial("info.material", Material.TNT);
-        String name = config.getString("info.name", "&#F8BEFB&lИгра «Минёр»");
-        List<String> lore = new ArrayList<>();
-        for (String line : config.getStringList("info.lore")) {
-            lore.add(line.replace("%mines%", String.valueOf(plugin.getMinerSettings().getMinesCount())));
-        }
-        return buildItem(mat, name, lore, config.getBoolean("info.glow", true));
+        return buildItem(Material.LIGHT_GRAY_STAINED_GLASS_PANE, "&7Пусто", Collections.emptyList(), false);
     }
 
     private ItemStack buildCloseButton() {
         Material mat = config.getMaterial("close.material", Material.RED_DYE);
-        String name = config.getString("close.name", "&cЗакрыть");
+        String name = config.getString("close.name", "&7« &cЗакрыть меню &7»");
         List<String> lore = config.getStringList("close.lore");
         return buildItem(mat, name, lore, false);
     }

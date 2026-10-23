@@ -5,7 +5,6 @@ import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -39,9 +38,11 @@ public class AutomateGui implements Listener {
 
     private static final int SIZE = 5;
     private static final int REEL_LENGTH = 80;
-    private static final int CLOSE_SLOT = 45;
+    private static final int CLOSE_LEFT = 45;
     private static final int PLAY_SLOT = 49;
-    private static final int PAYTABLE_SLOT = 53;
+    private static final int CLOSE_RIGHT = 53;
+    private static final int[] LEFT_COMBO_SLOTS = {0, 9, 18, 27, 36};
+    private static final int[] RIGHT_COMBO_SLOTS = {8, 17, 26, 35, 44};
 
     private final Main plugin;
 
@@ -60,11 +61,11 @@ public class AutomateGui implements Listener {
             plugin.getEconomy().depositPlayer(player, pending.win);
             plugin.send(player, "automate-win",
                     "%player%", player.getName(),
-                    "%amount%", Text.formatMoney(pending.win),
+                    "%amount%", String.valueOf(pending.win),
                     "%combo%", pending.combo,
-                    "%bet%", Text.formatMoney(pending.bet));
+                    "%bet%", String.valueOf(pending.bet));
         } else {
-            plugin.send(player, "automate-lose", "%bet%", Text.formatMoney(pending.bet));
+            plugin.send(player, "automate-lose", "%bet%", String.valueOf(pending.bet));
         }
     }
 
@@ -73,57 +74,70 @@ public class AutomateGui implements Listener {
         AutomateSettings settings = plugin.getAutomateSettings();
         AutomateHolder holder = new AutomateHolder(automate.getId());
         Inventory inventory = Bukkit.createInventory(holder, 54,
-                Text.color(gui.getString("title", "&#F8BEFB&lАВТОМАТ &8┃ &f%bet% ⛂")
-                        .replace("%bet%", Text.formatMoney(automate.getBet()))));
+                Text.color(gui.getString("title", "&#F8BEFB&lАвтомат")
+                        .replace("%bet%", String.valueOf(automate.getBet()))));
         holder.setInventory(inventory);
         holder.setPlaySlot(PLAY_SLOT);
 
-        Map<Integer, ItemStack> controls = new LinkedHashMap<>();
+        Map<Integer, ItemStack> comboItems = buildComboItems(settings);
+        Map<Integer, ItemStack> controls = new LinkedHashMap<>(comboItems);
         controls.put(PLAY_SLOT, playItem(automate.getBet()));
-        controls.put(PAYTABLE_SLOT, paytableItem(settings, automate.getBet()));
 
         plugin.getAnimator().openAutomateMenu(player, inventory, closeItem(), controls, row -> {
+            ItemStack leftCombo = comboItems.get(LEFT_COMBO_SLOTS[row]);
+            if (leftCombo != null) {
+                inventory.setItem(LEFT_COMBO_SLOTS[row], leftCombo);
+            }
             for (int col = 0; col < SIZE; col++) {
                 inventory.setItem(gridSlot(row, col), tagged(randomSymbol().icon()));
+            }
+            ItemStack rightCombo = comboItems.get(RIGHT_COMBO_SLOTS[row]);
+            if (rightCombo != null) {
+                inventory.setItem(RIGHT_COMBO_SLOTS[row], rightCombo);
             }
         });
     }
 
-    private ItemStack paytableItem(AutomateSettings settings, long bet) {
-        ItemStack item = new ItemStack(Material.BOOK, 1);
-        ItemMeta meta = item.getItemMeta();
-        if (meta != null) {
-            meta.setDisplayName(Text.color("&#F8BEFB&lТаблица множителей"));
-            List<String> lore = new ArrayList<>();
-            lore.add(Text.color("&#F8BEFB&l┃ &fСтавка за спин: &#F8BEFB" + Text.formatMoney(bet) + " ⛂"));
-            lore.add(Text.color("&#F8BEFB&l┃ "));
-            for (SlotSymbol symbol : settings.getSymbols()) {
-                long payout = Math.round(bet * symbol.pay(5));
-                lore.add(Text.color("&#F8BEFB&l┃ " + symbol.getName()
-                        + " &8— &#F8BEFBx" + Text.formatMultiplier(symbol.pay(5))
-                        + " &8(&f" + Text.formatMoney(payout) + " ⛂&8)"));
+    private Map<Integer, ItemStack> buildComboItems(AutomateSettings settings) {
+        Map<Integer, ItemStack> map = new LinkedHashMap<>();
+        List<SlotSymbol> symbols = settings.getSymbols();
+        int[] slots = {0, 9, 18, 27, 36, 8, 17, 26, 35, 44};
+        int index = 0;
+        for (SlotSymbol symbol : symbols) {
+            if (index >= slots.length) {
+                break;
             }
-            lore.add(Text.color("&#F8BEFB&l┃ "));
-            lore.add(Text.color("&7● &fРяд, столбец или крест из 5 символов"));
-            meta.setLore(lore);
-            meta.addItemFlags(ItemFlag.values());
-            item.setItemMeta(meta);
+            ItemStack item = symbol.icon();
+            ItemMeta meta = item.getItemMeta();
+            if (meta != null) {
+                meta.setDisplayName(Text.color(symbol.getName()));
+                List<String> lore = new ArrayList<>();
+                lore.add(Text.color("&#F8BEFB&l┃ &fЛиния: &#F8BEFBx" + Text.formatMultiplier(symbol.pay(5))));
+                lore.add(Text.color("&#F8BEFB&l┃ &f2 линии: &#F8BEFBx" + Text.formatMultiplier(symbol.pay(5) * 2.0D)));
+                lore.add(Text.color("&#F8BEFB&l┃ &f3 линии: &#F8BEFBx" + Text.formatMultiplier(symbol.pay(5) * 3.0D)));
+                lore.add(Text.color("&#F8BEFB&l┃ "));
+                lore.add(Text.color("&7● &fРяд, столбец или крест — одинаково"));
+                lore.add(Text.color("&7● &fМаксимум за спин: &#F8BEFBx" + Text.formatMultiplier(settings.getMaxMultiplier())));
+                meta.setLore(lore);
+                meta.addItemFlags(ItemFlag.values());
+                item.setItemMeta(meta);
+            }
+            map.put(slots[index], GuiGuard.mark(plugin, item));
+            index++;
         }
-        return GuiGuard.mark(plugin, item);
+        return map;
     }
 
     private ItemStack playItem(long bet) {
         GuiConfig gui = plugin.getAutomateGuiConfig();
-        ItemStack item = new ItemStack(gui.getMaterial("play-item", Material.AMETHYST_SHARD), 1);
+        ItemStack item = new ItemStack(gui.getMaterial("play-item", Material.PINK_DYE), 1);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            String formattedBet = Text.formatMoney(bet);
-            meta.setDisplayName(Text.color(gui.getString("play-name", "&#F8BEFB&lКРУТИТЬ БАРАБАН")));
+            meta.setDisplayName(Text.color(gui.getString("play-name", "&7« &#F8BEFBИграть &7»")));
             List<String> lore = new ArrayList<>();
             for (String line : gui.getStringList("play-lore")) {
-                lore.add(Text.color(line.replace("%bet%", formattedBet)));
+                lore.add(Text.color(line.replace("%bet%", String.valueOf(bet))));
             }
-            GuiGuard.applyGlow(meta);
             meta.addItemFlags(ItemFlag.values());
             meta.setLore(lore);
             item.setItemMeta(meta);
@@ -136,7 +150,7 @@ public class AutomateGui implements Listener {
         ItemStack item = new ItemStack(gui.getMaterial("close-item", Material.RED_DYE), 1);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(Text.color(gui.getString("close-name", "&cЗакрыть")));
+            meta.setDisplayName(Text.color(gui.getString("close-name", "&7« &cЗакрыть меню &7»")));
             List<String> lore = new ArrayList<>();
             for (String line : gui.getStringList("close-lore")) {
                 lore.add(Text.color(line));
@@ -187,7 +201,7 @@ public class AutomateGui implements Listener {
     private SlotSymbol symbolAt(int index) {
         List<SlotSymbol> symbols = plugin.getAutomateSettings().getSymbols();
         if (symbols.isEmpty()) {
-            return new SlotSymbol("resin", Material.RESIN_CLUMP, 1, "&6Сгусток смолы", 1.2, 1.2, 1.2);
+            return new SlotSymbol("flesh", Material.ROTTEN_FLESH, 1, "&8Гнилая плоть", 1.2, 1.2, 1.2);
         }
         int clamped = Math.max(0, Math.min(symbols.size() - 1, index));
         return symbols.get(clamped);
@@ -216,7 +230,7 @@ public class AutomateGui implements Listener {
             return;
         }
         int slot = event.getRawSlot();
-        if (slot == CLOSE_SLOT) {
+        if (slot == CLOSE_LEFT || slot == CLOSE_RIGHT) {
             plugin.getAnimator().stop(player.getUniqueId());
             player.closeInventory();
             return;
@@ -268,7 +282,7 @@ public class AutomateGui implements Listener {
         if (existing != null) {
             plugin.send(player, "already-has-active-bet",
                     "%game%", existing.getGameType().getDisplayName(),
-                    "%amount%", Text.formatMoney(existing.getAmount()));
+                    "%amount%", String.valueOf(existing.getAmount()));
             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.85F, 1.0F);
             return;
         }
@@ -288,7 +302,7 @@ public class AutomateGui implements Listener {
         if (!plugin.getActiveBets().tryAcquire(uuid, GameType.AUTOMATE, automate.getId(), bet)) {
             plugin.send(player, "already-has-active-bet",
                     "%game%", GameType.AUTOMATE.getDisplayName(),
-                    "%amount%", Text.formatMoney(bet));
+                    "%amount%", String.valueOf(bet));
             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.85F, 1.0F);
             return;
         }
@@ -303,7 +317,7 @@ public class AutomateGui implements Listener {
         plugin.getAnimator().stop(uuid);
         automate.setBusy(true);
         holder.setSpinning(true);
-        plugin.send(player, "bet-placed", "%bet%", Text.formatMoney(bet));
+        plugin.send(player, "bet-placed", "%bet%", String.valueOf(bet));
         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 0.9F, 0.65F);
 
         ThreadLocalRandom rng = ThreadLocalRandom.current();
@@ -436,12 +450,12 @@ public class AutomateGui implements Listener {
             plugin.getEconomy().depositPlayer(player, win);
             plugin.send(player, "automate-win",
                     "%player%", player.getName(),
-                    "%amount%", Text.formatMoney(win),
+                    "%amount%", String.valueOf(win),
                     "%combo%", result.label,
-                    "%bet%", Text.formatMoney(bet));
+                    "%bet%", String.valueOf(bet));
             player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.3F);
         } else {
-            plugin.send(player, "automate-lose", "%bet%", Text.formatMoney(bet));
+            plugin.send(player, "automate-lose", "%bet%", String.valueOf(bet));
             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.9F, 1.0F);
         }
         if (!inventory.getViewers().isEmpty()) {
@@ -450,10 +464,6 @@ public class AutomateGui implements Listener {
         }
     }
 
-    /**
-     * Генерация сетки 5x5 по списку символов из AutomateSettings (включая ресурсы 1.21.4):
-     * суммарный RTP = ~67.7% (House Edge +32.3%), частота выигрыша = 31.0%.
-     */
     private SlotSymbol[][] createGrid(ThreadLocalRandom rng) {
         SlotSymbol[][] grid = emptyGrid();
 
@@ -691,8 +701,7 @@ public class AutomateGui implements Listener {
                            long win, double multiplier, boolean flash) {
         GuiConfig gui = plugin.getAutomateGuiConfig();
         Material glassMat = gui.getMaterial("win-glass", Material.LIME_STAINED_GLASS_PANE);
-        String glassName = gui.getString("win-glass-name", "&#55FF99&l✦ КОМБИНАЦИЯ ✦");
-        ItemStack glass = named(glassMat, glassName);
+        ItemStack glass = named(glassMat, " ");
         for (int row = 0; row < SIZE; row++) {
             for (int col = 0; col < SIZE; col++) {
                 if (win > 0L && result.mask[row][col] && flash) {
@@ -711,7 +720,7 @@ public class AutomateGui implements Listener {
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             List<String> lore = new ArrayList<>();
-            lore.add(Text.color("&#F8BEFB&l┃ &fВыигрыш: &#55FF99+" + Text.formatMoney(win) + " ⛂"));
+            lore.add(Text.color("&#F8BEFB&l┃ &fВыигрыш: &a" + win + " монет"));
             lore.add(Text.color("&#F8BEFB&l┃ &fМножитель: &#F8BEFBx" + Text.formatMultiplier(multiplier)));
             lore.add(Text.color("&#F8BEFB&l┃ "));
             lore.add(Text.color("&7● &f" + label));

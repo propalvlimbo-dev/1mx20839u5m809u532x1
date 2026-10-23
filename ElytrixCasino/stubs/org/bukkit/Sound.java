@@ -21,5 +21,6 @@ public interface Sound {
     Sound ENTITY_CREEPER_PRIMED = null;
     Sound ENTITY_FIREWORK_ROCKET_BLAST = null;
     Sound ENTITY_EXPERIENCE_ORB_PICKUP = null;
+    Sound ENTITY_SNOWBALL_THROW = null;
     Sound UI_BUTTON_CLICK = null;
 }

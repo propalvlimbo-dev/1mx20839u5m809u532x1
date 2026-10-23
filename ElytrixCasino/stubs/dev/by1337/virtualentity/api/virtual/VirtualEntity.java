@@ -14,6 +14,8 @@ public interface VirtualEntity {
     UUID getUuid();
     Vec3d getPos();
     void setPos(Vec3d pos);
+    void setMotion(Vec3d motion);
+    void setNoMotion();
     void setYaw(float yaw);
     void setPitch(float pitch);
     float getYaw();

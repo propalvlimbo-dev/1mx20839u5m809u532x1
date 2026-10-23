@@ -1,17 +1,19 @@
 package ru.rooyzee.elytrixcasino.miner;
 
+import dev.by1337.virtualentity.api.entity.BillboardConstraints;
 import dev.by1337.virtualentity.api.entity.EntityAnimation;
 import dev.by1337.virtualentity.api.entity.EquipmentSlot;
 import dev.by1337.virtualentity.api.entity.HumanoidArm;
 import dev.by1337.virtualentity.api.tracker.PlayerTracker;
-import dev.by1337.virtualentity.api.virtual.decoration.VirtualArmorStand;
+import dev.by1337.virtualentity.api.virtual.display.VirtualTextDisplay;
 import dev.by1337.virtualentity.api.virtual.item.VirtualItem;
 import dev.by1337.virtualentity.api.virtual.player.VirtualPlayer;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
@@ -26,46 +28,30 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * Пакетный NPC «Минёр» в скине динамита (ExplodingTNT):
- * - стоит на месте, держит динамит (TNT) в ОБЕИХ руках (MAINHAND и OFFHAND),
- * - раз в 3 секунды (60 тиков) поворачивается налево/направо и выбрасывает виртуальный TNT,
- * - над головой висит голограмма в точном стиле dHolograms ElytriX с живой волной WAVE.
+ * Пакетный NPC «Минёр»:
+ * - голограмма VirtualTextDisplay без фона и с тенью (backgroundColor=0, shadow=true, billboard=CENTER),
+ * - плавный поворот корпуса/головы и нативный клиентский бросок TNT (SetEntityMotionPacket + гравитация клиента)
+ *   без серверных телепортов setPos каждый тик — летит плавно 1:1 как реальный выброс предмета игроком на Q.
  */
 public final class Miner {
 
     private static final String HIDE_NAMETAG_TEAM = "ec_npc";
-    // Все 3D-слои скина включены, плащ (0x01) выключен, чтобы на спине была видна текстура TNT
     private static final byte SKIN_LAYERS_NO_CAPE = 0x7E;
+    private static final int PRE_TURN_TICKS = 12;
+    private static final float YAW_TURN_SPEED = 4.5F;
+    private static final float PITCH_TURN_SPEED = 2.0F;
+    private static final int FLIGHT_BUFFER_TICKS = 22;
 
     private static final class ThrownTnt {
         final VirtualItem entity;
-        double x;
-        double y;
-        double z;
-        double vx;
-        double vy;
-        double vz;
-        final double groundY;
-        boolean landed;
-        int groundTicksLeft;
+        int ticksLeft;
 
-        ThrownTnt(VirtualItem entity,
-                  double x, double y, double z,
-                  double vx, double vy, double vz,
-                  double groundY,
-                  int groundLifetimeTicks) {
+        ThrownTnt(VirtualItem entity, int lifetimeTicks) {
             this.entity = entity;
-            this.x = x;
-            this.y = y;
-            this.z = z;
-            this.vx = vx;
-            this.vy = vy;
-            this.vz = vz;
-            this.groundY = groundY;
-            this.landed = false;
-            this.groundTicksLeft = groundLifetimeTicks;
+            this.ticksLeft = lifetimeTicks;
         }
     }
 
@@ -74,12 +60,11 @@ public final class Miner {
     private final Location location;
 
     private VirtualPlayer npc;
+    private VirtualTextDisplay hologram;
     private PlayerTracker tracker;
     private BukkitTask tickTask;
     private boolean spawned;
 
-    private final List<VirtualArmorStand> holograms = new ArrayList<>();
-    private final List<String> hologramTemplates = new ArrayList<>();
     private final List<ThrownTnt> activeThrows = new ArrayList<>();
 
     private float baseYaw;
@@ -88,8 +73,8 @@ public final class Miner {
     private float currentPitch;
     private float targetPitch;
     private boolean nextTurnLeft = true;
+    private boolean pendingLeftThrow = true;
     private int ticksUntilThrow;
-    private int tickCounter;
 
     public Miner(Main plugin, String id, Location location) {
         this.plugin = plugin;
@@ -132,8 +117,8 @@ public final class Miner {
         this.currentPitch = 0.0F;
         this.targetPitch = 0.0F;
         this.nextTurnLeft = true;
-        this.ticksUntilThrow = settings.getThrowIntervalTicks();
-        this.tickCounter = 0;
+        this.pendingLeftThrow = true;
+        this.ticksUntilThrow = Math.max(PRE_TURN_TICKS + 4, settings.getThrowIntervalTicks());
 
         String hiddenProfileName = buildHiddenName();
         ensureHiddenNametag(hiddenProfileName);
@@ -179,8 +164,7 @@ public final class Miner {
             tickTask = null;
         }
         activeThrows.clear();
-        holograms.clear();
-        hologramTemplates.clear();
+        hologram = null;
         if (tracker != null) {
             tracker.removeAll();
             tracker = null;
@@ -192,136 +176,110 @@ public final class Miner {
         if (!spawned || tracker == null || npc == null) {
             return;
         }
-        tickCounter++;
 
         MinerSettings settings = plugin.getMinerSettings();
+        int interval = Math.max(20, settings.getThrowIntervalTicks());
 
-        float deltaYaw = wrapDegrees(targetYaw - currentYaw);
-        if (Math.abs(deltaYaw) > 0.35F) {
-            currentYaw = wrapDegrees(currentYaw + deltaYaw * 0.38F);
-            npc.setYaw(currentYaw);
-        } else if (currentYaw != targetYaw) {
-            currentYaw = targetYaw;
+        ticksUntilThrow--;
+        if (ticksUntilThrow == PRE_TURN_TICKS) {
+            // Заранее плавно поворачиваем корпус и голову в сторону броска
+            this.pendingLeftThrow = this.nextTurnLeft;
+            this.nextTurnLeft = !this.nextTurnLeft;
+            float offset = this.pendingLeftThrow ? -settings.getTurnAngle() : settings.getTurnAngle();
+            this.targetYaw = wrapDegrees(baseYaw + offset);
+            this.targetPitch = 7.0F;
+        } else if (ticksUntilThrow <= 0) {
+            ticksUntilThrow = interval;
+            throwTnt(settings, this.pendingLeftThrow);
+        } else if (ticksUntilThrow == interval - 15) {
+            // Плавно возвращаем взгляд прямо после броска
+            this.targetYaw = baseYaw;
+            this.targetPitch = 0.0F;
+        }
+
+        float nextYaw = approachAngle(currentYaw, targetYaw, YAW_TURN_SPEED);
+        if (nextYaw != currentYaw) {
+            currentYaw = nextYaw;
             npc.setYaw(currentYaw);
         }
 
-        float deltaPitch = targetPitch - currentPitch;
-        if (Math.abs(deltaPitch) > 0.25F) {
-            currentPitch += deltaPitch * 0.35F;
+        float nextPitch = approachAngle(currentPitch, targetPitch, PITCH_TURN_SPEED);
+        if (nextPitch != currentPitch) {
+            currentPitch = nextPitch;
             npc.setPitch(currentPitch);
         }
 
-        ticksUntilThrow--;
-        if (ticksUntilThrow <= 0) {
-            ticksUntilThrow = settings.getThrowIntervalTicks();
-            performTurnAndThrow(settings);
-        } else if (ticksUntilThrow == settings.getThrowIntervalTicks() - 8) {
-            targetPitch = 0.0F;
-        }
-
-        if (tickCounter % 3 == 0) {
-            int waveStep = tickCounter / 3;
-            for (int i = 0; i < holograms.size() && i < hologramTemplates.size(); i++) {
-                String tpl = hologramTemplates.get(i);
-                if (tpl.contains(Text.HOLO_WAVE_TOKEN)) {
-                    holograms.get(i).setCustomName(Text.component(Text.resolveHoloLine(tpl, waveStep)));
-                }
-            }
-        }
-
-        updateThrownItems();
+        updateThrownLifetimes();
         tracker.tick();
         hideFromTab();
     }
 
-    private void performTurnAndThrow(MinerSettings settings) {
-        boolean throwingLeft = this.nextTurnLeft;
-        this.nextTurnLeft = !this.nextTurnLeft;
-
-        float angleOffset = throwingLeft ? -settings.getTurnAngle() : settings.getTurnAngle();
-        this.targetYaw = wrapDegrees(baseYaw + angleOffset);
-        this.currentYaw = wrapDegrees(currentYaw + wrapDegrees(this.targetYaw - currentYaw) * 0.65F);
-        this.targetPitch = 10.0F;
-        this.currentPitch = 8.0F;
-
-        npc.setYaw(this.currentYaw);
-        npc.setPitch(this.currentPitch);
-
+    /**
+     * Выбрасывает предмет 1:1 по формуле ванильного Player#drop(ItemStack, false, true):
+     * спавн на высоте глаз - 0.30 (y + 1.32), начальный импульс через SetEntityMotionPacket,
+     * дальше клиент сам просчитывает гравитацию, воздух, столкновение с полом и плавную интерполяцию кадров.
+     */
+    private void throwTnt(MinerSettings settings, boolean throwingLeft) {
         npc.playAnimation(throwingLeft ? EntityAnimation.SWING_OFFHAND : EntityAnimation.SWING_MAIN_ARM);
 
-        double rad = Math.toRadians(this.targetYaw);
-        double dirX = -Math.sin(rad);
-        double dirZ = Math.cos(rad);
+        double yawRad = Math.toRadians(this.currentYaw);
+        double pitchRad = Math.toRadians(this.currentPitch);
+        double sinYaw = Math.sin(yawRad);
+        double cosYaw = Math.cos(yawRad);
+        double sinPitch = Math.sin(pitchRad);
+        double cosPitch = Math.cos(pitchRad);
 
-        double startX = location.getX() + dirX * 0.38D;
-        double startY = location.getY() + 1.24D;
-        double startZ = location.getZ() + dirZ * 0.38D;
+        ThreadLocalRandom rng = ThreadLocalRandom.current();
+        double speed = 0.28D;
+        double randAngle = rng.nextDouble() * Math.PI * 2.0D;
+        double randSpread = 0.018D * rng.nextDouble();
 
-        double landCheckX = location.getX() + dirX * 1.15D;
-        double landCheckZ = location.getZ() + dirZ * 1.15D;
-        double groundY = resolveGroundY(location.getWorld(), landCheckX, location.getY(), landCheckZ);
+        double vx = -sinYaw * cosPitch * speed + Math.cos(randAngle) * randSpread;
+        double vy = -sinPitch * speed + 0.10D + (rng.nextDouble() - rng.nextDouble()) * 0.01D;
+        double vz = cosYaw * cosPitch * speed + Math.sin(randAngle) * randSpread;
+
+        double startX = location.getX() - sinYaw * 0.16D;
+        double startY = location.getY() + 1.32D;
+        double startZ = location.getZ() + cosYaw * 0.16D;
 
         VirtualItem item = VirtualItem.create();
         item.setItem(new ItemStack(Material.TNT));
-        item.setNoGravity(true);
+        item.setNoGravity(false);
         item.setSilent(true);
         item.setPos(new Vec3d(startX, startY, startZ));
+        item.setMotion(new Vec3d(vx, vy, vz));
 
         tracker.addEntity(item);
-        activeThrows.add(new ThrownTnt(
-                item,
-                startX, startY, startZ,
-                dirX * 0.145D, 0.075D, dirZ * 0.145D,
-                groundY,
-                settings.getGroundLifetimeTicks()
-        ));
+        activeThrows.add(new ThrownTnt(item, FLIGHT_BUFFER_TICKS + settings.getGroundLifetimeTicks()));
+        playDropSound();
     }
 
-    private void updateThrownItems() {
+    private void playDropSound() {
+        World world = location.getWorld();
+        if (world == null) {
+            return;
+        }
+        double radiusSq = 16.0D * 16.0D;
+        for (Player player : world.getPlayers()) {
+            if (player.getLocation().distanceSquared(location) <= radiusSq) {
+                player.playSound(location, Sound.ENTITY_SNOWBALL_THROW, 0.22F, 0.75F);
+            }
+        }
+    }
+
+    private void updateThrownLifetimes() {
         if (activeThrows.isEmpty()) {
             return;
         }
         Iterator<ThrownTnt> it = activeThrows.iterator();
         while (it.hasNext()) {
             ThrownTnt tnt = it.next();
-            if (!tnt.landed) {
-                tnt.vy -= 0.038D;
-                tnt.x += tnt.vx;
-                tnt.y += tnt.vy;
-                tnt.z += tnt.vz;
-                if (tnt.y <= tnt.groundY) {
-                    tnt.y = tnt.groundY;
-                    tnt.vx = 0.0D;
-                    tnt.vy = 0.0D;
-                    tnt.vz = 0.0D;
-                    tnt.landed = true;
-                }
-                tnt.entity.setPos(new Vec3d(tnt.x, tnt.y, tnt.z));
-            } else {
-                tnt.groundTicksLeft--;
-                if (tnt.groundTicksLeft <= 0) {
-                    tracker.removeEntity(tnt.entity);
-                    it.remove();
-                }
+            tnt.ticksLeft--;
+            if (tnt.ticksLeft <= 0) {
+                tracker.removeEntity(tnt.entity);
+                it.remove();
             }
         }
-    }
-
-    private double resolveGroundY(World world, double x, double baseY, double z) {
-        if (world == null) {
-            return baseY + 0.10D;
-        }
-        int bx = (int) Math.floor(x);
-        int bz = (int) Math.floor(z);
-        int startBy = (int) Math.floor(baseY);
-        for (int by = startBy; by >= startBy - 3; by--) {
-            Block below = world.getBlockAt(bx, by - 1, bz);
-            Block current = world.getBlockAt(bx, by, bz);
-            if (!below.getType().isAir() && current.getType().isAir()) {
-                return by + 0.10D;
-            }
-        }
-        return baseY + 0.10D;
     }
 
     private void applyConfiguredSkin(VirtualPlayer targetNpc, MinerSettings settings) {
@@ -329,10 +287,6 @@ public final class Miner {
         String sig = settings.getSkinSignature();
         String name = settings.getSkinName();
 
-        if (isDefaultSkinName(name) && val != null && !val.isEmpty() && sig != null && !sig.isEmpty()) {
-            targetNpc.setTexture(val, sig);
-            return;
-        }
         if (val != null && !val.isEmpty() && sig != null && !sig.isEmpty()) {
             targetNpc.setTexture(val, sig);
             return;
@@ -357,36 +311,27 @@ public final class Miner {
         }
     }
 
-    private static boolean isDefaultSkinName(String configuredName) {
-        return configuredName == null
-                || configuredName.isEmpty()
-                || MinerSettings.DEFAULT_SKIN_NAME.equalsIgnoreCase(configuredName.trim());
-    }
-
     private void spawnHologram(MinerSettings settings) {
         List<String> lines = settings.getHologramLines();
         if (lines == null || lines.isEmpty()) {
             return;
         }
-        int total = lines.size();
-        for (int i = 0; i < total; i++) {
-            String tpl = lines.get(i);
-            double y = location.getY()
-                    + settings.getHologramHeight()
-                    + (total - 1 - i) * settings.getHologramLineGap();
-            VirtualArmorStand stand = VirtualArmorStand.create();
-            stand.setPos(new Vec3d(location.getX(), y, location.getZ()));
-            stand.setInvisible(true);
-            stand.setNoBasePlate(true);
-            stand.setNoGravity(true);
-            stand.setSilent(true);
-            stand.setSmall(true);
-            stand.setCustomName(Text.component(Text.resolveHoloLine(tpl, 0)));
-            stand.setCustomNameVisible(true);
-            tracker.addEntity(stand);
-            holograms.add(stand);
-            hologramTemplates.add(tpl);
-        }
+        VirtualTextDisplay display = VirtualTextDisplay.create();
+        display.setPos(new Vec3d(
+                location.getX(),
+                location.getY() + settings.getHologramHeight(),
+                location.getZ()
+        ));
+        display.setBillboardConstraints(BillboardConstraints.CENTER);
+        display.setDefaultBackground(false);
+        display.setBackgroundColor(Color.BLACK, 0);
+        display.setShadow(true);
+        display.setLineWidth(400);
+        display.setNoGravity(true);
+        display.setSilent(true);
+        display.setText(Text.linesComponent(lines));
+        tracker.addEntity(display);
+        this.hologram = display;
     }
 
     private void hideFromTab() {
@@ -418,6 +363,14 @@ public final class Miner {
             }
         } catch (Throwable ignored) {
         }
+    }
+
+    private static float approachAngle(float current, float target, float maxStep) {
+        float diff = wrapDegrees(target - current);
+        if (Math.abs(diff) <= maxStep) {
+            return wrapDegrees(target);
+        }
+        return wrapDegrees(current + Math.copySign(maxStep, diff));
     }
 
     private static float wrapDegrees(float deg) {

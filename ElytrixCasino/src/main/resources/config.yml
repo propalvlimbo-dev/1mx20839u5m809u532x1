@@ -1,4 +1,4 @@
-config-version: 2
+config-version: 3
 
 roulette:
   min-bet: 100
@@ -24,12 +24,10 @@ roulette:
     hide-from-tab: true
     hand-item: ""
     hologram:
-      height: 0.92
-      line-gap: 0.25
+      height: 2.08
       lines:
-        - "<gradient:#F8BEFB:#89A0FF><bold>РУЛЕТКА</bold></gradient>"
-        - "{wave}"
-        - "&7● &fНажмите, чтобы &#F8BEFBиграть"
+        - "&#F8BEFB&lРУЛЕТКА"
+        - "&fНажмите, чтобы &#F8BEFBиграть"
     skin:
       player: ""
       value: "ewogICJ0aW1lc3RhbXAiIDogMTcyNjgzNTY0Mzk1OSwKICAicHJvZmlsZUlkIiA6ICI3NjczNTA4YTI4MTk0ODMwYTY0YzhjYWFjNGJhNmM2NiIsCiAgInByb2ZpbGVOYW1lIiA6ICJKb3Jpc0hlcm9zIiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzE4NTIzNzMxN2JkNzc5ODZlNTgxYzRkZTM5OWFjMGFmYWU3YmUzZTgwY2RjODNlNjUxOTBhM2ViZTg3ODQ0ZTgiCiAgICB9CiAgfQp9"
@@ -66,16 +64,16 @@ automate:
   bottom-block: PINK_CONCRETE
   top-block: PINK_STAINED_GLASS
   symbols:
-    - { id: resin, material: RESIN_CLUMP, weight: 34, name: "&6Сгусток смолы", pay3: 1.2, pay4: 1.2, pay5: 1.2 }
-    - { id: eyeblossom_closed, material: CLOSED_EYEBLOSSOM, weight: 16, name: "&7Закрытый глазоцвет", pay3: 1.5, pay4: 1.5, pay5: 1.5 }
-    - { id: resin_brick, material: RESIN_BRICK, weight: 13, name: "&#FF9955Смоляной кирпич", pay3: 2.0, pay4: 2.0, pay5: 2.0 }
-    - { id: eyeblossom, material: OPEN_EYEBLOSSOM, weight: 10, name: "&#FFA64DРаскрытый глазоцвет", pay3: 2.5, pay4: 2.5, pay5: 2.5 }
-    - { id: breeze, material: BREEZE_ROD, weight: 8, name: "&bСтержень вихря", pay3: 3.5, pay4: 3.5, pay5: 3.5 }
-    - { id: trial_key, material: TRIAL_KEY, weight: 6, name: "&#66D9EFКлюч испытаний", pay3: 4.5, pay4: 4.5, pay5: 4.5 }
-    - { id: creaking_heart, material: CREAKING_HEART, weight: 5, name: "&#FF7733Сердце скрипуна", pay3: 6.0, pay4: 6.0, pay5: 6.0 }
-    - { id: ominous_key, material: OMINOUS_TRIAL_KEY, weight: 4, name: "&#55FF99Зловещий ключ", pay3: 8.0, pay4: 8.0, pay5: 8.0 }
-    - { id: heavy_core, material: HEAVY_CORE, weight: 3, name: "&#C7BBFBТяжёлое ядро", pay3: 10.0, pay4: 10.0, pay5: 10.0 }
-    - { id: egapple, material: ENCHANTED_GOLDEN_APPLE, weight: 1, name: "&#F8BEFBЗачарованное яблоко", pay3: 15.0, pay4: 15.0, pay5: 15.0 }
+    - { id: flesh, material: ROTTEN_FLESH, weight: 34, name: "&8Гнилая плоть", pay3: 1.2, pay4: 1.2, pay5: 1.2 }
+    - { id: potato, material: POISONOUS_POTATO, weight: 16, name: "&aЯд. картофель", pay3: 1.5, pay4: 1.5, pay5: 1.5 }
+    - { id: eye, material: SPIDER_EYE, weight: 13, name: "&cПаучий глаз", pay3: 2.0, pay4: 2.0, pay5: 2.0 }
+    - { id: bread, material: BREAD, weight: 10, name: "&6Хлеб", pay3: 2.5, pay4: 2.5, pay5: 2.5 }
+    - { id: beef, material: COOKED_BEEF, weight: 8, name: "&cСтейк", pay3: 3.5, pay4: 3.5, pay5: 3.5 }
+    - { id: carrot, material: GOLDEN_CARROT, weight: 6, name: "&6Зол. морковь", pay3: 4.5, pay4: 4.5, pay5: 4.5 }
+    - { id: apple, material: APPLE, weight: 5, name: "&cЯблоко", pay3: 6.0, pay4: 6.0, pay5: 6.0 }
+    - { id: gapple, material: GOLDEN_APPLE, weight: 4, name: "&eЗол. яблоко", pay3: 8.0, pay4: 8.0, pay5: 8.0 }
+    - { id: pie, material: PUMPKIN_PIE, weight: 3, name: "&6Пирог", pay3: 10.0, pay4: 10.0, pay5: 10.0 }
+    - { id: cake, material: CAKE, weight: 1, name: "&#F8BEFBТорт", pay3: 15.0, pay4: 15.0, pay5: 15.0 }
 
 miner:
   skin: "ExplodingTNT"
@@ -86,16 +84,14 @@ miner:
   turn-angle: 28.0
   ground-lifetime-ticks: 36
   hologram:
-    height: 0.92
-    line-gap: 0.25
+    height: 2.08
     lines:
-      - "<gradient:#F8BEFB:#89A0FF><bold>МИНЁР</bold></gradient>"
-      - "{wave}"
-      - "&7● &fНажмите, чтобы &#F8BEFBиграть"
+      - "&#F8BEFB&lМИНЁР"
+      - "&fНажмите, чтобы &#F8BEFBиграть"
   field:
     mines: 14
     coin-tiers:
-      - { icon: SUNFLOWER, name: "&#FFE066&lГорсть монет", multiplier: 0.40, count: 8 }
-      - { icon: GOLD_NUGGET, name: "&#FFD24D&lЗолотые самородки", multiplier: 0.60, count: 6 }
-      - { icon: GOLD_INGOT, name: "&#FFA94D&lЗолотой слиток", multiplier: 0.85, count: 4 }
-      - { icon: EMERALD, name: "&#55FF99&lИзумруд удачи", multiplier: 1.15, count: 2 }
+      - { icon: SUNFLOWER, name: "&eМонеты", multiplier: 0.40, count: 8 }
+      - { icon: GOLD_NUGGET, name: "&6Самородки", multiplier: 0.60, count: 6 }
+      - { icon: GOLD_INGOT, name: "&6Слиток", multiplier: 0.85, count: 4 }
+      - { icon: EMERALD, name: "&aИзумруд", multiplier: 1.15, count: 2 }

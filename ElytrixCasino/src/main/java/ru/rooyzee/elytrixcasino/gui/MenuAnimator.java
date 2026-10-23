@@ -18,17 +18,10 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.IntConsumer;
 
-/**
- * Точная покадровая анимация 1:1 как в /menu (BMenu/menu/elytrix/main/menu.yml):
- *  - тик 0: close (45), info (49), фиолетовые 46, 47 + enchantment_table.use (0.3, 1.5);
- *  - тики 1..6: последовательная волна фиолетового стекла снизу с note_block.chime на тиках 1, 3, 5;
- *  - тики 7..14: последовательная волна чёрного стекла сверху с note_block.chime на тиках 7, 9, 11, 13;
- *  - тики 15+: по 1 кнопке за тик с note_block.pling (0.26..0.34, pitch 1.00..1.42) + финал amethyst_block.chime (0.45, 1.4).
- */
 public final class MenuAnimator {
 
     private static final int[][] PURPLE_FRAMES = {
-            {48, 50},
+            {48, 49, 50},
             {51, 52},
             {53, 36},
             {37, 43},
@@ -70,28 +63,27 @@ public final class MenuAnimator {
     private static final int[][] AUTOMATE_PURPLE_FRAMES = {
             {48, 50},
             {51, 52},
-            {36, 37},
-            {43, 44},
-            {27, 28},
-            {34, 35}
+            {37, 43},
+            {28, 34}
+    };
+
+    private static final float[][] AUTOMATE_PURPLE_CHIMES = {
+            {0.20F, 0.85F},
+            null,
+            {0.22F, 0.93F},
+            null
     };
 
     private static final int[][] AUTOMATE_BLACK_FRAMES = {
-            {18, 19},
-            {9, 10},
-            {0, 1},
-            {7, 8},
-            {16, 17},
-            {25, 26}
+            {19, 25},
+            {10, 16},
+            {1, 7}
     };
 
     private static final float[][] AUTOMATE_BLACK_CHIMES = {
             {0.25F, 1.05F},
             null,
-            {0.27F, 1.16F},
-            null,
-            {0.30F, 1.30F},
-            null
+            {0.29F, 1.22F}
     };
 
     private final Main plugin;
@@ -214,16 +206,14 @@ public final class MenuAnimator {
         ItemStack black = GuiGuard.pane(plugin, Material.BLACK_STAINED_GLASS_PANE);
         Map<Integer, ItemStack> reserved = new LinkedHashMap<>(controls);
 
-        if (closeButton != null && 45 < inv.getSize()) {
+        if (closeButton != null) {
             inv.setItem(45, closeButton);
+            inv.setItem(53, closeButton.clone());
+            reserved.put(53, closeButton);
         }
         ItemStack playBtn = controls.get(49);
         if (playBtn != null) {
             inv.setItem(49, playBtn);
-        }
-        ItemStack paytableBtn = controls.get(53);
-        if (paytableBtn != null) {
-            inv.setItem(53, paytableBtn);
         }
         placeFrameSlots(inv, new int[]{46, 47}, purple, reserved);
 
@@ -248,7 +238,7 @@ public final class MenuAnimator {
             int step = tick[0]++;
             if (step < purpleCount) {
                 placeFrameSlots(inv, AUTOMATE_PURPLE_FRAMES[step], purple, reserved);
-                float[] sound = PURPLE_CHIMES[step];
+                float[] sound = AUTOMATE_PURPLE_CHIMES[step];
                 if (sound != null) {
                     playSound(player, Sound.BLOCK_NOTE_BLOCK_CHIME, sound[0], sound[1]);
                 }
@@ -295,7 +285,7 @@ public final class MenuAnimator {
         stop(uuid);
 
         ItemStack purple = GuiGuard.pane(plugin, Material.PURPLE_STAINED_GLASS_PANE);
-        for (int slot = 46; slot <= 52; slot++) {
+        for (int slot = 46; slot <= 53; slot++) {
             if (!bottomControls.containsKey(slot)) {
                 inv.setItem(slot, purple);
             }

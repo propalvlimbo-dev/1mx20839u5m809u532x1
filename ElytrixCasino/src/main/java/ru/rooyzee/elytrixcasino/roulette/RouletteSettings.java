@@ -9,9 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-/**
- * Разобранный и провалидированный config.yml для Рулетки (Крупье в классическом смокинге + голограмма dHolograms).
- */
 public final class RouletteSettings {
 
     public static final String DEFAULT_CROUPIER_SKIN_VALUE =
@@ -55,7 +52,6 @@ public final class RouletteSettings {
     private final String npcName;
     private final String npcDisplayName;
     private final double hologramHeight;
-    private final double hologramLineGap;
     private final List<String> hologramLines;
     private final boolean hideFromTab;
     private final String npcHandItem;
@@ -103,14 +99,12 @@ public final class RouletteSettings {
             this.skinSignature = cfgSig == null ? "" : cfgSig;
         }
 
-        this.hologramHeight = config.getDouble("roulette.npc.hologram.height", 0.92D);
-        this.hologramLineGap = config.getDouble("roulette.npc.hologram.line-gap", 0.25D);
+        this.hologramHeight = config.getDouble("roulette.npc.hologram.height", 2.08D);
         List<String> rawHolo = config.getStringList("roulette.npc.hologram.lines");
         if (rawHolo == null || rawHolo.isEmpty()) {
             List<String> defaults = new ArrayList<>();
-            defaults.add("<gradient:#F8BEFB:#89A0FF><bold>РУЛЕТКА</bold></gradient>");
-            defaults.add("{wave}");
-            defaults.add("&7● &fНажмите, чтобы &#F8BEFBиграть");
+            defaults.add("&#F8BEFB&lРУЛЕТКА");
+            defaults.add("&fНажмите, чтобы &#F8BEFBиграть");
             this.hologramLines = Collections.unmodifiableList(defaults);
         } else {
             this.hologramLines = Collections.unmodifiableList(new ArrayList<>(rawHolo));
@@ -180,12 +174,8 @@ public final class RouletteSettings {
         }
         this.sectors = Collections.unmodifiableList(parsed);
 
-        int weightSum = 0;
-        for (Sector sector : sectors) {
-            weightSum += sector.getWeight();
-        }
-        int slots = clamp(config.getInt("roulette.wheel.slots", 12), 4, 32);
-        this.standCount = clamp(weightSum > 0 ? weightSum : slots, 4, 32);
+        // Строго по roulette.wheel.slots (по умолчанию 12 блоков, без переполнения колеса из-за weight)
+        this.standCount = clamp(config.getInt("roulette.wheel.slots", 12), 4, 32);
     }
 
     public static RouletteSettings load(FileConfiguration config, Logger logger) {
@@ -236,7 +226,6 @@ public final class RouletteSettings {
     public String getNpcName() { return npcName; }
     public String getNpcDisplayName() { return npcDisplayName; }
     public double getHologramHeight() { return hologramHeight; }
-    public double getHologramLineGap() { return hologramLineGap; }
     public List<String> getHologramLines() { return hologramLines; }
     public boolean isHideFromTab() { return hideFromTab; }
     public String getNpcHandItem() { return npcHandItem == null ? "" : npcHandItem; }

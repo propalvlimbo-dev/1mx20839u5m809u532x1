@@ -28,7 +28,7 @@ import ru.rooyzee.elytrixcasino.util.SkinFetcher;
 
 public class Main extends JavaPlugin {
 
-    private static final int CURRENT_CONFIG_VERSION = 2;
+    private static final int CURRENT_CONFIG_VERSION = 3;
 
     private static Main instance;
 
@@ -119,10 +119,6 @@ public class Main extends JavaPlugin {
         loadSkinAsync();
     }
 
-    /**
-     * Автоматически обновляет шаблоны конфигов и GUI при переходе на config-version 2 (2.1.0),
-     * сохраняя нетронутым data.yml со всеми созданными на карте объектами казино.
-     */
     private void migrateConfigsIfNeeded() {
         reloadConfig();
         if (getConfig().getInt("config-version", 1) >= CURRENT_CONFIG_VERSION) {
@@ -213,6 +209,7 @@ public class Main extends JavaPlugin {
         minerManager.removeAll();
         activeBetManager.clearAll();
 
+        migrateConfigsIfNeeded();
         reloadConfig();
         messages.reload();
         rouletteGuiConfig.reload();
@@ -225,7 +222,6 @@ public class Main extends JavaPlugin {
         skinValue = settings.getSkinValue();
         skinSignature = settings.getSkinSignature();
 
-        automateManager.startWaveTicker();
         dataManager.reload();
         loader.reload();
         loadSkinAsync();

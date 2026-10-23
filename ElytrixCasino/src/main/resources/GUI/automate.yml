@@ -1,22 +1,20 @@
-title: "&#F8BEFB&lА&#F3BEFB&lв&#ECBFFB&lт&#E2BEFB&lо&#D6BCFB&lм&#C7BBFB&lа&#B8BAFB&lт &8┃ &f%bet% ⛂"
+title: "&#F8BEFB&lАвтомат"
 rows: 6
 filler: BLACK_STAINED_GLASS_PANE
 win-glass: LIME_STAINED_GLASS_PANE
-win-glass-name: "&#55FF99&l✦ КОМБИНАЦИЯ ✦"
-play-item: AMETHYST_SHARD
-play-name: "&7« &#F8BEFBКрутить барабан &7»"
+play-item: PINK_DYE
+play-name: "&7« &#F8BEFBИграть &7»"
 play-lore:
   - "&#F8BEFB&l┃ "
-  - "&#F8BEFB&l┃ &fСтавка за спин: &#F8BEFB%bet% ⛂"
-  - "&#F8BEFB&l┃ &fСоберите 5 символов в ряд,"
-  - "&#F8BEFB&l┃ &fстолбец или диагональ!"
+  - "&#F8BEFB&l┃ &fСтавка: &#F8BEFB%bet% монет"
+  - "&#F8BEFB&l┃ &fИгра: &#F8BEFBАвтомат"
   - "&#F8BEFB&l┃ "
   - "&7● &fНажмите, чтобы крутить"
 close-item: RED_DYE
 close-name: "&7« &cЗакрыть меню &7»"
 close-lore:
   - "&#F8BEFB&l┃ "
-  - "&#F8BEFB&l┃ &fВыход в игровой мир"
+  - "&#F8BEFB&l┃ &fВыход в игровой мир."
   - "&#F8BEFB&l┃ "
   - "&7● &fНажмите для закрытия"
 combo-title: "&#F8BEFB&lКомбинации"

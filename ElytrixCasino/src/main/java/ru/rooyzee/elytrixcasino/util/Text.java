@@ -8,18 +8,12 @@ import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.ChatColor;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class Text {
-
-    public static final int ELYTRIX_PINK = 0xF8BEFB;
-    public static final int ELYTRIX_BLUE = 0x89A0FF;
-    public static final String HOLO_WAVE_TOKEN = "{wave}";
-    public static final String HOLO_WAVE_CHARS = "▬▬▬▬▬▬▬▬▬▬▬";
 
     private static final Pattern GRADIENT_PATTERN = Pattern.compile(
             "<gradient:#([0-9a-fA-F]{6}):#([0-9a-fA-F]{6})>(.*?)</gradient>",
@@ -27,13 +21,6 @@ public final class Text {
     );
 
     private static final String CODES = "0123456789abcdef";
-    private static final ThreadLocal<DecimalFormat> MONEY_FORMAT = ThreadLocal.withInitial(() -> {
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
-        symbols.setGroupingSeparator(' ');
-        DecimalFormat format = new DecimalFormat("#,###", symbols);
-        format.setGroupingUsed(true);
-        return format;
-    });
 
     private Text() {
     }
@@ -46,10 +33,6 @@ public final class Text {
         return stripped == null ? "" : stripped;
     }
 
-    public static String formatMoney(long amount) {
-        return MONEY_FORMAT.get().format(amount);
-    }
-
     public static String profileName(String input) {
         String plain = ChatColor.stripColor(color(input));
         if (plain == null || plain.isEmpty()) {
@@ -59,33 +42,6 @@ public final class Text {
             return plain.substring(0, 16);
         }
         return plain;
-    }
-
-    /**
-     * Живая волна разделителя 1:1 как в dHolograms ElytriX:
-     * anim-type: WAVE, anim-color1: #F8BEFB (16301819), anim-color2: #89A0FF (9019647), anim-speed: 3 тика.
-     */
-    public static String waveBar(int step) {
-        int len = HOLO_WAVE_CHARS.length();
-        StringBuilder sb = new StringBuilder(len * 9);
-        for (int i = 0; i < len; i++) {
-            double phase = ((i - step * 0.85D) / (double) len) * Math.PI * 2.0D;
-            double ratio = 0.5D + 0.5D * Math.sin(phase);
-            int rgb = lerpColor(ELYTRIX_PINK, ELYTRIX_BLUE, ratio);
-            appendHexCode(sb, rgb);
-            sb.append(HOLO_WAVE_CHARS.charAt(i));
-        }
-        return sb.toString();
-    }
-
-    public static String resolveHoloLine(String rawLine, int waveStep) {
-        if (rawLine == null) {
-            return "";
-        }
-        if (rawLine.contains(HOLO_WAVE_TOKEN)) {
-            return color(rawLine.replace(HOLO_WAVE_TOKEN, waveBar(waveStep)));
-        }
-        return color(rawLine);
     }
 
     private static String expandMiniTags(String input) {
@@ -109,7 +65,8 @@ public final class Text {
             int n = plain.length();
             for (int i = 0; i < n; i++) {
                 double t = n <= 1 ? 0.0D : (double) i / (double) (n - 1);
-                appendHexAmpersand(grad, lerpColor(startRgb, endRgb, t));
+                String hex = String.format(Locale.US, "%06x", lerpColor(startRgb, endRgb, t) & 0xFFFFFF);
+                grad.append("&#").append(hex);
                 if (bold) {
                     grad.append("&l");
                 }
@@ -135,19 +92,6 @@ public final class Text {
         int g = (int) Math.round(g1 + (g2 - g1) * clamped);
         int b = (int) Math.round(b1 + (b2 - b1) * clamped);
         return (r << 16) | (g << 8) | b;
-    }
-
-    private static void appendHexAmpersand(StringBuilder out, int rgb) {
-        String hex = String.format(Locale.US, "%06x", rgb & 0xFFFFFF);
-        out.append("&#").append(hex);
-    }
-
-    private static void appendHexCode(StringBuilder out, int rgb) {
-        String hex = String.format(Locale.US, "%06x", rgb & 0xFFFFFF);
-        out.append(ChatColor.COLOR_CHAR).append('x');
-        for (int i = 0; i < 6; i++) {
-            out.append(ChatColor.COLOR_CHAR).append(hex.charAt(i));
-        }
     }
 
     public static String color(String input) {
@@ -176,6 +120,20 @@ public final class Text {
         return ChatColor.translateAlternateColorCodes('&', out.toString());
     }
 
+    public static Component linesComponent(List<String> lines) {
+        if (lines == null || lines.isEmpty()) {
+            return Component.empty();
+        }
+        TextComponent.Builder root = Component.text();
+        for (int i = 0; i < lines.size(); i++) {
+            if (i > 0) {
+                root.append(Component.newline());
+            }
+            root.append(component(lines.get(i)));
+        }
+        return root.build();
+    }
+
     public static Component component(String input) {
         String text = color(input);
         TextComponent.Builder root = Component.text();
@@ -184,6 +142,15 @@ public final class Text {
 
         for (int i = 0; i < text.length(); i++) {
             char current = text.charAt(i);
+            if (current == '\n') {
+                if (buffer.length() > 0) {
+                    root.append(Component.text(buffer.toString(), style.build()));
+                    buffer.setLength(0);
+                }
+                root.append(Component.newline());
+                style = Style.style().decoration(TextDecoration.ITALIC, false);
+                continue;
+            }
             if (current == ChatColor.COLOR_CHAR && i + 1 < text.length()) {
                 char code = Character.toLowerCase(text.charAt(++i));
                 if (buffer.length() > 0) {
@@ -284,5 +251,9 @@ public final class Text {
 
     public static String formatPercent(double percent) {
         return String.format(Locale.US, "%.1f", percent);
+    }
+
+    public static String formatMoney(long amount) {
+        return String.valueOf(amount);
     }
 }

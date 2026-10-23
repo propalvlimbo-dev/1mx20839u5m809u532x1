@@ -15,8 +15,17 @@ import sys
 import urllib.parse
 import urllib.request
 
-BRANCH = "ver/1.21.11"
-API_ROOT = "https://api.github.com/repos/PaperMC/Paper/contents/paper-api/src/main/java/"
+LOCAL_TREES = [
+    ("org.bukkit.", "/tmp/upstreamsrc/Paper-ver-1.21.11/paper-api/src/main/java/"),
+    ("io.papermc.paper.", "/tmp/upstreamsrc/Paper-ver-1.21.11/paper-api/src/main/java/"),
+    ("dev.by1337.virtualentity.api.", "/tmp/upstreamsrc/VirtualEntityApi-81ea5de4/api/src/main/java/"),
+]
+SOURCES = [
+    ("org.bukkit.", "https://api.github.com/repos/PaperMC/Paper/contents/paper-api/src/main/java/", "ver/1.21.11"),
+    ("io.papermc.paper.", "https://api.github.com/repos/PaperMC/Paper/contents/paper-api/src/main/java/", "ver/1.21.11"),
+    ("dev.by1337.virtualentity.api.", "https://api.github.com/repos/by1337/VirtualEntityApi/contents/api/src/main/java/", "81ea5de4"),
+]
+ALLOWED_PREFIXES = ("org.bukkit.", "io.papermc.paper.", "dev.by1337.virtualentity.api.")
 CACHE = {}
 PRIM = {"B": "byte", "C": "char", "D": "double", "F": "float",
         "I": "int", "J": "long", "S": "short", "Z": "boolean", "V": "void"}
@@ -152,23 +161,33 @@ def descriptor_types(desc):
 
 # ---------- исходники Paper ----------
 def fetch(fqn, cache_dir):
-    if fqn in CACHE:
-        return CACHE[fqn]
-    path = os.path.join(cache_dir, fqn.replace(".", "_") + ".java")
+    top_fqn = fqn.split("$")[0]
+    if top_fqn in CACHE:
+        return CACHE[top_fqn]
+    for prefix, local_dir in LOCAL_TREES:
+        if top_fqn.startswith(prefix):
+            local_path = os.path.join(local_dir, top_fqn.replace(".", "/") + ".java")
+            if os.path.exists(local_path):
+                CACHE[top_fqn] = open(local_path, encoding="utf-8", errors="ignore").read()
+                return CACHE[top_fqn]
+    path = os.path.join(cache_dir, top_fqn.replace(".", "_") + ".java")
     if os.path.exists(path):
-        CACHE[fqn] = open(path, encoding="utf-8", errors="ignore").read()
-        return CACHE[fqn]
-    url = API_ROOT + fqn.replace(".", "/") + ".java?ref=" + urllib.parse.quote(BRANCH, safe="")
-    req = urllib.request.Request(url, headers={"Accept": "application/vnd.github.raw", "User-Agent": "x"})
-    try:
-        text = urllib.request.urlopen(req, timeout=40).read().decode("utf-8", "replace")
-    except Exception:
-        text = None
-    if text is not None:
-        os.makedirs(cache_dir, exist_ok=True)
-        open(path, "w", encoding="utf-8").write(text)
-    CACHE[fqn] = text
-    return text
+        CACHE[top_fqn] = open(path, encoding="utf-8", errors="ignore").read()
+        return CACHE[top_fqn]
+    for prefix, api_root, branch in SOURCES:
+        if top_fqn.startswith(prefix):
+            url = api_root + top_fqn.replace(".", "/") + ".java?ref=" + urllib.parse.quote(branch, safe="")
+            req = urllib.request.Request(url, headers={"Accept": "application/vnd.github.raw", "User-Agent": "x"})
+            try:
+                text = urllib.request.urlopen(req, timeout=40).read().decode("utf-8", "replace")
+            except Exception:
+                text = None
+            if text is not None:
+                os.makedirs(cache_dir, exist_ok=True)
+                open(path, "w", encoding="utf-8").write(text)
+            CACHE[top_fqn] = text
+            return text
+    return None
 
 
 def strip_comments(text):
@@ -193,14 +212,16 @@ def split_top(text, sep=","):
     return out
 
 
-def parse_source(fqn, text):
+def parse_source(fqn, text, cache_dir="/tmp/paperapi"):
     text = strip_comments(text)
     imports = {}
     for m in re.finditer(r"import\s+([\w.]+);", text):
         fq = m.group(1)
         imports[fq.split(".")[-1]] = fq
-    pkg = fqn.rsplit(".", 1)[0]
-    simple = fqn.rsplit(".", 1)[1]
+    outer_fqn = fqn.split("$")[0]
+    pkg = outer_fqn.rsplit(".", 1)[0]
+    outer_simple = outer_fqn.rsplit(".", 1)[1]
+    simple = fqn.rsplit(".", 1)[1].split("$")[-1]
 
     def resolve(raw):
         t = raw.strip()
@@ -220,9 +241,15 @@ def parse_source(fqn, text):
         if t in ("int", "long", "double", "float", "boolean", "byte", "short", "char", "void"):
             return t + arr
         if t in nested:
-            return pkg + "." + simple + "$" + t + arr + generics
+            return pkg + "." + outer_simple + "$" + t + arr + generics
+        if "." in t and len(t.split(".")) == 2 and t.split(".")[0] in imports:
+            return imports[t.split(".")[0]] + "$" + t.split(".")[1] + arr + generics
         if t in imports:
             return imports[t] + arr + generics
+        for imp_fq in imports.values():
+            parent_src = fetch(imp_fq, cache_dir)
+            if parent_src and re.search(r"\b(?:class|interface|enum|record)\s+" + re.escape(t) + r"\b", parent_src):
+                return imp_fq + "$" + t + arr + generics
         if t in JAVA_LANG:
             return "java.lang." + t + arr + generics
         if t.startswith("java.") or t.startswith("net.") or t.startswith("io."):
@@ -232,7 +259,7 @@ def parse_source(fqn, text):
         return pkg + "." + t + arr + generics
 
     nested = set(re.findall(r"\b(?:class|interface|enum|record)\s+([A-Z]\w*)", text))
-    nested.discard(simple)
+    nested.discard(outer_simple)
 
     m = re.search(r"\b(?:class|interface|enum|record)\s+" + re.escape(simple) + r"\b([^{]*)\{", text)
     parents, is_enum = [], False
@@ -422,7 +449,7 @@ def api(fqn, cache_dir, seen=None):
         return INDEX[fqn]
     if seen is None:
         seen = set()
-    if fqn in seen or not (fqn.startswith("org.bukkit.") or fqn.startswith("io.papermc.paper.")):
+    if fqn in seen or not fqn.startswith(ALLOWED_PREFIXES):
         return None
     seen.add(fqn)
     text = fetch(fqn, cache_dir)
@@ -449,7 +476,7 @@ def main():
             if not f.endswith(".class"):
                 continue
             for kind, owner, name, desc in parse_class(os.path.join(root, f)):
-                if not (owner.startswith("org.bukkit.") or owner.startswith("io.papermc.paper.")):
+                if not owner.startswith(ALLOWED_PREFIXES):
                     continue
                 data = api(owner, cache_dir)
                 if data is None:

@@ -8,9 +8,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Настройки NPC Минёра и математики поля «Минёр».
- */
 public final class MinerSettings {
 
     public static final String DEFAULT_SKIN_NAME = "ExplodingTNT";
@@ -29,26 +26,15 @@ public final class MinerSettings {
 
         public CoinTier(Material icon, String displayName, double multiplier, int count) {
             this.icon = icon == null ? Material.GOLD_INGOT : icon;
-            this.displayName = displayName == null ? "&#F8BEFB&lМонеты" : displayName;
+            this.displayName = displayName == null ? "&eМонеты" : displayName;
             this.multiplier = Math.max(0.05D, multiplier);
             this.count = Math.max(0, count);
         }
 
-        public Material getIcon() {
-            return icon;
-        }
-
-        public String getDisplayName() {
-            return displayName;
-        }
-
-        public double getMultiplier() {
-            return multiplier;
-        }
-
-        public int getCount() {
-            return count;
-        }
+        public Material getIcon() { return icon; }
+        public String getDisplayName() { return displayName; }
+        public double getMultiplier() { return multiplier; }
+        public int getCount() { return count; }
 
         public long rewardForBet(long bet) {
             return Math.max(1L, Math.round(bet * multiplier));
@@ -62,8 +48,7 @@ public final class MinerSettings {
     private int throwIntervalTicks = 60;
     private float turnAngle = 28.0F;
     private int groundLifetimeTicks = 36;
-    private double hologramHeight = 0.92D;
-    private double hologramLineGap = 0.25D;
+    private double hologramHeight = 2.08D;
     private List<String> hologramLines = Collections.emptyList();
 
     private int minesCount = 14;
@@ -75,18 +60,16 @@ public final class MinerSettings {
         this.skinValue = config.getString("miner.skin-value", DEFAULT_SKIN_VALUE);
         this.skinSignature = config.getString("miner.skin-signature", DEFAULT_SKIN_SIGNATURE);
         this.viewDistance = Math.max(8, config.getInt("miner.view-distance", 48));
-        this.throwIntervalTicks = Math.max(10, config.getInt("miner.throw-interval-ticks", 60));
+        this.throwIntervalTicks = Math.max(20, config.getInt("miner.throw-interval-ticks", 60));
         this.turnAngle = (float) Math.max(5.0D, Math.min(90.0D, config.getDouble("miner.turn-angle", 28.0D)));
-        this.groundLifetimeTicks = Math.max(10, config.getInt("miner.ground-lifetime-ticks", 36));
-        this.hologramHeight = config.getDouble("miner.hologram.height", 0.92D);
-        this.hologramLineGap = config.getDouble("miner.hologram.line-gap", 0.25D);
+        this.groundLifetimeTicks = Math.max(15, config.getInt("miner.ground-lifetime-ticks", 36));
+        this.hologramHeight = config.getDouble("miner.hologram.height", 2.08D);
 
         List<String> rawLines = config.getStringList("miner.hologram.lines");
         if (rawLines == null || rawLines.isEmpty()) {
             List<String> defaults = new ArrayList<>();
-            defaults.add("<gradient:#F8BEFB:#89A0FF><bold>МИНЁР</bold></gradient>");
-            defaults.add("{wave}");
-            defaults.add("&7● &fНажмите, чтобы &#F8BEFBиграть");
+            defaults.add("&#F8BEFB&lМИНЁР");
+            defaults.add("&fНажмите, чтобы &#F8BEFBиграть");
             this.hologramLines = Collections.unmodifiableList(defaults);
         } else {
             this.hologramLines = Collections.unmodifiableList(new ArrayList<>(rawLines));
@@ -99,7 +82,7 @@ public final class MinerSettings {
             if (mat == null || !mat.isItem()) {
                 mat = Material.GOLD_INGOT;
             }
-            String name = entry.containsKey("name") ? String.valueOf(entry.get("name")) : "&#F8BEFB&lМонеты";
+            String name = entry.containsKey("name") ? String.valueOf(entry.get("name")) : "&eМонеты";
             double mult = entry.get("multiplier") instanceof Number
                     ? ((Number) entry.get("multiplier")).doubleValue()
                     : 0.40D;
@@ -111,10 +94,10 @@ public final class MinerSettings {
             }
         }
         if (parsedTiers.isEmpty()) {
-            parsedTiers.add(new CoinTier(Material.SUNFLOWER, "&#FFE066&lГорсть монет", 0.40D, 8));
-            parsedTiers.add(new CoinTier(Material.GOLD_NUGGET, "&#FFD24D&lЗолотые самородки", 0.60D, 6));
-            parsedTiers.add(new CoinTier(Material.GOLD_INGOT, "&#FFA94D&lЗолотой слиток", 0.85D, 4));
-            parsedTiers.add(new CoinTier(Material.EMERALD, "&#55FF99&lИзумруд удачи", 1.15D, 2));
+            parsedTiers.add(new CoinTier(Material.SUNFLOWER, "&eМонеты", 0.40D, 8));
+            parsedTiers.add(new CoinTier(Material.GOLD_NUGGET, "&6Самородки", 0.60D, 6));
+            parsedTiers.add(new CoinTier(Material.GOLD_INGOT, "&6Слиток", 0.85D, 4));
+            parsedTiers.add(new CoinTier(Material.EMERALD, "&aИзумруд", 1.15D, 2));
         }
 
         int totalCoins = 0;
@@ -130,55 +113,16 @@ public final class MinerSettings {
         this.coinTiers = Collections.unmodifiableList(parsedTiers);
     }
 
-    public String getSkinName() {
-        return skinName;
-    }
-
-    public String getSkinValue() {
-        return skinValue;
-    }
-
-    public String getSkinSignature() {
-        return skinSignature;
-    }
-
-    public int getViewDistance() {
-        return viewDistance;
-    }
-
-    public int getThrowIntervalTicks() {
-        return throwIntervalTicks;
-    }
-
-    public float getTurnAngle() {
-        return turnAngle;
-    }
-
-    public int getGroundLifetimeTicks() {
-        return groundLifetimeTicks;
-    }
-
-    public double getHologramHeight() {
-        return hologramHeight;
-    }
-
-    public double getHologramLineGap() {
-        return hologramLineGap;
-    }
-
-    public List<String> getHologramLines() {
-        return hologramLines;
-    }
-
-    public int getMinesCount() {
-        return minesCount;
-    }
-
-    public int getEmptyCount() {
-        return emptyCount;
-    }
-
-    public List<CoinTier> getCoinTiers() {
-        return coinTiers;
-    }
+    public String getSkinName() { return skinName; }
+    public String getSkinValue() { return skinValue; }
+    public String getSkinSignature() { return skinSignature; }
+    public int getViewDistance() { return viewDistance; }
+    public int getThrowIntervalTicks() { return throwIntervalTicks; }
+    public float getTurnAngle() { return turnAngle; }
+    public int getGroundLifetimeTicks() { return groundLifetimeTicks; }
+    public double getHologramHeight() { return hologramHeight; }
+    public List<String> getHologramLines() { return hologramLines; }
+    public int getMinesCount() { return minesCount; }
+    public int getEmptyCount() { return emptyCount; }
+    public List<CoinTier> getCoinTiers() { return coinTiers; }
 }

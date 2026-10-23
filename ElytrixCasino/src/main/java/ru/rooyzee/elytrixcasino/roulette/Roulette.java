@@ -1,16 +1,19 @@
 package ru.rooyzee.elytrixcasino.roulette;
 
+import dev.by1337.virtualentity.api.entity.BillboardConstraints;
 import dev.by1337.virtualentity.api.entity.EntityAnimation;
 import dev.by1337.virtualentity.api.entity.EquipmentSlot;
 import dev.by1337.virtualentity.api.entity.HumanoidArm;
 import dev.by1337.virtualentity.api.tracker.PlayerTracker;
 import dev.by1337.virtualentity.api.virtual.VirtualEntity;
 import dev.by1337.virtualentity.api.virtual.decoration.VirtualArmorStand;
+import dev.by1337.virtualentity.api.virtual.display.VirtualTextDisplay;
 import dev.by1337.virtualentity.api.virtual.item.VirtualItem;
 import dev.by1337.virtualentity.api.virtual.player.VirtualPlayer;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -18,10 +21,10 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 import org.by1337.blib.geom.Vec3d;
 import org.by1337.blib.geom.Vec3f;
@@ -50,6 +53,7 @@ public class Roulette {
     private static final double DECELERATION_START = 0.55D;
     private static final int REFUSAL_TICKS = 16;
     private static final String NAME_TEAM = "ec_npc";
+    private static final int[] CLASSIC_12_QUOTAS = {5, 4, 2, 1};
 
     private final Main plugin;
     private final String id;
@@ -58,10 +62,9 @@ public class Roulette {
 
     private final List<VirtualArmorStand> stands = new ArrayList<>();
     private final List<Sector> slotSectors = new ArrayList<>();
-    private final List<VirtualArmorStand> nameHolos = new ArrayList<>();
-    private final List<String> holoTemplates = new ArrayList<>();
 
     private VirtualPlayer npc;
+    private VirtualTextDisplay nameHolo;
     private VirtualArmorStand pointer;
     private PlayerTracker tracker;
     private BukkitTask trackerTask;
@@ -78,7 +81,6 @@ public class Roulette {
     private double rotation;
     private double angularSpeed;
     private boolean spawned;
-    private int tickCounter;
     private boolean lookingAtPlayer;
     private boolean listedSupported = true;
     private BukkitTask refusalTask;
@@ -115,7 +117,9 @@ public class Roulette {
 
         List<VirtualEntity> entities = new ArrayList<>();
         entities.add(npc);
-        entities.addAll(nameHolos);
+        if (nameHolo != null) {
+            entities.add(nameHolo);
+        }
         entities.addAll(stands);
         entities.add(pointer);
 
@@ -180,39 +184,34 @@ public class Roulette {
     }
 
     private void createNameHolo() {
-        nameHolos.clear();
-        holoTemplates.clear();
         List<String> lines = settings().getHologramLines();
         if (lines == null || lines.isEmpty()) {
+            nameHolo = null;
             return;
         }
-        for (String tpl : lines) {
-            VirtualArmorStand stand = VirtualArmorStand.create();
-            stand.setInvisible(true);
-            stand.setSmall(true);
-            stand.setNoBasePlate(true);
-            stand.setNoGravity(true);
-            stand.setSilent(true);
-            stand.setCustomName(Text.component(Text.resolveHoloLine(tpl, 0)));
-            stand.setCustomNameVisible(true);
-            nameHolos.add(stand);
-            holoTemplates.add(tpl);
+        VirtualTextDisplay display = VirtualTextDisplay.create();
+        display.setBillboardConstraints(BillboardConstraints.CENTER);
+        display.setDefaultBackground(false);
+        display.setBackgroundColor(Color.BLACK, 0);
+        display.setShadow(true);
+        display.setLineWidth(400);
+        display.setNoGravity(true);
+        display.setSilent(true);
+        try {
+            display.setPosRotInterpolationDuration(2);
+        } catch (Throwable ignored) {
         }
+        display.setText(Text.linesComponent(lines));
+        this.nameHolo = display;
         followNameHolo();
     }
 
     private void followNameHolo() {
-        if (nameHolos.isEmpty() || npc == null) {
+        if (nameHolo == null || npc == null) {
             return;
         }
         Vec3d pos = npc.getPos();
-        int total = nameHolos.size();
-        double base = settings().getHologramHeight();
-        double gap = settings().getHologramLineGap();
-        for (int i = 0; i < total; i++) {
-            double y = pos.getY() + base + (total - 1 - i) * gap;
-            nameHolos.get(i).setPos(new Vec3d(pos.getX(), y, pos.getZ()));
-        }
+        nameHolo.setPos(new Vec3d(pos.getX(), pos.getY() + settings().getHologramHeight(), pos.getZ()));
     }
 
     private void hideNametag(String entry) {
@@ -231,37 +230,50 @@ public class Roulette {
         }
     }
 
+    /**
+     * Строит аккуратное колесо из ровно wheel.slots (по умолчанию 12) ячеек с чередованием цветов 1:1 как в оригинале,
+     * а реальный шанс выпадения сектора считается по sectors.weight в pickWinnerSlot().
+     */
     private void createWheel() {
         List<Sector> sectors = settings().getSectors();
         int count = settings().getStandCount();
-        int[] placed = new int[sectors.size()];
-        int filled = 0;
+        int n = sectors.size();
 
-        for (int s = 0; s < sectors.size() && filled < count; s++) {
-            if (sectors.get(s).getWeight() > 0) {
-                slotSectors.add(sectors.get(s));
-                placed[s]++;
-                filled++;
+        int[] quota = new int[n];
+        if (n == 4 && count == 12) {
+            System.arraycopy(CLASSIC_12_QUOTAS, 0, quota, 0, 4);
+        } else {
+            int remaining = count;
+            for (int s = 0; s < n && remaining > 0; s++) {
+                quota[s] = 1;
+                remaining--;
             }
-        }
-        int totalWeight = Math.max(1, settings().getTotalWeight());
-        while (filled < count) {
-            int bestIndex = -1;
-            double bestDeficit = -1.0D;
-            for (int s = 0; s < sectors.size(); s++) {
-                double desired = (double) sectors.get(s).getWeight() * count / (double) totalWeight;
-                double deficit = desired - placed[s];
-                if (deficit > bestDeficit) {
-                    bestDeficit = deficit;
-                    bestIndex = s;
+            while (remaining > 0) {
+                for (int s = 0; s < n && remaining > 0; s++) {
+                    quota[s]++;
+                    remaining--;
                 }
             }
-            if (bestIndex < 0) {
-                bestIndex = filled % sectors.size();
+        }
+
+        int[] placed = new int[n];
+        int filled = 0;
+        while (filled < count) {
+            boolean added = false;
+            for (int s = 0; s < n && filled < count; s++) {
+                if (placed[s] < quota[s]) {
+                    slotSectors.add(sectors.get(s));
+                    placed[s]++;
+                    filled++;
+                    added = true;
+                }
             }
-            slotSectors.add(sectors.get(bestIndex));
-            placed[bestIndex]++;
-            filled++;
+            if (!added) {
+                for (int s = 0; s < n && filled < count; s++) {
+                    slotSectors.add(sectors.get(s));
+                    filled++;
+                }
+            }
         }
 
         for (int i = 0; i < count; i++) {
@@ -395,21 +407,11 @@ public class Roulette {
         if (!spawned || tracker == null) {
             return;
         }
-        tickCounter++;
         if (state == State.IDLE && refusalTask == null) {
             updateIdleLook();
         }
         updateRotation();
         followNameHolo();
-        if (tickCounter % 3 == 0) {
-            int waveStep = tickCounter / 3;
-            for (int i = 0; i < nameHolos.size() && i < holoTemplates.size(); i++) {
-                String tpl = holoTemplates.get(i);
-                if (tpl.contains(Text.HOLO_WAVE_TOKEN)) {
-                    nameHolos.get(i).setCustomName(Text.component(Text.resolveHoloLine(tpl, waveStep)));
-                }
-            }
-        }
         tracker.tick();
         hideFromTab();
     }
@@ -474,7 +476,6 @@ public class Roulette {
         state = State.IDLE;
         spawned = false;
         lookingAtPlayer = false;
-        tickCounter = 0;
         rotation = 0.0D;
         angularSpeed = 0.0D;
 
@@ -501,9 +502,8 @@ public class Roulette {
         }
         stands.clear();
         slotSectors.clear();
-        nameHolos.clear();
-        holoTemplates.clear();
         npc = null;
+        nameHolo = null;
         pointer = null;
     }
 
@@ -574,7 +574,7 @@ public class Roulette {
         if (existing != null) {
             plugin.send(player, "already-has-active-bet",
                     "%game%", existing.getGameType().getDisplayName(),
-                    "%amount%", Text.formatMoney(existing.getAmount()));
+                    "%amount%", String.valueOf(existing.getAmount()));
             playRefusal(player);
             return false;
         }
@@ -588,7 +588,7 @@ public class Roulette {
         if (!plugin.getActiveBets().tryAcquire(uuid, ru.rooyzee.elytrixcasino.bet.GameType.ROULETTE, id, bet)) {
             plugin.send(player, "already-has-active-bet",
                     "%game%", ru.rooyzee.elytrixcasino.bet.GameType.ROULETTE.getDisplayName(),
-                    "%amount%", Text.formatMoney(bet));
+                    "%amount%", String.valueOf(bet));
             playRefusal(player);
             return false;
         }
@@ -604,7 +604,7 @@ public class Roulette {
         state = State.WALKING;
         currentPlayer = uuid;
         currentBet = bet;
-        plugin.send(player, "bet-placed", "%bet%", Text.formatMoney(bet));
+        plugin.send(player, "bet-placed", "%bet%", String.valueOf(bet));
 
         Location walkTo = wheelCenter.clone()
                 .subtract(forward.clone().multiply(settings().getNpcSpinDistance()))
@@ -835,9 +835,9 @@ public class Roulette {
                 plugin.getEconomy().depositPlayer(player, win);
                 plugin.send(player, "win",
                         "%player%", player.getName(),
-                        "%amount%", Text.formatMoney(win),
+                        "%amount%", String.valueOf(win),
                         "%mult%", Text.formatMultiplier(sector.getMultiplier()),
-                        "%bet%", Text.formatMoney(bet));
+                        "%bet%", String.valueOf(bet));
                 player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
             } else if (playerId != null) {
                 OfflinePlayer offline = Bukkit.getOfflinePlayer(playerId);
@@ -845,7 +845,7 @@ public class Roulette {
                 plugin.getLogger().info("Выигрыш " + win + " начислен оффлайн-игроку " + playerId);
             }
         } else if (player != null) {
-            plugin.send(player, "lose", "%bet%", Text.formatMoney(bet));
+            plugin.send(player, "lose", "%bet%", String.valueOf(bet));
             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
         }
 
@@ -875,32 +875,36 @@ public class Roulette {
         currentYaw = baseYaw;
         currentPitch = basePitch;
         manualRotation = true;
-        player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.8F, 1.2F);
+        npc.setYaw(baseYaw);
+        npc.setPitch(basePitch);
 
         refusalTask = new BukkitRunnable() {
             private int tick = 0;
 
             @Override
             public void run() {
-                tick++;
-                if (npc == null || !spawned || tick > REFUSAL_TICKS) {
-                    if (npc != null) {
-                        npc.setYaw(baseYaw);
-                        npc.setPitch(basePitch);
-                    }
-                    currentYaw = baseYaw;
-                    currentPitch = basePitch;
-                    targetYaw = baseYaw;
-                    targetPitch = basePitch;
-                    manualRotation = false;
-                    refusalTask = null;
-                    cancel();
+                if (npc == null || !spawned) {
+                    finishShake();
                     return;
                 }
-                double fade = 1.0D - (double) tick / REFUSAL_TICKS;
-                float offset = (float) (Math.sin(tick * Math.PI / 4.0D) * 25.0D * fade);
-                npc.setYaw(baseYaw + offset);
+                tick++;
+                double progress = (double) tick / REFUSAL_TICKS;
+                float offset = (float) (Math.sin(progress * Math.PI * 5.0D) * 20.0D * (1.0D - progress));
+                currentYaw = wrapDegrees(baseYaw + offset);
+                npc.setYaw(currentYaw);
                 npc.setPitch(basePitch);
+                if (tick >= REFUSAL_TICKS) {
+                    currentYaw = baseYaw;
+                    targetYaw = baseYaw;
+                    npc.setYaw(baseYaw);
+                    finishShake();
+                }
+            }
+
+            private void finishShake() {
+                manualRotation = false;
+                refusalTask = null;
+                cancel();
             }
         }.runTaskTimer(plugin, 1L, 1L);
     }
@@ -911,57 +915,34 @@ public class Roulette {
             return;
         }
         final List<VirtualItem> items = new ArrayList<>();
-        final List<double[]> motion = new ArrayList<>();
         final ItemStack drop = new ItemStack(settings().getJackpotItem());
         ThreadLocalRandom random = ThreadLocalRandom.current();
 
         for (int i = 0; i < count; i++) {
             VirtualItem item = VirtualItem.create();
-            item.setItem(drop);
-            item.setNoGravity(true);
+            item.setItem(drop.clone());
+            item.setNoGravity(false);
             item.setSilent(true);
             item.setPos(new Vec3d(source.getX(), source.getY(), source.getZ()));
+            item.setMotion(new Vec3d(
+                    random.nextDouble(-0.14D, 0.14D),
+                    random.nextDouble(0.16D, 0.34D),
+                    random.nextDouble(-0.14D, 0.14D)
+            ));
             tracker.addEntity(item);
             items.add(item);
-            motion.add(new double[]{
-                    random.nextDouble(-0.12D, 0.12D),
-                    random.nextDouble(0.15D, 0.35D),
-                    random.nextDouble(-0.12D, 0.12D),
-                    source.getX(), source.getY(), source.getZ()
-            });
         }
         playNearby(Sound.ENTITY_ITEM_PICKUP, 0.7F, 1.6F);
 
         final int lifetime = settings().getJackpotTicks();
-        jackpotTask = new BukkitRunnable() {
-            private int tick = 0;
-
-            @Override
-            public void run() {
-                tick++;
-                boolean stop = !spawned || tracker == null || tick >= lifetime;
-                if (stop) {
-                    if (tracker != null) {
-                        for (VirtualItem item : items) {
-                            tracker.removeEntity(item);
-                        }
-                    }
-                    cancel();
-                    jackpotTask = null;
-                    return;
-                }
-                for (int i = 0; i < items.size(); i++) {
-                    double[] data = motion.get(i);
-                    data[1] -= 0.035D;
-                    data[3] += data[0];
-                    data[4] += data[1];
-                    data[5] += data[2];
-                    data[0] *= 0.96D;
-                    data[2] *= 0.96D;
-                    items.get(i).setPos(new Vec3d(data[3], data[4], data[5]));
+        jackpotTask = Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (tracker != null) {
+                for (VirtualItem item : items) {
+                    tracker.removeEntity(item);
                 }
             }
-        }.runTaskTimer(plugin, 1L, 1L);
+            jackpotTask = null;
+        }, lifetime);
     }
 
     private void playNearby(Sound sound, float volume, float pitch) {
@@ -973,24 +954,52 @@ public class Roulette {
         double radiusSq = (double) radius * radius;
         for (Player player : world.getPlayers()) {
             if (player.getLocation().distanceSquared(wheelCenter) <= radiusSq) {
-                player.playSound(player.getLocation(), sound, volume, pitch);
+                player.playSound(wheelCenter, sound, volume, pitch);
             }
         }
     }
 
-    public String getId() { return id; }
-    public State getState() { return state; }
-    public boolean isBusy() { return state != State.IDLE; }
-    public boolean isSpawned() { return spawned; }
-    public Location getHomeLocation() { return npcHome.clone(); }
-    public Location getWheelLocation() { return wheelCenter.clone(); }
-    public int getNpcEntityId() { return npc == null ? -1 : npc.getId(); }
+    public boolean isNpc(int entityId) {
+        return npc != null && npc.getId() == entityId;
+    }
+
+    public int getNpcEntityId() {
+        return npc != null ? npc.getId() : -1;
+    }
+
+    public boolean isBusy() {
+        return state != State.IDLE;
+    }
+
+    public boolean isSpawned() {
+        return spawned;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public State getState() {
+        return state;
+    }
+
+    public Location getNpcHome() {
+        return npcHome.clone();
+    }
+
+    public Location getHomeLocation() {
+        return npcHome.clone();
+    }
 
     public Location getNpcLocation() {
-        if (npc == null) {
-            return npcHome.clone();
-        }
-        Vec3d pos = npc.getPos();
-        return new Location(npcHome.getWorld(), pos.getX(), pos.getY(), pos.getZ());
+        return npcHome.clone();
+    }
+
+    public Location getWheelCenter() {
+        return wheelCenter.clone();
+    }
+
+    public Location getWheelLocation() {
+        return wheelCenter.clone();
     }
 }

@@ -1,107 +1,88 @@
-title: "&#F8BEFB&lМ&#F1BFFB&lи&#E4BEFB&lн&#D4BCFB&lё&#C2BBFB&lр"
-info:
-  enabled: true
-  slot: 49
-  material: TNT
-  glow: true
-  name: "&7« &#F8BEFBИгра Минёр &7»"
-  lore:
-    - "&#F8BEFB&l┃ "
-    - "&#F8BEFB&l┃ &fПоле из &745 серых стёкол&f:"
-    - "&#F8BEFB&l┃ &7• Пустые клетки &8— безопасный ход"
-    - "&#F8BEFB&l┃ &e• Монеты &8— пополняют ваш банк"
-    - "&#F8BEFB&l┃ &c• Мины (%mines% шт.) &8— сжигают банк"
-    - "&#F8BEFB&l┃ "
-    - "&7● &fЗабрать выигрыш можно в любой момент!"
+title: "&#F8BEFB&lМинёр"
 close:
   material: RED_DYE
   name: "&7« &cЗакрыть меню &7»"
   lore:
     - "&#F8BEFB&l┃ "
-    - "&#F8BEFB&l┃ &fВыход в игровой мир"
+    - "&#F8BEFB&l┃ &fВыход в игровой мир."
     - "&#F8BEFB&l┃ "
     - "&7● &fНажмите для закрытия"
 bets:
   bet_100:
     slot: 21
     amount: 100
-    material: GOLD_NUGGET
+    material: GOLD_INGOT
     glow: false
-    name: "&7« &#F8BEFBСтавка 100 ⛂ &7»"
+    name: "&7« &#F8BEFBСтавка %amount% &7»"
     lore:
       - "&#F8BEFB&l┃ "
-      - "&#F8BEFB&l┃ &fСумма ставки: &#F8BEFB%amount% ⛂"
-      - "&#F8BEFB&l┃ &fМин на поле: &c%mines% шт."
+      - "&#F8BEFB&l┃ &fСтавка: &#F8BEFB%amount% монет"
+      - "&#F8BEFB&l┃ &fИгра: &#F8BEFBМинёр"
       - "&#F8BEFB&l┃ "
-      - "&7● &fНажмите, чтобы начать игру"
+      - "&7● &fНажмите, чтобы играть"
   bet_500:
     slot: 22
     amount: 500
-    material: RAW_GOLD
+    material: GOLD_INGOT
     glow: false
-    name: "&7« &#F8BEFBСтавка 500 ⛂ &7»"
+    name: "&7« &#F8BEFBСтавка %amount% &7»"
     lore:
       - "&#F8BEFB&l┃ "
-      - "&#F8BEFB&l┃ &fСумма ставки: &#F8BEFB%amount% ⛂"
-      - "&#F8BEFB&l┃ &fМин на поле: &c%mines% шт."
+      - "&#F8BEFB&l┃ &fСтавка: &#F8BEFB%amount% монет"
+      - "&#F8BEFB&l┃ &fИгра: &#F8BEFBМинёр"
       - "&#F8BEFB&l┃ "
-      - "&7● &fНажмите, чтобы начать игру"
+      - "&7● &fНажмите, чтобы играть"
   bet_1000:
     slot: 23
     amount: 1000
     material: GOLD_INGOT
     glow: false
-    name: "&7« &#F8BEFBСтавка 1 000 ⛂ &7»"
+    name: "&7« &#F8BEFBСтавка %amount% &7»"
     lore:
       - "&#F8BEFB&l┃ "
-      - "&#F8BEFB&l┃ &fСумма ставки: &#F8BEFB%amount% ⛂"
-      - "&#F8BEFB&l┃ &fМин на поле: &c%mines% шт."
+      - "&#F8BEFB&l┃ &fСтавка: &#F8BEFB%amount% монет"
+      - "&#F8BEFB&l┃ &fИгра: &#F8BEFBМинёр"
       - "&#F8BEFB&l┃ "
-      - "&7● &fНажмите, чтобы начать игру"
+      - "&7● &fНажмите, чтобы играть"
   bet_5000:
     slot: 30
     amount: 5000
-    material: AMETHYST_SHARD
+    material: GOLD_INGOT
     glow: false
-    name: "&7« &#F8BEFBСтавка 5 000 ⛂ &7»"
+    name: "&7« &#F8BEFBСтавка %amount% &7»"
     lore:
       - "&#F8BEFB&l┃ "
-      - "&#F8BEFB&l┃ &fСумма ставки: &#F8BEFB%amount% ⛂"
-      - "&#F8BEFB&l┃ &fМин на поле: &c%mines% шт."
+      - "&#F8BEFB&l┃ &fСтавка: &#F8BEFB%amount% монет"
+      - "&#F8BEFB&l┃ &fИгра: &#F8BEFBМинёр"
       - "&#F8BEFB&l┃ "
-      - "&7● &fНажмите, чтобы начать игру"
+      - "&7● &fНажмите, чтобы играть"
   bet_10000:
     slot: 31
     amount: 10000
-    material: EMERALD
-    glow: true
-    name: "&7« &#F8BEFBСтавка 10 000 ⛂ &7»"
+    material: GOLD_INGOT
+    glow: false
+    name: "&7« &#F8BEFBСтавка %amount% &7»"
     lore:
       - "&#F8BEFB&l┃ "
-      - "&#F8BEFB&l┃ &fСумма ставки: &#F8BEFB%amount% ⛂"
-      - "&#F8BEFB&l┃ &fМин на поле: &c%mines% шт."
+      - "&#F8BEFB&l┃ &fСтавка: &#F8BEFB%amount% монет"
+      - "&#F8BEFB&l┃ &fИгра: &#F8BEFBМинёр"
       - "&#F8BEFB&l┃ "
-      - "&7● &fНажмите, чтобы начать игру"
+      - "&7● &fНажмите, чтобы играть"
   bet_15000:
     slot: 32
     amount: 15000
-    material: DIAMOND
-    glow: true
-    name: "&7« &#F8BEFBСтавка 15 000 ⛂ &7»"
+    material: GOLD_INGOT
+    glow: false
+    name: "&7« &#F8BEFBСтавка %amount% &7»"
     lore:
       - "&#F8BEFB&l┃ "
-      - "&#F8BEFB&l┃ &fСумма ставки: &#F8BEFB%amount% ⛂"
-      - "&#F8BEFB&l┃ &fМин на поле: &c%mines% шт."
+      - "&#F8BEFB&l┃ &fСтавка: &#F8BEFB%amount% монет"
+      - "&#F8BEFB&l┃ &fИгра: &#F8BEFBМинёр"
       - "&#F8BEFB&l┃ "
-      - "&7● &fНажмите, чтобы начать игру"
+      - "&7● &fНажмите, чтобы играть"
 game:
-  title: "&#F8BEFB&lМ&#F1BFFB&lи&#E4BEFB&lн&#D4BCFB&lё&#C2BBFB&lр &8┃ &fСтавка: &#F8BEFB%amount% ⛂"
+  title: "&#F8BEFB&lМинёр"
   hidden-cell:
-    name: "&7Неизвестная клетка"
+    name: "&7Клетка"
     lore:
-      - "&#F8BEFB&l┃ &fПод стеклом скрывается:"
-      - "&#F8BEFB&l┃ &7• Пустая клетка"
-      - "&#F8BEFB&l┃ &e• Монеты &8(зависят от ставки %bet% ⛂)"
-      - "&#F8BEFB&l┃ &c• Мина &8(всего %mines% шт.)"
-      - "&#F8BEFB&l┃ "
       - "&7● &fНажмите, чтобы открыть"
