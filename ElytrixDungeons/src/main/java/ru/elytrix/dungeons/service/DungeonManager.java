@@ -54,7 +54,28 @@ import ru.elytrix.dungeons.util.TextUtil;
 
 public final class DungeonManager {
 
+    public static final int MAX_DUNGEONS_PER_CATEGORY = 7;
+
+    public enum CreateStatus {
+        CREATED,
+        MAX_REACHED,
+        INVALID_ID,
+        ID_ALREADY_EXISTS,
+        MISSING_SCHEMATIC,
+        WORLD_NOT_FOUND,
+        NO_SAFE_SPOT,
+        SNAPSHOT_FAILED,
+        SCAN_IN_PROGRESS
+    }
+
+    public record CreateResult(CreateStatus status, DungeonInstance dungeon, DungeonCategory category, int count) {
+        public boolean success() {
+            return status == CreateStatus.CREATED && dungeon != null;
+        }
+    }
+
     private record BlockWrite(int x, int y, int z, BlockData data) {}
+    private record CreateRequest(DungeonCategory category, String dungeonId, int slotNumber, DungeonTemplate preferredTemplate) {}
 
     private final ElytrixDungeonsPlugin plugin;
     private final File dungeonsFile;
@@ -71,6 +92,7 @@ public final class DungeonManager {
     private boolean hiddenFromWorld = false;
     private int pendingScanTotal = 0;
     private int pendingScanDone = 0;
+    private int activePasteCount = 0;
 
     private BukkitTask heartbeatTask;
     private BukkitTask workerTask;
@@ -104,8 +126,10 @@ public final class DungeonManager {
                     enqueueJob(() -> restoreSavedDungeonOnStartup(d));
                 }
             }, 20L);
-        } else if (plugin.getConfig().getBoolean("auto-spawn.enabled", true)) {
+        } else if (plugin.getConfig().getBoolean("auto-spawn.startup-enabled", false)) {
             Bukkit.getScheduler().runTaskLater(plugin, this::ensureTargetDungeonCounts, 20L);
+        } else {
+            plugin.getLogger().info("No saved dungeons; first-run auto-placement is disabled. Use /elytrixdungeon create <surface|underground> to create dungeons one at a time.");
         }
     }
 
@@ -169,6 +193,7 @@ public final class DungeonManager {
     public int getPendingScanDone() { return pendingScanDone; }
     public int getPendingScanTotal() { return pendingScanTotal; }
     public boolean isScanning() { return pendingScanTotal > 0 && pendingScanDone < pendingScanTotal; }
+    public boolean isPlacementInProgress() { return activePasteCount > 0; }
 
     public void loadSchematics() {
         templatesById.clear();
@@ -364,13 +389,17 @@ public final class DungeonManager {
         }
         if (world == null) return;
 
-        int needSurface = Math.max(0, plugin.getConfig().getInt("auto-spawn.surface-count", 7) - countByCategory(DungeonCategory.SURFACE));
-        int needUg = Math.max(0, plugin.getConfig().getInt("auto-spawn.underground-count", 7) - countByCategory(DungeonCategory.UNDERGROUND));
+        int surfaceTarget = Math.min(MAX_DUNGEONS_PER_CATEGORY,
+                Math.max(0, plugin.getConfig().getInt("auto-spawn.surface-count", MAX_DUNGEONS_PER_CATEGORY)));
+        int undergroundTarget = Math.min(MAX_DUNGEONS_PER_CATEGORY,
+                Math.max(0, plugin.getConfig().getInt("auto-spawn.underground-count", MAX_DUNGEONS_PER_CATEGORY)));
+        int needSurface = Math.max(0, surfaceTarget - countByCategory(DungeonCategory.SURFACE));
+        int needUg = Math.max(0, undergroundTarget - countByCategory(DungeonCategory.UNDERGROUND));
         pendingScanDone = 0;
         pendingScanTotal = needSurface + needUg;
 
-        scheduleCategory(world, DungeonCategory.SURFACE, plugin.getConfig().getInt("auto-spawn.surface-count", 7));
-        scheduleCategory(world, DungeonCategory.UNDERGROUND, plugin.getConfig().getInt("auto-spawn.underground-count", 7));
+        scheduleCategory(world, DungeonCategory.SURFACE, surfaceTarget);
+        scheduleCategory(world, DungeonCategory.UNDERGROUND, undergroundTarget);
     }
 
     /**
@@ -380,30 +409,35 @@ public final class DungeonManager {
      *   slots 1, 3, 5    -> surface_2.schem (3 dungeons!)
      */
     private void scheduleCategory(World world, DungeonCategory cat, int targetCount) {
+        targetCount = Math.min(MAX_DUNGEONS_PER_CATEGORY, Math.max(0, targetCount));
         List<DungeonTemplate> available = templatesByCategory.get(cat);
+        int have = countByCategory(cat);
+        int need = Math.max(0, targetCount - have);
         if (available == null || available.isEmpty()) {
+            pendingScanDone += need;
             plugin.getLogger().warning("No .schem files in schematics/" + cat.name().toLowerCase(Locale.ROOT) + "/");
             return;
         }
-        int have = countByCategory(cat);
-        int need = Math.max(0, targetCount - have);
         for (int i = 0; i < need; i++) {
-            int slotIndex = have + i;
+            int number = nextFreeNumber(cat, i);
+            if (number > MAX_DUNGEONS_PER_CATEGORY) break;
+            int slotIndex = number - 1;
             DungeonTemplate chosen = available.get(slotIndex % available.size());
-            String id = cat.name().toLowerCase(Locale.ROOT) + "_" + nextFreeNumber(cat, i);
+            String id = cat.name().toLowerCase(Locale.ROOT) + "_" + number;
             enqueueJob(() -> scanAndPlaceSingle(world, id, chosen));
         }
     }
 
     private int nextFreeNumber(DungeonCategory cat, int offset) {
-        int found = 0, candidate = 1;
-        while (true) {
-            if (!dungeons.containsKey(cat.name().toLowerCase(Locale.ROOT) + "_" + candidate)) {
+        int found = 0;
+        String prefix = cat.name().toLowerCase(Locale.ROOT) + "_";
+        for (int candidate = 1; candidate <= MAX_DUNGEONS_PER_CATEGORY; candidate++) {
+            if (!dungeons.containsKey(prefix + candidate)) {
                 if (found == offset) return candidate;
                 found++;
             }
-            candidate++;
         }
+        return MAX_DUNGEONS_PER_CATEGORY + 1;
     }
 
     public int countByCategory(DungeonCategory cat) {
@@ -414,9 +448,118 @@ public final class DungeonManager {
         return c;
     }
 
+    /** Creates exactly one dungeon through an explicit admin command; no first-start batch is needed. */
+    public CreateResult createDungeonFromCommand(String rawId) {
+        CreateRequest request = parseCreateRequest(rawId);
+        if (request == null) {
+            return new CreateResult(CreateStatus.INVALID_ID, null, null, 0);
+        }
+
+        DungeonCategory category = request.category();
+        int count = countByCategory(category);
+        if (request.slotNumber() > MAX_DUNGEONS_PER_CATEGORY || count >= MAX_DUNGEONS_PER_CATEGORY) {
+            return new CreateResult(CreateStatus.MAX_REACHED, null, category, count);
+        }
+        if (isScanning() || isPlacementInProgress()) {
+            return new CreateResult(CreateStatus.SCAN_IN_PROGRESS, null, category, count);
+        }
+        if (dungeons.containsKey(request.dungeonId())) {
+            return new CreateResult(CreateStatus.ID_ALREADY_EXISTS, null, category, count);
+        }
+
+        List<DungeonTemplate> available = templatesByCategory.get(category);
+        if (available == null || available.isEmpty()) {
+            return new CreateResult(CreateStatus.MISSING_SCHEMATIC, null, category, count);
+        }
+        DungeonTemplate template = request.preferredTemplate();
+        if (template == null) {
+            template = available.get((request.slotNumber() - 1) % available.size());
+        }
+
+        String worldName = plugin.getConfig().getString("world-settings.world", "world");
+        World world = Bukkit.getWorld(worldName);
+        if (world == null && !Bukkit.getWorlds().isEmpty()) {
+            world = Bukkit.getWorlds().get(0);
+        }
+        if (world == null) {
+            return new CreateResult(CreateStatus.WORLD_NOT_FOUND, null, category, count);
+        }
+
+        SpotFinder.PlacementPlan plan = spotFinder.findPlacement(world, template, dungeons.values(), request.dungeonId());
+        if (plan == null) {
+            return new CreateResult(CreateStatus.NO_SAFE_SPOT, null, category, count);
+        }
+
+        DungeonInstance created = placeDungeonWithSnapshot(
+                request.dungeonId(), template, plan.origin(), plan.structureBounds(), plan.snapshotBounds(), plan.surfaceY(), true);
+        if (created == null) {
+            return new CreateResult(CreateStatus.SNAPSHOT_FAILED, null, category, count);
+        }
+
+        plugin.getLogger().info("Created " + created.getId() + " using " + template.getId()
+                + " at " + plan.origin().worldName() + " " + plan.origin().x() + ", " + plan.origin().y() + ", " + plan.origin().z());
+        return new CreateResult(CreateStatus.CREATED, created, category, count + 1);
+    }
+
+    private CreateRequest parseCreateRequest(String rawId) {
+        if (rawId == null || rawId.isBlank()) return null;
+        String input = rawId.trim().toLowerCase(Locale.ROOT);
+
+        if (input.equals("surface")) return nextCreateRequest(DungeonCategory.SURFACE, null);
+        if (input.equals("underground")) return nextCreateRequest(DungeonCategory.UNDERGROUND, null);
+
+        int separator = input.indexOf('_');
+        if (separator > 0) {
+            DungeonCategory category = parseCategory(input.substring(0, separator));
+            if (category != null) {
+                String suffix = input.substring(separator + 1);
+                if (suffix.isEmpty()) return null;
+                for (int i = 0; i < suffix.length(); i++) {
+                    if (!Character.isDigit(suffix.charAt(i))) return null;
+                }
+                int number;
+                try {
+                    number = Integer.parseInt(suffix);
+                } catch (NumberFormatException ex) {
+                    number = MAX_DUNGEONS_PER_CATEGORY + 1;
+                }
+                if (number < 1) return null;
+                String id = category.name().toLowerCase(Locale.ROOT) + "_" + number;
+                return new CreateRequest(category, id, number, null);
+            }
+        }
+
+        DungeonTemplate template = getTemplate(input);
+        if (template != null) return nextCreateRequest(template.getCategory(), template);
+        return null;
+    }
+
+    private CreateRequest nextCreateRequest(DungeonCategory category, DungeonTemplate preferredTemplate) {
+        int number = nextAvailableDungeonNumber(category);
+        if (number < 1) number = MAX_DUNGEONS_PER_CATEGORY + 1;
+        String id = category.name().toLowerCase(Locale.ROOT) + "_" + number;
+        return new CreateRequest(category, id, number, preferredTemplate);
+    }
+
+    private int nextAvailableDungeonNumber(DungeonCategory category) {
+        String prefix = category.name().toLowerCase(Locale.ROOT) + "_";
+        for (int number = 1; number <= MAX_DUNGEONS_PER_CATEGORY; number++) {
+            if (!dungeons.containsKey(prefix + number)) return number;
+        }
+        return -1;
+    }
+
+    private static DungeonCategory parseCategory(String input) {
+        return switch (input) {
+            case "surface" -> DungeonCategory.SURFACE;
+            case "underground" -> DungeonCategory.UNDERGROUND;
+            default -> null;
+        };
+    }
+
     private void scanAndPlaceSingle(World world, String id, DungeonTemplate tpl) {
         pendingScanDone++;
-        if (dungeons.containsKey(id)) return;
+        if (dungeons.containsKey(id) || countByCategory(tpl.getCategory()) >= MAX_DUNGEONS_PER_CATEGORY) return;
         SpotFinder.PlacementPlan plan = spotFinder.findPlacement(world, tpl, dungeons.values(), id);
         if (plan == null) {
             plugin.getLogger().warning("[" + pendingScanDone + "/" + pendingScanTotal + "] Could not find ideal spot for " + id);
@@ -438,6 +581,14 @@ public final class DungeonManager {
     }
 
     public DungeonInstance manualSpawnHere(Player admin, DungeonTemplate tpl) {
+        if (admin == null || tpl == null || isScanning() || isPlacementInProgress()
+                || countByCategory(tpl.getCategory()) >= MAX_DUNGEONS_PER_CATEGORY) {
+            return null;
+        }
+        int number = nextAvailableDungeonNumber(tpl.getCategory());
+        if (number < 1) return null;
+        String id = tpl.getCategory().name().toLowerCase(Locale.ROOT) + "_" + number;
+
         World w = admin.getWorld();
         Location loc = admin.getLocation();
         int ox = loc.getBlockX() - tpl.getSizeX() / 2;
@@ -452,7 +603,18 @@ public final class DungeonManager {
         CuboidRegion snapBox = new CuboidRegion(w.getName(), ox - bufXZ, Math.max(w.getMinHeight(), oy - bufY), oz - bufXZ,
                 structBox.maxX() + bufXZ, Math.min(w.getMaxHeight() - 1, snapTop), structBox.maxZ() + bufXZ);
 
-        String id = "manual_" + (dungeons.size() + 1) + "_" + (System.currentTimeMillis() % 1000);
+        int claimPadding = plugin.getConfig().getInt("protection.claim-padding-blocks", 40);
+        for (DungeonInstance existing : dungeons.values()) {
+            if (!existing.getOrigin().worldName().equals(w.getName())) continue;
+            if (existing.getSnapshotBounds().intersects3D(snapBox)
+                    || existing.claimGuardRegion(claimPadding).intersects3D(snapBox)) {
+                return null;
+            }
+        }
+        if (plugin.getWorldGuardHook().hasForeignRegions(w, snapBox.expand(claimPadding, 6))) {
+            return null;
+        }
+
         return placeDungeonWithSnapshot(id, tpl, new BlockPosKey(w.getName(), ox, oy, oz), structBox, snapBox, surfY, true);
     }
 
@@ -471,7 +633,9 @@ public final class DungeonManager {
             try {
                 snapshotStore.saveWorldSnapshot(id, w, snapBounds);
             } catch (IOException ex) {
+                snapshotStore.deleteSnapshot(id);
                 plugin.getLogger().warning("Snapshot error for " + id + ": " + ex.getMessage());
+                return null;
             }
         }
         DungeonInstance inst = new DungeonInstance(
@@ -641,6 +805,7 @@ public final class DungeonManager {
         }
 
         int perTick = Math.max(300, plugin.getConfig().getInt("auto-spawn.blocks-per-tick", 1200));
+        activePasteCount++;
         new BukkitRunnable() {
             private int idx = 0;
 
@@ -657,8 +822,12 @@ public final class DungeonManager {
                 }
                 if (idx >= writes.size()) {
                     cancel();
-                    finalizeDungeonAfterPaste(world, inst);
-                    if (postHook != null) postHook.run();
+                    try {
+                        finalizeDungeonAfterPaste(world, inst);
+                        if (postHook != null) postHook.run();
+                    } finally {
+                        activePasteCount = Math.max(0, activePasteCount - 1);
+                    }
                 }
             }
         }.runTaskTimer(plugin, 1L, 1L);
@@ -749,6 +918,7 @@ public final class DungeonManager {
             workerTask = new BukkitRunnable() {
                 @Override
                 public void run() {
+                    if (activePasteCount > 0) return;
                     Runnable next = jobQueue.pollFirst();
                     if (next == null) {
                         cancel();

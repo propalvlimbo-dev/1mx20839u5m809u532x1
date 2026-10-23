@@ -73,9 +73,14 @@ public final class DungeonMenuService {
         holder.setInventory(inv);
         fillBorder(inv);
 
+        int dungeonCount = plugin.getDungeonManager().getAllDungeons().size();
         String scanLine = plugin.getDungeonManager().isScanning()
                 ? "&#96FF91Идёт поиск мест: " + plugin.getDungeonManager().getPendingScanDone() + "/" + plugin.getDungeonManager().getPendingScanTotal()
-                : "&#96FF91Места зафиксированы в dungeons.yml (" + plugin.getDungeonManager().getAllDungeons().size() + "/14)";
+                : plugin.getDungeonManager().isPlacementInProgress()
+                        ? "&#F8BEFBУстанавливается данж, дождитесь завершения"
+                        : dungeonCount == 0
+                                ? "&#F8BEFBАвтоспавн отключён: создавайте по одному командой /elytrixdungeon create surface|underground"
+                                : "&#96FF91Создано: " + dungeonCount + "/14 (координаты сохранены в dungeons.yml)";
 
         inv.setItem(4, icon(Material.BEACON, "&7« &#F8BEFBСтатус Данжей &7»", List.of(
                 "&#F8BEFB&l┃ &fСостояние: " + scanLine,
@@ -97,6 +102,7 @@ public final class DungeonMenuService {
         )));
         inv.setItem(46, icon(Material.STRUCTURE_BLOCK, "&7« &#F8BEFBПоставить .schem здесь &7»", List.of(
                 "&#F8BEFB&l┃ &fРучной спавн схемы на вашей точке",
+                "&#F8BEFB&l┃ &fНе больше 7 данжей каждого типа",
                 "&7● &fНажмите для выбора"
         )));
         inv.setItem(47, icon(Material.AMETHYST_SHARD, "&7« &#F8BEFBВзять Призрачный осколок &7»", List.of(

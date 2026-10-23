@@ -32,13 +32,14 @@ import ru.elytrix.dungeons.model.CuboidRegion;
 import ru.elytrix.dungeons.model.DungeonCategory;
 import ru.elytrix.dungeons.model.DungeonInstance;
 import ru.elytrix.dungeons.model.DungeonTemplate;
+import ru.elytrix.dungeons.service.DungeonManager;
 import ru.elytrix.dungeons.structure.SpongeSchematicCodec;
 import ru.elytrix.dungeons.util.TextUtil;
 
 public final class DungeonCommand implements TabExecutor {
 
     private static final List<String> SUBCOMMANDS = List.of(
-            "gui", "tp", "list", "status", "findspots", "regen", "relocate",
+            "gui", "create", "tp", "list", "status", "findspots", "regen", "relocate",
             "hide", "show", "protect", "loot", "giveshard", "wand", "save", "spawn", "remove", "reload"
     );
 
@@ -101,12 +102,28 @@ public final class DungeonCommand implements TabExecutor {
                         + " &8┃ &fПодземных: &#89A0FF" + plugin.getDungeonManager().countByCategory(DungeonCategory.UNDERGROUND) + "/7"));
                 sender.sendMessage(TextUtil.color(" &#F8BEFB● &fЗагружено .schem файлов: &#F8BEFB"
                         + plugin.getDungeonManager().getTemplates().keySet()));
-                sender.sendMessage(TextUtil.color(" &#F8BEFB● &fПоиск мест: &#F8BEFB"
-                        + (plugin.getDungeonManager().isScanning()
-                                ? plugin.getDungeonManager().getPendingScanDone() + "/" + plugin.getDungeonManager().getPendingScanTotal()
-                                : "завершён (зафиксированы в dungeons.yml)")));
+                String scanStatus;
+                if (plugin.getDungeonManager().isScanning()) {
+                    scanStatus = plugin.getDungeonManager().getPendingScanDone() + "/" + plugin.getDungeonManager().getPendingScanTotal();
+                } else if (plugin.getDungeonManager().isPlacementInProgress()) {
+                    scanStatus = "устанавливается данж, дождитесь завершения";
+                } else if (plugin.getDungeonManager().getAllDungeons().isEmpty()) {
+                    scanStatus = "ожидает /elytrixdungeon create <surface|underground>";
+                } else if (plugin.getDungeonManager().getAllDungeons().size() < 14) {
+                    scanStatus = "создано вручную: " + plugin.getDungeonManager().getAllDungeons().size() + "/14";
+                } else {
+                    scanStatus = "завершён (места сохранены в dungeons.yml)";
+                }
+                sender.sendMessage(TextUtil.color(" &#F8BEFB● &fПоиск мест: &#F8BEFB" + scanStatus));
                 sender.sendMessage(TextUtil.color(" &#F8BEFB● &fВидимость в мире: "
                         + (plugin.getDungeonManager().isHiddenFromWorld() ? "&cскрыты" : "&#96FF91активны")));
+            }
+            case "create" -> {
+                if (args.length < 2) {
+                    sender.sendMessage(plugin.prefix() + "/elytrixdungeon create <surface|underground|surface_1..surface_7|underground_1..underground_7>");
+                    return true;
+                }
+                sendCreateResult(sender, plugin.getDungeonManager().createDungeonFromCommand(args[1]));
             }
             case "findspots", "rebuildall" -> {
                 plugin.getDungeonManager().rebuildAllFromSchematics();
@@ -206,8 +223,16 @@ public final class DungeonCommand implements TabExecutor {
                 }
                 DungeonTemplate tpl = plugin.getDungeonManager().getTemplate(args[1]);
                 if (tpl != null) {
-                    plugin.getDungeonManager().manualSpawnHere(p, tpl);
-                    sender.sendMessage(plugin.prefix() + "Схема поставлена!");
+                    DungeonInstance created = plugin.getDungeonManager().manualSpawnHere(p, tpl);
+                    if (created != null) {
+                        sender.sendMessage(plugin.prefix() + "Схема поставлена как данж §f" + created.getId() + "§7.");
+                    } else if (plugin.getDungeonManager().countByCategory(tpl.getCategory()) >= DungeonManager.MAX_DUNGEONS_PER_CATEGORY) {
+                        sender.sendMessage(plugin.prefix() + "§cДля типа «" + tpl.getCategory().getTitle() + "» максимум — 7 данжей.");
+                    } else {
+                        sender.sendMessage(plugin.prefix() + "§cНе удалось создать данж здесь: место занято, защищено или идёт поиск мест.");
+                    }
+                } else {
+                    sender.sendMessage(plugin.prefix() + "§cСхема не найдена. Проверьте ID в /edungeon status.");
                 }
             }
             case "remove" -> {
@@ -220,9 +245,35 @@ public final class DungeonCommand implements TabExecutor {
                 sender.sendMessage(plugin.msg("reloaded"));
             }
             default -> sender.sendMessage(plugin.prefix()
-                    + "/edungeon <gui|tp|list|status|findspots|regen|relocate|hide|show|protect|loot|giveshard|wand|save|spawn|remove|reload>");
+                    + "/elytrixdungeon <create|gui|tp|list|status|findspots|regen|relocate|hide|show|protect|loot|giveshard|wand|save|spawn|remove|reload>");
         }
         return true;
+    }
+
+    private void sendCreateResult(CommandSender sender, DungeonManager.CreateResult result) {
+        DungeonCategory category = result.category();
+        String typeName = category == null ? "данжей" : category.getTitle();
+        switch (result.status()) {
+            case CREATED -> {
+                DungeonInstance d = result.dungeon();
+                BlockPosKey origin = d.getOrigin();
+                sender.sendMessage(plugin.prefix() + "Начата установка данжа §f" + d.getId() + " §7(" + d.getCategory().getTitle()
+                        + ", схема " + d.getTemplateId() + ").");
+                sender.sendMessage(TextUtil.color(" &#F8BEFB&l┃ &fКоординаты: &#F8BEFB" + origin.x() + ", " + origin.y() + ", " + origin.z()
+                        + " &8┃ &fСоздано этого типа: &#F8BEFB" + result.count() + "/" + DungeonManager.MAX_DUNGEONS_PER_CATEGORY));
+            }
+            case MAX_REACHED -> sender.sendMessage(plugin.prefix() + "§cДля типа «" + typeName + "» максимум — "
+                    + DungeonManager.MAX_DUNGEONS_PER_CATEGORY + " данжей. Сейчас: " + result.count() + "/"
+                    + DungeonManager.MAX_DUNGEONS_PER_CATEGORY + ".");
+            case INVALID_ID -> sender.sendMessage(plugin.prefix()
+                    + "§cНеверный ID. Используйте: /elytrixdungeon create <surface|underground|surface_1..surface_7|underground_1..underground_7>.");
+            case ID_ALREADY_EXISTS -> sender.sendMessage(plugin.prefix() + "§cДанж с таким ID уже существует.");
+            case MISSING_SCHEMATIC -> sender.sendMessage(plugin.prefix() + "§cДля типа «" + typeName + "» не найдено ни одной .schem схемы.");
+            case WORLD_NOT_FOUND -> sender.sendMessage(plugin.prefix() + "§cМир для создания данжей не найден. Проверьте world-settings.world в config.yml.");
+            case NO_SAFE_SPOT -> sender.sendMessage(plugin.prefix() + "§cНе найдено безопасное место для данжа. Проверьте размер схемы и границы поиска в config.yml.");
+            case SNAPSHOT_FAILED -> sender.sendMessage(plugin.prefix() + "§cНе удалось сохранить исходный рельеф. Данж не создан; проверьте свободное место и права записи плагина.");
+            case SCAN_IN_PROGRESS -> sender.sendMessage(plugin.prefix() + "§cИдёт поиск или установка предыдущего данжа. Дождитесь завершения и повторите команду.");
+        }
     }
 
     private void teleportToDungeon(Player p, String id) {
@@ -309,6 +360,20 @@ public final class DungeonCommand implements TabExecutor {
         }
         if (args.length == 2) {
             String sub = args[0].toLowerCase(Locale.ROOT);
+            if (sub.equals("create")) {
+                List<String> ids = new ArrayList<>(List.of("surface", "underground"));
+                for (DungeonCategory category : DungeonCategory.values()) {
+                    String prefix = category.name().toLowerCase(Locale.ROOT) + "_";
+                    for (int number = 1; number <= DungeonManager.MAX_DUNGEONS_PER_CATEGORY; number++) {
+                        String id = prefix + number;
+                        if (plugin.getDungeonManager().getDungeon(id) == null) ids.add(id);
+                    }
+                }
+                for (String templateId : plugin.getDungeonManager().getTemplates().keySet()) {
+                    if (!ids.contains(templateId)) ids.add(templateId);
+                }
+                return StringUtil.copyPartialMatches(args[1], ids, new ArrayList<>());
+            }
             if (sub.equals("tp") || sub.equals("remove") || sub.equals("regen") || sub.equals("relocate")) {
                 List<String> ids = new ArrayList<>();
                 if (sub.equals("regen") || sub.equals("relocate")) ids.add("all");

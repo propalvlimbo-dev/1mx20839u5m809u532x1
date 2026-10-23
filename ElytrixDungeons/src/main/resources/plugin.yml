@@ -17,7 +17,7 @@ commands:
     aliases: [dungeon, danzh]
   edungeon:
     description: Управление данжами, схематиками .schem, телепортом и лутом
-    aliases: [edungeons, ed]
+    aliases: [edungeons, ed, elytrixdungeon]
 
 permissions:
   elytrixdungeons.admin:

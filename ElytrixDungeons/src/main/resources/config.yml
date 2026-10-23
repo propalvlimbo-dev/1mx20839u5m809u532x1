@@ -21,7 +21,10 @@ world-settings:
   underground-max-y: 8
 
 auto-spawn:
-  enabled: true
+  # По умолчанию не запускать массовый поиск и создание при старте.
+  # Данжи создаются вручную по одному: /elytrixdungeon create surface|underground.
+  # startup-enabled: true включает прежнее массовое создание при первом запуске.
+  startup-enabled: false
   # Ровно 7 Наземных + 7 Подземных = 14 данжей (при 2 .schem в папке: 4 шт. #1 и 3 шт. #2)
   surface-count: 7
   underground-count: 7

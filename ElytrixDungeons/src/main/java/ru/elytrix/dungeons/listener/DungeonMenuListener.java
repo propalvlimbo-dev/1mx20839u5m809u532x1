@@ -96,8 +96,13 @@ public final class DungeonMenuListener implements Listener {
                             player.closeInventory();
                             DungeonInstance created = plugin.getDungeonManager().manualSpawnHere(player, tpl);
                             if (created != null) {
-                                player.sendMessage(plugin.prefix() + "Создан данж §f#" + created.getId());
+                                player.sendMessage(plugin.prefix() + "Создан данж §f" + created.getId() + "§7.");
                                 player.playSound(player.getLocation(), Sound.BLOCK_VAULT_ACTIVATE, 1.0f, 1.1f);
+                            } else if (plugin.getDungeonManager().countByCategory(tpl.getCategory())
+                                    >= ru.elytrix.dungeons.service.DungeonManager.MAX_DUNGEONS_PER_CATEGORY) {
+                                player.sendMessage(plugin.prefix() + "§cДля типа «" + tpl.getCategory().getTitle() + "» максимум — 7 данжей.");
+                            } else {
+                                player.sendMessage(plugin.prefix() + "§cНе удалось создать данж здесь: место занято, защищено или идёт поиск мест.");
                             }
                         }
                     }
