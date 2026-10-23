@@ -18,6 +18,7 @@ import ru.rooyzee.elytrixitem.enchant.impl.SunShacklesEnchant;
 import ru.rooyzee.elytrixitem.hook.EconomyHook;
 import ru.rooyzee.elytrixitem.item.ConsumableItems;
 import ru.rooyzee.elytrixitem.item.GearItems;
+import ru.rooyzee.elytrixitem.item.MechanicItems;
 import ru.rooyzee.elytrixitem.item.ItemRegistry;
 import ru.rooyzee.elytrixitem.item.SpawnItemListener;
 import ru.rooyzee.elytrixitem.item.aura.AuraListener;
@@ -29,6 +30,8 @@ import ru.rooyzee.elytrixitem.item.aura.impl.MinerAuraListener;
 import ru.rooyzee.elytrixitem.item.impl.AntiPearl;
 import ru.rooyzee.elytrixitem.item.impl.AntiPearlListener;
 import ru.rooyzee.elytrixitem.item.impl.CollectorSword;
+import ru.rooyzee.elytrixitem.item.impl.CustomBrewingListener;
+import ru.rooyzee.elytrixitem.item.impl.CustomFurnaceListener;
 import ru.rooyzee.elytrixitem.item.impl.CollectorSwordListener;
 import ru.rooyzee.elytrixitem.item.impl.ExperiencePot;
 import ru.rooyzee.elytrixitem.item.impl.ExperiencePotListener;
@@ -36,6 +39,7 @@ import ru.rooyzee.elytrixitem.item.impl.ExplosiveTrap;
 import ru.rooyzee.elytrixitem.item.impl.ExplosiveTrapListener;
 import ru.rooyzee.elytrixitem.item.impl.InfiniteFirework;
 import ru.rooyzee.elytrixitem.item.impl.InfiniteFireworkListener;
+import ru.rooyzee.elytrixitem.item.impl.RuneListener;
 import ru.rooyzee.elytrixitem.item.impl.SplitPickaxe;
 import ru.rooyzee.elytrixitem.item.impl.SplitPickaxeListener;
 import ru.rooyzee.elytrixitem.item.impl.Tyagun;
@@ -91,6 +95,9 @@ public final class Main extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new DrillListener(this), this);
         getServer().getPluginManager().registerEvents(new ExplosiveArrowListener(this), this);
         getServer().getPluginManager().registerEvents(new SplitPickaxeListener(this), this);
+        getServer().getPluginManager().registerEvents(new RuneListener(this), this);
+        getServer().getPluginManager().registerEvents(new CustomFurnaceListener(this), this);
+        getServer().getPluginManager().registerEvents(new CustomBrewingListener(this), this);
     }
 
     @Override
@@ -122,6 +129,7 @@ public final class Main extends JavaPlugin {
     private void registerItems() {
         GearItems.register(this, itemRegistry);
         ConsumableItems.register(this, itemRegistry);
+        MechanicItems.register(this, itemRegistry);
         itemRegistry.register(new CollectorSword(this));
         itemRegistry.register(new InfiniteFirework(this));
         itemRegistry.register(new Tyagun(this));

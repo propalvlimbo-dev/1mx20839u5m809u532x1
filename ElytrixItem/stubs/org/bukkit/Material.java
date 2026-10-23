@@ -71,6 +71,8 @@ public enum Material {
     PAPER,
     PARROT_SPAWN_EGG,
     PLAYER_HEAD,
+    FURNACE,
+    BREWING_STAND,
     PURPLE_STAINED_GLASS_PANE,
     REDSTONE,
     REDSTONE_ORE,

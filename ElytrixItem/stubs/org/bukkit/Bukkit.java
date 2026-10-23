@@ -14,6 +14,7 @@ public final class Bukkit {
     public static PluginManager getPluginManager() { return null; }
     public static ConsoleCommandSender getConsoleSender() { return null; }
     public static BukkitScheduler getScheduler() { return null; }
+    public static org.bukkit.profile.PlayerProfile createPlayerProfile(java.util.UUID uniqueId, String name) { return null; }
     public static boolean dispatchCommand(CommandSender sender, String commandLine) { return false; }
     public static Inventory createInventory(InventoryHolder owner, int size, String title) { return null; }
     public static Collection<? extends Player> getOnlinePlayers() { return java.util.Collections.emptyList(); }

@@ -15,5 +15,6 @@ public interface BlockState {
     BlockData getBlockData();
     void setBlockData(BlockData data);
     boolean update(boolean force, boolean applyPhysics);
+    boolean update(boolean force);
     boolean update();
 }

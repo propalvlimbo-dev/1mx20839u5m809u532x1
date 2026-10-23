@@ -1,4 +1,8 @@
 package org.bukkit.block;
-public interface Container extends BlockState {
-    org.bukkit.inventory.Inventory getInventory();
+
+import org.bukkit.inventory.Inventory;
+
+public interface Container extends TileState {
+    Inventory getInventory();
+    Inventory getSnapshotInventory();
 }
