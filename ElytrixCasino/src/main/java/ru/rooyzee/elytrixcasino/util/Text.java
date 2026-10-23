@@ -8,13 +8,34 @@ import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.ChatColor;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
 public final class Text {
 
     private static final String CODES = "0123456789abcdef";
+    private static final ThreadLocal<DecimalFormat> MONEY_FORMAT = ThreadLocal.withInitial(() -> {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
+        symbols.setGroupingSeparator(' ');
+        DecimalFormat format = new DecimalFormat("#,###", symbols);
+        format.setGroupingUsed(true);
+        return format;
+    });
 
     private Text() {
+    }
+
+    public static String strip(String input) {
+        if (input == null) {
+            return "";
+        }
+        String stripped = ChatColor.stripColor(input);
+        return stripped == null ? "" : stripped;
+    }
+
+    public static String formatMoney(long amount) {
+        return MONEY_FORMAT.get().format(amount);
     }
 
     public static String profileName(String input) {

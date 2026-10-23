@@ -8,6 +8,7 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import ru.rooyzee.elytrixcasino.Main;
 import ru.rooyzee.elytrixcasino.automate.Automate;
+import ru.rooyzee.elytrixcasino.miner.Miner;
 import ru.rooyzee.elytrixcasino.roulette.Roulette;
 import ru.rooyzee.elytrixcasino.util.Text;
 
@@ -22,7 +23,7 @@ public class CasinoCommand implements CommandExecutor, TabCompleter {
     private static final List<String> ADMIN_SUBCOMMANDS =
             Arrays.asList("reload", "create", "remove", "list", "tp", "debug");
     private static final List<String> CREATE_TYPES =
-            Arrays.asList("roulette", "automate");
+            Arrays.asList("roulette", "automate", "miner");
 
     private final Main plugin;
 
@@ -54,17 +55,26 @@ public class CasinoCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 if (args.length < 2) {
-                    sender.sendMessage(Text.color("&c/" + label + " create roulette|automate"));
+                    sender.sendMessage(Text.color("&c/" + label + " create roulette|automate|miner"));
                     return true;
                 }
                 String type = args[1].toLowerCase(Locale.ROOT);
-                if (type.equals("roulette")) {
+                if (type.equals("roulette") || type.equals("рулетка")) {
                     Roulette roulette = plugin.getRouletteManager().create((Player) sender);
                     if (roulette == null) {
                         plugin.send(sender, "create-failed");
                         return true;
                     }
                     plugin.send(sender, "created", "%id%", roulette.getId(), "%type%", "Рулетка");
+                    return true;
+                }
+                if (type.equals("miner") || type.equals("минёр") || type.equals("минер")) {
+                    Miner miner = plugin.getMinerManager().create((Player) sender);
+                    if (miner == null) {
+                        plugin.send(sender, "create-failed");
+                        return true;
+                    }
+                    plugin.send(sender, "created", "%id%", miner.getId(), "%type%", "Минёр");
                     return true;
                 }
                 if (type.equals("automate") || type.equals("authomate") || type.equals("автомат")) {
@@ -82,17 +92,19 @@ public class CasinoCommand implements CommandExecutor, TabCompleter {
                         return true;
                     }
                     plugin.getAutomateManager().beginCreate((Player) sender, bet);
-                    plugin.send(sender, "automate-bind", "%bet%", String.valueOf(bet));
+                    plugin.send(sender, "automate-bind", "%bet%", Text.formatMoney(bet));
                     return true;
                 }
-                sender.sendMessage(Text.color("&c/" + label + " create roulette|automate <ставка>"));
+                sender.sendMessage(Text.color("&c/" + label + " create roulette|automate|miner"));
                 return true;
             }
 
             case "remove": {
                 if (args.length >= 2) {
                     String id = args[1];
-                    if (plugin.getRouletteManager().remove(id) || plugin.getAutomateManager().remove(id)) {
+                    if (plugin.getRouletteManager().remove(id)
+                            || plugin.getAutomateManager().remove(id)
+                            || plugin.getMinerManager().remove(id)) {
                         plugin.send(sender, "removed", "%id%", id);
                     } else {
                         plugin.send(sender, "not-found");
@@ -109,7 +121,9 @@ public class CasinoCommand implements CommandExecutor, TabCompleter {
             }
 
             case "list": {
-                int count = plugin.getRouletteManager().getAll().size() + plugin.getAutomateManager().getAll().size();
+                int count = plugin.getRouletteManager().getAll().size()
+                        + plugin.getAutomateManager().getAll().size()
+                        + plugin.getMinerManager().getAll().size();
                 int pending = plugin.getLoader() == null ? 0 : plugin.getLoader().pendingCount();
                 if (count == 0 && pending == 0) {
                     plugin.send(sender, "list-empty");
@@ -125,6 +139,10 @@ public class CasinoCommand implements CommandExecutor, TabCompleter {
                         state += " (чанк не загружен)";
                     }
                     sendEntry(sender, "Автомат", automate.getId(), automate.getLocation(), state);
+                }
+                for (Miner miner : plugin.getMinerManager().getAll()) {
+                    sendEntry(sender, "Минёр", miner.getId(), miner.getLocation(),
+                            miner.isSpawned() ? "ACTIVE" : "UNLOADED");
                 }
                 if (pending > 0) {
                     sender.sendMessage(Text.color("&7● &eЕщё " + pending
@@ -154,6 +172,12 @@ public class CasinoCommand implements CommandExecutor, TabCompleter {
                     plugin.send(sender, "teleported", "%id%", automate.getId());
                     return true;
                 }
+                Miner miner = plugin.getMinerManager().get(args[1]);
+                if (miner != null) {
+                    ((Player) sender).teleport(miner.getLocation());
+                    plugin.send(sender, "teleported", "%id%", miner.getId());
+                    return true;
+                }
                 plugin.send(sender, "not-found");
                 return true;
             }
@@ -168,8 +192,8 @@ public class CasinoCommand implements CommandExecutor, TabCompleter {
                 }
                 boolean enabled = plugin.getCasinoListener().toggleDebug((Player) sender);
                 sender.sendMessage(Text.color(enabled
-                        ? "&#F8BEFBДиагностика кликов включена. &7Кликайте по автомату — в чат будет писаться, "
-                        + "что видит плагин (блок, сущность или пакетная сущность чужого плагина)."
+                        ? "&#F8BEFBДиагностика кликов включена. &7Кликайте по объекту — в чат будет писаться, "
+                        + "что видит плагин."
                         : "&#F8BEFBДиагностика кликов выключена."));
                 return true;
             }
@@ -213,6 +237,7 @@ public class CasinoCommand implements CommandExecutor, TabCompleter {
             if (args[0].equalsIgnoreCase("remove") || args[0].equalsIgnoreCase("tp")) {
                 List<String> ids = new ArrayList<>(plugin.getRouletteManager().getIds());
                 ids.addAll(plugin.getAutomateManager().getIds());
+                ids.addAll(plugin.getMinerManager().getIds());
                 return filter(ids, args[1]);
             }
         }

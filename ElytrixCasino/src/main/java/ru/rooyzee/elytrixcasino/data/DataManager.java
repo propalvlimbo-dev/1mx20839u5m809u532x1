@@ -17,11 +17,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 /**
- * Хранение рулеток и автоматов в data.yml.
- * <p>
- * Класс только читает и пишет файл: восстановлением сущностей занимается
- * {@link ru.rooyzee.elytrixcasino.restore.CasinoLoader}, потому что на старте сервера
- * миры и чанки могут быть ещё не готовы.
+ * Хранение рулеток, автоматов и NPC Минёров в data.yml.
  */
 public class DataManager {
 
@@ -82,9 +78,16 @@ public class DataManager {
         save();
     }
 
-    /**
-     * Все сохранённые рулетки как есть (без спавна).
-     */
+    public void saveMiner(String id, Location npc) {
+        config.set("miners." + id + ".npc", serialize(npc));
+        save();
+    }
+
+    public void removeMiner(String id) {
+        config.set("miners." + id, null);
+        save();
+    }
+
     public List<StoredRoulette> readRoulettes() {
         ConfigurationSection section = config.getConfigurationSection("roulettes");
         if (section == null) {
@@ -92,7 +95,6 @@ public class DataManager {
         }
         List<StoredRoulette> result = new ArrayList<>();
         for (String key : section.getKeys(false)) {
-            // "villager"/"roulette" — старые ключи, поддерживаем для совместимости со старыми data.yml
             String npc = section.getString(key + ".npc", section.getString(key + ".villager"));
             String wheel = section.getString(key + ".wheel", section.getString(key + ".roulette"));
             result.add(new StoredRoulette(key, npc, wheel));
@@ -100,9 +102,6 @@ public class DataManager {
         return result;
     }
 
-    /**
-     * Все сохранённые автоматы как есть (без спавна).
-     */
     public List<StoredAutomate> readAutomates() {
         ConfigurationSection section = config.getConfigurationSection("automates");
         if (section == null) {
@@ -113,6 +112,18 @@ public class DataManager {
         for (String key : section.getKeys(false)) {
             result.add(new StoredAutomate(key, section.getString(key + ".bottom"),
                     section.getLong(key + ".bet", defaultBet)));
+        }
+        return result;
+    }
+
+    public List<StoredMiner> readMiners() {
+        ConfigurationSection section = config.getConfigurationSection("miners");
+        if (section == null) {
+            return Collections.emptyList();
+        }
+        List<StoredMiner> result = new ArrayList<>();
+        for (String key : section.getKeys(false)) {
+            result.add(new StoredMiner(key, section.getString(key + ".npc")));
         }
         return result;
     }
@@ -154,9 +165,6 @@ public class DataManager {
         }
     }
 
-    /**
-     * Имя мира из сериализованной точки (или null, если строка битая).
-     */
     public static String worldName(String raw) {
         if (raw == null || raw.isEmpty()) {
             return null;
@@ -200,9 +208,6 @@ public class DataManager {
         }
     }
 
-    /**
-     * Запись рулетки из data.yml.
-     */
     public static final class StoredRoulette {
         private final String id;
         private final String npc;
@@ -227,9 +232,6 @@ public class DataManager {
         }
     }
 
-    /**
-     * Запись автомата из data.yml.
-     */
     public static final class StoredAutomate {
         private final String id;
         private final String bottom;
@@ -254,11 +256,31 @@ public class DataManager {
         }
     }
 
+    public static final class StoredMiner {
+        private final String id;
+        private final String npc;
+
+        public StoredMiner(String id, String npc) {
+            this.id = id;
+            this.npc = npc;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public String getNpc() {
+            return npc;
+        }
+    }
+
     public String newId() {
         String id;
         do {
             id = UUID.randomUUID().toString().substring(0, 8);
-        } while (config.contains("roulettes." + id) || config.contains("automates." + id));
+        } while (config.contains("roulettes." + id)
+                || config.contains("automates." + id)
+                || config.contains("miners." + id));
         return id;
     }
 }

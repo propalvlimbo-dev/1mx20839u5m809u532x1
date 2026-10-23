@@ -1,10 +1,8 @@
 name: ElytrixCasino
-version: '${project.version}'
+version: '2.0.0'
 main: ru.rooyzee.elytrixcasino.Main
-# Включаемся после загрузки миров: иначе Bukkit.getWorld() вернёт null
-# и сохранённые рулетки/автоматы не восстановятся после рестарта.
 load: POSTWORLD
-api-version: '1.16'
+api-version: '1.21'
 author: rooyzee
 depend:
   - Vault
@@ -17,10 +15,10 @@ commands:
     aliases: [ec, casino]
 permissions:
   elytrixcasino.use:
-    description: Возможность играть в рулетку
+    description: Возможность играть в казино
     default: true
   elytrixcasino.admin:
-    description: Управление рулетками
+    description: Управление казино
     default: op
     children:
       elytrixcasino.use: true

@@ -215,22 +215,34 @@ public class Roulette {
         int count = settings().getStandCount();
         int[] placed = new int[sectors.size()];
         int filled = 0;
+
+        // Гарантируем минимум 1 стенд на колесе для каждого сектора с weight > 0,
+        // чтобы любой выпавший по весу сектор имел реальный слот на колесе
+        for (int s = 0; s < sectors.size() && filled < count; s++) {
+            if (sectors.get(s).getWeight() > 0) {
+                slotSectors.add(sectors.get(s));
+                placed[s]++;
+                filled++;
+            }
+        }
+        int totalWeight = Math.max(1, settings().getTotalWeight());
         while (filled < count) {
-            boolean added = false;
-            for (int s = 0; s < sectors.size() && filled < count; s++) {
-                if (placed[s] < sectors.get(s).getWeight()) {
-                    slotSectors.add(sectors.get(s));
-                    placed[s]++;
-                    filled++;
-                    added = true;
+            int bestIndex = -1;
+            double bestDeficit = -1.0D;
+            for (int s = 0; s < sectors.size(); s++) {
+                double desired = (double) sectors.get(s).getWeight() * count / (double) totalWeight;
+                double deficit = desired - placed[s];
+                if (deficit > bestDeficit) {
+                    bestDeficit = deficit;
+                    bestIndex = s;
                 }
             }
-            if (!added) {
-                for (int s = 0; s < sectors.size() && filled < count; s++) {
-                    slotSectors.add(sectors.get(s));
-                    filled++;
-                }
+            if (bestIndex < 0) {
+                bestIndex = filled % sectors.size();
             }
+            slotSectors.add(sectors.get(bestIndex));
+            placed[bestIndex]++;
+            filled++;
         }
 
         for (int i = 0; i < count; i++) {
@@ -420,9 +432,18 @@ public class Roulette {
     }
 
     public void despawn() {
+        if (currentPlayer != null) {
+            UUID refundId = currentPlayer;
+            long refundAmount = currentBet;
+            currentPlayer = null;
+            currentBet = 0L;
+            plugin.getActiveBets().release(refundId);
+            if (refundAmount > 0L && plugin.getEconomy() != null) {
+                OfflinePlayer offline = Bukkit.getOfflinePlayer(refundId);
+                plugin.getEconomy().depositPlayer(offline, refundAmount);
+            }
+        }
         state = State.IDLE;
-        currentPlayer = null;
-        currentBet = 0L;
         spawned = false;
         lookingAtPlayer = false;
         tickCounter = 0;
@@ -519,14 +540,32 @@ public class Roulette {
             return false;
         }
 
+        UUID uuid = player.getUniqueId();
+        ru.rooyzee.elytrixcasino.bet.ActiveBet existing = plugin.getActiveBets().getActiveBet(uuid);
+        if (existing != null) {
+            plugin.send(player, "already-has-active-bet",
+                    "%game%", existing.getGameType().getDisplayName(),
+                    "%amount%", Text.formatMoney(existing.getAmount()));
+            playRefusal(player);
+            return false;
+        }
+
         Economy economy = plugin.getEconomy();
         if (!economy.has(player, bet)) {
             plugin.send(player, "no-money");
             playRefusal(player);
             return false;
         }
+        if (!plugin.getActiveBets().tryAcquire(uuid, ru.rooyzee.elytrixcasino.bet.GameType.ROULETTE, id, bet)) {
+            plugin.send(player, "already-has-active-bet",
+                    "%game%", ru.rooyzee.elytrixcasino.bet.GameType.ROULETTE.getDisplayName(),
+                    "%amount%", Text.formatMoney(bet));
+            playRefusal(player);
+            return false;
+        }
         EconomyResponse response = economy.withdrawPlayer(player, bet);
         if (!response.transactionSuccess()) {
+            plugin.getActiveBets().release(uuid);
             plugin.send(player, "no-money");
             playRefusal(player);
             plugin.getLogger().warning("Не удалось снять ставку у " + player.getName() + ": " + response.errorMessage);
@@ -534,9 +573,9 @@ public class Roulette {
         }
 
         state = State.WALKING;
-        currentPlayer = player.getUniqueId();
+        currentPlayer = uuid;
         currentBet = bet;
-        plugin.send(player, "bet-placed", "%bet%", String.valueOf(bet));
+        plugin.send(player, "bet-placed", "%bet%", Text.formatMoney(bet));
 
         Location walkTo = wheelCenter.clone()
                 .subtract(forward.clone().multiply(settings().getNpcSpinDistance()))
@@ -700,7 +739,32 @@ public class Roulette {
         if (slotSectors.isEmpty()) {
             return 0;
         }
-        return ThreadLocalRandom.current().nextInt(slotSectors.size());
+        List<Sector> sectors = settings().getSectors();
+        int totalWeight = settings().getTotalWeight();
+        if (sectors.isEmpty() || totalWeight <= 0) {
+            return ThreadLocalRandom.current().nextInt(slotSectors.size());
+        }
+        int roll = ThreadLocalRandom.current().nextInt(totalWeight);
+        int cumulative = 0;
+        Sector chosen = sectors.get(sectors.size() - 1);
+        for (Sector sector : sectors) {
+            cumulative += sector.getWeight();
+            if (roll < cumulative) {
+                chosen = sector;
+                break;
+            }
+        }
+        List<Integer> matchingSlots = new ArrayList<>();
+        for (int i = 0; i < slotSectors.size(); i++) {
+            if (slotSectors.get(i) == chosen
+                    || Double.compare(slotSectors.get(i).getMultiplier(), chosen.getMultiplier()) == 0) {
+                matchingSlots.add(i);
+            }
+        }
+        if (matchingSlots.isEmpty()) {
+            return ThreadLocalRandom.current().nextInt(slotSectors.size());
+        }
+        return matchingSlots.get(ThreadLocalRandom.current().nextInt(matchingSlots.size()));
     }
 
     private int slotAtPointer(double rot) {
@@ -732,6 +796,9 @@ public class Roulette {
         long win = Math.round(currentBet * sector.getMultiplier());
         UUID playerId = currentPlayer;
         long bet = currentBet;
+        if (playerId != null) {
+            plugin.getActiveBets().release(playerId);
+        }
 
         Player player = playerId == null ? null : Bukkit.getPlayer(playerId);
         if (win > 0L) {
@@ -739,9 +806,9 @@ public class Roulette {
                 plugin.getEconomy().depositPlayer(player, win);
                 plugin.send(player, "win",
                         "%player%", player.getName(),
-                        "%amount%", String.valueOf(win),
+                        "%amount%", Text.formatMoney(win),
                         "%mult%", Text.formatMultiplier(sector.getMultiplier()),
-                        "%bet%", String.valueOf(bet));
+                        "%bet%", Text.formatMoney(bet));
                 player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
             } else if (playerId != null) {
                 OfflinePlayer offline = Bukkit.getOfflinePlayer(playerId);
@@ -749,7 +816,7 @@ public class Roulette {
                 plugin.getLogger().info("Выигрыш " + win + " начислен оффлайн-игроку " + playerId);
             }
         } else if (player != null) {
-            plugin.send(player, "lose", "%bet%", String.valueOf(bet));
+            plugin.send(player, "lose", "%bet%", Text.formatMoney(bet));
             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
         }
 

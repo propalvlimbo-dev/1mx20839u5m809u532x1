@@ -1,10 +1,10 @@
 package ru.rooyzee.elytrixcasino.automate;
 
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import ru.rooyzee.elytrixcasino.gui.GuiGuard;
 import ru.rooyzee.elytrixcasino.util.Text;
 
 public final class SlotSymbol {
@@ -71,9 +71,9 @@ public final class SlotSymbol {
                 meta.setDisplayName(Text.color(name));
             }
             if (glow) {
-                meta.addEnchant(Enchantment.DURABILITY, 1, true);
-                meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                GuiGuard.applyGlow(meta);
             }
+            meta.addItemFlags(ItemFlag.values());
             item.setItemMeta(meta);
         }
         return item;

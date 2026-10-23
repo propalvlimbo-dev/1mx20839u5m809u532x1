@@ -8,14 +8,19 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import ru.rooyzee.elytrixcasino.automate.AutomateManager;
 import ru.rooyzee.elytrixcasino.automate.AutomateSettings;
+import ru.rooyzee.elytrixcasino.bet.ActiveBetManager;
 import ru.rooyzee.elytrixcasino.command.CasinoCommand;
 import ru.rooyzee.elytrixcasino.config.Messages;
 import ru.rooyzee.elytrixcasino.data.DataManager;
 import ru.rooyzee.elytrixcasino.gui.AutomateGui;
 import ru.rooyzee.elytrixcasino.gui.GuiConfig;
+import ru.rooyzee.elytrixcasino.gui.MenuAnimator;
+import ru.rooyzee.elytrixcasino.gui.MinerGui;
 import ru.rooyzee.elytrixcasino.gui.RouletteGui;
 import ru.rooyzee.elytrixcasino.listener.CasinoListener;
 import ru.rooyzee.elytrixcasino.listener.VirtualInteractionInjector;
+import ru.rooyzee.elytrixcasino.miner.MinerManager;
+import ru.rooyzee.elytrixcasino.miner.MinerSettings;
 import ru.rooyzee.elytrixcasino.restore.CasinoLoader;
 import ru.rooyzee.elytrixcasino.roulette.RouletteManager;
 import ru.rooyzee.elytrixcasino.roulette.RouletteSettings;
@@ -26,16 +31,21 @@ public class Main extends JavaPlugin {
     private static Main instance;
 
     private Economy economy;
+    private ActiveBetManager activeBetManager;
+    private MenuAnimator animator;
     private DataManager dataManager;
     private RouletteManager rouletteManager;
     private AutomateManager automateManager;
+    private MinerManager minerManager;
     private RouletteGui gui;
     private AutomateGui automateGui;
+    private MinerGui minerGui;
     private Messages messages;
     private GuiConfig rouletteGuiConfig;
     private GuiConfig automateGuiConfig;
     private RouletteSettings settings;
     private AutomateSettings automateSettings;
+    private MinerSettings minerSettings;
     private VirtualInteractionInjector interactionInjector;
     private CasinoListener casinoListener;
     private CasinoLoader loader;
@@ -58,18 +68,28 @@ public class Main extends JavaPlugin {
             return;
         }
 
+        activeBetManager = new ActiveBetManager();
+        animator = new MenuAnimator(this);
+
         messages = new Messages(this);
         rouletteGuiConfig = new GuiConfig(this, "roulette.yml");
         automateGuiConfig = new GuiConfig(this, "automate.yml");
         settings = RouletteSettings.load(getConfig(), getLogger());
         automateSettings = AutomateSettings.load(getConfig(), getLogger());
+        minerSettings = new MinerSettings();
+        minerSettings.load(getConfig());
+
         skinValue = settings.getSkinValue();
         skinSignature = settings.getSkinSignature();
+
         dataManager = new DataManager(this);
         rouletteManager = new RouletteManager(this);
         automateManager = new AutomateManager(this);
+        minerManager = new MinerManager(this);
+
         gui = new RouletteGui(this);
         automateGui = new AutomateGui(this);
+        minerGui = new MinerGui(this);
         loader = new CasinoLoader(this);
 
         casinoListener = new CasinoListener(this, gui);
@@ -77,6 +97,7 @@ public class Main extends JavaPlugin {
 
         Bukkit.getPluginManager().registerEvents(gui, this);
         Bukkit.getPluginManager().registerEvents(automateGui, this);
+        Bukkit.getPluginManager().registerEvents(minerGui, this);
         Bukkit.getPluginManager().registerEvents(casinoListener, this);
         Bukkit.getPluginManager().registerEvents(interactionInjector, this);
         Bukkit.getPluginManager().registerEvents(loader, this);
@@ -91,9 +112,6 @@ public class Main extends JavaPlugin {
             getLogger().warning("Команда elytrixcasino не найдена в plugin.yml!");
         }
 
-        // Рулетки и автоматы восстанавливаются не здесь, а на следующем тике (CasinoLoader):
-        // в onEnable миры и чанки могут быть ещё не готовы, из-за чего записи из data.yml
-        // молча пропускались и после рестарта казино «пропадало».
         loader.start();
         loadSkinAsync();
     }
@@ -128,6 +146,12 @@ public class Main extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (animator != null) {
+            animator.stopAll();
+        }
+        if (minerGui != null) {
+            minerGui.shutdown();
+        }
         if (loader != null) {
             loader.shutdown();
         }
@@ -139,6 +163,12 @@ public class Main extends JavaPlugin {
         }
         if (automateManager != null) {
             automateManager.unloadAll();
+        }
+        if (minerManager != null) {
+            minerManager.removeAll();
+        }
+        if (activeBetManager != null) {
+            activeBetManager.clearAll();
         }
         instance = null;
     }
@@ -156,14 +186,22 @@ public class Main extends JavaPlugin {
     }
 
     public void reload() {
+        animator.stopAll();
+        minerGui.shutdown();
         rouletteManager.removeAll();
         automateManager.removeAll();
+        minerManager.removeAll();
+        activeBetManager.clearAll();
+
         reloadConfig();
         messages.reload();
         rouletteGuiConfig.reload();
         automateGuiConfig.reload();
+        minerGui.reload();
+
         settings = RouletteSettings.load(getConfig(), getLogger());
         automateSettings = AutomateSettings.load(getConfig(), getLogger());
+        minerSettings.load(getConfig());
         if (!settings.getSkinValue().isEmpty()) {
             skinValue = settings.getSkinValue();
             skinSignature = settings.getSkinSignature();
@@ -201,6 +239,14 @@ public class Main extends JavaPlugin {
         return economy;
     }
 
+    public ActiveBetManager getActiveBets() {
+        return activeBetManager;
+    }
+
+    public MenuAnimator getAnimator() {
+        return animator;
+    }
+
     public DataManager getDataManager() {
         return dataManager;
     }
@@ -217,12 +263,20 @@ public class Main extends JavaPlugin {
         return automateManager;
     }
 
+    public MinerManager getMinerManager() {
+        return minerManager;
+    }
+
     public RouletteGui getGui() {
         return gui;
     }
 
     public AutomateGui getAutomateGui() {
         return automateGui;
+    }
+
+    public MinerGui getMinerGui() {
+        return minerGui;
     }
 
     public CasinoListener getCasinoListener() {
@@ -235,6 +289,10 @@ public class Main extends JavaPlugin {
 
     public AutomateSettings getAutomateSettings() {
         return automateSettings;
+    }
+
+    public MinerSettings getMinerSettings() {
+        return minerSettings;
     }
 
     public String getSkinValue() {

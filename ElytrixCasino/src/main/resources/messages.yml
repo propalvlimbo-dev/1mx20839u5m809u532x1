@@ -1,37 +1,41 @@
 prefix: "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» "
 no-money:
   - "&cОшибка"
-  - "&#F8BEFB&l┃ &fБаланс: &cнедостаточно монет"
+  - "&#F8BEFB&l┃ &fБаланс: &cнедостаточно монет ⛂"
+already-has-active-bet:
+  - "&cОшибка"
+  - "&#F8BEFB&l┃ &fУ вас уже есть активная ставка: &#F8BEFB%game% &8(&f%amount% ⛂&8)"
+  - "&#F8BEFB&l┃ &7Дождитесь окончания текущей игры"
 bet-too-low:
   - "&cОшибка"
-  - "&#F8BEFB&l┃ &fМинимум: &#F8BEFB%min% &fмонет"
+  - "&#F8BEFB&l┃ &fМинимум: &#F8BEFB%min% ⛂"
 bet-too-high:
   - "&cОшибка"
-  - "&#F8BEFB&l┃ &fМаксимум: &#F8BEFB%max% &fмонет"
+  - "&#F8BEFB&l┃ &fМаксимум: &#F8BEFB%max% ⛂"
 bet-placed:
   - "&aСтавка принята"
-  - "&#F8BEFB&l┃ &fСумма: &#F8BEFB%bet% &fмонет"
+  - "&#F8BEFB&l┃ &fСумма: &#F8BEFB%bet% ⛂"
 win:
   - "&aВыигрыш"
   - "&#F8BEFB&l┃ &fИгрок: &#F8BEFB%player%"
-  - "&#F8BEFB&l┃ &fНаграда: &a%amount% монет"
+  - "&#F8BEFB&l┃ &fНаграда: &a+%amount% ⛂"
   - "&#F8BEFB&l┃ &fМножитель: &#F8BEFBx%mult% &8| &#F8BEFBelytrix.pw"
 lose:
   - "&cПроигрыш"
-  - "&#F8BEFB&l┃ &fСтавка: &#F8BEFB%bet% &fмонет"
+  - "&#F8BEFB&l┃ &fСтавка: &#F8BEFB%bet% ⛂"
   - "&#F8BEFB&l┃ &fРезультат: &c—"
 busy:
   - "&cОшибка"
-  - "&#F8BEFB&l┃ &fСтатус: &cзанято"
+  - "&#F8BEFB&l┃ &fСтатус: &cколесо уже крутится"
 reload:
   - "&aУспешно"
-  - "&#F8BEFB&l┃ &fКонфиг: &aперезагружен"
+  - "&#F8BEFB&l┃ &fКонфигурация казино перезагружена"
 no-perm:
   - "&cОшибка"
   - "&#F8BEFB&l┃ &fДоступ: &cнет прав"
 players-only:
   - "&cОшибка"
-  - "&#F8BEFB&l┃ &fДоступ: &cтолько игрок"
+  - "&#F8BEFB&l┃ &fДоступ: &cтолько для игроков"
 created:
   - "&aУспешно"
   - "&#F8BEFB&l┃ &fОбъект: &#F8BEFB%type%"
@@ -41,8 +45,8 @@ create-failed:
   - "&#F8BEFB&l┃ &fСоздание: &cне удалось"
 automate-bind:
   - "&#F8BEFBАвтомат"
-  - "&#F8BEFB&l┃ &fСтавка: &#F8BEFB%bet% &fмонет"
-  - "&7● &fПКМ по верхнему блоку"
+  - "&#F8BEFB&l┃ &fСтавка: &#F8BEFB%bet% ⛂"
+  - "&7● &fНажмите ПКМ по верхнему блоку автомата"
 automate-bind-failed:
   - "&cОшибка"
   - "&#F8BEFB&l┃ &fНужны два блока: верхний и нижний"
@@ -62,25 +66,42 @@ not-found:
 teleported:
   - "&aУспешно"
   - "&#F8BEFB&l┃ &fТелепорт: &#F8BEFB%id%"
-list-empty: "&7—"
-list-header: "&#F8BEFBКазино &8| &f%count%"
+list-empty: "&7Список пуст."
+list-header: "&#F8BEFBКазино &8| &fВсего: &#F8BEFB%count%"
 list-entry: "&7● &#F8BEFB%type% &8| &#F8BEFB%id% &8| &f%world% %x% %y% %z% &8| &7%state%"
 automate-busy:
   - "&cОшибка"
-  - "&#F8BEFB&l┃ &fАвтомат: &cкрутится"
+  - "&#F8BEFB&l┃ &fАвтомат: &cуже крутится"
 automate-win:
   - "&aВыигрыш"
   - "&#F8BEFB&l┃ &fИгрок: &#F8BEFB%player%"
-  - "&#F8BEFB&l┃ &fНаграда: &a%amount% монет"
+  - "&#F8BEFB&l┃ &fНаграда: &a+%amount% ⛂"
   - "&#F8BEFB&l┃ &fКомбинация: &#F8BEFB%combo% &8| &#F8BEFBelytrix.pw"
 automate-lose:
   - "&cПроигрыш"
-  - "&#F8BEFB&l┃ &fСтавка: &#F8BEFB%bet% &fмонет"
+  - "&#F8BEFB&l┃ &fСтавка: &#F8BEFB%bet% ⛂"
   - "&#F8BEFB&l┃ &fКомбинация: &7—"
+miner-started:
+  - "&#F8BEFBМинёр"
+  - "&#F8BEFB&l┃ &fСтавка: &#F8BEFB%amount% ⛂ &8| &fМин на поле: &c%mines%"
+miner-win:
+  - "&aВыигрыш"
+  - "&#F8BEFB&l┃ &fИгра: &#F8BEFBМинёр"
+  - "&#F8BEFB&l┃ &fЗабрано: &a+%amount% ⛂ &8(ставка %bet% ⛂)"
+miner-exploded:
+  - "&cВзрыв!"
+  - "&#F8BEFB&l┃ &fВы подорвались на мине! Ставка &#F8BEFB%amount% ⛂ &fсгорела"
+miner-paused:
+  - "&#F8BEFBМинёр"
+  - "&#F8BEFB&l┃ &fПартия сохранена — кликните по NPC Минёр, чтобы продолжить"
+miner-nothing-to-take:
+  - "&cОшибка"
+  - "&#F8BEFB&l┃ &fОткройте хотя бы одну клетку с монетами, чтобы забрать выигрыш"
 help:
   - "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBКазино"
   - "&7● &f/ec create roulette"
-  - "&7● &f/ec create automate"
+  - "&7● &f/ec create automate [ставка]"
+  - "&7● &f/ec create miner"
   - "&7● &f/ec remove [id]"
   - "&7● &f/ec list"
   - "&7● &f/ec tp <id>"

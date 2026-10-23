@@ -54,7 +54,7 @@ public final class AutomateSettings {
             parsed.add(new SlotSymbol(String.valueOf(idRaw), icon, ((Number) weightRaw).intValue(), name, pay3, pay4, pay5));
         }
         if (parsed.isEmpty()) {
-            parsed.add(new SlotSymbol("flesh", Material.ROTTEN_FLESH, 34, "&8Гнилая плоть", 1.0, 1.0, 1.0));
+            parsed.add(new SlotSymbol("flesh", Material.ROTTEN_FLESH, 34, "&8Гнилая плоть", 1.2, 1.2, 1.2));
             parsed.add(new SlotSymbol("potato", Material.POISONOUS_POTATO, 16, "&aЯд. картофель", 1.5, 1.5, 1.5));
             parsed.add(new SlotSymbol("eye", Material.SPIDER_EYE, 13, "&cПаучий глаз", 2.0, 2.0, 2.0));
             parsed.add(new SlotSymbol("bread", Material.BREAD, 10, "&6Хлеб", 2.5, 2.5, 2.5));

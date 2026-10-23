@@ -22,12 +22,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 /**
- * Пакетные сущности не существуют на сервере, поэтому при клике по ним клиент шлёт
- * interact-пакет с неизвестным сервером id — и Bukkit не выдаёт никакого события
- * (ни PlayerInteractEvent, ни PlayerInteractEntityEvent).
- * <p>
- * Поэтому мы сами слушаем входящие пакеты через netty-пайплайн игрока.
- * Всё сделано на рефлексии, без NMS-импортов, чтобы работало на 1.16.5+.
+ * Перехват кликов по пакетным NPC (Рулетка, Минёр) через Netty-пайплайн игрока.
+ * Совместим с Spigot 1.16.5+ и Mojang-mapped Paper 1.20.5–1.21.11+.
  */
 public class VirtualInteractionInjector implements Listener {
 
@@ -43,10 +39,6 @@ public class VirtualInteractionInjector implements Listener {
         this.plugin = plugin;
         this.handler = handler;
     }
-
-    /* ------------------------------------------------------------------ */
-    /* Инъекция                                                            */
-    /* ------------------------------------------------------------------ */
 
     public void injectAll() {
         for (Player player : Bukkit.getOnlinePlayers()) {
@@ -91,9 +83,6 @@ public class VirtualInteractionInjector implements Listener {
                     super.channelRead(ctx, msg);
                 }
             };
-            // Встаём сразу после декодера, то есть раньше обработчиков других плагинов
-            // (например, плагинов картинок, рисующих пакетные item frame'ы): некоторые из них
-            // не пропускают interact-пакет дальше по пайплайну, и тогда клик до нас не дойдёт.
             if (channel.pipeline().get("decoder") != null) {
                 channel.pipeline().addAfter("decoder", HANDLER_NAME, listener);
             } else if (channel.pipeline().get("packet_handler") != null) {
@@ -118,17 +107,11 @@ public class VirtualInteractionInjector implements Listener {
                         channel.pipeline().remove(HANDLER_NAME);
                     }
                 } catch (Throwable ignored) {
-                    // канал уже закрыт
                 }
             });
         } catch (Throwable ignored) {
-            // игрок уже отключился
         }
     }
-
-    /* ------------------------------------------------------------------ */
-    /* Разбор пакета                                                       */
-    /* ------------------------------------------------------------------ */
 
     private void handlePacket(Player player, Object packet) throws Exception {
         String name = packet.getClass().getSimpleName();
@@ -140,8 +123,6 @@ public class VirtualInteractionInjector implements Listener {
             return;
         }
         String action = readAction(packet);
-        // На правый клик клиент шлёт INTERACT_AT и INTERACT — берём только INTERACT,
-        // иначе меню откроется дважды.
         if (action == null || action.equals("INTERACT_AT")) {
             return;
         }
@@ -182,7 +163,6 @@ public class VirtualInteractionInjector implements Listener {
                 if (value == null) {
                     continue;
                 }
-                // 1.16.5: поле-энум EnumEntityUseAction
                 if (value instanceof Enum) {
                     String enumName = ((Enum<?>) value).name();
                     if (ACTIONS.contains(enumName)) {
@@ -190,15 +170,24 @@ public class VirtualInteractionInjector implements Listener {
                     }
                     continue;
                 }
-                // 1.17+: объект Action с методом getType(), возвращающим энум
-                String className = value.getClass().getName();
-                if (!className.contains("Interact") && !className.contains("Action")) {
+                // В Paper 1.20.5–1.21.11 (Mojang mappings) Action.getType() — package-private,
+                // поэтому обходим как getMethods(), так и getDeclaredMethods() всей иерархии!
+                String enumAction = extractEnumFromObject(value);
+                if (enumAction != null) {
+                    return enumAction;
+                }
+            }
+        }
+        return null;
+    }
+
+    private String extractEnumFromObject(Object value) {
+        for (Class<?> cls = value.getClass(); cls != null && cls != Object.class; cls = cls.getSuperclass()) {
+            for (Method method : cls.getDeclaredMethods()) {
+                if (method.getParameterCount() != 0 || !Enum.class.isAssignableFrom(method.getReturnType())) {
                     continue;
                 }
-                for (Method method : value.getClass().getMethods()) {
-                    if (method.getParameterCount() != 0 || !Enum.class.isAssignableFrom(method.getReturnType())) {
-                        continue;
-                    }
+                try {
                     method.setAccessible(true);
                     Object result = method.invoke(value);
                     if (result instanceof Enum) {
@@ -207,15 +196,12 @@ public class VirtualInteractionInjector implements Listener {
                             return enumName;
                         }
                     }
+                } catch (Throwable ignored) {
                 }
             }
         }
         return null;
     }
-
-    /* ------------------------------------------------------------------ */
-    /* Поиск канала                                                        */
-    /* ------------------------------------------------------------------ */
 
     private Channel findChannel(Player player) throws Exception {
         Object handle = player.getClass().getMethod("getHandle").invoke(player);

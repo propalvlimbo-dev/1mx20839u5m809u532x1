@@ -12,6 +12,7 @@ import org.bukkit.scheduler.BukkitTask;
 import ru.rooyzee.elytrixcasino.Main;
 import ru.rooyzee.elytrixcasino.automate.Automate;
 import ru.rooyzee.elytrixcasino.data.DataManager;
+import ru.rooyzee.elytrixcasino.miner.Miner;
 import ru.rooyzee.elytrixcasino.roulette.Roulette;
 
 import java.util.ArrayList;
@@ -23,34 +24,18 @@ import java.util.Map;
 import java.util.logging.Level;
 
 /**
- * Восстановление рулеток и автоматов из data.yml после старта/перезагрузки сервера.
- * <p>
- * Почему нельзя грузить прямо в {@code onEnable}:
- * <ul>
- *   <li>миры в этот момент могут быть ещё не подняты (например, их грузит Multiverse,
- *       который включается позже нас) — {@code Bukkit.getWorld()} вернёт {@code null},
- *       и запись просто пропустят до следующего рестарта;</li>
- *   <li>чанки на старте не загружены, а голограммы автоматов — настоящие армор-стенды:
- *       сущность, созданная в невыгруженном чанке, не появится;</li>
- *   <li>любое исключение на одной записи роняло весь цикл загрузки, из-за чего пропадали
- *       сразу и рулетки, и автоматы.</li>
- * </ul>
- * Теперь первый проход отложен на тик после полного старта сервера, каждая запись грузится
- * в своём {@code try/catch}, а всё, для чего мир ещё не готов, ждёт в очереди и поднимается
- * по {@link WorldLoadEvent} либо по таймеру. Записи из data.yml при этом никогда не удаляются.
+ * Восстановление рулеток, автоматов и NPC Минёров из data.yml после старта/перезагрузки сервера.
  */
 public class CasinoLoader implements Listener {
 
-    /** Период повторных попыток, тиков (5 секунд). */
     private static final int RETRY_PERIOD_TICKS = 100;
-    /** Сколько попыток ждём появления мира, прежде чем ругнуться в консоль (~5 минут). */
     private static final int MAX_RETRIES = 60;
-    /** Сколько раз пробуем поднять запись, мир которой уже загружен, прежде чем сдаться. */
     private static final int MAX_ATTEMPTS = 3;
 
     private final Main plugin;
     private final Map<String, DataManager.StoredRoulette> pendingRoulettes = new LinkedHashMap<>();
     private final Map<String, DataManager.StoredAutomate> pendingAutomates = new LinkedHashMap<>();
+    private final Map<String, DataManager.StoredMiner> pendingMiners = new LinkedHashMap<>();
 
     private final Map<String, Integer> attempts = new HashMap<>();
 
@@ -61,67 +46,61 @@ public class CasinoLoader implements Listener {
         this.plugin = plugin;
     }
 
-    /**
-     * Старт восстановления: первый проход — на следующем тике, когда сервер уже поднялся,
-     * все плагины включены, а миры загружены.
-     */
     public void start() {
         Bukkit.getScheduler().runTask(plugin, this::reload);
     }
 
-    /**
-     * Полный перезапуск восстановления (старт сервера или /ec reload).
-     */
     public void reload() {
         cancelRetries();
         pendingRoulettes.clear();
         pendingAutomates.clear();
+        pendingMiners.clear();
         attempts.clear();
         retries = 0;
 
         DataManager data = plugin.getDataManager();
         List<DataManager.StoredRoulette> roulettes = data.readRoulettes();
         List<DataManager.StoredAutomate> automates = data.readAutomates();
+        List<DataManager.StoredMiner> miners = data.readMiners();
         for (DataManager.StoredRoulette stored : roulettes) {
             pendingRoulettes.put(stored.getId(), stored);
         }
         for (DataManager.StoredAutomate stored : automates) {
             pendingAutomates.put(stored.getId(), stored);
         }
+        for (DataManager.StoredMiner stored : miners) {
+            pendingMiners.put(stored.getId(), stored);
+        }
 
         int spawnedRoulettes = spawnPendingRoulettes();
         int spawnedAutomates = spawnPendingAutomates();
+        int spawnedMiners = spawnPendingMiners();
 
-        if (roulettes.isEmpty() && automates.isEmpty()) {
-            plugin.getLogger().info("В data.yml нет сохранённых рулеток и автоматов.");
+        if (roulettes.isEmpty() && automates.isEmpty() && miners.isEmpty()) {
+            plugin.getLogger().info("В data.yml нет сохранённых объектов казино.");
         } else {
             plugin.getLogger().info("Загружено рулеток: " + spawnedRoulettes + "/" + roulettes.size()
-                    + ", автоматов: " + spawnedAutomates + "/" + automates.size());
+                    + ", автоматов: " + spawnedAutomates + "/" + automates.size()
+                    + ", минёров: " + spawnedMiners + "/" + miners.size());
         }
         scheduleRetries();
     }
 
-    /**
-     * Остановить повторы (используется при выключении плагина).
-     */
     public void shutdown() {
         cancelRetries();
         pendingRoulettes.clear();
         pendingAutomates.clear();
+        pendingMiners.clear();
         attempts.clear();
     }
 
     public boolean hasPending() {
-        return !pendingRoulettes.isEmpty() || !pendingAutomates.isEmpty();
+        return !pendingRoulettes.isEmpty() || !pendingAutomates.isEmpty() || !pendingMiners.isEmpty();
     }
 
     public int pendingCount() {
-        return pendingRoulettes.size() + pendingAutomates.size();
+        return pendingRoulettes.size() + pendingAutomates.size() + pendingMiners.size();
     }
-
-    /* ------------------------------------------------------------------ */
-    /* Очередь                                                             */
-    /* ------------------------------------------------------------------ */
 
     private int spawnPendingRoulettes() {
         int spawned = 0;
@@ -132,14 +111,12 @@ public class CasinoLoader implements Listener {
             DataManager.StoredRoulette stored = entry.getValue();
 
             if (isWorldMissing(stored.getNpc()) || isWorldMissing(stored.getWheel())) {
-                // мир ещё не загружен — подождём WorldLoadEvent или следующую попытку
                 continue;
             }
             Location npc = DataManager.deserialize(stored.getNpc());
             Location wheel = DataManager.deserialize(stored.getWheel());
             if (npc == null || wheel == null) {
-                plugin.getLogger().warning("Рулетка '" + id + "' пропущена: битые координаты в data.yml (npc='"
-                        + stored.getNpc() + "', wheel='" + stored.getWheel() + "').");
+                plugin.getLogger().warning("Рулетка '" + id + "' пропущена: битые координаты в data.yml.");
                 iterator.remove();
                 continue;
             }
@@ -149,7 +126,6 @@ public class CasinoLoader implements Listener {
                     attempts.remove(id);
                     spawned++;
                 } else if (!registerFailure(id, "Рулетка")) {
-                    // причину Roulette.spawn() уже написал в лог (например, NPC и колесо в разных мирах)
                     iterator.remove();
                 }
             } catch (Throwable t) {
@@ -175,14 +151,11 @@ public class CasinoLoader implements Listener {
             }
             Location bottom = DataManager.deserialize(stored.getBottom());
             if (bottom == null) {
-                plugin.getLogger().warning("Автомат '" + id + "' пропущен: битые координаты в data.yml (bottom='"
-                        + stored.getBottom() + "').");
+                plugin.getLogger().warning("Автомат '" + id + "' пропущен: битые координаты в data.yml.");
                 iterator.remove();
                 continue;
             }
             try {
-                // Автомат регистрируется сразу, а голограмму он поднимет сам,
-                // как только его чанк загрузится (см. AutomateManager.onChunkLoad).
                 if (plugin.getAutomateManager().spawn(id, bottom, stored.getBet()) != null) {
                     iterator.remove();
                     attempts.remove(id);
@@ -200,11 +173,41 @@ public class CasinoLoader implements Listener {
         return spawned;
     }
 
-    /**
-     * Учитывает неудачную попытку.
-     *
-     * @return true, если запись стоит попробовать ещё раз
-     */
+    private int spawnPendingMiners() {
+        int spawned = 0;
+        Iterator<Map.Entry<String, DataManager.StoredMiner>> iterator = pendingMiners.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, DataManager.StoredMiner> entry = iterator.next();
+            String id = entry.getKey();
+            DataManager.StoredMiner stored = entry.getValue();
+
+            if (isWorldMissing(stored.getNpc())) {
+                continue;
+            }
+            Location npc = DataManager.deserialize(stored.getNpc());
+            if (npc == null) {
+                plugin.getLogger().warning("Минёр '" + id + "' пропущен: битые координаты в data.yml.");
+                iterator.remove();
+                continue;
+            }
+            try {
+                if (plugin.getMinerManager().spawn(id, npc) != null) {
+                    iterator.remove();
+                    attempts.remove(id);
+                    spawned++;
+                } else if (!registerFailure(id, "Минёр")) {
+                    iterator.remove();
+                }
+            } catch (Throwable t) {
+                plugin.getLogger().log(Level.SEVERE, "Не удалось восстановить минёра '" + id + "'", t);
+                if (!registerFailure(id, "Минёр")) {
+                    iterator.remove();
+                }
+            }
+        }
+        return spawned;
+    }
+
     private boolean registerFailure(String id, String what) {
         Integer count = attempts.get(id);
         int total = (count == null ? 0 : count) + 1;
@@ -234,8 +237,11 @@ public class CasinoLoader implements Listener {
     private void retry() {
         int spawnedRoulettes = spawnPendingRoulettes();
         int spawnedAutomates = spawnPendingAutomates();
-        if (spawnedRoulettes > 0 || spawnedAutomates > 0) {
-            plugin.getLogger().info("Догружено рулеток: " + spawnedRoulettes + ", автоматов: " + spawnedAutomates);
+        int spawnedMiners = spawnPendingMiners();
+        if (spawnedRoulettes > 0 || spawnedAutomates > 0 || spawnedMiners > 0) {
+            plugin.getLogger().info("Догружено рулеток: " + spawnedRoulettes
+                    + ", автоматов: " + spawnedAutomates
+                    + ", минёров: " + spawnedMiners);
         }
         if (!hasPending()) {
             cancelRetries();
@@ -257,13 +263,15 @@ public class CasinoLoader implements Listener {
     private void reportStuck() {
         for (DataManager.StoredRoulette stored : pendingRoulettes.values()) {
             plugin.getLogger().warning("Рулетка '" + stored.getId() + "' не восстановлена: мир '"
-                    + worldOf(stored.getNpc(), stored.getWheel()) + "' не загружен. Запись осталась в data.yml,"
-                    + " подниму её, как только мир загрузится.");
+                    + worldOf(stored.getNpc(), stored.getWheel()) + "' не загружен.");
         }
         for (DataManager.StoredAutomate stored : pendingAutomates.values()) {
             plugin.getLogger().warning("Автомат '" + stored.getId() + "' не восстановлен: мир '"
-                    + DataManager.worldName(stored.getBottom()) + "' не загружен. Запись осталась в data.yml,"
-                    + " подниму её, как только мир загрузится.");
+                    + DataManager.worldName(stored.getBottom()) + "' не загружен.");
+        }
+        for (DataManager.StoredMiner stored : pendingMiners.values()) {
+            plugin.getLogger().warning("Минёр '" + stored.getId() + "' не восстановлен: мир '"
+                    + DataManager.worldName(stored.getNpc()) + "' не загружен.");
         }
     }
 
@@ -272,13 +280,6 @@ public class CasinoLoader implements Listener {
         return name != null ? name : String.valueOf(DataManager.worldName(second));
     }
 
-    /* ------------------------------------------------------------------ */
-    /* Миры                                                                */
-    /* ------------------------------------------------------------------ */
-
-    /**
-     * Мир доехал (Multiverse и прочие загрузчики) — пробуем поднять то, что его ждало.
-     */
     @EventHandler(priority = EventPriority.MONITOR)
     public void onWorldLoad(WorldLoadEvent event) {
         if (!hasPending() || !plugin.isEnabled()) {
@@ -288,16 +289,16 @@ public class CasinoLoader implements Listener {
         if (!waitsFor(name)) {
             return;
         }
-        // не спавним прямо внутри события: даём миру и чанкам окончательно подняться
         Bukkit.getScheduler().runTask(plugin, () -> {
             if (!plugin.isEnabled()) {
                 return;
             }
             int spawnedRoulettes = spawnPendingRoulettes();
             int spawnedAutomates = spawnPendingAutomates();
-            if (spawnedRoulettes > 0 || spawnedAutomates > 0) {
+            int spawnedMiners = spawnPendingMiners();
+            if (spawnedRoulettes > 0 || spawnedAutomates > 0 || spawnedMiners > 0) {
                 plugin.getLogger().info("Мир '" + name + "' загружен — восстановлено рулеток: "
-                        + spawnedRoulettes + ", автоматов: " + spawnedAutomates);
+                        + spawnedRoulettes + ", автоматов: " + spawnedAutomates + ", минёров: " + spawnedMiners);
             }
         });
     }
@@ -314,13 +315,14 @@ public class CasinoLoader implements Listener {
                 return true;
             }
         }
+        for (DataManager.StoredMiner stored : pendingMiners.values()) {
+            if (worldName.equals(DataManager.worldName(stored.getNpc()))) {
+                return true;
+            }
+        }
         return false;
     }
 
-    /**
-     * Мир выгрузили — снимаем сущности и возвращаем их в очередь,
-     * чтобы при повторной загрузке мира всё встало на место.
-     */
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onWorldUnload(WorldUnloadEvent event) {
         World world = event.getWorld();
@@ -345,6 +347,16 @@ public class CasinoLoader implements Listener {
             pendingAutomates.put(id, new DataManager.StoredAutomate(id,
                     DataManager.serialize(bottom), automate.getBet()));
             plugin.getAutomateManager().unload(id);
+        }
+        List<Miner> miners = new ArrayList<>(plugin.getMinerManager().getAll());
+        for (Miner miner : miners) {
+            Location loc = miner.getLocation();
+            if (loc.getWorld() == null || !loc.getWorld().equals(world)) {
+                continue;
+            }
+            String id = miner.getId();
+            pendingMiners.put(id, new DataManager.StoredMiner(id, DataManager.serialize(loc)));
+            plugin.getMinerManager().unload(id);
         }
         scheduleRetries();
     }

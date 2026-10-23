@@ -1,69 +1,50 @@
-# Основной конфиг ElytrixCasino.
-# Сообщения лежат в messages.yml, меню — в папке GUI/.
-
 roulette:
-  # Ставки
   min-bet: 100
   max-bet: 100000
-
-  # Анимация
-  spin-duration-ticks: 200   # длительность прокрутки колеса
-  spin-turns: 5              # желаемое число оборотов (урежется, если не влезает в max-spin-speed)
-  max-spin-speed: 0.2        # максимальная скорость колеса, рад/тик.
-                             # Выше ~0.25 клиент начинает срезать дугу и колесо "стягивает" к центру
-  first-stage-speed: 0.45    # скорость после первого удара (доля от полной)
-  second-swing-tick: 14      # на каком тике NPC бьёт второй раз и колесо выходит на полную скорость
-  walk-ticks: 20             # за сколько тиков NPC доходит до колеса
-  npc-spin-distance: 1.5     # на каком расстоянии от колеса стоит NPC во время игры
-  npc-side-offset: -0.9      # смещение NPC вбок (минус - левее со стороны игрока), чтобы он "крутил" колесо
-  npc-look-side-offset: -0.9 # куда смотрит NPC во время раскрутки: смещение точки взгляда вбок (минус - левее)
-  npc-look-height-offset: -0.3 # и по высоте (минус - ниже). После второго удара NPC смотрит на указатель
-  turn-ticks: 30             # максимум тиков на разворот на месте перед ходьбой обратно
-  look-turn-speed: 6         # плавность поворота головы, градусов за тик (меньше - плавнее)
-  walk-turn-speed: 16        # скорость разворота корпуса при ходьбе, градусов за тик
-  view-radius: 48            # радиус, в котором игроки видят пакетные сущности
-  look-radius: 10            # радиус, в котором NPC смотрит на ближайшего игрока (0 - выключить)
+  spin-duration-ticks: 200
+  spin-turns: 5
+  max-spin-speed: 0.2
+  first-stage-speed: 0.45
+  second-swing-tick: 14
+  walk-ticks: 20
+  npc-spin-distance: 1.5
+  npc-side-offset: -0.9
+  npc-look-side-offset: -0.9
+  npc-look-height-offset: -0.3
+  turn-ticks: 30
+  look-turn-speed: 6
+  walk-turn-speed: 16
+  view-radius: 48
+  look-radius: 10
   spin-sound: true
-
-  # NPC-крупье — это пакетный игрок (не житель)
   npc:
-    name: "&#F8BEFBРулетка"  # надпись над NPC (голограмма, hex можно). Ник профиля всегда без цвета и ≤16, иначе кик клиента
-    hide-from-tab: true      # прятать NPC из списка игроков (Tab)
-    hand-item: ""            # предмет в руке, например GOLD_INGOT
+    name: "&#F8BEFB&lРулетка"
+    hide-from-tab: true
+    hand-item: ""
     skin:
-      player: ""             # взять скин с этого ника (подгружается с Mojang в фоне)
-      value: ""              # либо готовые текстуры: base64 value
-      signature: ""          # и signature
-
+      player: ""
+      value: ""
+      signature: ""
   wheel:
-    distance: 3.5            # на сколько блоков колесо стоит перед жителем
-    height: 2.0              # высота центра колеса относительно жителя
-    radius: 1.5              # радиус колеса
-    slots: 12                # количество ячеек колеса (кратно числу секторов)
-    item-y-offset: -0.7      # компенсация высоты головы армор-стенда
-    radius-compensation: true # компенсировать сглаживание клиента, чтобы колесо не сужалось на скорости
+    distance: 3.5
+    height: 2.0
+    radius: 1.5
+    slots: 12
+    item-y-offset: -0.7
+    radius-compensation: true
     pointer:
-      item: GOLDEN_SWORD     # предмет-указатель сверху колеса
-      height: 1.35           # насколько указатель поднят над верхним краем колеса
-      # Из-за поворота головы спрайт меча уезжает вбок от центра ячейки.
-      # Минус — сдвинуть влево, плюс — вправо (со стороны игрока).
+      item: GOLDEN_SWORD
+      height: 1.35
       side-offset: -0.38
-      # Спрайт меча нарисован по диагонали, поэтому его доворачивают по оси Z.
       pose: [0.0, 0.0, 135.0]
-    show-labels: true        # показывать подписи x2/x3/... над ячейками
-
-  # Сектора. weight - относительный шанс, multiplier - во сколько раз умножается ставка
-  # (0 = проигрыш). Сумма weight может быть любой.
+    show-labels: true
   sectors:
-    - { multiplier: 0, weight: 5, color: "&c", material: RED_WOOL }
-    - { multiplier: 2, weight: 4, color: "&a", material: LIME_WOOL }
-    - { multiplier: 3, weight: 2, color: "&b", material: LIGHT_BLUE_WOOL }
-    - { multiplier: 5, weight: 1, color: "&#F8BEFB", material: GOLD_BLOCK }
-
-  # Эффект при крупном выигрыше: из победной ячейки сыплются предметы.
-  # Это пакетные сущности — их нельзя подобрать.
+    - { multiplier: 0, weight: 71, color: "&c", material: RED_WOOL }
+    - { multiplier: 2, weight: 19, color: "&a", material: LIME_WOOL }
+    - { multiplier: 3, weight: 7, color: "&b", material: LIGHT_BLUE_WOOL }
+    - { multiplier: 5, weight: 3, color: "&#F8BEFB", material: GOLD_BLOCK }
   jackpot:
-    multiplier: 5            # с какого множителя играть эффект
+    multiplier: 5
     item: GOLD_NUGGET
     count: 14
     ticks: 50
@@ -72,11 +53,11 @@ automate:
   bet: 1000
   spin-ticks: 48
   reel-stop-delay: 7
-  max-multiplier: 15          # потолок выплаты за спин (x15). Казино в плюсе: RTP ~78%
+  max-multiplier: 15
   bottom-block: PINK_CONCRETE
   top-block: PINK_STAINED_GLASS
   symbols:
-    - { id: flesh, material: ROTTEN_FLESH, weight: 34, name: "&8Гнилая плоть", pay3: 1.0, pay4: 1.0, pay5: 1.0 }
+    - { id: flesh, material: ROTTEN_FLESH, weight: 34, name: "&8Гнилая плоть", pay3: 1.2, pay4: 1.2, pay5: 1.2 }
     - { id: potato, material: POISONOUS_POTATO, weight: 16, name: "&aЯд. картофель", pay3: 1.5, pay4: 1.5, pay5: 1.5 }
     - { id: eye, material: SPIDER_EYE, weight: 13, name: "&cПаучий глаз", pay3: 2.0, pay4: 2.0, pay5: 2.0 }
     - { id: bread, material: BREAD, weight: 10, name: "&6Хлеб", pay3: 2.5, pay4: 2.5, pay5: 2.5 }
@@ -86,3 +67,25 @@ automate:
     - { id: gapple, material: GOLDEN_APPLE, weight: 4, name: "&eЗол. яблоко", pay3: 8.0, pay4: 8.0, pay5: 8.0 }
     - { id: pie, material: PUMPKIN_PIE, weight: 3, name: "&6Пирог", pay3: 10.0, pay4: 10.0, pay5: 10.0 }
     - { id: cake, material: CAKE, weight: 1, name: "&#F8BEFBТорт", pay3: 15.0, pay4: 15.0, pay5: 15.0 }
+
+miner:
+  skin: "SignalSMPLover"
+  skin-value: "ewogICJ0aW1lc3RhbXAiIDogMTc5Mjc2NTI4NDMyOCwKICAicHJvZmlsZUlkIiA6ICI3ZmJlNDY4NWJiNTA0NGRiYmU3Mjc1MzIxNjViNDc2YiIsCiAgInByb2ZpbGVOYW1lIiA6ICJTaWduYWxTTVBMb3ZlciIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS8xNWJmZjUzMjBiYzRlMmRmYjg5MDQ3ZDZkOTAzNzdjYTExMTk3YWI5MzcyOGIyM2Q3NzkyZmMzZjMxNWUwODZiIgogICAgfQogIH0KfQ=="
+  skin-signature: "kHdXL1UlyXd+cY1QwSYevTiR7oeI6H4r3EIr7S05k/XaQUWoiVHLE2/VfY8/Tl7I2mNxklZkwtb2zSG1MiQE3zezqokwSzSKl2n/hSHaR/U0xBwq+8rutDi2XotFKZyk9f8KueSCgug5yZBoKTwvbRLo1s5arxZt71pv0JuNEh4lG83qgmgwzLuBupR6VkxkUNQ90YxG4v5t1wOyHa7spYKBLBVdfvsPM0wTU4GRvVv38EPvsjcTWGbY8+TBC9GOXu3xwxxVzod7RHyLiPXfuZcvK36UARGE1PEI48G5vXpOFZZoiwCac2iz7lri02XpcrhkSlobLjy6ka59+agr8m4YMSMZ8Ar9Y8lReJzon8GKRgnWqn9PNJfBY4skbmOFohKcgACwz/m+TrgwlpdlOjWLUToejDHmDLokSGoWt5thCFIUA6tL3QJ7W3HPxFUi1jQprHRQjkuHBfCuo+kcglOAElzrtW/xjAqviaZoaQHTGLNDQ7klCshzKCQ5yiHO3isbDFwc3d+hv7oZ3ZBPrIiYm1ZyfoSwT1tFkIphh4GjX7QsmSh0fQcpa0peb4dJcDX/dHPFkK79IE1ZIJ+v2SbyOAVknTgNlhx+wo7dNT2Jp2jaxPTkzvnXMYmFgBlHUyKokLo0bIpbBdkAJIpzSLWQ87yjG5+Gt1FuVPH8QQM="
+  view-distance: 48
+  throw-interval-ticks: 60
+  turn-angle: 28.0
+  ground-lifetime-ticks: 36
+  hologram:
+    height: 2.08
+    line-gap: 0.27
+    lines:
+      - "&#F8BEFB&lМинёр"
+      - "&7Нажмите, чтобы играть"
+  field:
+    mines: 16
+    coin-tiers:
+      - { icon: SUNFLOWER, name: "&#FFE066&lГорсть монет", multiplier: 0.80, count: 6 }
+      - { icon: GOLD_INGOT, name: "&#FFB84D&lЗолотой слиток", multiplier: 1.15, count: 5 }
+      - { icon: EMERALD, name: "&#55FF99&lИзумруд удачи", multiplier: 1.70, count: 3 }
+      - { icon: DIAMOND, name: "&#66E0FF&lАлмазный куш", multiplier: 2.60, count: 2 }
