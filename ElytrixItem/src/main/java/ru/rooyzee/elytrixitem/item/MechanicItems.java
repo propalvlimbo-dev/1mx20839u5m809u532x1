@@ -38,8 +38,8 @@ public final class MechanicItems {
                 .stat(Attribute.ARMOR, 1.0D, "к броне")
                 .stat(Attribute.MAX_HEALTH, 2.0D, "к здоровью")
                 .drawback(PotionEffectType.POISON, 1, 80, 0.05D, "отравления")
+                .awaken(PotionEffectType.STRENGTH, 1, "Сила")
                 .awaken(PotionEffectType.SPEED, 1, "Скорость")
-                .awaken(PotionEffectType.RESISTANCE, 1, "Сопротивление")
                 .awaken(PotionEffectType.FIRE_RESISTANCE, 1, "Огнестойкость"));
 
         registry.register(new RuneItem(plugin, "shar3", "Шар Солнца",
@@ -47,8 +47,8 @@ public final class MechanicItems {
                 .stat(Attribute.ATTACK_DAMAGE, 4.0D, "к урону")
                 .stat(Attribute.ARMOR, -2.0D, "к броне")
                 .percent(Attribute.MOVEMENT_SPEED, -0.30D, "скорости")
+                .awaken(PotionEffectType.STRENGTH, 1, "Сила")
                 .awaken(PotionEffectType.SPEED, 2, "Скорость")
-                .awaken(PotionEffectType.RESISTANCE, 1, "Сопротивление")
                 .awaken(PotionEffectType.FIRE_RESISTANCE, 1, "Огнестойкость"));
 
         registry.register(new RuneItem(plugin, "shar4", "Шар Шалкера",
@@ -57,8 +57,8 @@ public final class MechanicItems {
                 .stat(Attribute.ARMOR, 3.0D, "к броне")
                 .stat(Attribute.MAX_HEALTH, 2.0D, "к здоровью")
                 .drawback(OffhandBonusItem.Drawback.fire(40, 0.10D))
+                .awaken(PotionEffectType.STRENGTH, 2, "Сила")
                 .awaken(PotionEffectType.SPEED, 2, "Скорость")
-                .awaken(PotionEffectType.RESISTANCE, 2, "Сопротивление")
                 .awaken(PotionEffectType.FIRE_RESISTANCE, 1, "Огнестойкость"));
 
         registry.register(new RuneItem(plugin, "donshar", "Шар Повелителя",
