@@ -36,12 +36,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Меню ставок и игровое поле «Минёра»:
- * - 6 ставок: 100, 500, 1000, 5000, 10000, 15000 (с фирменной анимацией BMenu ElytriX),
- * - поле 45 серых стёкол (слоты 0..44): пустые клетки, клетки с монетами от ставки и много мин.
+ * - открытие меню ставок 1:1 с покадровой анимацией /menu (BMenu ElytriX),
+ * - поле 45 серых стёкол (слоты 0..44): пустые клетки, клетки с аккуратными множителями и мины,
+ * - кнопка «СЫГРАТЬ ЕЩЁ РАЗ» (слот 49) сразу запускает новую партию на ту же ставку,
+ *   а кнопка в слоте 47 позволяет сменить номинал ставки.
  */
 public final class MinerGui implements Listener {
 
     private static final int CLOSE_SLOT = 45;
+    private static final int CHANGE_BET_SLOT = 47;
     private static final int ACTION_SLOT = 49;
     private static final int INFO_SLOT = 53;
 
@@ -81,14 +84,8 @@ public final class MinerGui implements Listener {
         holder.setInventory(inv);
 
         ItemStack closeButton = buildCloseButton();
+        ItemStack bottomInfo = config.getBoolean("info.enabled", true) ? buildMenuInfoItem() : null;
         Map<Integer, ItemStack> buttons = new LinkedHashMap<>();
-
-        if (config.getBoolean("info.enabled", true)) {
-            int infoSlot = config.getInt("info.slot", 13);
-            if (infoSlot >= 0 && infoSlot < size) {
-                buttons.put(infoSlot, buildMenuInfoItem());
-            }
-        }
 
         ConfigurationSection betsSection = config.raw().getConfigurationSection("bets");
         if (betsSection != null) {
@@ -114,7 +111,7 @@ public final class MinerGui implements Listener {
             }
         }
 
-        plugin.getAnimator().openStandardMenu(player, inv, closeButton, buttons);
+        plugin.getAnimator().openStandardMenu(player, inv, closeButton, bottomInfo, buttons);
     }
 
     private void startNewGame(Player player, String minerId, long bet) {
@@ -259,6 +256,9 @@ public final class MinerGui implements Listener {
             if (slot == CLOSE_SLOT) {
                 player.closeInventory();
             } else if (slot == ACTION_SLOT) {
+                // Сразу запускаем новую партию на ту же самую ставку!
+                startNewGame(player, session.getMinerId(), session.getBet());
+            } else if (slot == CHANGE_BET_SLOT) {
                 openBetMenu(player, session.getMinerId());
             }
             return;
@@ -366,15 +366,27 @@ public final class MinerGui implements Listener {
 
     private void refreshFinishedControls(Inventory inv, MinerSession session, boolean won, long payout) {
         inv.setItem(CLOSE_SLOT, buildCloseButton());
+
+        List<String> changeBetLore = new ArrayList<>();
+        changeBetLore.add("&#F8BEFB&l┃ &fТекущая ставка: &#F8BEFB" + Text.formatMoney(session.getBet()) + " ⛂");
+        changeBetLore.add("");
+        changeBetLore.add("&7● &fНажмите, чтобы выбрать другую ставку");
+        inv.setItem(CHANGE_BET_SLOT, buildItem(
+                Material.GOLD_INGOT,
+                "&7« &#F8BEFBСменить ставку &7»",
+                changeBetLore,
+                false
+        ));
+
         List<String> lore = new ArrayList<>();
         if (won) {
             lore.add("&#F8BEFB&l┃ &fВы забрали: &#55FF99+" + Text.formatMoney(payout) + " ⛂");
         } else {
             lore.add("&#F8BEFB&l┃ &fВы наткнулись на мину!");
         }
-        lore.add("&#F8BEFB&l┃ &fСтавка была: &#F8BEFB" + Text.formatMoney(session.getBet()) + " ⛂");
+        lore.add("&#F8BEFB&l┃ &fСтавка: &#F8BEFB" + Text.formatMoney(session.getBet()) + " ⛂");
         lore.add("");
-        lore.add("&#F8BEFB▶ &fНажмите, чтобы сыграть снова");
+        lore.add("&7● &fНажмите — сразу новая игра (&#F8BEFB" + Text.formatMoney(session.getBet()) + " ⛂&f)");
         inv.setItem(ACTION_SLOT, buildItem(
                 won ? Material.EMERALD : Material.TNT,
                 "&#F8BEFB&lСЫГРАТЬ ЕЩЁ РАЗ",
@@ -439,7 +451,7 @@ public final class MinerGui implements Listener {
             lore.add("&#F8BEFB&l┃ &e• Монеты &7(от ставки)");
             lore.add("&#F8BEFB&l┃ &c• Мина &7(сжигает банк)");
             lore.add("");
-            lore.add("&#F8BEFB▶ &fНажмите, чтобы открыть");
+            lore.add("&7● &fНажмите, чтобы открыть");
         }
         return buildItem(Material.GRAY_STAINED_GLASS_PANE, name, lore, false);
     }
@@ -520,11 +532,6 @@ public final class MinerGui implements Listener {
         }
     }
 
-    /**
-     * При выходе игрока с сервера:
-     * если он уже нашёл монеты — выплачиваем их; иначе сессия закрывается без дюпа возврата ставки,
-     * а глобальный лок ставки освобождается.
-     */
     public void handleQuit(Player player) {
         UUID uuid = player.getUniqueId();
         plugin.getAnimator().stop(uuid);
@@ -538,10 +545,6 @@ public final class MinerGui implements Listener {
         }
     }
 
-    /**
-     * При остановке плагина / перезагрузке возвращаем честный максимум (ставка или найденный куш)
-     * всем игрокам с незавершёнными сессиями и снимаем локи.
-     */
     public void shutdown() {
         Economy economy = plugin.getEconomy();
         for (Map.Entry<UUID, MinerSession> entry : sessions.entrySet()) {

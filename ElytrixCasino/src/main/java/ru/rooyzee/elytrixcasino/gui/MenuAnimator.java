@@ -16,46 +16,82 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.IntConsumer;
 
 /**
- * Покадровая анимация открытия меню казино в фирменном стиле BMenu ElytriX.
+ * Точная покадровая анимация 1:1 как в /menu (BMenu/menu/elytrix/main/menu.yml):
+ *  - тик 0: close (45), info (49), фиолетовые 46, 47 + enchantment_table.use (0.3, 1.5);
+ *  - тики 1..6: последовательная волна фиолетового стекла снизу с note_block.chime на тиках 1, 3, 5;
+ *  - тики 7..14: последовательная волна чёрного стекла сверху с note_block.chime на тиках 7, 9, 11, 13;
+ *  - тики 15+: по 1 кнопке за тик с note_block.pling (0.26..0.34, pitch 1.00..1.42) + финал amethyst_block.chime (0.45, 1.4).
  */
 public final class MenuAnimator {
 
-    private static final int[][] PURPLE_STEPS = {
+    private static final int[][] PURPLE_FRAMES = {
             {48, 50},
             {51, 52},
             {53, 36},
             {37, 43},
             {44, 27},
-            {35, 49}
+            {35}
     };
 
-    private static final int[][] BLACK_STEPS = {
+    private static final float[][] PURPLE_CHIMES = {
+            {0.20F, 0.85F},
+            null,
+            {0.22F, 0.91F},
+            null,
+            {0.23F, 0.98F},
+            null
+    };
+
+    private static final int[][] BLACK_FRAMES = {
             {18, 9},
             {10, 0},
             {1, 2},
             {3, 4},
             {5, 6},
-            {7, 8, 16, 17, 26}
+            {7, 8},
+            {16, 17},
+            {26}
     };
 
-    private static final int[][] AUTOMATE_PURPLE_STEPS = {
-            {46, 52},
-            {47, 51},
+    private static final float[][] BLACK_CHIMES = {
+            {0.25F, 1.05F},
+            null,
+            {0.27F, 1.13F},
+            null,
+            {0.28F, 1.21F},
+            null,
+            {0.30F, 1.30F},
+            null
+    };
+
+    private static final int[][] AUTOMATE_PURPLE_FRAMES = {
             {48, 50},
-            {36, 44},
-            {37, 43},
-            {27, 28, 34, 35}
+            {51, 52},
+            {36, 37},
+            {43, 44},
+            {27, 28},
+            {34, 35}
     };
 
-    private static final int[][] AUTOMATE_BLACK_STEPS = {
-            {18, 26},
-            {19, 25},
-            {9, 17},
-            {10, 16},
-            {0, 8},
-            {1, 7}
+    private static final int[][] AUTOMATE_BLACK_FRAMES = {
+            {18, 19},
+            {9, 10},
+            {0, 1},
+            {7, 8},
+            {16, 17},
+            {25, 26}
+    };
+
+    private static final float[][] AUTOMATE_BLACK_CHIMES = {
+            {0.25F, 1.05F},
+            null,
+            {0.27F, 1.16F},
+            null,
+            {0.30F, 1.30F},
+            null
     };
 
     private final Main plugin;
@@ -87,24 +123,32 @@ public final class MenuAnimator {
     public void openStandardMenu(Player player,
                                  Inventory inv,
                                  ItemStack closeButton,
+                                 ItemStack bottomInfoItem,
                                  Map<Integer, ItemStack> actionButtons) {
         UUID uuid = player.getUniqueId();
         stop(uuid);
 
         ItemStack purple = GuiGuard.pane(plugin, Material.PURPLE_STAINED_GLASS_PANE);
         ItemStack black = GuiGuard.pane(plugin, Material.BLACK_STAINED_GLASS_PANE);
-        Map<Integer, ItemStack> orderedButtons = new LinkedHashMap<>(actionButtons);
-        List<Map.Entry<Integer, ItemStack>> buttonList = new ArrayList<>(orderedButtons.entrySet());
+
+        Map<Integer, ItemStack> reserved = new LinkedHashMap<>(actionButtons);
+        List<Map.Entry<Integer, ItemStack>> buttonList = new ArrayList<>(actionButtons.entrySet());
 
         if (closeButton != null && 45 < inv.getSize()) {
             inv.setItem(45, closeButton);
         }
-        placeFrameSlots(inv, new int[]{46, 47}, purple, orderedButtons);
+        if (bottomInfoItem != null && 49 < inv.getSize()) {
+            inv.setItem(49, bottomInfoItem);
+            reserved.put(49, bottomInfoItem);
+        }
+        placeFrameSlots(inv, new int[]{46, 47}, purple, reserved);
 
         player.openInventory(inv);
         playSound(player, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.30F, 1.50F);
 
-        final int totalFrameSteps = PURPLE_STEPS.length;
+        final int purpleCount = PURPLE_FRAMES.length;
+        final int blackCount = BLACK_FRAMES.length;
+        final int totalFrameSteps = purpleCount + blackCount;
         final int[] tick = {0};
 
         BukkitTask task = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
@@ -113,13 +157,21 @@ public final class MenuAnimator {
                 return;
             }
             int step = tick[0]++;
+            if (step < purpleCount) {
+                placeFrameSlots(inv, PURPLE_FRAMES[step], purple, reserved);
+                float[] sound = PURPLE_CHIMES[step];
+                if (sound != null) {
+                    playSound(player, Sound.BLOCK_NOTE_BLOCK_CHIME, sound[0], sound[1]);
+                }
+                return;
+            }
             if (step < totalFrameSteps) {
-                placeFrameSlots(inv, PURPLE_STEPS[step], purple, orderedButtons);
-                placeFrameSlots(inv, BLACK_STEPS[step], black, orderedButtons);
-                float progress = (float) step / (float) Math.max(1, totalFrameSteps - 1);
-                playSound(player, Sound.BLOCK_NOTE_BLOCK_CHIME,
-                        0.22F + 0.08F * progress,
-                        0.85F + 0.45F * progress);
+                int bIndex = step - purpleCount;
+                placeFrameSlots(inv, BLACK_FRAMES[bIndex], black, reserved);
+                float[] sound = BLACK_CHIMES[bIndex];
+                if (sound != null) {
+                    playSound(player, Sound.BLOCK_NOTE_BLOCK_CHIME, sound[0], sound[1]);
+                }
                 return;
             }
 
@@ -134,8 +186,12 @@ public final class MenuAnimator {
                         ? 1.0F
                         : (float) btnIndex / (float) (buttonList.size() - 1);
                 playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING,
-                        0.28F + 0.06F * progress,
-                        1.00F + 0.50F * progress);
+                        0.26F + 0.08F * progress,
+                        1.00F + 0.42F * progress);
+                if (btnIndex == buttonList.size() - 1) {
+                    playSound(player, Sound.BLOCK_AMETHYST_BLOCK_CHIME, 0.45F, 1.40F);
+                    stop(uuid);
+                }
                 return;
             }
 
@@ -150,52 +206,77 @@ public final class MenuAnimator {
                                  Inventory inv,
                                  ItemStack closeButton,
                                  Map<Integer, ItemStack> controls,
-                                 Runnable paintInitialReelGrid) {
+                                 IntConsumer paintReelRow) {
         UUID uuid = player.getUniqueId();
         stop(uuid);
 
         ItemStack purple = GuiGuard.pane(plugin, Material.PURPLE_STAINED_GLASS_PANE);
         ItemStack black = GuiGuard.pane(plugin, Material.BLACK_STAINED_GLASS_PANE);
-        Map<Integer, ItemStack> orderedButtons = new LinkedHashMap<>(controls);
-        List<Map.Entry<Integer, ItemStack>> buttonList = new ArrayList<>(orderedButtons.entrySet());
+        Map<Integer, ItemStack> reserved = new LinkedHashMap<>(controls);
 
         if (closeButton != null && 45 < inv.getSize()) {
             inv.setItem(45, closeButton);
         }
-        if (paintInitialReelGrid != null) {
-            paintInitialReelGrid.run();
+        ItemStack playBtn = controls.get(49);
+        if (playBtn != null) {
+            inv.setItem(49, playBtn);
         }
+        ItemStack paytableBtn = controls.get(53);
+        if (paytableBtn != null) {
+            inv.setItem(53, paytableBtn);
+        }
+        placeFrameSlots(inv, new int[]{46, 47}, purple, reserved);
 
         player.openInventory(inv);
         playSound(player, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.30F, 1.50F);
 
-        final int totalFrameSteps = AUTOMATE_PURPLE_STEPS.length;
+        final int purpleCount = AUTOMATE_PURPLE_FRAMES.length;
+        final int blackCount = AUTOMATE_BLACK_FRAMES.length;
+        final int totalFrameSteps = purpleCount + blackCount;
         final int[] tick = {0};
 
         BukkitTask task = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             if (!isStillViewing(player, inv)) {
+                if (paintReelRow != null) {
+                    for (int r = 0; r < 5; r++) {
+                        paintReelRow.accept(r);
+                    }
+                }
                 stop(uuid);
                 return;
             }
             int step = tick[0]++;
+            if (step < purpleCount) {
+                placeFrameSlots(inv, AUTOMATE_PURPLE_FRAMES[step], purple, reserved);
+                float[] sound = PURPLE_CHIMES[step];
+                if (sound != null) {
+                    playSound(player, Sound.BLOCK_NOTE_BLOCK_CHIME, sound[0], sound[1]);
+                }
+                return;
+            }
             if (step < totalFrameSteps) {
-                placeFrameSlots(inv, AUTOMATE_PURPLE_STEPS[step], purple, orderedButtons);
-                placeFrameSlots(inv, AUTOMATE_BLACK_STEPS[step], black, orderedButtons);
-                float progress = (float) step / (float) Math.max(1, totalFrameSteps - 1);
-                playSound(player, Sound.BLOCK_NOTE_BLOCK_CHIME,
-                        0.22F + 0.08F * progress,
-                        0.88F + 0.42F * progress);
+                int bIndex = step - purpleCount;
+                placeFrameSlots(inv, AUTOMATE_BLACK_FRAMES[bIndex], black, reserved);
+                float[] sound = AUTOMATE_BLACK_CHIMES[bIndex];
+                if (sound != null) {
+                    playSound(player, Sound.BLOCK_NOTE_BLOCK_CHIME, sound[0], sound[1]);
+                }
                 return;
             }
 
-            int btnIndex = step - totalFrameSteps;
-            if (btnIndex < buttonList.size()) {
-                Map.Entry<Integer, ItemStack> entry = buttonList.get(btnIndex);
-                int slot = entry.getKey();
-                if (slot >= 0 && slot < inv.getSize()) {
-                    inv.setItem(slot, entry.getValue());
+            int reelRow = step - totalFrameSteps;
+            if (reelRow < 5) {
+                if (paintReelRow != null) {
+                    paintReelRow.accept(reelRow);
                 }
-                playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING, 0.30F, 1.25F + 0.20F * btnIndex);
+                float progress = (float) reelRow / 4.0F;
+                playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING,
+                        0.26F + 0.08F * progress,
+                        1.00F + 0.42F * progress);
+                if (reelRow == 4) {
+                    playSound(player, Sound.BLOCK_AMETHYST_BLOCK_CHIME, 0.45F, 1.40F);
+                    stop(uuid);
+                }
                 return;
             }
 
@@ -254,7 +335,13 @@ public final class MenuAnimator {
                         inv.setItem(slot, hiddenCellTemplate.clone());
                     }
                 }
-                playSound(player, Sound.BLOCK_NOTE_BLOCK_CHIME, 0.25F, 0.90F + 0.12F * r);
+                if (r % 2 == 1) {
+                    playSound(player, Sound.BLOCK_NOTE_BLOCK_CHIME, 0.24F, 0.92F + 0.14F * r);
+                }
+                if (r == 4) {
+                    playSound(player, Sound.BLOCK_AMETHYST_BLOCK_CHIME, 0.45F, 1.40F);
+                    stop(uuid);
+                }
                 return;
             }
 

@@ -10,10 +10,14 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 /**
- * Разобранный и провалидированный config.yml.
- * Читается один раз при старте/релоаде, чтобы не дёргать конфиг каждый тик.
+ * Разобранный и провалидированный config.yml для Рулетки (Крупье в классическом смокинге + голограмма dHolograms).
  */
 public final class RouletteSettings {
+
+    public static final String DEFAULT_CROUPIER_SKIN_VALUE =
+            "ewogICJ0aW1lc3RhbXAiIDogMTcyNjgzNTY0Mzk1OSwKICAicHJvZmlsZUlkIiA6ICI3NjczNTA4YTI4MTk0ODMwYTY0YzhjYWFjNGJhNmM2NiIsCiAgInByb2ZpbGVOYW1lIiA6ICJKb3Jpc0hlcm9zIiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzE4NTIzNzMxN2JkNzc5ODZlNTgxYzRkZTM5OWFjMGFmYWU3YmUzZTgwY2RjODNlNjUxOTBhM2ViZTg3ODQ0ZTgiCiAgICB9CiAgfQp9";
+    public static final String DEFAULT_CROUPIER_SKIN_SIGNATURE =
+            "S/9Or0ThDcU7SCW6GSINBwLA5fSClCnGdMsA76gpoH/RVeSEtoG4pGOuCQy7cG7frN6qcsT6wtPbf49nFOiOgTSwER6+XX/uUvaZKfn2/59HuIW9M7gIeWv6cy6jaX9RvWqaQFFTbhMRmw/9hVpOIov3RKOpq5c1d1LtzqUlQk0exM/CqgEc8TrF4fKsxY9hFEmVtbu0cVSCZ1aRsVyV7M3B/n5LebspvMKo3n+L5Lt4dJvQ6AdYAmisC5QB5azw7f8UipNbOkIFX1XqFk/howUZAO/1hxPT3YUXyXlU89Cg7+gaA8SbYBZgfnCUHpmgwA0vhneTpqkLUzAha2qF+PtWZRl1AJoQHj6rpFY2ZjfgsUnEHRn6j9W3QjgiUv6KMJ3Bo6frbmliy7w5Pyh75szemkST1jO1/5oDWwmSCe4AQMck/pCChp9Dl3uZ5gxr0dbiXYt+TRKINN9PYyjZ9xvUNyfFd+l1sCVKA1Pa5JNmzR2nQm1+kYzeoBMRRzwxI0hlzapdjzPCX5sXmrF4AUg/lJ3Hz6rTK9UGA6pro3tC1lmZPrBqRFKMGkNUPrGgKMVK2jt1egnFSsMVzYJLulwjNDZzk1N941nkU+Vv3bKuRfqlcMVyYK+Xg4tm3+EbFKu7OhnexVqIkCTPPF75lm97IgNmpl5jhYgPFWjuli0=";
 
     private final long minBet;
     private final long maxBet;
@@ -50,6 +54,9 @@ public final class RouletteSettings {
     private final int jackpotTicks;
     private final String npcName;
     private final String npcDisplayName;
+    private final double hologramHeight;
+    private final double hologramLineGap;
+    private final List<String> hologramLines;
     private final boolean hideFromTab;
     private final String npcHandItem;
     private final String skinPlayer;
@@ -85,8 +92,29 @@ public final class RouletteSettings {
         this.hideFromTab = config.getBoolean("roulette.npc.hide-from-tab", true);
         this.npcHandItem = config.getString("roulette.npc.hand-item", "");
         this.skinPlayer = config.getString("roulette.npc.skin.player", "");
-        this.skinValue = config.getString("roulette.npc.skin.value", "");
-        this.skinSignature = config.getString("roulette.npc.skin.signature", "");
+
+        String cfgVal = config.getString("roulette.npc.skin.value", "");
+        String cfgSig = config.getString("roulette.npc.skin.signature", "");
+        if ((cfgVal == null || cfgVal.isEmpty()) && (this.skinPlayer == null || this.skinPlayer.isEmpty())) {
+            this.skinValue = DEFAULT_CROUPIER_SKIN_VALUE;
+            this.skinSignature = DEFAULT_CROUPIER_SKIN_SIGNATURE;
+        } else {
+            this.skinValue = cfgVal == null ? "" : cfgVal;
+            this.skinSignature = cfgSig == null ? "" : cfgSig;
+        }
+
+        this.hologramHeight = config.getDouble("roulette.npc.hologram.height", 0.92D);
+        this.hologramLineGap = config.getDouble("roulette.npc.hologram.line-gap", 0.25D);
+        List<String> rawHolo = config.getStringList("roulette.npc.hologram.lines");
+        if (rawHolo == null || rawHolo.isEmpty()) {
+            List<String> defaults = new ArrayList<>();
+            defaults.add("<gradient:#F8BEFB:#89A0FF><bold>РУЛЕТКА</bold></gradient>");
+            defaults.add("{wave}");
+            defaults.add("&7● &fНажмите, чтобы &#F8BEFBиграть");
+            this.hologramLines = Collections.unmodifiableList(defaults);
+        } else {
+            this.hologramLines = Collections.unmodifiableList(new ArrayList<>(rawHolo));
+        }
 
         Material pointer = Material.matchMaterial(config.getString("roulette.wheel.pointer.item", "GOLDEN_SWORD"));
         if (pointer == null || !pointer.isItem()) {
@@ -114,8 +142,8 @@ public final class RouletteSettings {
                 pose.size() > 2 ? pose.get(2).floatValue() : 135.0F
         };
 
-        String rawName = config.getString("roulette.npc.name", config.getString("roulette.npc-name", "&#F8BEFBРулетка"));
-        this.npcDisplayName = rawName == null || rawName.isEmpty() ? "&#F8BEFBРулетка" : rawName;
+        String rawName = config.getString("roulette.npc.name", config.getString("roulette.npc-name", "ec_r_npc"));
+        this.npcDisplayName = rawName == null || rawName.isEmpty() ? "ec_r_npc" : rawName;
         this.npcName = ru.rooyzee.elytrixcasino.util.Text.profileName(this.npcDisplayName);
 
         List<Sector> parsed = new ArrayList<>();
@@ -145,11 +173,10 @@ public final class RouletteSettings {
             parsed.add(new Sector(multiplier, weight, color, icon));
         }
         if (parsed.isEmpty()) {
-            logger.warning("В конфиге нет валидных секторов рулетки! Использую значения по умолчанию.");
-            parsed.add(new Sector(0.0D, 5, "&c", Material.RED_WOOL));
-            parsed.add(new Sector(2.0D, 4, "&a", Material.LIME_WOOL));
-            parsed.add(new Sector(3.0D, 2, "&b", Material.LIGHT_BLUE_WOOL));
-            parsed.add(new Sector(5.0D, 1, "&#F8BEFB", Material.GOLD_BLOCK));
+            parsed.add(new Sector(0.0D, 71, "&c", Material.RED_WOOL));
+            parsed.add(new Sector(2.0D, 19, "&a", Material.LIME_WOOL));
+            parsed.add(new Sector(3.0D, 7, "&b", Material.LIGHT_BLUE_WOOL));
+            parsed.add(new Sector(5.0D, 3, "&#F8BEFB", Material.GOLD_BLOCK));
         }
         this.sectors = Collections.unmodifiableList(parsed);
 
@@ -173,210 +200,50 @@ public final class RouletteSettings {
         return Math.max(min, Math.min(max, value));
     }
 
-    public long getMinBet() {
-        return minBet;
-    }
-
-    public long getMaxBet() {
-        return maxBet;
-    }
-
-    public int getSpinTicks() {
-        return spinTicks;
-    }
-
-    public int getSpinTurns() {
-        return spinTurns;
-    }
-
-    public int getWalkTicks() {
-        return walkTicks;
-    }
-
-    /**
-     * Сколько тиков NPC разворачивается на месте перед тем, как пойти.
-     */
-    public int getTurnTicks() {
-        return turnTicks;
-    }
-
-    /**
-     * Скорость поворота головы (градусов за тик) — чем меньше, тем плавнее взгляд.
-     */
-    public double getLookTurnSpeed() {
-        return lookTurnSpeed;
-    }
-
-    /**
-     * Скорость разворота при ходьбе, градусов за тик.
-     */
-    public double getWalkTurnSpeed() {
-        return walkTurnSpeed;
-    }
-
-    /**
-     * На каком тике прокрутки NPC бьёт второй раз (и колесо ускоряется).
-     */
-    public int getSecondSwingTick() {
-        return secondSwingTick;
-    }
-
-    /**
-     * Скорость после первого удара, в долях от полной.
-     */
-    public double getFirstStageSpeed() {
-        return firstStageSpeed;
-    }
-
-    /**
-     * Максимальная угловая скорость колеса, рад/тик. Выше — клиент начинает
-     * заметно срезать дугу, и колесо визуально «стягивается» к центру.
-     */
-    public double getMaxSpinSpeed() {
-        return maxSpinSpeed;
-    }
-
-    public double getWheelDistance() {
-        return wheelDistance;
-    }
-
-    public double getWheelHeight() {
-        return wheelHeight;
-    }
-
-    public double getWheelRadius() {
-        return wheelRadius;
-    }
-
-    public double getNpcSpinDistance() {
-        return npcSpinDistance;
-    }
-
-    /**
-     * Смещение NPC вбок относительно центра колеса во время игры
-     * (отрицательное — левее, если смотреть со стороны игрока).
-     */
-    public double getNpcSideOffset() {
-        return npcSideOffset;
-    }
-
-    public double getNpcLookSideOffset() {
-        return npcLookSideOffset;
-    }
-
-    public double getNpcLookHeightOffset() {
-        return npcLookHeightOffset;
-    }
-
-    /**
-     * Голова маленького армор-стенда рендерится выше его позиции, смещение это компенсирует.
-     */
-    public double getItemYOffset() {
-        return itemYOffset;
-    }
-
-    /**
-     * Радиус, в котором NPC поворачивается к игроку (0 — выключено).
-     */
-    public double getLookRadius() {
-        return lookRadius;
-    }
-
-    public int getStandCount() {
-        return standCount;
-    }
-
-    public int getViewRadius() {
-        return viewRadius;
-    }
-
-    public boolean isShowLabels() {
-        return showLabels;
-    }
-
-    public boolean isSpinSound() {
-        return spinSound;
-    }
-
-    public boolean isRadiusCompensation() {
-        return radiusCompensation;
-    }
-
-    public Material getPointerItem() {
-        return pointerItem;
-    }
-
-    /**
-     * Поворот головы указателя в градусах (x, y, z).
-     */
-    public float[] getPointerPose() {
-        return pointerPose;
-    }
-
-    /**
-     * На сколько блоков указатель поднят над верхним краем колеса.
-     */
-    public double getPointerHeight() {
-        return pointerHeight;
-    }
-
-    /**
-     * Смещение указателя вбок: спрайт меча из-за поворота головы уезжает в сторону.
-     */
-    public double getPointerSideOffset() {
-        return pointerSideOffset;
-    }
-
-    /**
-     * С какого множителя играть эффект с самородками.
-     */
-    public double getJackpotMultiplier() {
-        return jackpotMultiplier;
-    }
-
-    public Material getJackpotItem() {
-        return jackpotItem;
-    }
-
-    public int getJackpotCount() {
-        return jackpotCount;
-    }
-
-    public int getJackpotTicks() {
-        return jackpotTicks;
-    }
-
-    public String getNpcName() {
-        return npcName;
-    }
-
-    public String getNpcDisplayName() {
-        return npcDisplayName;
-    }
-
-    public boolean isHideFromTab() {
-        return hideFromTab;
-    }
-
-    public String getNpcHandItem() {
-        return npcHandItem == null ? "" : npcHandItem;
-    }
-
-    public String getSkinPlayer() {
-        return skinPlayer == null ? "" : skinPlayer;
-    }
-
-    public String getSkinValue() {
-        return skinValue == null ? "" : skinValue;
-    }
-
-    public String getSkinSignature() {
-        return skinSignature == null ? "" : skinSignature;
-    }
-
-    public List<Sector> getSectors() {
-        return sectors;
-    }
+    public long getMinBet() { return minBet; }
+    public long getMaxBet() { return maxBet; }
+    public int getSpinTicks() { return spinTicks; }
+    public int getSpinTurns() { return spinTurns; }
+    public int getWalkTicks() { return walkTicks; }
+    public int getTurnTicks() { return turnTicks; }
+    public double getLookTurnSpeed() { return lookTurnSpeed; }
+    public double getWalkTurnSpeed() { return walkTurnSpeed; }
+    public int getSecondSwingTick() { return secondSwingTick; }
+    public double getFirstStageSpeed() { return firstStageSpeed; }
+    public double getMaxSpinSpeed() { return maxSpinSpeed; }
+    public double getWheelDistance() { return wheelDistance; }
+    public double getWheelHeight() { return wheelHeight; }
+    public double getWheelRadius() { return wheelRadius; }
+    public double getNpcSpinDistance() { return npcSpinDistance; }
+    public double getNpcSideOffset() { return npcSideOffset; }
+    public double getNpcLookSideOffset() { return npcLookSideOffset; }
+    public double getNpcLookHeightOffset() { return npcLookHeightOffset; }
+    public double getItemYOffset() { return itemYOffset; }
+    public double getLookRadius() { return lookRadius; }
+    public int getStandCount() { return standCount; }
+    public int getViewRadius() { return viewRadius; }
+    public boolean isShowLabels() { return showLabels; }
+    public boolean isSpinSound() { return spinSound; }
+    public boolean isRadiusCompensation() { return radiusCompensation; }
+    public Material getPointerItem() { return pointerItem; }
+    public float[] getPointerPose() { return pointerPose; }
+    public double getPointerHeight() { return pointerHeight; }
+    public double getPointerSideOffset() { return pointerSideOffset; }
+    public double getJackpotMultiplier() { return jackpotMultiplier; }
+    public Material getJackpotItem() { return jackpotItem; }
+    public int getJackpotCount() { return jackpotCount; }
+    public int getJackpotTicks() { return jackpotTicks; }
+    public String getNpcName() { return npcName; }
+    public String getNpcDisplayName() { return npcDisplayName; }
+    public double getHologramHeight() { return hologramHeight; }
+    public double getHologramLineGap() { return hologramLineGap; }
+    public List<String> getHologramLines() { return hologramLines; }
+    public boolean isHideFromTab() { return hideFromTab; }
+    public String getNpcHandItem() { return npcHandItem == null ? "" : npcHandItem; }
+    public String getSkinPlayer() { return skinPlayer == null ? "" : skinPlayer; }
+    public String getSkinValue() { return skinValue == null ? "" : skinValue; }
+    public String getSkinSignature() { return skinSignature == null ? "" : skinSignature; }
+    public List<Sector> getSectors() { return sectors; }
 
     public int getTotalWeight() {
         int total = 0;

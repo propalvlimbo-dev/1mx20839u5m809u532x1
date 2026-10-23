@@ -9,15 +9,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Все настройки NPC Минёра и математики поля «Минёр».
+ * Настройки NPC Минёра и математики поля «Минёр».
  */
 public final class MinerSettings {
 
-    public static final String DEFAULT_SKIN_NAME = "SignalSMPLover";
+    public static final String DEFAULT_SKIN_NAME = "ExplodingTNT";
     public static final String DEFAULT_SKIN_VALUE =
-            "ewogICJ0aW1lc3RhbXAiIDogMTc5Mjc2NTI4NDMyOCwKICAicHJvZmlsZUlkIiA6ICI3ZmJlNDY4NWJiNTA0NGRiYmU3Mjc1MzIxNjViNDc2YiIsCiAgInByb2ZpbGVOYW1lIiA6ICJTaWduYWxTTVBMb3ZlciIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS8xNWJmZjUzMjBiYzRlMmRmYjg5MDQ3ZDZkOTAzNzdjYTExMTk3YWI5MzcyOGIyM2Q3NzkyZmMzZjMxNWUwODZiIgogICAgfQogIH0KfQ==";
+            "ewogICJ0aW1lc3RhbXAiIDogMTc5Mjc2ODE3OTg2NCwKICAicHJvZmlsZUlkIiA6ICJjMGU5MTRmZDRlYjY0N2I3OTgwNmVlMzZkY2U5ZjYwOCIsCiAgInByb2ZpbGVOYW1lIiA6ICJFeHBsb2RpbmdUTlQiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDkwYjQ0ZmEwODg5MjJmMTQ2NzhiMjMxNTc4NTQxNDg1NGQ4MmFiNmU5M2ZlYzljNjJkYThiMDEzYWNlNzljZCIKICAgIH0sCiAgICAiQ0FQRSIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTJlOGQ5N2VjNzkxMDBlOTBhNzVkMzY5ZDFiM2JhODEyNzNjNGY4MmJjMWI3MzdlOTM0ZWVkNGE4NTRiZTFiNiIKICAgIH0KICB9Cn0=";
     public static final String DEFAULT_SKIN_SIGNATURE =
-            "kHdXL1UlyXd+cY1QwSYevTiR7oeI6H4r3EIr7S05k/XaQUWoiVHLE2/VfY8/Tl7I2mNxklZkwtb2zSG1MiQE3zezqokwSzSKl2n/hSHaR/U0xBwq+8rutDi2XotFKZyk9f8KueSCgug5yZBoKTwvbRLo1s5arxZt71pv0JuNEh4lG83qgmgwzLuBupR6VkxkUNQ90YxG4v5t1wOyHa7spYKBLBVdfvsPM0wTU4GRvVv38EPvsjcTWGbY8+TBC9GOXu3xwxxVzod7RHyLiPXfuZcvK36UARGE1PEI48G5vXpOFZZoiwCac2iz7lri02XpcrhkSlobLjy6ka59+agr8m4YMSMZ8Ar9Y8lReJzon8GKRgnWqn9PNJfBY4skbmOFohKcgACwz/m+TrgwlpdlOjWLUToejDHmDLokSGoWt5thCFIUA6tL3QJ7W3HPxFUi1jQprHRQjkuHBfCuo+kcglOAElzrtW/xjAqviaZoaQHTGLNDQ7klCshzKCQ5yiHO3isbDFwc3d+hv7oZ3ZBPrIiYm1ZyfoSwT1tFkIphh4GjX7QsmSh0fQcpa0peb4dJcDX/dHPFkK79IE1ZIJ+v2SbyOAVknTgNlhx+wo7dNT2Jp2jaxPTkzvnXMYmFgBlHUyKokLo0bIpbBdkAJIpzSLWQ87yjG5+Gt1FuVPH8QQM=";
+            "A0QYz+WvCKJCSi7+4jWzD1xR6McT3Mrv1gS7Halci+75hWkq4VFY9eIsQ18RGZ9h/gONG/Acri9DHgkMWETZITOy0fSy7Bz/UwGFLTsbG+5/R3fVoR2Ywt/geqLktL6Blj0ZLJqroVhZkOcoU5etxZmluE1ILqnlMGBsTdXKGyiZpUtd4muEaqy8OYN2qjbn5XbGQSrI9ulws1uERPTEDc6HjJ1/05CIkP9tdvm1UFxX71wd8Aj48r+ZFdj/MXmz4iXK5aCwbn7w+aOWc97d5K34H0+KEaPNJEsvzEqigIa5mUlDxR9GQFRxQXKOuoILRu4Zy2ev54rkEPehE+cXZbkSwR1+Z60jBSFseocYNIPmYYXfCCDMzt7tDc4cZ80nsXfEX4n5fNN+YKfql5HbMRC7KcMyMqacxKi6PCG7YLEbmfnGFuTrXkZbhHra/vjx4PLsYeWMiB8r9uWhhQaukidK+GoZo4OfzxsoZrWW04Adek0320VGe8ivCRBMr8s04opUL+GIOAX9YjG8ml59rD38/kt8qZpuRln6mdu+8BB6MZCO+5jqDt8BtutvODBI6n1qzP9lErSXC82iTdv0bOXqWNe6pHyA5AmCh/VIbM2CpewX6sizHkqWD6dpTUo/ZbLneAZax8utAbB2pfiN20DtN2dbwGYxHXOE712j5Tk=";
 
     public static final int BOARD_SIZE = 45;
 
@@ -62,12 +62,12 @@ public final class MinerSettings {
     private int throwIntervalTicks = 60;
     private float turnAngle = 28.0F;
     private int groundLifetimeTicks = 36;
-    private double hologramHeight = 2.08D;
-    private double hologramLineGap = 0.27D;
+    private double hologramHeight = 0.92D;
+    private double hologramLineGap = 0.25D;
     private List<String> hologramLines = Collections.emptyList();
 
-    private int minesCount = 16;
-    private int emptyCount = 13;
+    private int minesCount = 14;
+    private int emptyCount = 11;
     private List<CoinTier> coinTiers = Collections.emptyList();
 
     public void load(FileConfiguration config) {
@@ -78,14 +78,15 @@ public final class MinerSettings {
         this.throwIntervalTicks = Math.max(10, config.getInt("miner.throw-interval-ticks", 60));
         this.turnAngle = (float) Math.max(5.0D, Math.min(90.0D, config.getDouble("miner.turn-angle", 28.0D)));
         this.groundLifetimeTicks = Math.max(10, config.getInt("miner.ground-lifetime-ticks", 36));
-        this.hologramHeight = config.getDouble("miner.hologram.height", 2.08D);
-        this.hologramLineGap = config.getDouble("miner.hologram.line-gap", 0.27D);
+        this.hologramHeight = config.getDouble("miner.hologram.height", 0.92D);
+        this.hologramLineGap = config.getDouble("miner.hologram.line-gap", 0.25D);
 
         List<String> rawLines = config.getStringList("miner.hologram.lines");
         if (rawLines == null || rawLines.isEmpty()) {
             List<String> defaults = new ArrayList<>();
-            defaults.add("&#F8BEFB&lМИНЁР");
-            defaults.add("&7Нажми, чтобы испытать удачу");
+            defaults.add("<gradient:#F8BEFB:#89A0FF><bold>МИНЁР</bold></gradient>");
+            defaults.add("{wave}");
+            defaults.add("&7● &fНажмите, чтобы &#F8BEFBиграть");
             this.hologramLines = Collections.unmodifiableList(defaults);
         } else {
             this.hologramLines = Collections.unmodifiableList(new ArrayList<>(rawLines));
@@ -101,7 +102,7 @@ public final class MinerSettings {
             String name = entry.containsKey("name") ? String.valueOf(entry.get("name")) : "&#F8BEFB&lМонеты";
             double mult = entry.get("multiplier") instanceof Number
                     ? ((Number) entry.get("multiplier")).doubleValue()
-                    : 0.80D;
+                    : 0.40D;
             int count = entry.get("count") instanceof Number
                     ? ((Number) entry.get("count")).intValue()
                     : 0;
@@ -110,17 +111,17 @@ public final class MinerSettings {
             }
         }
         if (parsedTiers.isEmpty()) {
-            parsedTiers.add(new CoinTier(Material.SUNFLOWER, "&#FFE066&lГорсть монет", 0.80D, 6));
-            parsedTiers.add(new CoinTier(Material.GOLD_INGOT, "&#FFB84D&lЗолотой слиток", 1.15D, 5));
-            parsedTiers.add(new CoinTier(Material.EMERALD, "&#55FF99&lИзумруд удачи", 1.70D, 3));
-            parsedTiers.add(new CoinTier(Material.DIAMOND, "&#66E0FF&lАлмазный куш", 2.60D, 2));
+            parsedTiers.add(new CoinTier(Material.SUNFLOWER, "&#FFE066&lГорсть монет", 0.40D, 8));
+            parsedTiers.add(new CoinTier(Material.GOLD_NUGGET, "&#FFD24D&lЗолотые самородки", 0.60D, 6));
+            parsedTiers.add(new CoinTier(Material.GOLD_INGOT, "&#FFA94D&lЗолотой слиток", 0.85D, 4));
+            parsedTiers.add(new CoinTier(Material.EMERALD, "&#55FF99&lИзумруд удачи", 1.15D, 2));
         }
 
         int totalCoins = 0;
         for (CoinTier tier : parsedTiers) {
             totalCoins += tier.getCount();
         }
-        int requestedMines = Math.max(8, Math.min(BOARD_SIZE - 4, config.getInt("miner.field.mines", 16)));
+        int requestedMines = Math.max(8, Math.min(BOARD_SIZE - 4, config.getInt("miner.field.mines", 14)));
         if (requestedMines + totalCoins > BOARD_SIZE) {
             requestedMines = Math.max(1, BOARD_SIZE - totalCoins);
         }

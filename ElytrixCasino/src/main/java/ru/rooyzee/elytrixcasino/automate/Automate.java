@@ -17,13 +17,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Автомат: сам блок-низ хранится как координата, а «вывеска» — настоящие армор-стенды.
- * <p>
- * Армор-стенды живут в чанке, поэтому показываем их только когда чанк загружен:
- * на старте сервера чанки ещё спят, и сущность, созданная в невыгруженном чанке,
- * молча пропадала (автомат «исчезал» после рестарта, хотя запись в data.yml была).
- * Голограмма поднимается заново на {@code ChunkLoadEvent} и убирается на
- * {@code ChunkUnloadEvent}, чтобы стенды не записывались в сейв мира и не дублировались.
+ * Автомат: блок-низ хранится как координата, а над крышкой висит 3-строчная голограмма
+ * в фирменном стиле dHolograms ElytriX с живой переливающейся волной WAVE.
  */
 public class Automate {
 
@@ -37,6 +32,7 @@ public class Automate {
     private boolean busy;
     private boolean hologramShown;
     private final List<ArmorStand> holograms = new ArrayList<>();
+    private ArmorStand waveStand;
 
     public Automate(Main plugin, String id, Location bottom, long bet) {
         this.plugin = plugin;
@@ -63,30 +59,22 @@ public class Automate {
         return world != null && world.isChunkLoaded(bottom.getBlockX() >> 4, bottom.getBlockZ() >> 4);
     }
 
-    /**
-     * Видна ли сейчас вывеска автомата.
-     */
     public boolean isHologramShown() {
         return hologramShown && !holograms.isEmpty();
     }
 
-    /**
-     * Поднять вывеску, если чанк уже загружен. Иначе она поднимется вместе с чанком.
-     */
     public void refreshHologram() {
         if (isChunkLoaded()) {
             spawnHologram();
         }
     }
 
-    /**
-     * Снять вывеску (чанк выгружается / плагин выключается).
-     */
     public void hideHologram() {
         if (isChunkLoaded()) {
             removeHologram();
         } else {
             holograms.clear();
+            waveStand = null;
             hologramShown = false;
         }
     }
@@ -96,11 +84,19 @@ public class Automate {
         if (!isChunkLoaded()) {
             return;
         }
-        Location base = bottom.clone().add(0.5D, 2.15D, 0.5D);
-        ArmorStand title = line(base.clone().add(0.0D, 0.28D, 0.0D), "&#F8BEFB&lАВТОМАТ");
-        ArmorStand amount = line(base, "&#F8BEFBСТАВКА: &f" + bet);
+        Location base = bottom.clone().add(0.5D, 2.10D, 0.5D);
+        ArmorStand title = line(base.clone().add(0.0D, 0.50D, 0.0D),
+                Text.color("<gradient:#F8BEFB:#89A0FF><bold>АВТОМАТ</bold></gradient>"));
+        ArmorStand wave = line(base.clone().add(0.0D, 0.25D, 0.0D),
+                Text.waveBar(0));
+        ArmorStand amount = line(base,
+                Text.color("&7● &fСтавка: &#F8BEFB" + Text.formatMoney(bet) + " ⛂"));
         if (title != null) {
             holograms.add(title);
+        }
+        if (wave != null) {
+            holograms.add(wave);
+            this.waveStand = wave;
         }
         if (amount != null) {
             holograms.add(amount);
@@ -108,7 +104,14 @@ public class Automate {
         hologramShown = !holograms.isEmpty();
     }
 
-    private ArmorStand line(Location location, String text) {
+    public void updateWave(int waveStep) {
+        if (!hologramShown || waveStand == null || waveStand.isDead()) {
+            return;
+        }
+        waveStand.setCustomName(Text.waveBar(waveStep));
+    }
+
+    private ArmorStand line(Location location, String coloredText) {
         World world = location.getWorld();
         if (world == null) {
             return null;
@@ -124,7 +127,6 @@ public class Automate {
             return null;
         }
         if (!stand.isValid()) {
-            // чанк успел выгрузиться прямо во время спавна
             removeQuietly(stand);
             return null;
         }
@@ -135,7 +137,7 @@ public class Automate {
         stand.setSilent(true);
         stand.setInvulnerable(true);
         stand.setCollidable(false);
-        stand.setCustomName(Text.color(text));
+        stand.setCustomName(coloredText);
         stand.setCustomNameVisible(true);
         stand.addScoreboardTag(HOLO_TAG);
         stand.addScoreboardTag(ID_TAG_PREFIX + id);
@@ -147,13 +149,14 @@ public class Automate {
             removeQuietly(stand);
         }
         holograms.clear();
+        waveStand = null;
         hologramShown = false;
 
         if (!isChunkLoaded()) {
             return;
         }
-        Location center = bottom.clone().add(0.5D, 2.2D, 0.5D);
-        for (Entity nearby : nearby(center, 1.2D, 1.5D, 1.2D)) {
+        Location center = bottom.clone().add(0.5D, 2.35D, 0.5D);
+        for (Entity nearby : nearby(center, 1.2D, 1.6D, 1.2D)) {
             if (isStaleHologram(nearby)) {
                 removeQuietly(nearby);
             }
@@ -172,11 +175,6 @@ public class Automate {
         }
     }
 
-    /**
-     * Наша вывеска (или сирота от прошлых запусков), но НЕ вывеска соседнего автомата:
-     * автоматы в казино стоят вплотную, и прежняя чистка «всех по общему тегу»
-     * сносила надписи соседей при загрузке.
-     */
     private boolean isStaleHologram(Entity entity) {
         if (!(entity instanceof ArmorStand)) {
             return false;
@@ -225,16 +223,6 @@ public class Automate {
                 && (y == bottom.getBlockY() || y == bottom.getBlockY() + 1);
     }
 
-    /**
-     * Сторона, с которой к автомату вплотную примыкает указанный блок: «+1 блок вперёд»,
-     * только по прямой (север/юг/запад/восток, без диагоналей) и на высоте самого автомата
-     * (нижний и верхний блок). Возвращает направление ОТ автомата К блоку либо {@code null},
-     * если блок не примыкает.
-     * <p>
-     * Специально считается на лету по координатам: направление автомата нигде не хранится,
-     * поэтому свойство одинаково работает и у новых автоматов, и у всех уже созданных
-     * (в data.yml для них ничего дописывать не нужно).
-     */
     public BlockFace adjacentFace(Location location) {
         if (location == null || location.getWorld() == null || bottom.getWorld() == null) {
             return null;
@@ -263,23 +251,9 @@ public class Automate {
         return null;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public Location getLocation() {
-        return bottom.clone();
-    }
-
-    public long getBet() {
-        return bet;
-    }
-
-    public boolean isBusy() {
-        return busy;
-    }
-
-    public void setBusy(boolean busy) {
-        this.busy = busy;
-    }
+    public String getId() { return id; }
+    public Location getLocation() { return bottom.clone(); }
+    public long getBet() { return bet; }
+    public boolean isBusy() { return busy; }
+    public void setBusy(boolean busy) { this.busy = busy; }
 }

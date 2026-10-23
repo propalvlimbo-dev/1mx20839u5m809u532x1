@@ -37,7 +37,7 @@ public final class AutomateSettings {
             if (idRaw == null || !(weightRaw instanceof Number)) {
                 continue;
             }
-            Material icon = Material.ROTTEN_FLESH;
+            Material icon = Material.RESIN_CLUMP;
             Object materialRaw = raw.get("material");
             if (materialRaw != null) {
                 Material matched = Material.matchMaterial(String.valueOf(materialRaw));
@@ -54,16 +54,16 @@ public final class AutomateSettings {
             parsed.add(new SlotSymbol(String.valueOf(idRaw), icon, ((Number) weightRaw).intValue(), name, pay3, pay4, pay5));
         }
         if (parsed.isEmpty()) {
-            parsed.add(new SlotSymbol("flesh", Material.ROTTEN_FLESH, 34, "&8Гнилая плоть", 1.2, 1.2, 1.2));
-            parsed.add(new SlotSymbol("potato", Material.POISONOUS_POTATO, 16, "&aЯд. картофель", 1.5, 1.5, 1.5));
-            parsed.add(new SlotSymbol("eye", Material.SPIDER_EYE, 13, "&cПаучий глаз", 2.0, 2.0, 2.0));
-            parsed.add(new SlotSymbol("bread", Material.BREAD, 10, "&6Хлеб", 2.5, 2.5, 2.5));
-            parsed.add(new SlotSymbol("beef", Material.COOKED_BEEF, 8, "&cСтейк", 3.5, 3.5, 3.5));
-            parsed.add(new SlotSymbol("carrot", Material.GOLDEN_CARROT, 6, "&6Зол. морковь", 4.5, 4.5, 4.5));
-            parsed.add(new SlotSymbol("apple", Material.APPLE, 5, "&cЯблоко", 6.0, 6.0, 6.0));
-            parsed.add(new SlotSymbol("gapple", Material.GOLDEN_APPLE, 4, "&eЗол. яблоко", 8.0, 8.0, 8.0));
-            parsed.add(new SlotSymbol("pie", Material.PUMPKIN_PIE, 3, "&6Пирог", 10.0, 10.0, 10.0));
-            parsed.add(new SlotSymbol("cake", Material.CAKE, 1, "&#F8BEFBТорт", 15.0, 15.0, 15.0));
+            parsed.add(new SlotSymbol("resin", Material.RESIN_CLUMP, 34, "&6Сгусток смолы", 1.2, 1.2, 1.2));
+            parsed.add(new SlotSymbol("eyeblossom_closed", Material.CLOSED_EYEBLOSSOM, 16, "&7Закрытый глазоцвет", 1.5, 1.5, 1.5));
+            parsed.add(new SlotSymbol("resin_brick", Material.RESIN_BRICK, 13, "&#FF9955Смоляной кирпич", 2.0, 2.0, 2.0));
+            parsed.add(new SlotSymbol("eyeblossom", Material.OPEN_EYEBLOSSOM, 10, "&#FFA64DРаскрытый глазоцвет", 2.5, 2.5, 2.5));
+            parsed.add(new SlotSymbol("breeze", Material.BREEZE_ROD, 8, "&bСтержень вихря", 3.5, 3.5, 3.5));
+            parsed.add(new SlotSymbol("trial_key", Material.TRIAL_KEY, 6, "&#66D9EFКлюч испытаний", 4.5, 4.5, 4.5));
+            parsed.add(new SlotSymbol("creaking_heart", Material.CREAKING_HEART, 5, "&#FF7733Сердце скрипуна", 6.0, 6.0, 6.0));
+            parsed.add(new SlotSymbol("ominous_key", Material.OMINOUS_TRIAL_KEY, 4, "&#55FF99Зловещий ключ", 8.0, 8.0, 8.0));
+            parsed.add(new SlotSymbol("heavy_core", Material.HEAVY_CORE, 3, "&#C7BBFBТяжёлое ядро", 10.0, 10.0, 10.0));
+            parsed.add(new SlotSymbol("egapple", Material.ENCHANTED_GOLDEN_APPLE, 1, "&#F8BEFBЗачарованное яблоко", 15.0, 15.0, 15.0));
         }
         this.symbols = Collections.unmodifiableList(parsed);
     }
@@ -76,33 +76,13 @@ public final class AutomateSettings {
         return raw instanceof Number ? ((Number) raw).doubleValue() : def;
     }
 
-    public long getBet() {
-        return bet;
-    }
-
-    public int getSpinTicks() {
-        return spinTicks;
-    }
-
-    public int getReelStopDelay() {
-        return reelStopDelay;
-    }
-
-    public double getMaxMultiplier() {
-        return maxMultiplier;
-    }
-
-    public Material getBottomBlock() {
-        return bottomBlock;
-    }
-
-    public Material getTopBlock() {
-        return topBlock;
-    }
-
-    public List<SlotSymbol> getSymbols() {
-        return symbols;
-    }
+    public long getBet() { return bet; }
+    public int getSpinTicks() { return spinTicks; }
+    public int getReelStopDelay() { return reelStopDelay; }
+    public double getMaxMultiplier() { return maxMultiplier; }
+    public Material getBottomBlock() { return bottomBlock; }
+    public Material getTopBlock() { return topBlock; }
+    public List<SlotSymbol> getSymbols() { return symbols; }
 
     public int getTotalWeight() {
         int total = 0;

@@ -82,11 +82,9 @@ public class AutomateGui implements Listener {
         controls.put(PLAY_SLOT, playItem(automate.getBet()));
         controls.put(PAYTABLE_SLOT, paytableItem(settings, automate.getBet()));
 
-        plugin.getAnimator().openAutomateMenu(player, inventory, closeItem(), controls, () -> {
-            for (int row = 0; row < SIZE; row++) {
-                for (int col = 0; col < SIZE; col++) {
-                    inventory.setItem(gridSlot(row, col), tagged(randomSymbol().icon()));
-                }
+        plugin.getAnimator().openAutomateMenu(player, inventory, closeItem(), controls, row -> {
+            for (int col = 0; col < SIZE; col++) {
+                inventory.setItem(gridSlot(row, col), tagged(randomSymbol().icon()));
             }
         });
     }
@@ -184,6 +182,15 @@ public class AutomateGui implements Listener {
             }
         }
         return symbols.get(symbols.size() - 1);
+    }
+
+    private SlotSymbol symbolAt(int index) {
+        List<SlotSymbol> symbols = plugin.getAutomateSettings().getSymbols();
+        if (symbols.isEmpty()) {
+            return new SlotSymbol("resin", Material.RESIN_CLUMP, 1, "&6Сгусток смолы", 1.2, 1.2, 1.2);
+        }
+        int clamped = Math.max(0, Math.min(symbols.size() - 1, index));
+        return symbols.get(clamped);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
@@ -435,7 +442,7 @@ public class AutomateGui implements Listener {
             player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.3F);
         } else {
             plugin.send(player, "automate-lose", "%bet%", Text.formatMoney(bet));
-            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 0.9F, 0.55F);
+            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.9F, 1.0F);
         }
         if (!inventory.getViewers().isEmpty()) {
             showResult(inventory, grid, result, win, multiplier);
@@ -444,49 +451,47 @@ public class AutomateGui implements Listener {
     }
 
     /**
-     * Честная независимая генерация сетки 5x5 без Heat/абуза твинков и смены ставок:
-     * суммарный RTP = ~67.7% (стабильный доход казино +32.3%), частота выигрыша = 31.0%.
+     * Генерация сетки 5x5 по списку символов из AutomateSettings (включая ресурсы 1.21.4):
+     * суммарный RTP = ~67.7% (House Edge +32.3%), частота выигрыша = 31.0%.
      */
     private SlotSymbol[][] createGrid(ThreadLocalRandom rng) {
         SlotSymbol[][] grid = emptyGrid();
-        SlotSymbol fallback = plugin.getAutomateSettings().getSymbols().get(0);
-        SlotSymbol flesh = byId("flesh", fallback);
 
         int roll = rng.nextInt(1000);
         SlotSymbol symbol;
         int lines;
         if (roll < 110) {
-            symbol = flesh;
+            symbol = symbolAt(0);
             lines = 1;
         } else if (roll < 125) {
-            symbol = flesh;
+            symbol = symbolAt(0);
             lines = 2;
         } else if (roll < 190) {
-            symbol = byId("potato", flesh);
+            symbol = symbolAt(1);
             lines = 1;
         } else if (roll < 235) {
-            symbol = byId("eye", flesh);
+            symbol = symbolAt(2);
             lines = 1;
         } else if (roll < 265) {
-            symbol = byId("bread", flesh);
+            symbol = symbolAt(3);
             lines = 1;
         } else if (roll < 283) {
-            symbol = byId("beef", flesh);
+            symbol = symbolAt(4);
             lines = 1;
         } else if (roll < 294) {
-            symbol = byId("carrot", flesh);
+            symbol = symbolAt(5);
             lines = 1;
         } else if (roll < 301) {
-            symbol = byId("apple", flesh);
+            symbol = symbolAt(6);
             lines = 1;
         } else if (roll < 305) {
-            symbol = byId("gapple", flesh);
+            symbol = symbolAt(7);
             lines = 1;
         } else if (roll < 308) {
-            symbol = byId("pie", flesh);
+            symbol = symbolAt(8);
             lines = 1;
         } else if (roll < 310) {
-            symbol = byId("cake", flesh);
+            symbol = symbolAt(9);
             lines = 1;
         } else {
             return grid;
@@ -596,15 +601,6 @@ public class AutomateGui implements Listener {
         return current;
     }
 
-    private SlotSymbol byId(String id, SlotSymbol fallback) {
-        for (SlotSymbol symbol : plugin.getAutomateSettings().getSymbols()) {
-            if (symbol.getId().equals(id)) {
-                return symbol;
-            }
-        }
-        return fallback;
-    }
-
     private void paintLine(SlotSymbol[][] grid, SlotSymbol symbol, int id, boolean[][] protectedCells) {
         int[] coords = lineCellCoords(id);
         for (int i = 0; i < SIZE; i++) {
@@ -693,7 +689,10 @@ public class AutomateGui implements Listener {
 
     private void drawBoard(Inventory inventory, SlotSymbol[][] grid, Result result,
                            long win, double multiplier, boolean flash) {
-        ItemStack glass = named(Material.PURPLE_STAINED_GLASS_PANE, " ");
+        GuiConfig gui = plugin.getAutomateGuiConfig();
+        Material glassMat = gui.getMaterial("win-glass", Material.LIME_STAINED_GLASS_PANE);
+        String glassName = gui.getString("win-glass-name", "&#55FF99&l✦ КОМБИНАЦИЯ ✦");
+        ItemStack glass = named(glassMat, glassName);
         for (int row = 0; row < SIZE; row++) {
             for (int col = 0; col < SIZE; col++) {
                 if (win > 0L && result.mask[row][col] && flash) {

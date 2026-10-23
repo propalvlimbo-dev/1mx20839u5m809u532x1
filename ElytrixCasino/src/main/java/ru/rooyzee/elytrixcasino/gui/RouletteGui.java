@@ -56,14 +56,8 @@ public class RouletteGui implements Listener {
                 Text.color(gui.getString("title", "&#F8BEFB&lРУЛЕТКА &8┃ &7Выбор ставки")));
         holder.setInventory(inventory);
 
+        ItemStack bottomInfo = gui.getBoolean("info-enabled", true) ? createInfoItem(gui) : null;
         Map<Integer, ItemStack> actionButtons = new LinkedHashMap<>();
-
-        if (gui.getBoolean("info-enabled", true)) {
-            int infoSlot = gui.getInt("info-slot", 13);
-            if (infoSlot >= 0 && infoSlot < size) {
-                actionButtons.put(infoSlot, createInfoItem(gui));
-            }
-        }
 
         List<Long> bets = new ArrayList<>();
         for (Number number : readBets()) {
@@ -78,7 +72,7 @@ public class RouletteGui implements Listener {
 
         List<Integer> betSlots = gui.getIntegerList("bet-slots");
         if (betSlots.isEmpty()) {
-            betSlots = Arrays.asList(20, 22, 24, 29, 31, 33);
+            betSlots = Arrays.asList(21, 22, 23, 30, 31, 32);
         }
         List<String> customIcons = gui.getStringList("bet-icons");
         Material fallbackMaterial = gui.getMaterial("bet-item", Material.GOLD_INGOT);
@@ -103,7 +97,7 @@ public class RouletteGui implements Listener {
             holder.getBets().put(slot, bet);
         }
 
-        plugin.getAnimator().openStandardMenu(player, inventory, closeItem(), actionButtons);
+        plugin.getAnimator().openStandardMenu(player, inventory, closeItem(), bottomInfo, actionButtons);
     }
 
     private ItemStack createInfoItem(GuiConfig gui) {
@@ -111,7 +105,7 @@ public class RouletteGui implements Listener {
         ItemStack item = new ItemStack(mat, 1);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(Text.color(gui.getString("info-name", "&#F8BEFB&lКолесо Фортуны")));
+            meta.setDisplayName(Text.color(gui.getString("info-name", "&7« &#F8BEFBКолесо удачи &7»")));
             List<String> lore = new ArrayList<>();
             for (String line : gui.getStringList("info-lore")) {
                 lore.add(Text.color(line));
@@ -129,7 +123,7 @@ public class RouletteGui implements Listener {
         ItemStack item = new ItemStack(gui.getMaterial("close-item", Material.RED_DYE), 1);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(Text.color(gui.getString("close-name", "&cЗакрыть")));
+            meta.setDisplayName(Text.color(gui.getString("close-name", "&7« &cЗакрыть меню &7»")));
             List<String> lore = new ArrayList<>();
             for (String line : gui.getStringList("close-lore")) {
                 lore.add(Text.color(line));
@@ -155,7 +149,7 @@ public class RouletteGui implements Listener {
         if (meta != null) {
             GuiConfig gui = plugin.getRouletteGuiConfig();
             String formattedBet = Text.formatMoney(bet);
-            String name = gui.getString("bet-name", "&#F8BEFB&lСтавка: &f%bet% ⛂");
+            String name = gui.getString("bet-name", "&7« &#F8BEFBСтавка %bet% ⛂ &7»");
             meta.setDisplayName(Text.color(name.replace("%bet%", formattedBet)));
 
             List<String> lore = new ArrayList<>();
@@ -175,7 +169,7 @@ public class RouletteGui implements Listener {
                                 + " &8(" + Text.formatPercent(percent) + "%)"));
                     }
                     lore.add("");
-                    lore.add(Text.color("&#F8BEFB▶ &fНажмите, чтобы крутить"));
+                    lore.add(Text.color("&7● &fНажмите, чтобы крутить"));
                 }
             }
             if (glow) {

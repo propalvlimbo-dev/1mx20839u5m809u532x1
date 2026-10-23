@@ -1,7 +1,7 @@
 title: "&#F8BEFB&lМ&#F1BFFB&lи&#E4BEFB&lн&#D4BCFB&lё&#C2BBFB&lр"
 info:
   enabled: true
-  slot: 13
+  slot: 49
   material: TNT
   glow: true
   name: "&7« &#F8BEFBИгра Минёр &7»"
@@ -23,7 +23,7 @@ close:
     - "&7● &fНажмите для закрытия"
 bets:
   bet_100:
-    slot: 20
+    slot: 21
     amount: 100
     material: GOLD_NUGGET
     glow: false
@@ -47,7 +47,7 @@ bets:
       - "&#F8BEFB&l┃ "
       - "&7● &fНажмите, чтобы начать игру"
   bet_1000:
-    slot: 24
+    slot: 23
     amount: 1000
     material: GOLD_INGOT
     glow: false
@@ -59,7 +59,7 @@ bets:
       - "&#F8BEFB&l┃ "
       - "&7● &fНажмите, чтобы начать игру"
   bet_5000:
-    slot: 29
+    slot: 30
     amount: 5000
     material: AMETHYST_SHARD
     glow: false
@@ -83,7 +83,7 @@ bets:
       - "&#F8BEFB&l┃ "
       - "&7● &fНажмите, чтобы начать игру"
   bet_15000:
-    slot: 33
+    slot: 32
     amount: 15000
     material: DIAMOND
     glow: true

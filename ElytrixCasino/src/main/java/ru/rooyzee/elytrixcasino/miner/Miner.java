@@ -28,15 +28,16 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Пакетный NPC «Минёр» со скином SignalSMPLover:
+ * Пакетный NPC «Минёр» в скине динамита (ExplodingTNT):
  * - стоит на месте, держит динамит (TNT) в ОБЕИХ руках (MAINHAND и OFFHAND),
- * - раз в 3 секунды (60 тиков) поворачивается чуть-чуть налево и выкидывает виртуальный динамит,
- * - ещё через 3 секунды поворачивается чуть-чуть направо и выкидывает виртуальный динамит,
- * - выброшенный динамит падает на землю, лежит немного времени и пропадает (чисто визуал, подобрать нельзя).
+ * - раз в 3 секунды (60 тиков) поворачивается налево/направо и выбрасывает виртуальный TNT,
+ * - над головой висит голограмма в точном стиле dHolograms ElytriX с живой волной WAVE.
  */
 public final class Miner {
 
     private static final String HIDE_NAMETAG_TEAM = "ec_npc";
+    // Все 3D-слои скина включены, плащ (0x01) выключен, чтобы на спине была видна текстура TNT
+    private static final byte SKIN_LAYERS_NO_CAPE = 0x7E;
 
     private static final class ThrownTnt {
         final VirtualItem entity;
@@ -78,6 +79,7 @@ public final class Miner {
     private boolean spawned;
 
     private final List<VirtualArmorStand> holograms = new ArrayList<>();
+    private final List<String> hologramTemplates = new ArrayList<>();
     private final List<ThrownTnt> activeThrows = new ArrayList<>();
 
     private float baseYaw;
@@ -87,6 +89,7 @@ public final class Miner {
     private float targetPitch;
     private boolean nextTurnLeft = true;
     private int ticksUntilThrow;
+    private int tickCounter;
 
     public Miner(Main plugin, String id, Location location) {
         this.plugin = plugin;
@@ -130,6 +133,7 @@ public final class Miner {
         this.targetPitch = 0.0F;
         this.nextTurnLeft = true;
         this.ticksUntilThrow = settings.getThrowIntervalTicks();
+        this.tickCounter = 0;
 
         String hiddenProfileName = buildHiddenName();
         ensureHiddenNametag(hiddenProfileName);
@@ -144,7 +148,7 @@ public final class Miner {
         created.setSilent(true);
         created.setListed(false);
         created.setPlayerMainHand(HumanoidArm.RIGHT);
-        created.setPlayerModeCustomisation((byte) 0x7F);
+        created.setPlayerModeCustomisation(SKIN_LAYERS_NO_CAPE);
 
         equipDualTnt(created);
         applyConfiguredSkin(created, settings);
@@ -176,6 +180,7 @@ public final class Miner {
         }
         activeThrows.clear();
         holograms.clear();
+        hologramTemplates.clear();
         if (tracker != null) {
             tracker.removeAll();
             tracker = null;
@@ -187,6 +192,7 @@ public final class Miner {
         if (!spawned || tracker == null || npc == null) {
             return;
         }
+        tickCounter++;
 
         MinerSettings settings = plugin.getMinerSettings();
 
@@ -213,6 +219,16 @@ public final class Miner {
             targetPitch = 0.0F;
         }
 
+        if (tickCounter % 3 == 0) {
+            int waveStep = tickCounter / 3;
+            for (int i = 0; i < holograms.size() && i < hologramTemplates.size(); i++) {
+                String tpl = hologramTemplates.get(i);
+                if (tpl.contains(Text.HOLO_WAVE_TOKEN)) {
+                    holograms.get(i).setCustomName(Text.component(Text.resolveHoloLine(tpl, waveStep)));
+                }
+            }
+        }
+
         updateThrownItems();
         tracker.tick();
         hideFromTab();
@@ -222,7 +238,6 @@ public final class Miner {
         boolean throwingLeft = this.nextTurnLeft;
         this.nextTurnLeft = !this.nextTurnLeft;
 
-        // В системе координат Minecraft: уменьшение yaw = поворот налево, увеличение yaw = поворот направо
         float angleOffset = throwingLeft ? -settings.getTurnAngle() : settings.getTurnAngle();
         this.targetYaw = wrapDegrees(baseYaw + angleOffset);
         this.currentYaw = wrapDegrees(currentYaw + wrapDegrees(this.targetYaw - currentYaw) * 0.65F);
@@ -320,6 +335,7 @@ public final class Miner {
         }
         if (val != null && !val.isEmpty() && sig != null && !sig.isEmpty()) {
             targetNpc.setTexture(val, sig);
+            return;
         }
         if (name != null && !name.isEmpty()) {
             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
@@ -354,6 +370,7 @@ public final class Miner {
         }
         int total = lines.size();
         for (int i = 0; i < total; i++) {
+            String tpl = lines.get(i);
             double y = location.getY()
                     + settings.getHologramHeight()
                     + (total - 1 - i) * settings.getHologramLineGap();
@@ -364,10 +381,11 @@ public final class Miner {
             stand.setNoGravity(true);
             stand.setSilent(true);
             stand.setSmall(true);
-            stand.setCustomName(Text.component(lines.get(i)));
+            stand.setCustomName(Text.component(Text.resolveHoloLine(tpl, 0)));
             stand.setCustomNameVisible(true);
             tracker.addEntity(stand);
             holograms.add(stand);
+            hologramTemplates.add(tpl);
         }
     }
 

@@ -46,10 +46,9 @@ public class Roulette {
     private static final double POINTER_ANGLE = Math.PI / 2.0D;
     private static final double TWO_PI = Math.PI * 2.0D;
     private static final double NPC_EYE_HEIGHT = 1.62D;
-    private static final byte ALL_SKIN_LAYERS = 0x7F;
+    private static final byte ALL_SKIN_LAYERS = 0x7E;
     private static final double DECELERATION_START = 0.55D;
     private static final int REFUSAL_TICKS = 16;
-    private static final double NAME_HOLO_Y = 0.95D;
     private static final String NAME_TEAM = "ec_npc";
 
     private final Main plugin;
@@ -59,9 +58,10 @@ public class Roulette {
 
     private final List<VirtualArmorStand> stands = new ArrayList<>();
     private final List<Sector> slotSectors = new ArrayList<>();
+    private final List<VirtualArmorStand> nameHolos = new ArrayList<>();
+    private final List<String> holoTemplates = new ArrayList<>();
 
     private VirtualPlayer npc;
-    private VirtualArmorStand nameHolo;
     private VirtualArmorStand pointer;
     private PlayerTracker tracker;
     private BukkitTask trackerTask;
@@ -115,9 +115,7 @@ public class Roulette {
 
         List<VirtualEntity> entities = new ArrayList<>();
         entities.add(npc);
-        if (nameHolo != null) {
-            entities.add(nameHolo);
-        }
+        entities.addAll(nameHolos);
         entities.addAll(stands);
         entities.add(pointer);
 
@@ -135,8 +133,9 @@ public class Roulette {
 
     private void createNpc() {
         npc = VirtualPlayer.create();
-        npc.setName(settings().getNpcName());
-        hideNametag(settings().getNpcName());
+        String profile = buildHiddenName();
+        npc.setName(profile);
+        hideNametag(profile);
         npc.setPos(new Vec3d(npcHome.getX(), npcHome.getY(), npcHome.getZ()));
         currentYaw = npcHome.getYaw();
         currentPitch = npcHome.getPitch();
@@ -174,24 +173,46 @@ public class Roulette {
         createNameHolo();
     }
 
+    private String buildHiddenName() {
+        String clean = id.replaceAll("[^a-zA-Z0-9_]", "");
+        String raw = "ec_r_" + (clean.isEmpty() ? "npc" : clean);
+        return raw.length() > 16 ? raw.substring(0, 16) : raw;
+    }
+
     private void createNameHolo() {
-        nameHolo = VirtualArmorStand.create();
-        nameHolo.setInvisible(true);
-        nameHolo.setSmall(true);
-        nameHolo.setNoBasePlate(true);
-        nameHolo.setNoGravity(true);
-        nameHolo.setSilent(true);
-        nameHolo.setCustomName(Text.component(settings().getNpcDisplayName()));
-        nameHolo.setCustomNameVisible(true);
+        nameHolos.clear();
+        holoTemplates.clear();
+        List<String> lines = settings().getHologramLines();
+        if (lines == null || lines.isEmpty()) {
+            return;
+        }
+        for (String tpl : lines) {
+            VirtualArmorStand stand = VirtualArmorStand.create();
+            stand.setInvisible(true);
+            stand.setSmall(true);
+            stand.setNoBasePlate(true);
+            stand.setNoGravity(true);
+            stand.setSilent(true);
+            stand.setCustomName(Text.component(Text.resolveHoloLine(tpl, 0)));
+            stand.setCustomNameVisible(true);
+            nameHolos.add(stand);
+            holoTemplates.add(tpl);
+        }
         followNameHolo();
     }
 
     private void followNameHolo() {
-        if (nameHolo == null || npc == null) {
+        if (nameHolos.isEmpty() || npc == null) {
             return;
         }
         Vec3d pos = npc.getPos();
-        nameHolo.setPos(new Vec3d(pos.getX(), pos.getY() + NAME_HOLO_Y, pos.getZ()));
+        int total = nameHolos.size();
+        double base = settings().getHologramHeight();
+        double gap = settings().getHologramLineGap();
+        for (int i = 0; i < total; i++) {
+            double y = pos.getY() + base + (total - 1 - i) * gap;
+            nameHolos.get(i).setPos(new Vec3d(pos.getX(), y, pos.getZ()));
+        }
     }
 
     private void hideNametag(String entry) {
@@ -216,8 +237,6 @@ public class Roulette {
         int[] placed = new int[sectors.size()];
         int filled = 0;
 
-        // Гарантируем минимум 1 стенд на колесе для каждого сектора с weight > 0,
-        // чтобы любой выпавший по весу сектор имел реальный слот на колесе
         for (int s = 0; s < sectors.size() && filled < count; s++) {
             if (sectors.get(s).getWeight() > 0) {
                 slotSectors.add(sectors.get(s));
@@ -382,6 +401,15 @@ public class Roulette {
         }
         updateRotation();
         followNameHolo();
+        if (tickCounter % 3 == 0) {
+            int waveStep = tickCounter / 3;
+            for (int i = 0; i < nameHolos.size() && i < holoTemplates.size(); i++) {
+                String tpl = holoTemplates.get(i);
+                if (tpl.contains(Text.HOLO_WAVE_TOKEN)) {
+                    nameHolos.get(i).setCustomName(Text.component(Text.resolveHoloLine(tpl, waveStep)));
+                }
+            }
+        }
         tracker.tick();
         hideFromTab();
     }
@@ -473,8 +501,9 @@ public class Roulette {
         }
         stands.clear();
         slotSectors.clear();
+        nameHolos.clear();
+        holoTemplates.clear();
         npc = null;
-        nameHolo = null;
         pointer = null;
     }
 
@@ -949,33 +978,13 @@ public class Roulette {
         }
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public State getState() {
-        return state;
-    }
-
-    public boolean isBusy() {
-        return state != State.IDLE;
-    }
-
-    public boolean isSpawned() {
-        return spawned;
-    }
-
-    public Location getHomeLocation() {
-        return npcHome.clone();
-    }
-
-    public Location getWheelLocation() {
-        return wheelCenter.clone();
-    }
-
-    public int getNpcEntityId() {
-        return npc == null ? -1 : npc.getId();
-    }
+    public String getId() { return id; }
+    public State getState() { return state; }
+    public boolean isBusy() { return state != State.IDLE; }
+    public boolean isSpawned() { return spawned; }
+    public Location getHomeLocation() { return npcHome.clone(); }
+    public Location getWheelLocation() { return wheelCenter.clone(); }
+    public int getNpcEntityId() { return npc == null ? -1 : npc.getId(); }
 
     public Location getNpcLocation() {
         if (npc == null) {

@@ -1,12 +1,12 @@
 title: "&#F8BEFB&lР&#F3BEFB&lу&#ECBFFB&lл&#E2BEFB&lе&#D6BCFB&lт&#C7BBFB&lк&#B8BAFB&lа"
 rows: 6
 info-enabled: true
-info-slot: 13
+info-slot: 49
 info-item: AMETHYST_SHARD
 info-name: "&7« &#F8BEFBКолесо удачи &7»"
 info-lore:
   - "&#F8BEFB&l┃ "
-  - "&#F8BEFB&l┃ &fВыберите размер ставки ниже"
+  - "&#F8BEFB&l┃ &fВыберите размер ставки выше"
   - "&#F8BEFB&l┃ &fи испытайте удачу на колесе!"
   - "&#F8BEFB&l┃ "
   - "&#F8BEFB&l┃ &7Лимит: &f1 активная ставка"
@@ -25,7 +25,7 @@ bet-lore:
   - "&#F8BEFB&l┃ &fИгра: &#F8BEFBРулетка"
 show-chances: true
 bets: [100, 500, 1000, 5000, 10000, 25000]
-bet-slots: [20, 22, 24, 29, 31, 33]
+bet-slots: [21, 22, 23, 30, 31, 32]
 close-item: RED_DYE
 close-slot: 45
 close-name: "&7« &cЗакрыть меню &7»"

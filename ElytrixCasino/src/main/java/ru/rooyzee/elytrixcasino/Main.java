@@ -28,6 +28,8 @@ import ru.rooyzee.elytrixcasino.util.SkinFetcher;
 
 public class Main extends JavaPlugin {
 
+    private static final int CURRENT_CONFIG_VERSION = 2;
+
     private static Main instance;
 
     private Economy economy;
@@ -56,6 +58,7 @@ public class Main extends JavaPlugin {
     public void onEnable() {
         instance = this;
         saveDefaultConfig();
+        migrateConfigsIfNeeded();
 
         if (Bukkit.getPluginManager().getPlugin("VirtualEntityApi") == null) {
             getLogger().severe("VirtualEntityApi не найден! Отключаюсь.");
@@ -114,6 +117,23 @@ public class Main extends JavaPlugin {
 
         loader.start();
         loadSkinAsync();
+    }
+
+    /**
+     * Автоматически обновляет шаблоны конфигов и GUI при переходе на config-version 2 (2.1.0),
+     * сохраняя нетронутым data.yml со всеми созданными на карте объектами казино.
+     */
+    private void migrateConfigsIfNeeded() {
+        reloadConfig();
+        if (getConfig().getInt("config-version", 1) >= CURRENT_CONFIG_VERSION) {
+            return;
+        }
+        saveResource("config.yml", true);
+        saveResource("messages.yml", true);
+        saveResource("GUI/roulette.yml", true);
+        saveResource("GUI/miner.yml", true);
+        saveResource("GUI/automate.yml", true);
+        reloadConfig();
     }
 
     private void loadSkinAsync() {
@@ -202,10 +222,10 @@ public class Main extends JavaPlugin {
         settings = RouletteSettings.load(getConfig(), getLogger());
         automateSettings = AutomateSettings.load(getConfig(), getLogger());
         minerSettings.load(getConfig());
-        if (!settings.getSkinValue().isEmpty()) {
-            skinValue = settings.getSkinValue();
-            skinSignature = settings.getSkinSignature();
-        }
+        skinValue = settings.getSkinValue();
+        skinSignature = settings.getSkinSignature();
+
+        automateManager.startWaveTicker();
         dataManager.reload();
         loader.reload();
         loadSkinAsync();
@@ -215,91 +235,26 @@ public class Main extends JavaPlugin {
         messages.send(receiver, path, replacements);
     }
 
-    public String rawMsg(String path) {
-        return messages.raw(path);
-    }
-
-    public Messages getMessages() {
-        return messages;
-    }
-
-    public GuiConfig getRouletteGuiConfig() {
-        return rouletteGuiConfig;
-    }
-
-    public GuiConfig getAutomateGuiConfig() {
-        return automateGuiConfig;
-    }
-
-    public static Main getInstance() {
-        return instance;
-    }
-
-    public Economy getEconomy() {
-        return economy;
-    }
-
-    public ActiveBetManager getActiveBets() {
-        return activeBetManager;
-    }
-
-    public MenuAnimator getAnimator() {
-        return animator;
-    }
-
-    public DataManager getDataManager() {
-        return dataManager;
-    }
-
-    public CasinoLoader getLoader() {
-        return loader;
-    }
-
-    public RouletteManager getRouletteManager() {
-        return rouletteManager;
-    }
-
-    public AutomateManager getAutomateManager() {
-        return automateManager;
-    }
-
-    public MinerManager getMinerManager() {
-        return minerManager;
-    }
-
-    public RouletteGui getGui() {
-        return gui;
-    }
-
-    public AutomateGui getAutomateGui() {
-        return automateGui;
-    }
-
-    public MinerGui getMinerGui() {
-        return minerGui;
-    }
-
-    public CasinoListener getCasinoListener() {
-        return casinoListener;
-    }
-
-    public RouletteSettings getSettings() {
-        return settings;
-    }
-
-    public AutomateSettings getAutomateSettings() {
-        return automateSettings;
-    }
-
-    public MinerSettings getMinerSettings() {
-        return minerSettings;
-    }
-
-    public String getSkinValue() {
-        return skinValue;
-    }
-
-    public String getSkinSignature() {
-        return skinSignature;
-    }
+    public String rawMsg(String path) { return messages.raw(path); }
+    public Messages getMessages() { return messages; }
+    public GuiConfig getRouletteGuiConfig() { return rouletteGuiConfig; }
+    public GuiConfig getAutomateGuiConfig() { return automateGuiConfig; }
+    public static Main getInstance() { return instance; }
+    public Economy getEconomy() { return economy; }
+    public ActiveBetManager getActiveBets() { return activeBetManager; }
+    public MenuAnimator getAnimator() { return animator; }
+    public DataManager getDataManager() { return dataManager; }
+    public CasinoLoader getLoader() { return loader; }
+    public RouletteManager getRouletteManager() { return rouletteManager; }
+    public AutomateManager getAutomateManager() { return automateManager; }
+    public MinerManager getMinerManager() { return minerManager; }
+    public RouletteGui getGui() { return gui; }
+    public AutomateGui getAutomateGui() { return automateGui; }
+    public MinerGui getMinerGui() { return minerGui; }
+    public CasinoListener getCasinoListener() { return casinoListener; }
+    public RouletteSettings getSettings() { return settings; }
+    public AutomateSettings getAutomateSettings() { return automateSettings; }
+    public MinerSettings getMinerSettings() { return minerSettings; }
+    public String getSkinValue() { return skinValue; }
+    public String getSkinSignature() { return skinSignature; }
 }
