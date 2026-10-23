@@ -1,5 +1,5 @@
 name: ElytrixItem
-version: '2.4.0'
+version: '2.5.0'
 main: ru.rooyzee.elytrixitem.Main
 api-version: '1.21'
 authors: [rooyzee]

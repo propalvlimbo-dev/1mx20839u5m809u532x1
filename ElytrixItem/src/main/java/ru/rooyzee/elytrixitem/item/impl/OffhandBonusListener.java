@@ -9,6 +9,7 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
@@ -28,6 +29,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -46,6 +48,7 @@ public final class OffhandBonusListener implements Listener {
     private final NamespacedKey key;
     private final Map<UUID, Map<String, Applied>> appliedStats = new HashMap<>();
     private final Map<UUID, Map<PotionEffectType, Integer>> appliedEffects = new HashMap<>();
+    private final Random random = new Random();
 
     public OffhandBonusListener(Main plugin) {
         this.plugin = plugin;
@@ -191,6 +194,30 @@ public final class OffhandBonusListener implements Listener {
 
         previous.clear();
         previous.putAll(desired);
+    }
+
+    // ---------- минусы ----------
+
+    /** Минус шара: с шансом вешает эффект на самого владельца после его удара. */
+    @EventHandler(ignoreCancelled = true)
+    public void onHit(EntityDamageByEntityEvent event) {
+        if (!(event.getDamager() instanceof Player player)) {
+            return;
+        }
+
+        OffhandBonusItem bonus = resolve(player.getInventory().getItemInOffHand());
+        if (bonus == null || bonus.getDrawbacks().isEmpty()) {
+            return;
+        }
+
+        for (OffhandBonusItem.Drawback drawback : bonus.getDrawbacks()) {
+            if (random.nextDouble() >= drawback.getChance()) {
+                continue;
+            }
+
+            player.addPotionEffect(new PotionEffect(drawback.getType(),
+                    drawback.getDurationTicks(), drawback.getLevel() - 1, false, true, true), true);
+        }
     }
 
     // ---------- пробуждение шаров ----------

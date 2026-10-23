@@ -16,6 +16,11 @@ public interface OffhandBonusItem extends CustomItem {
 
     List<Stat> getStats();
 
+    /** Минусы предмета: срабатывают с шансом, когда игрок бьёт. */
+    default List<Drawback> getDrawbacks() {
+        return List.of();
+    }
+
     /** Эффекты, которые предмет даёт прямо сейчас (у шаров — только после пробуждения). */
     List<Effect> getEffects(ItemStack item);
 
@@ -49,6 +54,55 @@ public interface OffhandBonusItem extends CustomItem {
                 return String.valueOf((long) value);
             }
             return String.valueOf(value);
+        }
+    }
+
+    /** Минус: с шансом вешает на владельца неприятный эффект после удара. */
+    final class Drawback {
+
+        private final PotionEffectType type;
+        private final int level;
+        private final int durationTicks;
+        private final double chance;
+        private final String label;
+
+        public Drawback(PotionEffectType type, int level, int durationTicks, double chance,
+                        String label) {
+            this.type = type;
+            this.level = level;
+            this.durationTicks = durationTicks;
+            this.chance = chance;
+            this.label = label;
+        }
+
+        public PotionEffectType getType() {
+            return type;
+        }
+
+        public int getLevel() {
+            return level;
+        }
+
+        public int getDurationTicks() {
+            return durationTicks;
+        }
+
+        /** Шанс от 0 до 1. */
+        public double getChance() {
+            return chance;
+        }
+
+        /** «5% шанс отравления после удара» — как минус пишется в лоре. */
+        public String describe() {
+            return percent(chance) + " шанс " + label + " после удара";
+        }
+
+        private static String percent(double value) {
+            double percent = value * 100.0D;
+            if (percent == Math.rint(percent)) {
+                return String.valueOf((long) percent) + "%";
+            }
+            return String.format(java.util.Locale.ROOT, "%.1f%%", percent);
         }
     }
 

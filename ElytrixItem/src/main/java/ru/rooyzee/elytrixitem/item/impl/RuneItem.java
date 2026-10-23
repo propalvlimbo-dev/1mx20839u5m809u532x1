@@ -44,6 +44,7 @@ public final class RuneItem implements OffhandBonusItem {
     private final int killsRequired;
     private final List<Stat> stats = new ArrayList<>();
     private final List<Effect> effects = new ArrayList<>();
+    private final List<Drawback> drawbacks = new ArrayList<>();
 
     public RuneItem(Main plugin, String id, String name, String texture, int killsRequired) {
         this.key = new NamespacedKey(plugin, "custom_item_id");
@@ -56,6 +57,13 @@ public final class RuneItem implements OffhandBonusItem {
 
     public RuneItem stat(Attribute attribute, double amount, String label) {
         this.stats.add(new Stat(attribute, amount, label));
+        return this;
+    }
+
+    /** Минус шара: срабатывает с шансом после удара. */
+    public RuneItem drawback(PotionEffectType type, int level, int durationTicks, double chance,
+                             String label) {
+        this.drawbacks.add(new Drawback(type, level, durationTicks, chance, label));
         return this;
     }
 
@@ -84,6 +92,11 @@ public final class RuneItem implements OffhandBonusItem {
     }
 
     @Override
+    public List<Drawback> getDrawbacks() {
+        return drawbacks;
+    }
+
+    @Override
     public List<Effect> getEffects(ItemStack item) {
         return isAwakened(item) ? effects : Collections.emptyList();
     }
@@ -109,14 +122,26 @@ public final class RuneItem implements OffhandBonusItem {
 
             List<String> lore = new ArrayList<>();
             lore.add(ColorUtil.color("&#F8BEFB&l┃ "));
+
+            // Что даёт: просто значение, без слова «Бонус».
             for (Stat stat : stats) {
-                lore.add(ColorUtil.color("&#F8BEFB&l┃ &fБонус: &#F8BEFB+" + stat.getLabel()));
+                if (stat.getAmount() < 0) {
+                    lore.add(ColorUtil.color("&#F8BEFB&l┃ &c-" + stat.getLabel()));
+                } else {
+                    lore.add(ColorUtil.color("&#F8BEFB&l┃ &f+" + stat.getLabel()));
+                }
+            }
+            for (Drawback drawback : drawbacks) {
+                lore.add(ColorUtil.color("&#F8BEFB&l┃ &cМинус: &#F8BEFB" + drawback.describe()));
             }
             lore.add(ColorUtil.color("&#F8BEFB&l┃ "));
 
             int shown = Math.min(kills, killsRequired);
             if (kills >= killsRequired) {
-                lore.add(ColorUtil.color("&#F8BEFB&l┃ &fПробуждён: &#F8BEFB" + describeEffects()));
+                // Пробуждён: эффекты пишутся так же, как и атрибуты.
+                for (Effect effect : effects) {
+                    lore.add(ColorUtil.color("&#F8BEFB&l┃ &f" + effect.describe()));
+                }
             } else {
                 lore.add(ColorUtil.color("&#F8BEFB&l┃ &fПробуждение: &#F8BEFB"
                         + shown + "/" + killsRequired + " &fубийств"));
