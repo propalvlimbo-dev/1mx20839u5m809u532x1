@@ -39,7 +39,7 @@ items:
     on_click:
     - if: '%playerpoints_points% >= 389'
       do:
-      - '[console] shadowci give %player_name% shar1'
+      - '[console] eitems give %player_name% shar1 1'
       - '[console] p take %player_name% 389'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
@@ -71,7 +71,7 @@ items:
     on_click:
     - if: '%playerpoints_points% >= 679'
       do:
-      - '[console] shadowci give %player_name% shar2'
+      - '[console] eitems give %player_name% shar2 1'
       - '[console] p take %player_name% 679'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
@@ -103,7 +103,7 @@ items:
     on_click:
     - if: '%playerpoints_points% >= 949'
       do:
-      - '[console] shadowci give %player_name% shar3'
+      - '[console] eitems give %player_name% shar3 1'
       - '[console] p take %player_name% 949'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
@@ -135,7 +135,7 @@ items:
     on_click:
     - if: '%playerpoints_points% >= 1379'
       do:
-      - '[console] shadowci give %player_name% shar4'
+      - '[console] eitems give %player_name% shar4 1'
       - '[console] p take %player_name% 1379'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'

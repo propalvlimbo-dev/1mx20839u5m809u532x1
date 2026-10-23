@@ -19,7 +19,7 @@ items:
     on_click:
     - if: '%playerpoints_points% >= 389'
       do:
-      - '[console] shadowbrewing give %player_name% onebrew'
+      - '[console] eitems give %player_name% onebrew 1'
       - '[console] p take %player_name% 389'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
@@ -48,7 +48,7 @@ items:
     on_click:
     - if: '%playerpoints_points% >= 499'
       do:
-      - '[console] shadowfurnace give %player_name% twoFurnace'
+      - '[console] eitems give %player_name% twoFurnace 1'
       - '[console] p take %player_name% 499'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
@@ -77,7 +77,7 @@ items:
     on_click:
     - if: '%playerpoints_points% >= 899'
       do:
-      - '[console] shadowfurnace give %player_name% threeFurnace'
+      - '[console] eitems give %player_name% threeFurnace 1'
       - '[console] p take %player_name% 899'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
@@ -106,7 +106,7 @@ items:
     on_click:
     - if: '%playerpoints_points% >= 699'
       do:
-      - '[console] shadowfurnace give %player_name% fourFurnace'
+      - '[console] eitems give %player_name% fourFurnace 1'
       - '[console] p take %player_name% 699'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
@@ -135,7 +135,7 @@ items:
     on_click:
     - if: '%playerpoints_points% >= 589'
       do:
-      - '[console] shadowbrewing give %player_name% twobrew'
+      - '[console] eitems give %player_name% twobrew 1'
       - '[console] p take %player_name% 589'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
