@@ -3,26 +3,25 @@ package ru.rooyzee.elytrixitem.item.impl;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import ru.rooyzee.elytrixitem.Main;
-import ru.rooyzee.elytrixitem.item.CustomItem;
+import ru.rooyzee.elytrixitem.item.OffhandBonusItem;
 import ru.rooyzee.elytrixitem.util.ColorUtil;
 import ru.rooyzee.elytrixitem.util.ItemStackUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Тотем: работает только в левой руке и даёт бонусы к характеристикам.
  *
- * Раньше это были атрибуты ExecutableItems — теперь модификаторы ставятся
- * прямо на предмет, поэтому тотем работает и без чужого плагина.
+ * Сами бонусы ставит OffhandBonusListener, поэтому при снятии тотема
+ * здоровье пересчитывается правильно.
  */
-public final class TotemItem implements CustomItem {
+public final class TotemItem implements OffhandBonusItem {
 
     private final NamespacedKey key;
     private final String id;
@@ -47,6 +46,21 @@ public final class TotemItem implements CustomItem {
     }
 
     @Override
+    public List<Stat> getStats() {
+        return stats;
+    }
+
+    @Override
+    public List<Effect> getEffects(ItemStack item) {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public boolean isStackable() {
+        return false;
+    }
+
+    @Override
     public ItemStack createItem() {
         ItemStack item = new ItemStack(Material.TOTEM_OF_UNDYING);
         ItemMeta meta = item.getItemMeta();
@@ -58,22 +72,14 @@ public final class TotemItem implements CustomItem {
             lore.add(ColorUtil.color("&#F8BEFB&l┃ "));
             lore.add(ColorUtil.color("&#F8BEFB&l┃ &fУсловие: &#F8BEFBВ левой руке"));
             for (Stat stat : stats) {
-                if (stat.amount < 0) {
-                    lore.add(ColorUtil.color("&#F8BEFB&l┃ &fШтраф: &cминус " + stat.label));
+                if (stat.getAmount() < 0) {
+                    lore.add(ColorUtil.color("&#F8BEFB&l┃ &fШтраф: &cминус " + stat.getLabel()));
                 } else {
-                    lore.add(ColorUtil.color("&#F8BEFB&l┃ &fБонус: &#F8BEFB+" + stat.label));
+                    lore.add(ColorUtil.color("&#F8BEFB&l┃ &fБонус: &#F8BEFB+" + stat.getLabel()));
                 }
             }
             lore.add(ColorUtil.color("&#F8BEFB&l┃ "));
             meta.setLore(lore);
-
-            for (int i = 0; i < stats.size(); i++) {
-                Stat stat = stats.get(i);
-                NamespacedKey modifierKey = new NamespacedKey(key.getNamespace(), id + "_" + i);
-                AttributeModifier modifier = new AttributeModifier(modifierKey, stat.amount,
-                        AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.OFFHAND);
-                meta.addAttributeModifier(stat.attribute, modifier);
-            }
 
             // Свечение как у ExecutableItems, без лишнего зачарования.
             meta.setEnchantmentGlintOverride(true);
@@ -83,25 +89,5 @@ public final class TotemItem implements CustomItem {
 
         ItemStackUtil.hideAllFlags(item);
         return item;
-    }
-
-    private static String number(double value) {
-        if (value == Math.rint(value)) {
-            return String.valueOf((long) value);
-        }
-        return String.valueOf(value);
-    }
-
-    private static final class Stat {
-
-        private final Attribute attribute;
-        private final double amount;
-        private final String label;
-
-        private Stat(Attribute attribute, double amount, String label) {
-            this.attribute = attribute;
-            this.amount = amount;
-            this.label = number(Math.abs(amount)) + " " + label;
-        }
     }
 }

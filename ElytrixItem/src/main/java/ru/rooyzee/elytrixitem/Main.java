@@ -39,7 +39,7 @@ import ru.rooyzee.elytrixitem.item.impl.ExplosiveTrap;
 import ru.rooyzee.elytrixitem.item.impl.ExplosiveTrapListener;
 import ru.rooyzee.elytrixitem.item.impl.InfiniteFirework;
 import ru.rooyzee.elytrixitem.item.impl.InfiniteFireworkListener;
-import ru.rooyzee.elytrixitem.item.impl.RuneListener;
+import ru.rooyzee.elytrixitem.item.impl.OffhandBonusListener;
 import ru.rooyzee.elytrixitem.item.impl.SplitPickaxe;
 import ru.rooyzee.elytrixitem.item.impl.SplitPickaxeListener;
 import ru.rooyzee.elytrixitem.item.impl.Tyagun;
@@ -95,7 +95,7 @@ public final class Main extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new DrillListener(this), this);
         getServer().getPluginManager().registerEvents(new ExplosiveArrowListener(this), this);
         getServer().getPluginManager().registerEvents(new SplitPickaxeListener(this), this);
-        getServer().getPluginManager().registerEvents(new RuneListener(this), this);
+        getServer().getPluginManager().registerEvents(new OffhandBonusListener(this), this);
         getServer().getPluginManager().registerEvents(new CustomFurnaceListener(this), this);
         getServer().getPluginManager().registerEvents(new CustomBrewingListener(this), this);
     }

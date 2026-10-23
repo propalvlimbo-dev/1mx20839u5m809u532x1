@@ -10,4 +10,5 @@ public interface Attribute {
     Attribute ATTACK_SPEED = null;
     Attribute LUCK = null;
     static Attribute valueOf(String name) { return null; }
+    org.bukkit.NamespacedKey getKey();
 }

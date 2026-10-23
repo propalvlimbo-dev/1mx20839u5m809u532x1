@@ -303,7 +303,9 @@ KEYWORDS = {"if", "for", "while", "switch", "catch", "return", "new", "throw",
 
 
 def param_type(raw, resolve=None):
-    p = re.sub(r"@[\w.]+(\([^)]*\))?", "", raw.split("=")[0]).strip()
+    # Сначала убираем аннотации: внутри @Range(from = ..., to = ...) есть «=».
+    p = re.sub(r"@[\w.]+(\([^)]*\))?", "", raw).strip()
+    p = p.split("=")[0].strip()
     p = re.sub(r"\bfinal\b", "", p).strip()
     if not p:
         return ""
@@ -341,6 +343,19 @@ def scan_body(text, start, resolve):
             i += 1
             continue
         if ch == "(" and depth == 1:
+            # @Аннотация(...) — это не список параметров: пропускаем её скобки.
+            if re.search(r"@[\w.]+$", text[stmt_start:i].rstrip()):
+                j, pdepth = i, 0
+                while j < n:
+                    if text[j] == "(":
+                        pdepth += 1
+                    elif text[j] == ")":
+                        pdepth -= 1
+                        if pdepth == 0:
+                            break
+                    j += 1
+                i = j + 1
+                continue
             prefix = re.sub(r"@[\w.]+(\([^)]*\))?", "", text[stmt_start:i])
             prefix = re.sub(r"^\s*<[^<>]*>\s*", "", prefix)
             mm = re.match(r"\s*(?:@[\w.]+(?:\([^)]*\))?\s*)*"

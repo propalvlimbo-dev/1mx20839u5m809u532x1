@@ -15,6 +15,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.inventory.FurnaceBurnEvent;
 import org.bukkit.event.inventory.FurnaceSmeltEvent;
 import org.bukkit.event.inventory.FurnaceStartSmeltEvent;
 import org.bukkit.inventory.ItemStack;
@@ -63,6 +64,17 @@ public final class CustomFurnaceListener implements Listener {
             nameable.setCustomName(furnace.getDisplayName());
         }
         state.update(true, false);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onBurn(FurnaceBurnEvent event) {
+        CustomFurnaceItem furnace = furnaceAt(event.getBlock());
+        if (furnace == null || furnace.getFuelEconomy() <= 1) {
+            return;
+        }
+
+        // Топливо горит дольше — тратится меньше.
+        event.setBurnTime(event.getBurnTime() * furnace.getFuelEconomy());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

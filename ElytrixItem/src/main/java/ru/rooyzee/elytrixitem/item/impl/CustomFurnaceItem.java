@@ -25,16 +25,18 @@ public final class CustomFurnaceItem implements CustomItem {
     private final String description;
     private final int cookSpeed;
     private final int resultMultiplier;
+    private final int fuelEconomy;
     private final boolean glow;
 
     public CustomFurnaceItem(Main plugin, String id, String name, String description,
-                             int cookSpeed, int resultMultiplier, boolean glow) {
+                             int cookSpeed, int resultMultiplier, int fuelEconomy, boolean glow) {
         this.key = new NamespacedKey(plugin, "custom_item_id");
         this.id = id;
         this.name = name;
         this.description = description;
         this.cookSpeed = cookSpeed;
         this.resultMultiplier = resultMultiplier;
+        this.fuelEconomy = fuelEconomy;
         this.glow = glow;
     }
 
@@ -56,6 +58,11 @@ public final class CustomFurnaceItem implements CustomItem {
     /** Во сколько раз больше предметов выдаёт за одну плавку. */
     public int getResultMultiplier() {
         return resultMultiplier;
+    }
+
+    /** Во сколько раз дольше горит топливо. */
+    public int getFuelEconomy() {
+        return fuelEconomy;
     }
 
     @Override

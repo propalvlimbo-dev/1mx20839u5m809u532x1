@@ -13,4 +13,5 @@ public class PotionEffect {
     public boolean hasParticles() { return true; }
     public boolean isAmbient() { return false; }
     public boolean hasIcon() { return true; }
+    public boolean isInfinite() { return getDuration() == INFINITE_DURATION; }
 }
