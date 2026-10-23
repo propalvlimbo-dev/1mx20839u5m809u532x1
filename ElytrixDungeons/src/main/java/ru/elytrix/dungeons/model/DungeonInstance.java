@@ -31,6 +31,10 @@ public final class DungeonInstance {
     private final List<BlockPosKey> barrelPositions = new ArrayList<>();
     private final Set<BlockPosKey> openedContainers = new HashSet<>();
     private final Map<BlockPosKey, Boolean> shulkerUnlocked = new LinkedHashMap<>();
+    private final List<BlockPosKey> shulkerPositions = new ArrayList<>();
+    private final Map<BlockPosKey, String> surfaceShulkerRarities = new LinkedHashMap<>();
+    private final Map<BlockPosKey, Long> surfaceShulkerRefreshAtMs = new LinkedHashMap<>();
+    private final Set<BlockPosKey> pendingSurfaceShulkerRefresh = new HashSet<>();
     private final List<BlockPosKey> mobSpawns = new ArrayList<>();
 
     public DungeonInstance(
@@ -73,9 +77,15 @@ public final class DungeonInstance {
         this.openedContainers.clear();
 
         this.shulkerUnlocked.clear();
-        if (this.category == DungeonCategory.UNDERGROUND) {
-            for (int[] off : tpl.getShulkerOffsets()) {
-                this.shulkerUnlocked.put(origin.add(off[0], off[1], off[2]), Boolean.FALSE);
+        this.shulkerPositions.clear();
+        this.surfaceShulkerRarities.clear();
+        this.surfaceShulkerRefreshAtMs.clear();
+        this.pendingSurfaceShulkerRefresh.clear();
+        for (int[] off : tpl.getShulkerOffsets()) {
+            BlockPosKey shulker = origin.add(off[0], off[1], off[2]);
+            this.shulkerPositions.add(shulker);
+            if (this.category == DungeonCategory.UNDERGROUND) {
+                this.shulkerUnlocked.put(shulker, Boolean.FALSE);
             }
         }
 
@@ -132,5 +142,9 @@ public final class DungeonInstance {
     public void markContainerOpened(BlockPosKey pos) { openedContainers.add(pos); }
     public void clearOpenedContainers() { openedContainers.clear(); }
     public Map<BlockPosKey, Boolean> getShulkerUnlocked() { return shulkerUnlocked; }
+    public List<BlockPosKey> getShulkerPositions() { return shulkerPositions; }
+    public Map<BlockPosKey, String> getSurfaceShulkerRarities() { return surfaceShulkerRarities; }
+    public Map<BlockPosKey, Long> getSurfaceShulkerRefreshAtMs() { return surfaceShulkerRefreshAtMs; }
+    public Set<BlockPosKey> getPendingSurfaceShulkerRefresh() { return pendingSurfaceShulkerRefresh; }
     public List<BlockPosKey> getMobSpawns() { return mobSpawns; }
 }

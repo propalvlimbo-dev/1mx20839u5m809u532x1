@@ -1,4 +1,5 @@
 # ElytrixDungeons — до 7 наземных домов и 7 подземных данжей.
+config-version: 2
 # Схемы плагин не создаёт: загрузите собственные файлы .schem в нужную папку.
 #   plugins/ElytrixDungeons/schematics/surface/<id-схемы>.schem
 #   plugins/ElytrixDungeons/schematics/underground/<id-схемы>.schem
@@ -53,7 +54,14 @@ regeneration:
   relocate-on-reset: false
 
 surface-dungeon:
-  chest-stacks: 6
+  chest-stacks: 8
+  shulker-stacks: 14
+  # Содержимое и редкость каждого шалкера обновляются раз в 6 часов, даже если его не открывали.
+  shulker-refresh-seconds: 21600
+  landscaping:
+    enabled: true
+    # Плавный природный склон вокруг основания дома (в пределах снимка местности).
+    radius: 6
   ghosts:
     # В каждой волне ровно 6 призраков. После убийства всех шестерых новая волна появляется сразу;
     # если кто-то остался жив, вся волна обновляется через ровно 30 минут после появления.
@@ -62,8 +70,8 @@ surface-dungeon:
     shard-drop-chance: 100.0
     shard-min-amount: 1
     shard-max-amount: 1
-    # Шанс выпадения ключа Хранилища.
-    key-drop-chance: 5.0
+    # 35% шанс выпадения ключа Хранилища.
+    key-drop-chance: 35.0
     key-weights:
       rusty: 52
       knowledge: 25
@@ -72,8 +80,8 @@ surface-dungeon:
       unique: 3
   ambience:
     enabled: true
-    # Ванильный тревожный музыкальный трек MUSIC_DISC_5 звучит при входе в дом.
-    volume: 0.55
+    # MUSIC_DISC_5 зацикливается, звучит с увеличенной дальностью и останавливается при выходе.
+    volume: 2.0
     pitch: 0.85
 
 underground-dungeon:
@@ -98,16 +106,16 @@ hologram:
   surface-lines:
     - "&#F8BEFBНаземный данж &8[&#96FF91Дом призраков&8]"
     - "&fПризраков внутри: &#F8BEFB{ghosts} &8┃ &fСундуки с добычей"
-    - "&7Обновление через: &#F8BEFB{timer}"
+    - "&7Восстановление данжа через: &#F8BEFB{timer}"
   underground-ready-lines:
     - "&#F8BEFBПодземный данж &8[&#89A0FFЗапечатан&8]"
     - "&fПКМ по шалкеру — вызвать стражей"
-    - "&7Обновление через: &#F8BEFB{timer}"
+    - "&7Восстановление данжа через: &#F8BEFB{timer}"
   underground-fight-lines:
     - "&#F8BEFBПодземный данж &8[&cИдёт бой&8]"
     - "&fОсталось противников: &#F8BEFB{mobs} &8(&7{clock}&8)"
-    - "&7Обновление через: &#F8BEFB{timer}"
+    - "&7Восстановление данжа через: &#F8BEFB{timer}"
   underground-cooldown-lines:
     - "&#F8BEFBПодземный данж &8[&7Перезарядка&8]"
     - "&fШалкер открыт &8┃ &7Данж скоро обновится"
-    - "&7Обновление через: &#F8BEFB{timer}"
+    - "&7Восстановление данжа через: &#F8BEFB{timer}"

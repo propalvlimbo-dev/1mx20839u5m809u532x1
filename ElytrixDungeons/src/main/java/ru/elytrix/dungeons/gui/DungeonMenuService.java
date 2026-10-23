@@ -49,7 +49,7 @@ public final class DungeonMenuService {
                 "&#F8BEFB&l┃ &fАктивно данжей: &#F8BEFB" + plugin.getDungeonManager().getAllDungeons().size() + " &8(7 Наземных + 7 Подземных)",
                 "&#F8BEFB&l┃ &fБлижайшее обновление: &#F8BEFB" + nearestTimer,
                 "&#F8BEFB&l┃",
-                "&#F8BEFB&l┃ &#96FF91Наземные дома: &fсундуки + Призраки (100% осколки, 5% ключ)",
+                "&#F8BEFB&l┃ &#96FF91Наземные дома: &fсундуки/шалкеры + Призраки (100% осколки, 35% ключ)",
                 "&#F8BEFB&l┃ &#89A0FFПодземные залы: &fбой со стражами за главный шалкер"
         )));
 
@@ -97,7 +97,7 @@ public final class DungeonMenuService {
         boolean hidden = plugin.getDungeonManager().isHiddenFromWorld();
 
         inv.setItem(45, icon(Material.CHEST, "&7« &#F8BEFBНастройка лута (GUI) &7»", List.of(
-                "&#F8BEFB&l┃ &fСундуки Дома, Главный шалкер и бочки Подземелья",
+                "&#F8BEFB&l┃ &fСундуки, 6 редкостей шалкеров Дома и лут Подземелья",
                 "&7● &fНажмите для редактирования"
         )));
         inv.setItem(46, icon(Material.STRUCTURE_BLOCK, "&7« &#F8BEFBПоставить .schem здесь &7»", List.of(
@@ -176,9 +176,9 @@ public final class DungeonMenuService {
         holder.setInventory(inv);
         fillBorder(inv);
 
-        int[] slots = {20, 22, 24};
+        int[] slots = {10, 12, 14, 19, 21, 23, 28, 30, 32};
         LootPoolType[] types = LootPoolType.values();
-        for (int i = 0; i < types.length; i++) {
+        for (int i = 0; i < types.length && i < slots.length; i++) {
             LootPoolType pt = types[i];
             ItemStack it = icon(pt.getIcon(),
                     "&7« " + pt.getColorHex() + pt.getTitle() + " &7»",

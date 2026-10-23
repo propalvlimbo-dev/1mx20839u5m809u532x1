@@ -167,41 +167,83 @@ public final class SpongeSchematicCodec {
             }
         }
 
-        // Scan genuine 2-high walkable interior floor spaces (under ceiling for houses!)
+        // Flood from the schematic edges so roofed porches and balconies are not mistaken for rooms.
+        boolean[] exterior = findExteriorPassableCells(tpl);
+        int layer = sx * sz;
+        List<int[]> enclosedFloorSpots = new ArrayList<>();
         List<int[]> roofedSpots = new ArrayList<>();
         List<int[]> anyFloorSpots = new ArrayList<>();
+        List<int[]> hologramSpots = new ArrayList<>();
         for (int y = 1; y < sy - 1; y++) {
             for (int z = 1; z < sz - 1; z++) {
                 for (int x = 1; x < sx - 1; x++) {
-                    if (isSolidFloor(tpl.getBlock(x, y - 1, z))
-                            && isPassable(tpl.getBlock(x, y, z))
-                            && isPassable(tpl.getBlock(x, y + 1, z))) {
-                        int[] cell = new int[]{x, y, z};
-                        anyFloorSpots.add(cell);
-                        if (hasCeilingAbove(tpl, x, y + 2, z)) {
-                            roofedSpots.add(cell);
-                        }
+                    if (!isSolidFloor(tpl.getBlock(x, y - 1, z))
+                            || !isPassable(tpl.getBlock(x, y, z))
+                            || !isPassable(tpl.getBlock(x, y + 1, z))) {
+                        continue;
+                    }
+
+                    int[] cell = new int[]{x, y, z};
+                    anyFloorSpots.add(cell);
+                    int index = indexOf(x, y, z, sx, sz);
+                    boolean enclosed = !exterior[index] && !exterior[index + layer];
+                    if (enclosed) {
+                        enclosedFloorSpots.add(cell);
+                    }
+                    if (hasCeilingAbove(tpl, x, y + 2, z)) {
+                        roofedSpots.add(cell);
+                    }
+                    if (isPassable(tpl.getBlock(x, y + 2, z)) && enclosed) {
+                        hologramSpots.add(cell);
                     }
                 }
             }
         }
 
-        List<int[]> interior = !roofedSpots.isEmpty() ? roofedSpots : anyFloorSpots;
-        interior.sort(Comparator.comparingInt(a -> distSq2D(a[0], a[2], midX, midZ) + Math.abs(a[1] - 2) * 4));
+        List<int[]> interior;
+        if (!enclosedFloorSpots.isEmpty()) {
+            interior = enclosedFloorSpots;
+        } else if (!roofedSpots.isEmpty()) {
+            interior = roofedSpots;
+        } else {
+            interior = anyFloorSpots;
+        }
 
-        if (category == DungeonCategory.SURFACE) {
-            // Ensure House always has loot chests even if builder forgot to add chests in .schem
-            if (tpl.getChestOffsets().isEmpty() && tpl.getBarrelOffsets().isEmpty()) {
-                int placed = 0;
-                for (int i = interior.size() - 1; i >= 0 && placed < 3; i -= Math.max(1, interior.size() / 4)) {
-                    int[] c = interior.get(i);
-                    tpl.setBlock(c[0], c[1], c[2], "minecraft:chest[facing=north]");
-                    tpl.getChestOffsets().add(new int[]{c[0], c[1], c[2]});
-                    placed++;
+        // If a house has an open entrance and no fully sealed room, bias ghost markers toward
+        // the central footprint instead of exposed outer decks and verandas.
+        if (category == DungeonCategory.SURFACE && enclosedFloorSpots.isEmpty() && !interior.isEmpty()) {
+            int centerRadius = Math.max(4, Math.min(sx, sz) / 3);
+            int maxDistance = centerRadius * centerRadius;
+            List<int[]> central = new ArrayList<>();
+            for (int[] spot : interior) {
+                if (distSq2D(spot[0], spot[2], midX, midZ) <= maxDistance) {
+                    central.add(spot);
                 }
             }
+            if (!central.isEmpty()) {
+                interior = central;
+            }
+        }
+
+        int firstFloorY = sy;
+        for (int[] spot : interior) {
+            firstFloorY = Math.min(firstFloorY, spot[1]);
+        }
+        final int floorY = firstFloorY;
+        interior.sort(Comparator.comparingInt(a -> Math.abs(a[1] - floorY) * 10000
+                + distSq2D(a[0], a[2], midX, midZ)));
+        hologramSpots.removeIf(spot -> category == DungeonCategory.SURFACE
+                && enclosedFloorSpots.isEmpty()
+                && distSq2D(spot[0], spot[2], midX, midZ) > Math.max(4, Math.min(sx, sz) / 3)
+                        * Math.max(4, Math.min(sx, sz) / 3));
+        List<int[]> holoCandidates = hologramSpots.isEmpty() ? interior : hologramSpots;
+        holoCandidates.sort(Comparator.comparingInt(a -> Math.abs(a[1] - floorY) * 10000
+                + distSq2D(a[0], a[2], midX, midZ)));
+
+        if (category == DungeonCategory.SURFACE) {
+            // Container positions are intentional markers in the uploaded .schem: never invent chests.
             if (!interior.isEmpty()) {
-                int[] centerRoom = interior.get(0);
+                int[] centerRoom = !holoCandidates.isEmpty() ? holoCandidates.get(0) : interior.get(0);
                 tpl.setHologramOffset(centerRoom[0], centerRoom[1], centerRoom[2]);
                 int[] entry = interior.get(Math.min(interior.size() - 1, Math.max(0, interior.size() / 4)));
                 tpl.setEntranceOffset(entry[0], entry[1], entry[2]);
@@ -212,7 +254,7 @@ public final class SpongeSchematicCodec {
                 }
             }
         } else {
-            // UNDERGROUND: ensure at least 1 locked Boss Shulker on interior floor
+            // UNDERGROUND: ensure at least one locked boss shulker on an interior floor.
             if (tpl.getShulkerOffsets().isEmpty()) {
                 int[] center = !interior.isEmpty() ? interior.get(0) : new int[]{midX, Math.max(1, sy / 3), midZ};
                 tpl.setBlock(center[0], center[1], center[2], "minecraft:purple_shulker_box[facing=up]");
@@ -240,6 +282,59 @@ public final class SpongeSchematicCodec {
                 tpl.getMobSpawnOffsets().add(new int[]{Math.max(1, mainShulker[0] - 2), mainShulker[1], mainShulker[2]});
             }
         }
+    }
+
+    private static boolean[] findExteriorPassableCells(DungeonTemplate tpl) {
+        int sx = tpl.getSizeX(), sy = tpl.getSizeY(), sz = tpl.getSizeZ();
+        int volume = sx * sy * sz;
+        boolean[] exterior = new boolean[volume];
+        int[] queue = new int[volume];
+        int tail = 0;
+
+        for (int y = 0; y < sy; y++) {
+            for (int z = 0; z < sz; z++) {
+                for (int x = 0; x < sx; x++) {
+                    if (x != 0 && x != sx - 1 && y != 0 && y != sy - 1 && z != 0 && z != sz - 1) {
+                        continue;
+                    }
+                    tail = enqueuePassable(tpl, exterior, queue, tail, x, y, z);
+                }
+            }
+        }
+
+        int head = 0;
+        while (head < tail) {
+            int index = queue[head++];
+            int x = index % sx;
+            int z = (index / sx) % sz;
+            int y = index / (sx * sz);
+            tail = enqueuePassable(tpl, exterior, queue, tail, x - 1, y, z);
+            tail = enqueuePassable(tpl, exterior, queue, tail, x + 1, y, z);
+            tail = enqueuePassable(tpl, exterior, queue, tail, x, y - 1, z);
+            tail = enqueuePassable(tpl, exterior, queue, tail, x, y + 1, z);
+            tail = enqueuePassable(tpl, exterior, queue, tail, x, y, z - 1);
+            tail = enqueuePassable(tpl, exterior, queue, tail, x, y, z + 1);
+        }
+        return exterior;
+    }
+
+    private static int enqueuePassable(
+            DungeonTemplate tpl, boolean[] exterior, int[] queue, int tail, int x, int y, int z
+    ) {
+        int sx = tpl.getSizeX(), sy = tpl.getSizeY(), sz = tpl.getSizeZ();
+        if (x < 0 || y < 0 || z < 0 || x >= sx || y >= sy || z >= sz) {
+            return tail;
+        }
+        int index = indexOf(x, y, z, sx, sz);
+        if (!exterior[index] && isPassable(tpl.getBlock(x, y, z))) {
+            exterior[index] = true;
+            queue[tail++] = index;
+        }
+        return tail;
+    }
+
+    private static int indexOf(int x, int y, int z, int sx, int sz) {
+        return (y * sz + z) * sx + x;
     }
 
     private static boolean hasCeilingAbove(DungeonTemplate tpl, int x, int startY, int z) {

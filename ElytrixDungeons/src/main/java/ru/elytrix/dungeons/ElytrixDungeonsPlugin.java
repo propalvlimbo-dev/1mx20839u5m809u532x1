@@ -39,6 +39,7 @@ public final class ElytrixDungeonsPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         saveDefaultConfig();
+        migrateLegacyConfig();
         saveResourceIfMissing("messages.yml");
         reloadMessages();
 
@@ -83,10 +84,33 @@ public final class ElytrixDungeonsPlugin extends JavaPlugin {
 
     public void reloadAll() {
         reloadConfig();
+        migrateLegacyConfig();
         reloadMessages();
         lootRegistry.load();
         dungeonManager.loadSchematics();
         dungeonManager.syncAllWorldGuardRegions();
+    }
+
+    private void migrateLegacyConfig() {
+        int version = getConfig().isSet("config-version") ? getConfig().getInt("config-version", 0) : 0;
+        if (version >= 2) {
+            return;
+        }
+
+        // Upgrade the old built-in 5% default without changing newer user tuning.
+        if (Math.abs(getConfig().getDouble("surface-dungeon.ghosts.key-drop-chance", 5.0) - 5.0) < 0.001) {
+            getConfig().set("surface-dungeon.ghosts.key-drop-chance", 35.0);
+        }
+        if (getConfig().getDouble("surface-dungeon.ambience.volume", 0.55) < 1.5) {
+            getConfig().set("surface-dungeon.ambience.volume", 2.0);
+        }
+        getConfig().set("surface-dungeon.shulker-stacks", Math.max(14,
+                getConfig().getInt("surface-dungeon.shulker-stacks", 14)));
+        getConfig().set("surface-dungeon.shulker-refresh-seconds", 21600);
+        getConfig().set("surface-dungeon.landscaping.enabled", true);
+        getConfig().set("surface-dungeon.landscaping.radius", 6);
+        getConfig().set("config-version", 2);
+        saveConfig();
     }
 
     private void saveResourceIfMissing(String name) {

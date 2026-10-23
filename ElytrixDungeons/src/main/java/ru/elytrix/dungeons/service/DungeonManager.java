@@ -22,10 +22,12 @@ import org.bukkit.Color;
 import org.bukkit.HeightMap;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Nameable;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -46,6 +48,7 @@ import ru.elytrix.dungeons.model.DungeonInstance;
 import ru.elytrix.dungeons.model.DungeonStatus;
 import ru.elytrix.dungeons.model.DungeonTemplate;
 import ru.elytrix.dungeons.model.LootPoolType;
+import ru.elytrix.dungeons.model.SurfaceShulkerRarity;
 import ru.elytrix.dungeons.structure.SpongeSchematicCodec;
 import ru.elytrix.dungeons.structure.TerrainSnapshotStore;
 import ru.elytrix.dungeons.structure.TerrainSnapshotStore.BlockRestoreDiff;
@@ -54,6 +57,8 @@ import ru.elytrix.dungeons.util.TextUtil;
 public final class DungeonManager {
 
     public static final int MAX_DUNGEONS_PER_CATEGORY = 7;
+    // Restart just before the 2:58 track ends to hide tick scheduling/network jitter.
+    private static final long MUSIC_DISC_5_DURATION_MS = 177_000L;
 
     public enum CreateStatus {
         CREATED,
@@ -77,6 +82,7 @@ public final class DungeonManager {
     }
 
     private record BlockWrite(int x, int y, int z, BlockData data) {}
+    private record BlockCoordinate(int x, int y, int z) {}
     private record CreateRequest(DungeonCategory category, String dungeonId, int slotNumber) {}
 
     private final ElytrixDungeonsPlugin plugin;
@@ -92,6 +98,7 @@ public final class DungeonManager {
     private final Map<String, DungeonInstance> dungeons = new LinkedHashMap<>();
     private final Map<BlockPosKey, String> protectedContainerIndex = new HashMap<>();
     private final Map<UUID, String> houseMusicPlayers = new HashMap<>();
+    private final Map<UUID, Long> houseMusicStartedAtMs = new HashMap<>();
 
     private boolean hiddenFromWorld = false;
     private int pendingScanTotal = 0;
@@ -284,6 +291,23 @@ public final class DungeonManager {
                     inst.getShulkerUnlocked().put(pk, Boolean.TRUE);
                 }
             }
+            if (cat == DungeonCategory.SURFACE) {
+                for (String state : d.getStringList("surface-shulkers")) {
+                    String[] parts = state.split("\\|", 4);
+                    if (parts.length < 3) continue;
+                    BlockPosKey pos = BlockPosKey.deserialize(parts[0]);
+                    SurfaceShulkerRarity rarity = SurfaceShulkerRarity.fromName(parts[1]);
+                    if (pos == null || rarity == null || !inst.getShulkerPositions().contains(pos)) continue;
+                    try {
+                        inst.getSurfaceShulkerRarities().put(pos, rarity.name());
+                        inst.getSurfaceShulkerRefreshAtMs().put(pos, Long.parseLong(parts[2]));
+                        if (parts.length >= 4 && Boolean.parseBoolean(parts[3])) {
+                            inst.getPendingSurfaceShulkerRefresh().add(pos);
+                        }
+                    } catch (NumberFormatException ignored) {
+                    }
+                }
+            }
             registerDungeonRuntime(inst, pad, allowPvp, allowBreak);
         }
         return !dungeons.isEmpty();
@@ -307,7 +331,7 @@ public final class DungeonManager {
             inst.setStatus(savedStatus);
             inst.getShulkerUnlocked().putAll(savedShulkers);
             updateDungeonHologram(inst);
-        });
+        }, true);
     }
 
     private DungeonTemplate resolveTemplateOrCategoryFallback(String tplId, DungeonCategory cat) {
@@ -336,6 +360,18 @@ public final class DungeonManager {
                 if (Boolean.TRUE.equals(e.getValue())) unlocked.add(e.getKey().serialize());
             }
             yml.set(p + ".unlocked-shulkers", unlocked);
+
+            List<String> surfaceShulkers = new ArrayList<>();
+            if (d.getCategory() == DungeonCategory.SURFACE) {
+                for (BlockPosKey pos : d.getShulkerPositions()) {
+                    String rarity = d.getSurfaceShulkerRarities().get(pos);
+                    Long refreshAt = d.getSurfaceShulkerRefreshAtMs().get(pos);
+                    if (rarity == null || refreshAt == null) continue;
+                    boolean pending = d.getPendingSurfaceShulkerRefresh().contains(pos);
+                    surfaceShulkers.add(pos.serialize() + "|" + rarity + "|" + refreshAt + "|" + pending);
+                }
+            }
+            yml.set(p + ".surface-shulkers", surfaceShulkers);
         }
         try {
             yml.save(dungeonsFile);
@@ -623,7 +659,7 @@ public final class DungeonManager {
         boolean allowBreak = plugin.getConfig().getBoolean("protection.allow-block-modify-in-zone", true);
         registerDungeonRuntime(inst, pad, allowPvp, allowBreak);
 
-        pasteWithRestoreDiffsBatched(w, inst, tpl, null);
+        pasteWithRestoreDiffsBatched(w, inst, tpl, null, false);
         saveDungeons();
         return inst;
     }
@@ -647,7 +683,7 @@ public final class DungeonManager {
         protectedContainerIndex.entrySet().removeIf(e -> e.getValue().equals(inst.getId()));
         for (BlockPosKey p : inst.getChestPositions()) protectedContainerIndex.put(p, inst.getId());
         for (BlockPosKey p : inst.getBarrelPositions()) protectedContainerIndex.put(p, inst.getId());
-        for (BlockPosKey p : inst.getShulkerUnlocked().keySet()) protectedContainerIndex.put(p, inst.getId());
+        for (BlockPosKey p : inst.getShulkerPositions()) protectedContainerIndex.put(p, inst.getId());
     }
 
     public void regenerateDungeon(DungeonInstance inst, boolean forceRelocate) {
@@ -689,7 +725,7 @@ public final class DungeonManager {
         inst.applyTemplateMarkers(tpl);
         reindexProtectedContainers(inst);
         inst.setNextResetEpochMs(System.currentTimeMillis() + resetIntervalMs());
-        pasteWithRestoreDiffsBatched(w, inst, tpl, null);
+        pasteWithRestoreDiffsBatched(w, inst, tpl, null, false);
         saveDungeons();
     }
 
@@ -725,7 +761,8 @@ public final class DungeonManager {
             World world,
             DungeonInstance inst,
             DungeonTemplate tpl,
-            Runnable postHook
+            Runnable postHook,
+            boolean preserveSurfaceShulkerState
     ) {
         TerrainSnapshotStore.ensureChunksLoaded(world, inst.getSnapshotBounds());
         List<BlockWrite> writes = new ArrayList<>();
@@ -753,6 +790,7 @@ public final class DungeonManager {
                     }
                 }
             }
+            addSurfaceLandscapingWrites(world, inst, tpl, writes);
         }
 
         for (int y = 0; y < tpl.getSizeY(); y++) {
@@ -793,7 +831,7 @@ public final class DungeonManager {
                 if (idx >= writes.size()) {
                     cancel();
                     try {
-                        finalizeDungeonAfterPaste(world, inst);
+                        finalizeDungeonAfterPaste(world, inst, preserveSurfaceShulkerState);
                         if (postHook != null) postHook.run();
                     } finally {
                         activePasteCount = Math.max(0, activePasteCount - 1);
@@ -803,7 +841,127 @@ public final class DungeonManager {
         }.runTaskTimer(plugin, 1L, 1L);
     }
 
-    private void finalizeDungeonAfterPaste(World world, DungeonInstance inst) {
+    private void addSurfaceLandscapingWrites(
+            World world, DungeonInstance inst, DungeonTemplate tpl, List<BlockWrite> writes
+    ) {
+        if (!plugin.getConfig().getBoolean("surface-dungeon.landscaping.enabled", true)) {
+            return;
+        }
+
+        int ox = inst.getOrigin().x(), oz = inst.getOrigin().z();
+        int minX = ox, maxX = ox + tpl.getSizeX() - 1;
+        int minZ = oz, maxZ = oz + tpl.getSizeZ() - 1;
+        CuboidRegion snapshot = inst.getSnapshotBounds();
+        int availablePadding = Math.min(
+                Math.min(minX - snapshot.minX(), snapshot.maxX() - maxX),
+                Math.min(minZ - snapshot.minZ(), snapshot.maxZ() - maxZ));
+        int radius = Math.min(Math.max(0, plugin.getConfig().getInt("surface-dungeon.landscaping.radius", 6)),
+                Math.max(0, availablePadding));
+        if (radius == 0) return;
+
+        int baseY = inst.getOrigin().y() - 1;
+        BlockData grass = Bukkit.createBlockData(Material.GRASS_BLOCK);
+        BlockData dirt = Bukkit.createBlockData(Material.DIRT);
+        BlockData air = Bukkit.createBlockData(Material.AIR);
+        BlockData shortGrass = Bukkit.createBlockData(Material.SHORT_GRASS);
+        Map<BlockCoordinate, Material> restoredMaterials = new HashMap<>();
+        for (BlockWrite write : writes) {
+            if (write.x >= minX - radius && write.x <= maxX + radius
+                    && write.z >= minZ - radius && write.z <= maxZ + radius
+                    && write.y >= snapshot.minY() && write.y <= snapshot.maxY()) {
+                restoredMaterials.put(new BlockCoordinate(write.x, write.y, write.z), write.data.getMaterial());
+            }
+        }
+        for (int x = minX - radius; x <= maxX + radius; x++) {
+            for (int z = minZ - radius; z <= maxZ + radius; z++) {
+                int dx = x < minX ? minX - x : x > maxX ? x - maxX : 0;
+                int dz = z < minZ ? minZ - z : z > maxZ ? z - maxZ : 0;
+                int distance = Math.max(dx, dz);
+                if (distance < 1 || distance > radius) continue;
+
+                if (!world.isChunkLoaded(x >> 4, z >> 4)) continue;
+                int worldTop = world.getHighestBlockYAt(x, z, HeightMap.MOTION_BLOCKING_NO_LEAVES);
+                if (worldTop > snapshot.maxY()) continue;
+                int scanTop = Math.min(snapshot.maxY(), Math.max(worldTop, baseY + radius + 6));
+                int scanMin = Math.max(world.getMinHeight(), snapshot.minY());
+                int groundY = Integer.MIN_VALUE;
+                Material groundType = null;
+                boolean obstructed = false;
+                for (int y = scanTop; y >= scanMin; y--) {
+                    Material material = terrainMaterialAt(world, restoredMaterials, x, y, z);
+                    if (material.isAir() || material.name().endsWith("_LEAVES") || !material.isSolid()) {
+                        continue;
+                    }
+                    if (!isNaturalTerrain(material)) {
+                        obstructed = true;
+                        break;
+                    }
+                    groundY = y;
+                    groundType = material;
+                    break;
+                }
+                if (obstructed || groundY == Integer.MIN_VALUE || groundType == null
+                        || groundY <= world.getMinHeight() || Math.abs(groundY - baseY) > radius + 6) continue;
+
+                int targetY = baseY + (int) Math.round((groundY - baseY) * (distance / (double) radius));
+                int noise = Math.floorMod((x * 73_428_767) ^ (z * 912_931) ^ inst.getId().hashCode(), 19);
+                if (distance < radius && (groundType == Material.GRASS_BLOCK || groundType == Material.DIRT
+                        || groundType == Material.COARSE_DIRT || groundType == Material.PODZOL)) {
+                    if (noise == 0 || noise == 1) targetY++;
+                    else if (noise == 2) targetY--;
+                }
+
+                boolean safeColumn = true;
+                if (targetY > groundY) {
+                    for (int y = groundY + 1; y <= targetY; y++) {
+                        if (!terrainMaterialAt(world, restoredMaterials, x, y, z).isAir()) {
+                            safeColumn = false;
+                            break;
+                        }
+                    }
+                    if (!safeColumn) continue;
+                    for (int y = groundY + 1; y < targetY; y++) {
+                        writes.add(new BlockWrite(x, y, z, dirt));
+                    }
+                    writes.add(new BlockWrite(x, targetY, z, grass));
+                } else if (targetY < groundY) {
+                    for (int y = targetY + 1; y <= groundY; y++) {
+                        if (!isNaturalTerrain(terrainMaterialAt(world, restoredMaterials, x, y, z))) {
+                            safeColumn = false;
+                            break;
+                        }
+                    }
+                    if (!safeColumn) continue;
+                    for (int y = targetY + 1; y <= groundY; y++) {
+                        writes.add(new BlockWrite(x, y, z, air));
+                    }
+                    writes.add(new BlockWrite(x, targetY, z, grass));
+                }
+                if (targetY == groundY && groundType == Material.GRASS_BLOCK && noise == 3
+                        && terrainMaterialAt(world, restoredMaterials, x, targetY + 1, z).isAir()) {
+                    // Scatter a few tufts through the transition band so the edge reads as terrain.
+                    writes.add(new BlockWrite(x, targetY + 1, z, shortGrass));
+                }
+            }
+        }
+    }
+
+    private static Material terrainMaterialAt(
+            World world, Map<BlockCoordinate, Material> restoredMaterials, int x, int y, int z
+    ) {
+        Material restored = restoredMaterials.get(new BlockCoordinate(x, y, z));
+        return restored != null ? restored : world.getBlockAt(x, y, z).getType();
+    }
+
+    private static boolean isNaturalTerrain(Material material) {
+        return material == Material.GRASS_BLOCK || material == Material.DIRT
+                || material == Material.COARSE_DIRT || material == Material.ROOTED_DIRT
+                || material == Material.PODZOL || material == Material.MYCELIUM
+                || material == Material.STONE || material == Material.GRAVEL || material == Material.SAND
+                || material == Material.RED_SAND || material == Material.MOSS_BLOCK;
+    }
+
+    private void finalizeDungeonAfterPaste(World world, DungeonInstance inst, boolean preserveSurfaceShulkerState) {
         inst.setStatus(DungeonStatus.READY);
         inst.clearOpenedContainers();
         removeContainerHolograms(inst);
@@ -822,6 +980,7 @@ public final class DungeonManager {
                     plugin.getLootRegistry().fillContainerRandomSlots(holder.getInventory(), LootPoolType.SURFACE_CHEST, chestStacks);
                 }
             }
+            fillSurfaceShulkerContainers(inst, world, preserveSurfaceShulkerState);
             plugin.getGhostController().populateInitialGhosts(inst);
         } else {
             int sideStacks = plugin.getConfig().getInt("underground-dungeon.side-container-stacks", 4);
@@ -849,7 +1008,8 @@ public final class DungeonManager {
         Location safe = inst.teleportLocation();
         if (safe != null) {
             for (Player p : world.getPlayers()) {
-                if (inst.getSnapshotBounds().contains(p.getLocation())) {
+                // Restore buffers extend beyond the house; only move players inside the actual schematic.
+                if (inst.getBounds().contains(p.getLocation())) {
                     p.setFallDistance(0f);
                     p.teleport(safe);
                     p.playSound(safe, Sound.BLOCK_PORTAL_TRAVEL, 0.5f, 1.35f);
@@ -858,6 +1018,90 @@ public final class DungeonManager {
             }
         }
         updateDungeonHologram(inst);
+        saveDungeons();
+    }
+
+    private void fillSurfaceShulkerContainers(
+            DungeonInstance dungeon, World world, boolean preserveSurfaceShulkerState
+    ) {
+        long now = System.currentTimeMillis();
+        long refreshInterval = surfaceShulkerRefreshIntervalMs();
+        int stacks = Math.max(1, plugin.getConfig().getInt("surface-dungeon.shulker-stacks", 14));
+
+        for (BlockPosKey pos : dungeon.getShulkerPositions()) {
+            SurfaceShulkerRarity rarity = SurfaceShulkerRarity.fromName(
+                    dungeon.getSurfaceShulkerRarities().get(pos));
+            Long refreshAt = dungeon.getSurfaceShulkerRefreshAtMs().get(pos);
+            if (!preserveSurfaceShulkerState || rarity == null || refreshAt == null || refreshAt <= now) {
+                rarity = SurfaceShulkerRarity.roll();
+                dungeon.getSurfaceShulkerRarities().put(pos, rarity.name());
+                dungeon.getSurfaceShulkerRefreshAtMs().put(pos, now + refreshInterval);
+            }
+            applySurfaceShulkerState(dungeon, world, pos, rarity, stacks);
+        }
+    }
+
+    private void refreshSurfaceShulkerLootIfDue(DungeonInstance dungeon, long now) {
+        if (dungeon.getCategory() != DungeonCategory.SURFACE || dungeon.getShulkerPositions().isEmpty()) {
+            return;
+        }
+        World world = dungeon.getOrigin().world();
+        if (world == null) return;
+
+        boolean changed = false;
+        int stacks = Math.max(1, plugin.getConfig().getInt("surface-dungeon.shulker-stacks", 14));
+        long refreshInterval = surfaceShulkerRefreshIntervalMs();
+        for (BlockPosKey pos : dungeon.getShulkerPositions()) {
+            SurfaceShulkerRarity rarity = SurfaceShulkerRarity.fromName(
+                    dungeon.getSurfaceShulkerRarities().get(pos));
+            Long refreshAt = dungeon.getSurfaceShulkerRefreshAtMs().get(pos);
+            if (rarity == null || refreshAt == null || refreshAt <= now) {
+                rarity = SurfaceShulkerRarity.roll();
+                dungeon.getSurfaceShulkerRarities().put(pos, rarity.name());
+                dungeon.getSurfaceShulkerRefreshAtMs().put(pos, now + refreshInterval);
+                if (world.isChunkLoaded(pos.x() >> 4, pos.z() >> 4)) {
+                    applySurfaceShulkerState(dungeon, world, pos, rarity, stacks);
+                } else {
+                    dungeon.getPendingSurfaceShulkerRefresh().add(pos);
+                }
+                changed = true;
+            } else if (dungeon.getPendingSurfaceShulkerRefresh().contains(pos)
+                    && world.isChunkLoaded(pos.x() >> 4, pos.z() >> 4)) {
+                changed |= applySurfaceShulkerState(dungeon, world, pos, rarity, stacks);
+            }
+        }
+        if (changed) {
+            saveDungeons();
+        }
+    }
+
+    private boolean applySurfaceShulkerState(
+            DungeonInstance dungeon, World world, BlockPosKey pos, SurfaceShulkerRarity rarity, int stacks
+    ) {
+        if (rarity == null || !world.isChunkLoaded(pos.x() >> 4, pos.z() >> 4)) {
+            dungeon.getPendingSurfaceShulkerRefresh().add(pos);
+            return false;
+        }
+
+        Block block = world.getBlockAt(pos.x(), pos.y(), pos.z());
+        if (block.getType() != rarity.getBlockMaterial()) {
+            block.setType(rarity.getBlockMaterial(), false);
+        }
+        BlockState state = block.getState();
+        if (state instanceof InventoryHolder holder) {
+            plugin.getLootRegistry().fillContainerRandomSlots(holder.getInventory(), rarity.getLootPool(), stacks);
+        }
+        if (state instanceof Nameable nameable) {
+            nameable.setCustomName(TextUtil.color("&7« " + rarity.getColorHex()
+                    + rarity.getDisplayName() + " шалкер &7»"));
+            state.update(true, false);
+        }
+        dungeon.getPendingSurfaceShulkerRefresh().remove(pos);
+        return true;
+    }
+
+    private long surfaceShulkerRefreshIntervalMs() {
+        return Math.max(60L, plugin.getConfig().getLong("surface-dungeon.shulker-refresh-seconds", 21600L)) * 1000L;
     }
 
     private void updateHouseMusic() {
@@ -866,8 +1110,12 @@ public final class DungeonManager {
             return;
         }
 
-        float volume = (float) Math.max(0.0, plugin.getConfig().getDouble("surface-dungeon.ambience.volume", 0.55));
+        // Volume above 1 increases the positional sound radius; keep older 0.55 configs audible
+        // throughout the house while allowing an administrator to choose a stronger level.
+        float volume = (float) Math.max(1.5, Math.min(4.0,
+                plugin.getConfig().getDouble("surface-dungeon.ambience.volume", 2.0)));
         float pitch = (float) Math.max(0.5, plugin.getConfig().getDouble("surface-dungeon.ambience.pitch", 0.85));
+        long now = System.currentTimeMillis();
         Map<UUID, String> insideNow = new HashMap<>();
 
         for (DungeonInstance house : dungeons.values()) {
@@ -879,9 +1127,17 @@ public final class DungeonManager {
                 if (!house.getBounds().contains(player.getLocation()) || insideNow.containsKey(playerId)) continue;
                 insideNow.put(playerId, house.getId());
                 String previousHouse = houseMusicPlayers.get(playerId);
+                Long startedAt = houseMusicStartedAtMs.get(playerId);
                 if (!house.getId().equals(previousHouse)) {
                     if (previousHouse != null) player.stopSound(Sound.MUSIC_DISC_5);
                     player.playSound(player.getLocation(), Sound.MUSIC_DISC_5, volume, pitch);
+                    houseMusicStartedAtMs.put(playerId, now);
+                } else if (startedAt == null || now - startedAt >= MUSIC_DISC_5_DURATION_MS) {
+                    // MUSIC_DISC_5 is a finite vanilla track. Restart it at its end so the house
+                    // has a continuous ambience rather than a one-shot effect.
+                    player.stopSound(Sound.MUSIC_DISC_5);
+                    player.playSound(player.getLocation(), Sound.MUSIC_DISC_5, volume, pitch);
+                    houseMusicStartedAtMs.put(playerId, now);
                 }
             }
         }
@@ -890,10 +1146,12 @@ public final class DungeonManager {
             if (!insideNow.containsKey(playerId)) {
                 Player player = Bukkit.getPlayer(playerId);
                 if (player != null) player.stopSound(Sound.MUSIC_DISC_5);
+                houseMusicStartedAtMs.remove(playerId);
             }
         }
         houseMusicPlayers.clear();
         houseMusicPlayers.putAll(insideNow);
+        houseMusicStartedAtMs.keySet().removeIf(playerId -> !insideNow.containsKey(playerId));
     }
 
     private void stopHouseMusic() {
@@ -902,6 +1160,7 @@ public final class DungeonManager {
             if (player != null) player.stopSound(Sound.MUSIC_DISC_5);
         }
         houseMusicPlayers.clear();
+        houseMusicStartedAtMs.clear();
     }
 
     private void startHeartbeat() {
@@ -923,6 +1182,10 @@ public final class DungeonManager {
                         continue;
                     }
                     World w = d.getOrigin().world();
+                    if (d.getCategory() == DungeonCategory.SURFACE
+                            && d.getStatus() != DungeonStatus.REGENERATING && activePasteCount == 0) {
+                        refreshSurfaceShulkerLootIfDue(d, now);
+                    }
                     BlockPosKey anchor = d.getHologramAnchor();
                     if (w != null && anchor != null && w.isChunkLoaded(anchor.x() >> 4, anchor.z() >> 4)) {
                         updateDungeonHologram(d);
@@ -963,7 +1226,8 @@ public final class DungeonManager {
         World w = anchor.world();
         if (w == null || !w.isChunkLoaded(anchor.x() >> 4, anchor.z() >> 4)) return;
 
-        double yOff = d.getCategory() == DungeonCategory.UNDERGROUND ? 2.35 : 2.15;
+        // Surface anchors are a clear first-floor air cell; keep the three-line display below the ceiling.
+        double yOff = d.getCategory() == DungeonCategory.UNDERGROUND ? 2.35 : 1.55;
         Location holoLoc = new Location(w, anchor.x() + 0.5, anchor.y() + yOff, anchor.z() + 0.5);
         TextDisplay td = findHologram(w, d, holoLoc);
         if (td == null) {
@@ -1099,7 +1363,8 @@ public final class DungeonManager {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < lines.size(); i++) {
             if (i > 0) sb.append('\n');
-            sb.append(TextUtil.color(lines.get(i)
+            String line = lines.get(i).replace("Обновление через:", "Восстановление данжа через:");
+            sb.append(TextUtil.color(line
                     .replace("{ghosts}", String.valueOf(ghosts))
                     .replace("{mobs}", String.valueOf(mobs))
                     .replace("{clock}", clock)
@@ -1159,8 +1424,26 @@ public final class DungeonManager {
                     && (anchor.x() >> 4) == chunk.getX() && (anchor.z() >> 4) == chunk.getZ()) {
                 updateDungeonHologram(dungeon);
             }
+            applyPendingSurfaceShulkersInChunk(dungeon, chunk);
             ensureContainerHologramsInChunk(dungeon, chunk);
         }
+    }
+
+    private void applyPendingSurfaceShulkersInChunk(DungeonInstance dungeon, Chunk chunk) {
+        if (dungeon.getCategory() != DungeonCategory.SURFACE) return;
+        int stacks = Math.max(1, plugin.getConfig().getInt("surface-dungeon.shulker-stacks", 14));
+        boolean changed = false;
+        for (BlockPosKey pos : dungeon.getShulkerPositions()) {
+            if (!pos.worldName().equals(chunk.getWorld().getName())
+                    || (pos.x() >> 4) != chunk.getX() || (pos.z() >> 4) != chunk.getZ()
+                    || !dungeon.getPendingSurfaceShulkerRefresh().contains(pos)) {
+                continue;
+            }
+            SurfaceShulkerRarity rarity = SurfaceShulkerRarity.fromName(
+                    dungeon.getSurfaceShulkerRarities().get(pos));
+            changed |= applySurfaceShulkerState(dungeon, chunk.getWorld(), pos, rarity, stacks);
+        }
+        if (changed) saveDungeons();
     }
 
     private void ensureContainerHologramsInChunk(DungeonInstance dungeon, Chunk chunk) {

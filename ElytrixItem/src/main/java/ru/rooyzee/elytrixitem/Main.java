@@ -44,6 +44,8 @@ import ru.rooyzee.elytrixitem.item.impl.SplitPickaxe;
 import ru.rooyzee.elytrixitem.item.impl.SplitPickaxeListener;
 import ru.rooyzee.elytrixitem.item.impl.Tyagun;
 import ru.rooyzee.elytrixitem.item.impl.TyagunListener;
+import ru.rooyzee.elytrixitem.item.impl.TruthCompass;
+import ru.rooyzee.elytrixitem.item.impl.TruthCompassListener;
 import ru.rooyzee.elytrixitem.menu.MenuListener;
 import ru.rooyzee.elytrixitem.menu.MenuManager;
 import ru.rooyzee.elytrixitem.message.MessageService;
@@ -85,6 +87,7 @@ public final class Main extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new SpawnItemListener(this), this);
         getServer().getPluginManager().registerEvents(new CollectorSwordListener(this), this);
         getServer().getPluginManager().registerEvents(new InfiniteFireworkListener(this), this);
+        getServer().getPluginManager().registerEvents(new TruthCompassListener(this), this);
         getServer().getPluginManager().registerEvents(new ExplosiveTrapListener(this), this);
         getServer().getPluginManager().registerEvents(new TyagunListener(this), this);
         getServer().getPluginManager().registerEvents(new ExperiencePotListener(this), this);
@@ -135,6 +138,7 @@ public final class Main extends JavaPlugin {
         itemRegistry.register(new Tyagun(this));
         itemRegistry.register(new ExperiencePot(this));
         itemRegistry.register(new AntiPearl(this));
+        itemRegistry.register(new TruthCompass(this));
         itemRegistry.register(new ExplosiveTrap(this));
         itemRegistry.register(new FallProtectionAura(this));
         itemRegistry.register(new CrystalProtectionAura(this));

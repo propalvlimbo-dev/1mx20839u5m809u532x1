@@ -40,7 +40,7 @@ import ru.elytrix.dungeons.util.TextUtil;
  * Manages Surface House Ghosts (EntityType.ALLAY):
  *  - Spawns ghosts inside rooms of every Surface House & keeps them leashed inside house walls
  *  - Prevents vanilla Allay duplication / item-handing / passive regen exploits
- *  - On kill: 100% drops Призрачный осколок (amethyst_shard) + 5% weighted Vault Key (mostly common!)
+ *  - On kill: 100% drops Призрачный осколок (amethyst_shard) + 35% weighted Vault Key
  */
 public final class GhostController {
 
@@ -232,8 +232,8 @@ public final class GhostController {
             event.getDrops().add(plugin.getItemsHook().createGhostShard(amt));
         }
 
-        // 2. 5% chance: Vault Key of any rarity (weighted — common drops most frequently!)
-        double keyChance = plugin.getConfig().getDouble("surface-dungeon.ghosts.key-drop-chance", 5.0);
+        // 2. 35% chance: Vault Key of any rarity (weighted — common drops most frequently!)
+        double keyChance = plugin.getConfig().getDouble("surface-dungeon.ghosts.key-drop-chance", 35.0);
         if (rng.nextDouble(100.0) < keyChance) {
             String keyId = rollWeightedKeyId(rng);
             ItemStack keyItem = plugin.getItemsHook().createVaultKey(keyId, 1);

@@ -30,6 +30,8 @@ trap-build-blocked: '{prefix} &cЗдесь нельзя изменять бло�
 trap-cooldown: '{prefix} &cЛовушка ещё перезаряжается.'
 trap-schematic-missing: '{prefix} &cЛовушка временно недоступна: не найдена schem/trapa.schem.'
 firework-not-flying: '{prefix} &cФейерверк можно использовать только во время полёта на элитре!'
+truth-compass-activated: '{prefix} &fКомпас Правды нашёл случайный данж. Координаты появятся в action bar на 2 минуты.'
+truth-compass-no-dungeons: '{prefix} &cНе найдено ни одного активного данжа. Попробуйте позже.'
 
 help:
   - ''
