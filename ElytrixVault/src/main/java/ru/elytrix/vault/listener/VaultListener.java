@@ -54,6 +54,7 @@ public class VaultListener implements Listener {
 
     private final ElytrixVaultPlugin plugin;
     private final Map<UUID, Long> lastFeedbackMs = new HashMap<>();
+    private final Map<UUID, Long> lastOpenedMs = new HashMap<>();
 
     public VaultListener(ElytrixVaultPlugin plugin) {
         this.plugin = plugin;
@@ -88,6 +89,19 @@ public class VaultListener implements Listener {
 
         event.setCancelled(true);
 
+        VaultManager.OpeningSession running = plugin.getVaultManager().getActiveSession(vault.getPos());
+        if (running != null) {
+            if (running.getOpenerUuid().equals(player.getUniqueId())) {
+                lastOpenedMs.put(player.getUniqueId(), System.currentTimeMillis());
+                return;
+            }
+            if (allowFeedback(player)) {
+                player.sendMessage(plugin.msg("vault-busy").replace("{player}", running.getOpenerName()));
+                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 0.7f, 0.9f);
+            }
+            return;
+        }
+
         PlayerInventory inv = player.getInventory();
         ItemStack mainItem = inv.getItemInMainHand();
         VaultKeyType mainKey = plugin.getKeyRegistry().resolveKeyItem(mainItem);
@@ -107,10 +121,17 @@ public class VaultListener implements Listener {
         }
 
         if (chosenKey == null) {
+            if (action == Action.RIGHT_CLICK_BLOCK && event.getHand() != EquipmentSlot.HAND) {
+                return;
+            }
             if (action == Action.LEFT_CLICK_BLOCK && player.hasPermission("elytrixvault.admin") && player.isSneaking()) {
                 if (allowFeedback(player)) {
                     player.sendMessage(plugin.msg("cannot-break"));
                 }
+                return;
+            }
+            Long openedAt = lastOpenedMs.get(player.getUniqueId());
+            if (openedAt != null && System.currentTimeMillis() - openedAt < 1200L) {
                 return;
             }
             pushPlayerBack(player, vault);
@@ -118,15 +139,6 @@ public class VaultListener implements Listener {
         }
 
         if (event.getHand() != null && event.getHand() != usedHand) {
-            return;
-        }
-
-        VaultManager.OpeningSession running = plugin.getVaultManager().getActiveSession(vault.getPos());
-        if (running != null) {
-            if (allowFeedback(player)) {
-                player.sendMessage(plugin.msg("vault-busy").replace("{player}", running.getOpenerName()));
-                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 0.7f, 0.9f);
-            }
             return;
         }
 
@@ -146,6 +158,7 @@ public class VaultListener implements Listener {
             return;
         }
 
+        lastOpenedMs.put(player.getUniqueId(), System.currentTimeMillis());
         if (!plugin.getVaultManager().startOpening(player, vault, chosenKey, rolled)) {
             plugin.getKeyRegistry().giveOrDropProtected(player, chosenKey.createKeyItem(plugin.getKeyRegistry().getKeyPdc(), 1));
         }
@@ -374,7 +387,9 @@ public class VaultListener implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        lastFeedbackMs.remove(event.getPlayer().getUniqueId());
+        UUID uid = event.getPlayer().getUniqueId();
+        lastFeedbackMs.remove(uid);
+        lastOpenedMs.remove(uid);
         plugin.getVaultManager().handlePlayerQuit(event.getPlayer());
     }
 

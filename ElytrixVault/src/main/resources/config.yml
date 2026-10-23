@@ -1,3 +1,5 @@
+config-version: 2
+
 settings:
   pushback:
     enabled: true
@@ -11,16 +13,19 @@ animation:
 
 hologram:
   enabled: true
-  height-offset: 1.45
-  line-width: 220
+  idle-height-offset: 1.65
+  active-height-offset: 2.25
+  line-width: 240
   view-range: 0.65
   idle-lines:
     - "&#F8BEFBХранилище"
     - "&7ПКМ ключом для открытия"
-  active-lines:
-    - "&#F8BEFBХранилище"
-    - "&fОткрывает: &#F8BEFB{player}"
-    - "&7Ключ: {key}"
+  opening-start-lines:
+    - "{key}"
+    - "&7Открывает: &#F8BEFB{player}"
+  opening-reward-lines:
+    - "{reward}"
+    - "&7Открывает: &#F8BEFB{player}"
 
 rarities:
   COMMON:

@@ -16,6 +16,8 @@ import ru.elytrix.vault.util.TextUtil;
 
 public final class ElytrixVaultPlugin extends JavaPlugin {
 
+    private static final int CURRENT_CONFIG_VERSION = 2;
+
     private FileConfiguration messages;
     private KeyRegistry keyRegistry;
     private VaultManager vaultManager;
@@ -23,6 +25,7 @@ public final class ElytrixVaultPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         saveDefaultConfig();
+        upgradeConfigIfNeeded();
         loadMessages();
 
         this.keyRegistry = new KeyRegistry(this);
@@ -55,9 +58,17 @@ public final class ElytrixVaultPlugin extends JavaPlugin {
 
     public void reloadAll() {
         reloadConfig();
+        upgradeConfigIfNeeded();
         loadMessages();
         keyRegistry.load();
         vaultManager.load();
+    }
+
+    private void upgradeConfigIfNeeded() {
+        if (getConfig().getInt("config-version", 1) < CURRENT_CONFIG_VERSION) {
+            saveResource("config.yml", true);
+            reloadConfig();
+        }
     }
 
     private void loadMessages() {

@@ -61,6 +61,7 @@ public class VaultManager {
         private final List<LootEntry> allRewards;
         private final Deque<LootEntry> remaining;
         private final List<Entity> tempEntities = new ArrayList<>();
+        private LootEntry latestEjected;
         private BukkitTask task;
 
         OpeningSession(VaultBlock vault, Player opener, VaultKeyType keyType, List<LootEntry> rolled) {
@@ -218,7 +219,7 @@ public class VaultManager {
         vaultsByPos.put(pos, vault);
 
         applySilentShrieker(targetBlock);
-        ensureHologram(vault, buildIdleText());
+        ensureHologram(vault, buildIdleText(), false);
         save();
         return vault;
     }
@@ -277,7 +278,7 @@ public class VaultManager {
                 applySilentShrieker(block);
             }
             OpeningSession session = activeSessions.get(vb.getPos());
-            ensureHologram(vb, session == null ? buildIdleText() : buildActiveText(session));
+            ensureHologram(vb, session == null ? buildIdleText() : buildActiveText(session), session != null);
         }
     }
 
@@ -294,7 +295,7 @@ public class VaultManager {
                     applySilentShrieker(b);
                 }
                 OpeningSession session = activeSessions.get(p);
-                ensureHologram(vb, session == null ? buildIdleText() : buildActiveText(session));
+                ensureHologram(vb, session == null ? buildIdleText() : buildActiveText(session), session != null);
             }
         }
     }
@@ -309,7 +310,7 @@ public class VaultManager {
             if (session.openerUuid.equals(uid)) {
                 activeSessions.remove(session.vault.getPos());
                 abortAndDeliverRemaining(session);
-                ensureHologram(session.vault, buildIdleText());
+                ensureHologram(session.vault, buildIdleText(), false);
             }
         }
     }
@@ -321,7 +322,7 @@ public class VaultManager {
         OpeningSession session = new OpeningSession(vault, player, keyType, rolled);
         activeSessions.put(vault.getPos(), session);
 
-        ensureHologram(vault, buildActiveText(session));
+        ensureHologram(vault, buildActiveText(session), true);
 
         Location center = vault.getCenterLocation();
         World world = center.getWorld();
@@ -332,7 +333,7 @@ public class VaultManager {
         int visualItemLife = Math.max(14, plugin.getConfig().getInt("animation.visual-item-lifetime-ticks", 22));
         int stepInterval = rolled.size() >= 5 ? 5 : (rolled.size() >= 3 ? 6 : 8);
 
-        Location keyLoc = center.clone().add(0.0, 0.85, 0.0);
+        Location keyLoc = center.clone().add(0.0, 0.72, 0.0);
         keyLoc.setYaw(yawToPlayer);
         keyLoc.setPitch(0.0f);
         ItemDisplay keyDisplay = spawnKeyDisplay(world, keyLoc, keyType, insertTicks);
@@ -355,7 +356,6 @@ public class VaultManager {
             private int nextEjectTick = insertTicks + 2;
             private int finishTick = -1;
             private int ejectedIndex = 0;
-            private TextDisplay currentItemLabel;
 
             @Override
             public void run() {
@@ -379,14 +379,9 @@ public class VaultManager {
                             plugin.getKeyRegistry().enqueuePendingReward(session.openerUuid, next);
                         }
 
+                        session.latestEjected = next;
+                        ensureHologram(vault, buildActiveText(session), true);
                         spawnVisualEjectedReward(world, center, opener, next, ejectedIndex, session.allRewards.size(), visualItemLife, session);
-                        if (currentItemLabel != null && currentItemLabel.isValid()) {
-                            currentItemLabel.remove();
-                        }
-                        currentItemLabel = spawnFloatingRewardLabel(world, center.clone().add(0.0, 1.05, 0.0), next);
-                        if (currentItemLabel != null) {
-                            session.tempEntities.add(currentItemLabel);
-                        }
 
                         ejectedIndex++;
                         nextEjectTick = tick + stepInterval;
@@ -400,13 +395,10 @@ public class VaultManager {
 
                 if (finishTick > 0 && tick >= finishTick) {
                     cancel();
-                    if (currentItemLabel != null && currentItemLabel.isValid()) {
-                        currentItemLabel.remove();
-                    }
                     cleanupSessionEntities(session);
                     activeSessions.remove(vault.getPos());
                     world.playSound(center, Sound.BLOCK_VAULT_CLOSE_SHUTTER, 0.85f, 1.0f);
-                    ensureHologram(vault, buildIdleText());
+                    ensureHologram(vault, buildIdleText(), false);
 
                     Player opener = Bukkit.getPlayer(session.openerUuid);
                     if (opener != null && opener.isOnline()) {
@@ -452,7 +444,7 @@ public class VaultManager {
             double nz = horiz.getX() * sin + horiz.getZ() * cos;
             horiz = new Vector(nx, 0.0, nz);
         }
-        Vector velocity = horiz.multiply(0.115).setY(0.30);
+        Vector velocity = horiz.multiply(0.115).setY(0.24);
 
         Item dropped = world.dropItem(spawnAt, visualStack, item -> {
             item.setPickupDelay(32767);
@@ -514,31 +506,6 @@ public class VaultManager {
         return display;
     }
 
-    private TextDisplay spawnFloatingRewardLabel(World world, Location loc, LootEntry entry) {
-        Entity spawned = world.spawnEntity(loc, EntityType.TEXT_DISPLAY);
-        if (!(spawned instanceof TextDisplay td)) {
-            spawned.remove();
-            return null;
-        }
-        ItemStack stack = entry.getPreviewItem();
-        String color = plugin.getKeyRegistry().getRarityColor(entry.getRarity());
-        String title = TextUtil.cleanItemTitle(stack);
-        String label = TextUtil.color(color + title + (stack.getAmount() > 1 ? " &7x" + stack.getAmount() : ""));
-
-        td.setPersistent(false);
-        td.getPersistentDataContainer().set(tempEntityPdc, PersistentDataType.BYTE, (byte) 1);
-        td.setBillboard(Display.Billboard.CENTER);
-        td.setAlignment(TextDisplay.TextAlignment.CENTER);
-        td.setDefaultBackground(false);
-        td.setBackgroundColor(Color.fromARGB(0, 0, 0, 0));
-        td.setShadowed(true);
-        td.setSeeThrough(false);
-        td.setLineWidth(200);
-        td.setViewRange(0.45f);
-        td.setText(label);
-        return td;
-    }
-
     private void sendSummaryMessage(Player opener, OpeningSession session) {
         String header = plugin.rawMsg("opened-summary-header")
                 .replace("{key}", TextUtil.color(session.keyType.getDisplayName()));
@@ -591,9 +558,29 @@ public class VaultManager {
     }
 
     private String buildActiveText(OpeningSession session) {
-        List<String> lines = plugin.getConfig().getStringList("hologram.active-lines");
+        if (session.latestEjected != null) {
+            LootEntry entry = session.latestEjected;
+            ItemStack st = entry.getPreviewItem();
+            String color = plugin.getKeyRegistry().getRarityColor(entry.getRarity());
+            String rewardText = color + TextUtil.cleanItemTitle(st)
+                    + (st.getAmount() > 1 ? " &7x" + st.getAmount() : "");
+            List<String> lines = plugin.getConfig().getStringList("hologram.opening-reward-lines");
+            if (lines.isEmpty()) {
+                lines = List.of("{reward}", "&7Открывает: &#F8BEFB{player}");
+            }
+            List<String> replaced = new ArrayList<>(lines.size());
+            for (String line : lines) {
+                replaced.add(line
+                        .replace("{reward}", rewardText)
+                        .replace("{player}", session.openerName)
+                        .replace("{key}", session.keyType.getDisplayName()));
+            }
+            return joinColored(replaced);
+        }
+
+        List<String> lines = plugin.getConfig().getStringList("hologram.opening-start-lines");
         if (lines.isEmpty()) {
-            lines = List.of("&#F8BEFBХранилище", "&fОткрывает: &#F8BEFB{player}", "&7Ключ: {key}");
+            lines = List.of("{key}", "&7Открывает: &#F8BEFB{player}");
         }
         List<String> replaced = new ArrayList<>(lines.size());
         for (String line : lines) {
@@ -613,7 +600,7 @@ public class VaultManager {
         return sb.toString();
     }
 
-    private void ensureHologram(VaultBlock vault, String coloredText) {
+    private void ensureHologram(VaultBlock vault, String coloredText, boolean elevated) {
         if (!plugin.getConfig().getBoolean("hologram.enabled", true)) {
             removeHologram(vault);
             return;
@@ -622,7 +609,9 @@ public class VaultManager {
         if (world == null || !world.isChunkLoaded(vault.getPos().getX() >> 4, vault.getPos().getZ() >> 4)) {
             return;
         }
-        double offsetY = plugin.getConfig().getDouble("hologram.height-offset", 1.45);
+        double offsetY = elevated
+                ? plugin.getConfig().getDouble("hologram.active-height-offset", 2.25)
+                : plugin.getConfig().getDouble("hologram.idle-height-offset", 1.65);
         Location holoLoc = new Location(
                 world,
                 vault.getPos().getX() + 0.5,
@@ -640,6 +629,7 @@ public class VaultManager {
             display = created;
             vault.setHologramUuid(display.getUniqueId());
         } else {
+            display.setTeleportDuration(5);
             display.teleport(holoLoc);
         }
 
@@ -651,7 +641,7 @@ public class VaultManager {
         display.setBackgroundColor(Color.fromARGB(0, 0, 0, 0));
         display.setShadowed(true);
         display.setSeeThrough(false);
-        display.setLineWidth(plugin.getConfig().getInt("hologram.line-width", 220));
+        display.setLineWidth(plugin.getConfig().getInt("hologram.line-width", 240));
         display.setViewRange((float) plugin.getConfig().getDouble("hologram.view-range", 0.65));
         display.setText(coloredText);
     }
