@@ -69,11 +69,12 @@ public final class OffhandBonusListener implements Listener {
         ItemStack offhand = player.getInventory().getItemInOffHand();
         OffhandBonusItem bonus = resolve(offhand);
 
-        Map<Attribute, Double> stats = new LinkedHashMap<>();
+        Map<String, Desired> stats = new LinkedHashMap<>();
         List<OffhandBonusItem.Effect> effects = new ArrayList<>();
         if (bonus != null) {
             for (OffhandBonusItem.Stat stat : bonus.getStats()) {
-                stats.merge(stat.getAttribute(), stat.getAmount(), Double::sum);
+                stats.put(statKey(stat), new Desired(stat.getAttribute(),
+                        stat.getOperation(), stat.getAmount()));
             }
             effects.addAll(bonus.getEffects(offhand));
         }
@@ -84,7 +85,7 @@ public final class OffhandBonusListener implements Listener {
 
     // ---------- характеристики ----------
 
-    private void applyStats(Player player, Map<Attribute, Double> desired) {
+    private void applyStats(Player player, Map<String, Desired> desired) {
         Map<String, Applied> previous = appliedStats.computeIfAbsent(player.getUniqueId(),
                 ignored -> new HashMap<>());
 
@@ -95,9 +96,9 @@ public final class OffhandBonusListener implements Listener {
              iterator.hasNext(); ) {
             Map.Entry<String, Applied> entry = iterator.next();
             Applied applied = entry.getValue();
-            Double amount = desired.get(applied.attribute);
+            Desired want = desired.get(entry.getKey());
 
-            if (amount != null && Math.abs(amount - applied.amount) < EPSILON) {
+            if (want != null && Math.abs(want.amount - applied.amount) < EPSILON) {
                 continue;
             }
 
@@ -105,27 +106,27 @@ public final class OffhandBonusListener implements Listener {
             iterator.remove();
         }
 
-        for (Map.Entry<Attribute, Double> entry : desired.entrySet()) {
-            String statKey = entry.getKey().getKey().getKey().toLowerCase(Locale.ROOT);
-            if (previous.containsKey(statKey)) {
+        for (Map.Entry<String, Desired> entry : desired.entrySet()) {
+            if (previous.containsKey(entry.getKey())) {
                 continue;
             }
 
-            AttributeInstance instance = player.getAttribute(entry.getKey());
+            Desired want = entry.getValue();
+            AttributeInstance instance = player.getAttribute(want.attribute);
             if (instance == null) {
                 continue;
             }
 
-            NamespacedKey modifierKey = new NamespacedKey(plugin, "offhand_" + statKey);
-            AttributeModifier modifier = new AttributeModifier(modifierKey, entry.getValue(),
-                    AttributeModifier.Operation.ADD_NUMBER);
+            NamespacedKey modifierKey = new NamespacedKey(plugin, "offhand_" + entry.getKey());
+            AttributeModifier modifier = new AttributeModifier(modifierKey, want.amount,
+                    want.operation);
             for (AttributeModifier existing : new ArrayList<>(instance.getModifiers())) {
                 if (existing.getKey().equals(modifierKey)) {
                     instance.removeModifier(existing);
                 }
             }
             instance.addModifier(modifier);
-            previous.put(statKey, new Applied(entry.getKey(), modifier, entry.getValue()));
+            previous.put(entry.getKey(), new Applied(want.attribute, modifier, want.amount));
         }
 
         double newMax = maxHealth(player);
@@ -136,6 +137,11 @@ public final class OffhandBonusListener implements Listener {
         } else if (health > newMax) {
             player.setHealth(newMax);
         }
+    }
+
+    private String statKey(OffhandBonusItem.Stat stat) {
+        return stat.getAttribute().getKey().getKey().toLowerCase(Locale.ROOT) + "_"
+                + stat.getOperation().name().toLowerCase(Locale.ROOT);
     }
 
     private void remove(Player player, Applied applied) {
@@ -198,10 +204,15 @@ public final class OffhandBonusListener implements Listener {
 
     // ---------- минусы ----------
 
-    /** Минус шара: с шансом вешает эффект на самого владельца после его удара. */
+    /**
+     * Минусы шара: срабатывают с шансом, когда владелец бьёт.
+     *
+     * Эффект вешается на владельца, огонь поджигает его же (и проходит сквозь
+     * огнестойкость), а обратный удар возвращает ему урон его же удара.
+     */
     @EventHandler(ignoreCancelled = true)
     public void onHit(EntityDamageByEntityEvent event) {
-        if (!(event.getDamager() instanceof Player player)) {
+        if (!(event.getDamager() instanceof Player player) || event.getEntity().equals(player)) {
             return;
         }
 
@@ -215,8 +226,22 @@ public final class OffhandBonusListener implements Listener {
                 continue;
             }
 
-            player.addPotionEffect(new PotionEffect(drawback.getType(),
-                    drawback.getDurationTicks(), drawback.getLevel() - 1, false, true, true), true);
+            switch (drawback.getKind()) {
+                case EFFECT -> player.addPotionEffect(new PotionEffect(drawback.getType(),
+                        drawback.getDurationTicks(), drawback.getLevel() - 1, false, true, true),
+                        true);
+                case FIRE -> ignite(player, drawback.getDurationTicks());
+                case REFLECT -> player.damage(Math.max(0.5D, event.getFinalDamage()));
+            }
+        }
+    }
+
+    /** Поджог владельца: обычный огонь, но огнестойкость его не спасает. */
+    private void ignite(Player player, int ticks) {
+        player.setFireTicks(Math.max(player.getFireTicks(), ticks));
+
+        if (player.hasPotionEffect(PotionEffectType.FIRE_RESISTANCE)) {
+            player.damage(ticks / 20.0D);
         }
     }
 
@@ -298,6 +323,19 @@ public final class OffhandBonusListener implements Listener {
     private RuneItem runeOf(ItemStack item) {
         OffhandBonusItem bonus = resolve(item);
         return bonus instanceof RuneItem rune ? rune : null;
+    }
+
+    private static final class Desired {
+
+        private final Attribute attribute;
+        private final AttributeModifier.Operation operation;
+        private final double amount;
+
+        private Desired(Attribute attribute, AttributeModifier.Operation operation, double amount) {
+            this.attribute = attribute;
+            this.operation = operation;
+            this.amount = amount;
+        }
     }
 
     private static final class Applied {

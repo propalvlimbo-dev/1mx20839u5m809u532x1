@@ -24,6 +24,7 @@ public interface LivingEntity extends Entity {
     void setVelocity(Vector vector);
     boolean addPotionEffect(PotionEffect effect);
     boolean addPotionEffect(PotionEffect effect, boolean force);
+    boolean hasPotionEffect(PotionEffectType type);
     PotionEffect getPotionEffect(PotionEffectType type);
     void removePotionEffect(PotionEffectType type);
     Collection<PotionEffect> getActivePotionEffects();

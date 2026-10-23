@@ -1,6 +1,7 @@
 package ru.rooyzee.elytrixitem.item;
 
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
@@ -29,12 +30,24 @@ public interface OffhandBonusItem extends CustomItem {
 
         private final Attribute attribute;
         private final double amount;
+        private final AttributeModifier.Operation operation;
         private final String label;
 
         public Stat(Attribute attribute, double amount, String label) {
+            this(attribute, amount, AttributeModifier.Operation.ADD_NUMBER, label);
+        }
+
+        private Stat(Attribute attribute, double amount, AttributeModifier.Operation operation,
+                     String label) {
             this.attribute = attribute;
             this.amount = amount;
-            this.label = number(Math.abs(amount)) + " " + label;
+            this.operation = operation;
+            this.label = display(amount, operation, label);
+        }
+
+        /** Штраф или бонус в процентах: -0.3 — это «-30% скорости». */
+        public static Stat percent(Attribute attribute, double amount, String label) {
+            return new Stat(attribute, amount, AttributeModifier.Operation.MULTIPLY_SCALAR_1, label);
         }
 
         public Attribute getAttribute() {
@@ -45,8 +58,21 @@ public interface OffhandBonusItem extends CustomItem {
             return amount;
         }
 
+        public AttributeModifier.Operation getOperation() {
+            return operation;
+        }
+
         public String getLabel() {
             return label;
+        }
+
+        private static String display(double amount, AttributeModifier.Operation operation,
+                                      String label) {
+            double value = Math.abs(amount);
+            if (operation == AttributeModifier.Operation.ADD_NUMBER) {
+                return number(value) + " " + label;
+            }
+            return number(Math.round(value * 1000.0D) / 10.0D) + "% " + label;
         }
 
         private static String number(double value) {
@@ -57,9 +83,19 @@ public interface OffhandBonusItem extends CustomItem {
         }
     }
 
-    /** Минус: с шансом вешает на владельца неприятный эффект после удара. */
+    /** Минус: срабатывает с шансом, когда владелец бьёт. */
     final class Drawback {
 
+        public enum Kind {
+            /** Неприятный эффект на владельца. */
+            EFFECT,
+            /** Владелец загорается: огонь проходит сквозь огнестойкость. */
+            FIRE,
+            /** Урон удара возвращается владельцу. */
+            REFLECT
+        }
+
+        private final Kind kind;
         private final PotionEffectType type;
         private final int level;
         private final int durationTicks;
@@ -68,11 +104,29 @@ public interface OffhandBonusItem extends CustomItem {
 
         public Drawback(PotionEffectType type, int level, int durationTicks, double chance,
                         String label) {
+            this(Kind.EFFECT, type, level, durationTicks, chance, label);
+        }
+
+        private Drawback(Kind kind, PotionEffectType type, int level, int durationTicks,
+                         double chance, String label) {
+            this.kind = kind;
             this.type = type;
             this.level = level;
             this.durationTicks = durationTicks;
             this.chance = chance;
             this.label = label;
+        }
+
+        public static Drawback fire(int durationTicks, double chance) {
+            return new Drawback(Kind.FIRE, null, 0, durationTicks, chance, "загореться");
+        }
+
+        public static Drawback reflect(double chance) {
+            return new Drawback(Kind.REFLECT, null, 0, 0, chance, "обратного удара");
+        }
+
+        public Kind getKind() {
+            return kind;
         }
 
         public PotionEffectType getType() {
@@ -94,11 +148,16 @@ public interface OffhandBonusItem extends CustomItem {
 
         /** «5% шанс отравления после удара» — как минус пишется в лоре. */
         public String describe() {
-            return percent(chance) + " шанс " + label + " после удара";
+            return switch (kind) {
+                case EFFECT -> percent(chance) + " шанс " + label + " после удара";
+                case FIRE -> percent(chance) + " шанс загореться после удара "
+                        + "(сквозь огнестойкость)";
+                case REFLECT -> percent(chance) + " шанс " + label;
+            };
         }
 
         private static String percent(double value) {
-            double percent = value * 100.0D;
+            double percent = Math.round(value * 1000.0D) / 10.0D;
             if (percent == Math.rint(percent)) {
                 return String.valueOf((long) percent) + "%";
             }

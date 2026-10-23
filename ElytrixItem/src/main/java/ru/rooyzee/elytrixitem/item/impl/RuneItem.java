@@ -60,11 +60,21 @@ public final class RuneItem implements OffhandBonusItem {
         return this;
     }
 
+    /** Штраф в процентах, например -30% скорости. */
+    public RuneItem percent(Attribute attribute, double amount, String label) {
+        this.stats.add(Stat.percent(attribute, amount, label));
+        return this;
+    }
+
     /** Минус шара: срабатывает с шансом после удара. */
+    public RuneItem drawback(Drawback drawback) {
+        this.drawbacks.add(drawback);
+        return this;
+    }
+
     public RuneItem drawback(PotionEffectType type, int level, int durationTicks, double chance,
                              String label) {
-        this.drawbacks.add(new Drawback(type, level, durationTicks, chance, label));
-        return this;
+        return drawback(new Drawback(type, level, durationTicks, chance, label));
     }
 
     /** Эффект, который включится после пробуждения. */
