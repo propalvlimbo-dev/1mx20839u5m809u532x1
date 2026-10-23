@@ -4,17 +4,17 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Deque;
 import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -23,7 +23,6 @@ import org.bukkit.HeightMap;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -50,6 +49,7 @@ import ru.elytrix.dungeons.model.LootPoolType;
 import ru.elytrix.dungeons.structure.SpongeSchematicCodec;
 import ru.elytrix.dungeons.structure.StarterSchemFactory;
 import ru.elytrix.dungeons.structure.TerrainSnapshotStore;
+import ru.elytrix.dungeons.structure.TerrainSnapshotStore.BlockRestoreDiff;
 import ru.elytrix.dungeons.util.TextUtil;
 
 public final class DungeonManager {
@@ -66,10 +66,14 @@ public final class DungeonManager {
     private final Map<String, DungeonTemplate> templatesById = new LinkedHashMap<>();
     private final Map<DungeonCategory, List<DungeonTemplate>> templatesByCategory = new EnumMap<>(DungeonCategory.class);
     private final Map<String, DungeonInstance> dungeons = new LinkedHashMap<>();
-    private final Map<BlockPosKey, String> interactiveBlockIndex = new HashMap<>();
+    private final Map<BlockPosKey, String> protectedContainerIndex = new HashMap<>();
+
+    private boolean hiddenFromWorld = false;
+    private int pendingScanTotal = 0;
+    private int pendingScanDone = 0;
 
     private BukkitTask heartbeatTask;
-    private BukkitTask pasteWorkerTask;
+    private BukkitTask workerTask;
     private final Deque<Runnable> jobQueue = new ArrayDeque<>();
 
     public DungeonManager(ElytrixDungeonsPlugin plugin) {
@@ -89,39 +93,82 @@ public final class DungeonManager {
 
     public void startup() {
         loadSchematics();
-        loadDungeons();
+        boolean hadSaved = loadDungeonsFromDisk();
         startHeartbeat();
 
-        if (plugin.getConfig().getBoolean("auto-spawn.enabled", true)) {
+        if (hadSaved) {
+            // Re-place previously found dungeons onto their saved spots WITHOUT searching for new locations!
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                plugin.getLogger().info("Restoring " + dungeons.size() + " saved dungeons onto locked coordinates...");
+                for (DungeonInstance d : new ArrayList<>(dungeons.values())) {
+                    enqueueJob(() -> restoreSavedDungeonOnStartup(d));
+                }
+            }, 20L);
+        } else if (plugin.getConfig().getBoolean("auto-spawn.enabled", true)) {
             Bukkit.getScheduler().runTaskLater(plugin, this::ensureTargetDungeonCounts, 20L);
         }
     }
 
+    /**
+     * When the plugin disables / server shuts down:
+     *  - Stops fights & removes all Allay ghosts and holograms
+     *  - Saves locked spots & state in dungeons.yml
+     *  - Restores virgin natural terrain across all 14 dungeons so if the plugin stays disabled/removed,
+     *    zero traces of any dungeon remain in the world!
+     */
     public void shutdown() {
         if (heartbeatTask != null) {
             heartbeatTask.cancel();
             heartbeatTask = null;
         }
-        if (pasteWorkerTask != null) {
-            pasteWorkerTask.cancel();
-            pasteWorkerTask = null;
+        if (workerTask != null) {
+            workerTask.cancel();
+            workerTask = null;
         }
+        jobQueue.clear();
         plugin.getTrialController().shutdownAll();
+        plugin.getGhostController().shutdownAll(dungeons.values());
+        saveDungeons();
+
+        if (plugin.getConfig().getBoolean("auto-spawn.hide-dungeons-on-disable", true) && !hiddenFromWorld) {
+            plugin.getLogger().info("Hiding " + dungeons.size() + " dungeons & restoring natural terrain (locations stay saved in dungeons.yml)...");
+            for (DungeonInstance d : dungeons.values()) {
+                removeHologram(d);
+                try {
+                    snapshotStore.restoreWorldSnapshotInstant(d.getId());
+                } catch (IOException ex) {
+                    plugin.getLogger().warning("Could not restore snapshot on disable for " + d.getId() + ": " + ex.getMessage());
+                }
+            }
+            hiddenFromWorld = true;
+        }
+    }
+
+    public void hideAllDungeonsNow() {
+        plugin.getTrialController().shutdownAll();
+        plugin.getGhostController().shutdownAll(dungeons.values());
+        for (DungeonInstance d : dungeons.values()) {
+            removeHologram(d);
+            try {
+                snapshotStore.restoreWorldSnapshotInstant(d.getId());
+            } catch (IOException ignored) {
+            }
+        }
+        hiddenFromWorld = true;
         saveDungeons();
     }
 
-    public Set<String> configuredShardMaterials() {
-        Set<String> set = new HashSet<>();
-        for (String s : plugin.getConfig().getStringList("sky-dungeon.shard-block-types")) {
-            set.add(s.toUpperCase(Locale.ROOT));
+    public void showAllDungeonsNow() {
+        hiddenFromWorld = false;
+        for (DungeonInstance d : new ArrayList<>(dungeons.values())) {
+            enqueueJob(() -> restoreSavedDungeonOnStartup(d));
         }
-        if (set.isEmpty()) {
-            set.add("AMETHYST_CLUSTER");
-            set.add("LARGE_AMETHYST_BUD");
-            set.add("BUDDING_AMETHYST");
-        }
-        return set;
     }
+
+    public boolean isHiddenFromWorld() { return hiddenFromWorld; }
+    public int getPendingScanDone() { return pendingScanDone; }
+    public int getPendingScanTotal() { return pendingScanTotal; }
+    public boolean isScanning() { return pendingScanTotal > 0 && pendingScanDone < pendingScanTotal; }
 
     public void loadSchematics() {
         templatesById.clear();
@@ -131,9 +178,8 @@ public final class DungeonManager {
             if (plugin.getConfig().getBoolean("auto-spawn.write-starter-schems-if-empty", true) && !hasAnySchemFile(dir)) {
                 try {
                     switch (cat) {
-                        case SURFACE -> StarterSchemFactory.writeStarterSurfaceSchem(new File(dir, "surface_starter.schem"));
-                        case UNDERGROUND -> StarterSchemFactory.writeStarterUndergroundSchem(new File(dir, "underground_starter.schem"));
-                        case SKY -> StarterSchemFactory.writeStarterSkySchem(new File(dir, "sky_starter.schem"));
+                        case SURFACE -> StarterSchemFactory.writeStarterSurfacePair(dir);
+                        case UNDERGROUND -> StarterSchemFactory.writeStarterUndergroundPair(dir);
                     }
                 } catch (IOException ex) {
                     plugin.getLogger().warning("Failed writing starter .schem in " + dir + ": " + ex.getMessage());
@@ -141,15 +187,12 @@ public final class DungeonManager {
             }
             File[] files = dir.listFiles();
             if (files == null) continue;
-            int uniqueCount = plugin.getConfig().getInt("surface-dungeon.unique-shulker-count", 3);
-            int minShards = plugin.getConfig().getInt("sky-dungeon.min-shards-if-missing-in-schem", 8);
-            Set<String> shardMats = configuredShardMaterials();
-
+            Arrays.sort(files, Comparator.comparing(f -> f.getName().toLowerCase(Locale.ROOT)));
             for (File f : files) {
                 String n = f.getName().toLowerCase(Locale.ROOT);
                 if (!n.endsWith(".schem") && !n.endsWith(".schematic")) continue;
                 try {
-                    DungeonTemplate tpl = SpongeSchematicCodec.readSchem(f, cat, uniqueCount, minShards, shardMats);
+                    DungeonTemplate tpl = SpongeSchematicCodec.readSchem(f, cat);
                     templatesById.put(tpl.getId(), tpl);
                     templatesByCategory.get(cat).add(tpl);
                 } catch (Exception ex) {
@@ -169,82 +212,90 @@ public final class DungeonManager {
         return false;
     }
 
-    public void loadDungeons() {
+    private boolean loadDungeonsFromDisk() {
         dungeons.clear();
-        interactiveBlockIndex.clear();
-        if (!dungeonsFile.exists()) return;
+        protectedContainerIndex.clear();
+        if (!dungeonsFile.exists()) return false;
 
         YamlConfiguration yml = YamlConfiguration.loadConfiguration(dungeonsFile);
         ConfigurationSection sec = yml.getConfigurationSection("dungeons");
-        if (sec == null) return;
+        if (sec == null || sec.getKeys(false).isEmpty()) return false;
 
-        int pad = plugin.getConfig().getInt("protection.claim-padding-blocks", 12);
+        int pad = plugin.getConfig().getInt("protection.claim-padding-blocks", 40);
         boolean allowPvp = plugin.getConfig().getBoolean("protection.allow-pvp", true);
-        int maxSurfaceShulkers = plugin.getConfig().getInt("surface-dungeon.unique-shulker-count", 3);
+        boolean allowBreak = plugin.getConfig().getBoolean("protection.allow-block-modify-in-zone", true);
 
         for (String id : sec.getKeys(false)) {
             ConfigurationSection d = sec.getConfigurationSection(id);
             if (d == null) continue;
             BlockPosKey origin = BlockPosKey.deserialize(d.getString("origin"));
-            DungeonCategory cat = DungeonCategory.valueOf(d.getString("category", "SURFACE"));
-            String tplId = d.getString("template", "");
-            DungeonTemplate tpl = resolveTemplateOrCategoryFallback(tplId, cat);
+            DungeonCategory cat;
+            try {
+                cat = DungeonCategory.valueOf(d.getString("category", "SURFACE"));
+            } catch (IllegalArgumentException ex) {
+                continue;
+            }
+            DungeonTemplate tpl = resolveTemplateOrCategoryFallback(d.getString("template", ""), cat);
             if (origin == null || tpl == null) continue;
 
-            CuboidRegion bounds = new CuboidRegion(
+            CuboidRegion structBounds = new CuboidRegion(
                     origin.worldName(),
                     d.getInt("bounds.min-x"), d.getInt("bounds.min-y"), d.getInt("bounds.min-z"),
                     d.getInt("bounds.max-x"), d.getInt("bounds.max-y"), d.getInt("bounds.max-z")
             );
+            CuboidRegion snapBounds = d.isConfigurationSection("snapshot-bounds")
+                    ? new CuboidRegion(
+                            origin.worldName(),
+                            d.getInt("snapshot-bounds.min-x"), d.getInt("snapshot-bounds.min-y"), d.getInt("snapshot-bounds.min-z"),
+                            d.getInt("snapshot-bounds.max-x"), d.getInt("snapshot-bounds.max-y"), d.getInt("snapshot-bounds.max-z"))
+                    : structBounds.expand(12, 8);
+
             DungeonInstance inst = new DungeonInstance(
                     id,
-                    d.getString("display-name", cat.getTitle() + " данж"),
+                    d.getString("display-name", cat.getTitle()),
                     tpl.getId(),
                     cat,
                     origin,
-                    bounds,
+                    structBounds,
+                    snapBounds,
                     d.getInt("surface-y", origin.y()),
                     d.getLong("next-reset-ms", System.currentTimeMillis() + resetIntervalMs())
             );
-            DungeonStatus st;
             try {
-                st = DungeonStatus.valueOf(d.getString("status", "READY"));
-            } catch (IllegalArgumentException ex) {
-                st = DungeonStatus.READY;
-            }
-            inst.setStatus(st == DungeonStatus.CLEARED ? DungeonStatus.CLEARED : DungeonStatus.READY);
-
-            String holoStr = d.getString("hologram-uuid");
-            if (holoStr != null && !holoStr.isEmpty()) {
-                try {
-                    inst.setHologramUuid(UUID.fromString(holoStr));
-                } catch (IllegalArgumentException ignored) {
-                }
+                DungeonStatus st = DungeonStatus.valueOf(d.getString("status", "READY"));
+                inst.setStatus(st == DungeonStatus.CLEARED ? DungeonStatus.CLEARED : DungeonStatus.READY);
+            } catch (IllegalArgumentException ignored) {
             }
 
-            inst.applyTemplateMarkers(tpl, maxSurfaceShulkers);
-
+            inst.applyTemplateMarkers(tpl);
             for (String unlockedKey : d.getStringList("unlocked-shulkers")) {
                 BlockPosKey pk = BlockPosKey.deserialize(unlockedKey);
                 if (pk != null && inst.getShulkerUnlocked().containsKey(pk)) {
                     inst.getShulkerUnlocked().put(pk, Boolean.TRUE);
                 }
             }
-            ConfigurationSection shardSec = d.getConfigurationSection("shards");
-            if (shardSec != null) {
-                int initialCount = d.getInt("initial-shards", inst.getShardExplosions().size());
-                inst.getShardExplosions().clear();
-                for (String key : shardSec.getKeys(false)) {
-                    BlockPosKey pk = BlockPosKey.deserialize(key.replace('|', ';'));
-                    if (pk != null) {
-                        inst.getShardExplosions().put(pk, shardSec.getInt(key, 0));
-                    }
-                }
-                inst.setInitialShardCount(initialCount);
-            }
-
-            registerDungeonRuntime(inst, pad, allowPvp);
+            registerDungeonRuntime(inst, pad, allowPvp, allowBreak);
         }
+        return !dungeons.isEmpty();
+    }
+
+    private void restoreSavedDungeonOnStartup(DungeonInstance inst) {
+        DungeonTemplate tpl = resolveTemplateOrCategoryFallback(inst.getTemplateId(), inst.getCategory());
+        World w = inst.getOrigin().world();
+        if (tpl == null || w == null) return;
+        if (!snapshotStore.hasSnapshot(inst.getId())) {
+            try {
+                snapshotStore.saveWorldSnapshot(inst.getId(), w, inst.getSnapshotBounds());
+            } catch (IOException ignored) {
+            }
+        }
+        DungeonStatus savedStatus = inst.getStatus();
+        Map<BlockPosKey, Boolean> savedShulkers = new LinkedHashMap<>(inst.getShulkerUnlocked());
+        pasteWithRestoreDiffsBatched(w, inst, tpl, () -> {
+            inst.setStatus(savedStatus);
+            inst.getShulkerUnlocked().putAll(savedShulkers);
+            updateDungeonHologram(inst);
+        });
     }
 
     private DungeonTemplate resolveTemplateOrCategoryFallback(String tplId, DungeonCategory cat) {
@@ -265,24 +316,14 @@ public final class DungeonManager {
             yml.set(p + ".surface-y", d.getSurfaceY());
             yml.set(p + ".status", d.getStatus().name());
             yml.set(p + ".next-reset-ms", d.getNextResetEpochMs());
-            yml.set(p + ".hologram-uuid", d.getHologramUuid() == null ? null : d.getHologramUuid().toString());
-            CuboidRegion b = d.getBounds();
-            yml.set(p + ".bounds.min-x", b.minX());
-            yml.set(p + ".bounds.min-y", b.minY());
-            yml.set(p + ".bounds.min-z", b.minZ());
-            yml.set(p + ".bounds.max-x", b.maxX());
-            yml.set(p + ".bounds.max-y", b.maxY());
-            yml.set(p + ".bounds.max-z", b.maxZ());
+            writeRegion(yml, p + ".bounds", d.getBounds());
+            writeRegion(yml, p + ".snapshot-bounds", d.getSnapshotBounds());
 
             List<String> unlocked = new ArrayList<>();
             for (Map.Entry<BlockPosKey, Boolean> e : d.getShulkerUnlocked().entrySet()) {
                 if (Boolean.TRUE.equals(e.getValue())) unlocked.add(e.getKey().serialize());
             }
             yml.set(p + ".unlocked-shulkers", unlocked);
-            yml.set(p + ".initial-shards", d.getInitialShardCount());
-            for (Map.Entry<BlockPosKey, Integer> e : d.getShardExplosions().entrySet()) {
-                yml.set(p + ".shards." + e.getKey().serialize().replace(';', '|'), e.getValue());
-            }
         }
         try {
             yml.save(dungeonsFile);
@@ -291,7 +332,22 @@ public final class DungeonManager {
         }
     }
 
+    private static void writeRegion(YamlConfiguration yml, String path, CuboidRegion b) {
+        yml.set(path + ".min-x", b.minX());
+        yml.set(path + ".min-y", b.minY());
+        yml.set(path + ".min-z", b.minZ());
+        yml.set(path + ".max-x", b.maxX());
+        yml.set(path + ".max-y", b.maxY());
+        yml.set(path + ".max-z", b.maxZ());
+    }
+
+    /**
+     * Wipes old dungeons cleanly back to natural terrain, reloads schematics/{surface,underground}/,
+     * and scans fresh ideal spots across ungenerated chunks: 7 SURFACE (4 + 3) & 7 UNDERGROUND (4 + 3)!
+     */
     public void rebuildAllFromSchematics() {
+        hiddenFromWorld = false;
+        jobQueue.clear();
         for (String id : new ArrayList<>(dungeons.keySet())) {
             removeDungeon(id, true);
         }
@@ -300,6 +356,7 @@ public final class DungeonManager {
     }
 
     public void ensureTargetDungeonCounts() {
+        hiddenFromWorld = false;
         String worldName = plugin.getConfig().getString("world-settings.world", "world");
         World world = Bukkit.getWorld(worldName);
         if (world == null && !Bukkit.getWorlds().isEmpty()) {
@@ -307,30 +364,39 @@ public final class DungeonManager {
         }
         if (world == null) return;
 
-        scheduleCategory(world, DungeonCategory.SURFACE, plugin.getConfig().getInt("auto-spawn.surface-count", 5));
-        scheduleCategory(world, DungeonCategory.UNDERGROUND, plugin.getConfig().getInt("auto-spawn.underground-count", 5));
-        scheduleCategory(world, DungeonCategory.SKY, plugin.getConfig().getInt("auto-spawn.sky-count", 5));
+        int needSurface = Math.max(0, plugin.getConfig().getInt("auto-spawn.surface-count", 7) - countByCategory(DungeonCategory.SURFACE));
+        int needUg = Math.max(0, plugin.getConfig().getInt("auto-spawn.underground-count", 7) - countByCategory(DungeonCategory.UNDERGROUND));
+        pendingScanDone = 0;
+        pendingScanTotal = needSurface + needUg;
+
+        scheduleCategory(world, DungeonCategory.SURFACE, plugin.getConfig().getInt("auto-spawn.surface-count", 7));
+        scheduleCategory(world, DungeonCategory.UNDERGROUND, plugin.getConfig().getInt("auto-spawn.underground-count", 7));
     }
 
+    /**
+     * Round-robin across sorted .schem files in the category folder:
+     * With 2 files (e.g. surface_1.schem, surface_2.schem) and targetCount = 7:
+     *   slots 0, 2, 4, 6 -> surface_1.schem (4 dungeons!)
+     *   slots 1, 3, 5    -> surface_2.schem (3 dungeons!)
+     */
     private void scheduleCategory(World world, DungeonCategory cat, int targetCount) {
         List<DungeonTemplate> available = templatesByCategory.get(cat);
         if (available == null || available.isEmpty()) {
-            plugin.getLogger().warning("No .schem files found in schematics/" + cat.name().toLowerCase(Locale.ROOT) + "/");
+            plugin.getLogger().warning("No .schem files in schematics/" + cat.name().toLowerCase(Locale.ROOT) + "/");
             return;
         }
         int have = countByCategory(cat);
         int need = Math.max(0, targetCount - have);
         for (int i = 0; i < need; i++) {
-            DungeonTemplate chosen = available.get((have + i) % available.size());
-            String id = cat.name().toLowerCase(Locale.ROOT) + "_" + (nextFreeNumber(cat, i));
-            World targetWorld = world;
-            enqueueBuildJob(() -> autoCreateSingle(targetWorld, id, chosen));
+            int slotIndex = have + i;
+            DungeonTemplate chosen = available.get(slotIndex % available.size());
+            String id = cat.name().toLowerCase(Locale.ROOT) + "_" + nextFreeNumber(cat, i);
+            enqueueJob(() -> scanAndPlaceSingle(world, id, chosen));
         }
     }
 
     private int nextFreeNumber(DungeonCategory cat, int offset) {
-        int found = 0;
-        int candidate = 1;
+        int found = 0, candidate = 1;
         while (true) {
             if (!dungeons.containsKey(cat.name().toLowerCase(Locale.ROOT) + "_" + candidate)) {
                 if (found == offset) return candidate;
@@ -348,14 +414,27 @@ public final class DungeonManager {
         return c;
     }
 
-    private void autoCreateSingle(World world, String id, DungeonTemplate tpl) {
+    private void scanAndPlaceSingle(World world, String id, DungeonTemplate tpl) {
+        pendingScanDone++;
         if (dungeons.containsKey(id)) return;
         SpotFinder.PlacementPlan plan = spotFinder.findPlacement(world, tpl, dungeons.values(), id);
         if (plan == null) {
-            plugin.getLogger().warning("Could not find free spot in 3000x3000 world for " + id);
+            plugin.getLogger().warning("[" + pendingScanDone + "/" + pendingScanTotal + "] Could not find ideal spot for " + id);
             return;
         }
-        placeDungeonWithSnapshot(id, tpl, plan.origin(), plan.fullBounds(), plan.surfaceY(), true);
+        DungeonInstance created = placeDungeonWithSnapshot(
+                id, tpl, plan.origin(), plan.structureBounds(), plan.snapshotBounds(), plan.surfaceY(), true);
+        if (created != null) {
+            String logMsg = "[" + pendingScanDone + "/" + Math.max(pendingScanDone, pendingScanTotal) + "] Найден идеальный участок для "
+                    + id + " (" + tpl.getId() + ") -> X: " + plan.origin().x()
+                    + ", Y: " + plan.origin().y() + ", Z: " + plan.origin().z();
+            plugin.getLogger().info(logMsg);
+            for (Player op : Bukkit.getOnlinePlayers()) {
+                if (op.hasPermission("elytrixdungeons.admin")) {
+                    op.sendMessage(plugin.prefix() + "§7" + logMsg);
+                }
+            }
+        }
     }
 
     public DungeonInstance manualSpawnHere(Player admin, DungeonTemplate tpl) {
@@ -365,19 +444,24 @@ public final class DungeonManager {
         int oy = loc.getBlockY() - 1;
         int oz = loc.getBlockZ() - tpl.getSizeZ() / 2;
         int surfY = w.getHighestBlockYAt(loc.getBlockX(), loc.getBlockZ(), HeightMap.MOTION_BLOCKING_NO_LEAVES);
-        int maxY = tpl.getCategory() == DungeonCategory.UNDERGROUND
-                ? Math.max(oy + tpl.getSizeY() - 1, surfY + 7)
-                : oy + tpl.getSizeY() + 1;
-        CuboidRegion bounds = new CuboidRegion(w.getName(), ox, oy - 3, oz, ox + tpl.getSizeX() - 1, maxY, oz + tpl.getSizeZ() - 1);
+        int bufXZ = plugin.getConfig().getInt("protection.surround-restore-padding-xz", 12);
+        int bufY = plugin.getConfig().getInt("protection.surround-restore-padding-y", 8);
+
+        CuboidRegion structBox = new CuboidRegion(w.getName(), ox, oy, oz, ox + tpl.getSizeX() - 1, oy + tpl.getSizeY() - 1, oz + tpl.getSizeZ() - 1);
+        int snapTop = tpl.getCategory() == DungeonCategory.UNDERGROUND ? Math.max(structBox.maxY() + bufY, surfY + 6) : structBox.maxY() + bufY;
+        CuboidRegion snapBox = new CuboidRegion(w.getName(), ox - bufXZ, Math.max(w.getMinHeight(), oy - bufY), oz - bufXZ,
+                structBox.maxX() + bufXZ, Math.min(w.getMaxHeight() - 1, snapTop), structBox.maxZ() + bufXZ);
+
         String id = "manual_" + (dungeons.size() + 1) + "_" + (System.currentTimeMillis() % 1000);
-        return placeDungeonWithSnapshot(id, tpl, new BlockPosKey(w.getName(), ox, oy, oz), bounds, surfY, true);
+        return placeDungeonWithSnapshot(id, tpl, new BlockPosKey(w.getName(), ox, oy, oz), structBox, snapBox, surfY, true);
     }
 
     private DungeonInstance placeDungeonWithSnapshot(
             String id,
             DungeonTemplate tpl,
             BlockPosKey origin,
-            CuboidRegion bounds,
+            CuboidRegion structBounds,
+            CuboidRegion snapBounds,
             int surfaceY,
             boolean saveTerrainFirst
     ) {
@@ -385,7 +469,7 @@ public final class DungeonManager {
         if (w == null) return null;
         if (saveTerrainFirst) {
             try {
-                snapshotStore.saveWorldSnapshot(id, w, bounds);
+                snapshotStore.saveWorldSnapshot(id, w, snapBounds);
             } catch (IOException ex) {
                 plugin.getLogger().warning("Snapshot error for " + id + ": " + ex.getMessage());
             }
@@ -396,39 +480,43 @@ public final class DungeonManager {
                 tpl.getId(),
                 tpl.getCategory(),
                 origin,
-                bounds,
+                structBounds,
+                snapBounds,
                 surfaceY,
                 System.currentTimeMillis() + resetIntervalMs()
         );
-        inst.applyTemplateMarkers(tpl, plugin.getConfig().getInt("surface-dungeon.unique-shulker-count", 3));
+        inst.applyTemplateMarkers(tpl);
 
-        int pad = plugin.getConfig().getInt("protection.claim-padding-blocks", 12);
+        int pad = plugin.getConfig().getInt("protection.claim-padding-blocks", 40);
         boolean allowPvp = plugin.getConfig().getBoolean("protection.allow-pvp", true);
-        registerDungeonRuntime(inst, pad, allowPvp);
+        boolean allowBreak = plugin.getConfig().getBoolean("protection.allow-block-modify-in-zone", true);
+        registerDungeonRuntime(inst, pad, allowPvp, allowBreak);
 
-        pasteDungeonBatched(w, inst, tpl);
+        pasteWithRestoreDiffsBatched(w, inst, tpl, null);
         saveDungeons();
-        plugin.getLogger().info("Spawned " + inst.getCategory() + " dungeon '" + id + "' at "
-                + origin.x() + ", " + origin.y() + ", " + origin.z());
         return inst;
     }
 
-    private void registerDungeonRuntime(DungeonInstance inst, int pad, boolean allowPvp) {
-        dungeons.put(inst.getId(), inst);
-        reindexBlocks(inst);
-        if (plugin.getConfig().getBoolean("protection.prevent-claims", true)) {
-            plugin.getWorldGuardHook().syncDungeonRegion(inst, pad, allowPvp);
+    public void syncAllWorldGuardRegions() {
+        int pad = plugin.getConfig().getInt("protection.claim-padding-blocks", 40);
+        boolean allowPvp = plugin.getConfig().getBoolean("protection.allow-pvp", true);
+        boolean allowBreak = plugin.getConfig().getBoolean("protection.allow-block-modify-in-zone", true);
+        for (DungeonInstance d : dungeons.values()) {
+            plugin.getWorldGuardHook().syncDungeonRegion(d, pad, allowPvp, allowBreak);
         }
     }
 
-    public void reindexBlocks(DungeonInstance inst) {
-        interactiveBlockIndex.entrySet().removeIf(e -> e.getValue().equals(inst.getId()));
-        for (BlockPosKey p : inst.getShulkerUnlocked().keySet()) {
-            interactiveBlockIndex.put(p, inst.getId());
-        }
-        for (BlockPosKey p : inst.getShardExplosions().keySet()) {
-            interactiveBlockIndex.put(p, inst.getId());
-        }
+    private void registerDungeonRuntime(DungeonInstance inst, int pad, boolean allowPvp, boolean allowBreak) {
+        dungeons.put(inst.getId(), inst);
+        reindexProtectedContainers(inst);
+        plugin.getWorldGuardHook().syncDungeonRegion(inst, pad, allowPvp, allowBreak);
+    }
+
+    public void reindexProtectedContainers(DungeonInstance inst) {
+        protectedContainerIndex.entrySet().removeIf(e -> e.getValue().equals(inst.getId()));
+        for (BlockPosKey p : inst.getChestPositions()) protectedContainerIndex.put(p, inst.getId());
+        for (BlockPosKey p : inst.getBarrelPositions()) protectedContainerIndex.put(p, inst.getId());
+        for (BlockPosKey p : inst.getShulkerUnlocked().keySet()) protectedContainerIndex.put(p, inst.getId());
     }
 
     public void regenerateDungeon(DungeonInstance inst, boolean forceRelocate) {
@@ -438,6 +526,7 @@ public final class DungeonManager {
             return;
         }
         plugin.getTrialController().abortFight(inst.getId(), false);
+        plugin.getGhostController().clearHouseGhosts(inst.getId());
         inst.setStatus(DungeonStatus.REGENERATING);
 
         boolean relocate = forceRelocate || plugin.getConfig().getBoolean("regeneration.relocate-on-reset", false);
@@ -451,28 +540,24 @@ public final class DungeonManager {
             SpotFinder.PlacementPlan newPlan = spotFinder.findPlacement(w, tpl, dungeons.values(), inst.getId());
             if (newPlan != null) {
                 try {
-                    snapshotStore.saveWorldSnapshot(inst.getId(), w, newPlan.fullBounds());
+                    snapshotStore.saveWorldSnapshot(inst.getId(), w, newPlan.snapshotBounds());
                 } catch (IOException ignored) {
                 }
                 inst.setOrigin(newPlan.origin());
-                inst.setBounds(newPlan.fullBounds());
+                inst.setBounds(newPlan.structureBounds());
+                inst.setSnapshotBounds(newPlan.snapshotBounds());
                 inst.setSurfaceY(newPlan.surfaceY());
             }
-            int pad = plugin.getConfig().getInt("protection.claim-padding-blocks", 12);
-            if (plugin.getConfig().getBoolean("protection.prevent-claims", true)) {
-                plugin.getWorldGuardHook().syncDungeonRegion(inst, pad, plugin.getConfig().getBoolean("protection.allow-pvp", true));
-            }
-        } else if (snapshotStore.hasSnapshot(inst.getId())) {
-            try {
-                snapshotStore.restoreWorldSnapshotInstant(inst.getId());
-            } catch (IOException ignored) {
-            }
+            int pad = plugin.getConfig().getInt("protection.claim-padding-blocks", 40);
+            plugin.getWorldGuardHook().syncDungeonRegion(inst, pad,
+                    plugin.getConfig().getBoolean("protection.allow-pvp", true),
+                    plugin.getConfig().getBoolean("protection.allow-block-modify-in-zone", true));
         }
 
-        inst.applyTemplateMarkers(tpl, plugin.getConfig().getInt("surface-dungeon.unique-shulker-count", 3));
-        reindexBlocks(inst);
+        inst.applyTemplateMarkers(tpl);
+        reindexProtectedContainers(inst);
         inst.setNextResetEpochMs(System.currentTimeMillis() + resetIntervalMs());
-        pasteDungeonBatched(w, inst, tpl);
+        pasteWithRestoreDiffsBatched(w, inst, tpl, null);
         saveDungeons();
     }
 
@@ -480,7 +565,8 @@ public final class DungeonManager {
         DungeonInstance inst = dungeons.remove(id);
         if (inst == null) return false;
         plugin.getTrialController().abortFight(id, false);
-        interactiveBlockIndex.entrySet().removeIf(e -> e.getValue().equals(id));
+        plugin.getGhostController().clearHouseGhosts(id);
+        protectedContainerIndex.entrySet().removeIf(e -> e.getValue().equals(id));
         removeHologram(inst);
         World w = inst.getOrigin().world();
         plugin.getWorldGuardHook().removeDungeonRegion(w, id);
@@ -495,18 +581,41 @@ public final class DungeonManager {
         return true;
     }
 
-    private void pasteDungeonBatched(World world, DungeonInstance inst, DungeonTemplate tpl) {
-        List<BlockWrite> writes = new ArrayList<>(tpl.getSizeX() * tpl.getSizeY() * tpl.getSizeZ());
+    /**
+     * Combines BOTH:
+     *   1) Full surround-terrain restoration diffs (wipes ALL nearby grief craters, cobble, tunnels, water/lava!)
+     *   2) Fresh .schem paste (skipping structure_void so curved caves blend naturally!)
+     * Executed smoothly across ticks without lagging TPS!
+     */
+    private void pasteWithRestoreDiffsBatched(
+            World world,
+            DungeonInstance inst,
+            DungeonTemplate tpl,
+            Runnable postHook
+    ) {
+        TerrainSnapshotStore.ensureChunksLoaded(world, inst.getSnapshotBounds());
+        List<BlockWrite> writes = new ArrayList<>();
+
+        if (snapshotStore.hasSnapshot(inst.getId())) {
+            try {
+                for (BlockRestoreDiff diff : snapshotStore.collectRestoreDiffs(inst.getId())) {
+                    writes.add(new BlockWrite(diff.x(), diff.y(), diff.z(), diff.data()));
+                }
+            } catch (IOException ignored) {
+            }
+        }
+
         Map<String, BlockData> bdCache = new HashMap<>();
         int ox = inst.getOrigin().x(), oy = inst.getOrigin().y(), oz = inst.getOrigin().z();
 
+        // Solid foundation under Surface House so zero gaps exist on slight 1–3 block terrain slopes
         if (inst.getCategory() == DungeonCategory.SURFACE) {
+            BlockData stoneBricks = Bukkit.createBlockData(Material.STONE_BRICKS);
             BlockData cobble = Bukkit.createBlockData(Material.COBBLESTONE);
-            BlockData bricks = Bukkit.createBlockData(Material.STONE_BRICKS);
             for (int x = 1; x <= tpl.getSizeX() - 2; x++) {
                 for (int z = 1; z <= tpl.getSizeZ() - 2; z++) {
-                    for (int dy = -3; dy <= -1; dy++) {
-                        writes.add(new BlockWrite(ox + x, oy + dy, oz + z, dy == -1 ? bricks : cobble));
+                    for (int dy = -4; dy <= -1; dy++) {
+                        writes.add(new BlockWrite(ox + x, oy + dy, oz + z, dy == -1 ? stoneBricks : cobble));
                     }
                 }
             }
@@ -516,6 +625,9 @@ public final class DungeonManager {
             for (int z = 0; z < tpl.getSizeZ(); z++) {
                 for (int x = 0; x < tpl.getSizeX(); x++) {
                     String state = tpl.getBlock(x, y, z);
+                    if (state.endsWith("structure_void")) {
+                        continue;
+                    }
                     BlockData bd = bdCache.computeIfAbsent(state, s -> {
                         try {
                             return Bukkit.createBlockData(s);
@@ -528,12 +640,7 @@ public final class DungeonManager {
             }
         }
 
-        if (inst.getCategory() == DungeonCategory.UNDERGROUND
-                && plugin.getConfig().getBoolean("auto-spawn.underground-surface-shaft", true)) {
-            appendUndergroundShaft(writes, inst, tpl);
-        }
-
-        int perTick = Math.max(250, plugin.getConfig().getInt("auto-spawn.blocks-per-tick", 900));
+        int perTick = Math.max(300, plugin.getConfig().getInt("auto-spawn.blocks-per-tick", 1200));
         new BukkitRunnable() {
             private int idx = 0;
 
@@ -550,59 +657,18 @@ public final class DungeonManager {
                 }
                 if (idx >= writes.size()) {
                     cancel();
-                    finalizeDungeonContainers(world, inst);
+                    finalizeDungeonAfterPaste(world, inst);
+                    if (postHook != null) postHook.run();
                 }
             }
         }.runTaskTimer(plugin, 1L, 1L);
     }
 
-    private void appendUndergroundShaft(List<BlockWrite> writes, DungeonInstance inst, DungeonTemplate tpl) {
-        int[] ent = tpl.getEntranceOffset();
-        int shaftX = inst.getOrigin().x() + ent[0];
-        int shaftZ = inst.getOrigin().z() + ent[2];
-        int startY = inst.getOrigin().y() + tpl.getSizeY() - 2;
-        int topY = inst.getSurfaceY();
-
-        BlockData air = Bukkit.createBlockData(Material.AIR);
-        BlockData wall = Bukkit.createBlockData(Material.DEEPSLATE_BRICKS);
-        BlockData mossy = Bukkit.createBlockData(Material.MOSSY_STONE_BRICKS);
-        BlockData ladder = Bukkit.createBlockData("minecraft:ladder[facing=south]");
-        BlockData lantern = Bukkit.createBlockData("minecraft:soul_lantern[hanging=false]");
-        BlockData post = Bukkit.createBlockData(Material.DEEPSLATE_BRICK_WALL);
-
-        for (int y = startY; y <= topY; y++) {
-            for (int dx = -2; dx <= 2; dx++) {
-                for (int dz = -2; dz <= 2; dz++) {
-                    boolean border = Math.abs(dx) == 2 || Math.abs(dz) == 2;
-                    writes.add(new BlockWrite(shaftX + dx, y, shaftZ + dz, border ? wall : air));
-                }
-            }
-            writes.add(new BlockWrite(shaftX, y, shaftZ - 1, ladder));
-        }
-        for (int dx = -3; dx <= 3; dx++) {
-            for (int dz = -3; dz <= 3; dz++) {
-                if (Math.abs(dx) <= 1 && Math.abs(dz) <= 1) continue;
-                writes.add(new BlockWrite(shaftX + dx, topY, shaftZ + dz, mossy));
-                for (int y = topY + 1; y <= topY + 4; y++) {
-                    writes.add(new BlockWrite(shaftX + dx, y, shaftZ + dz, air));
-                }
-            }
-        }
-        int[][] corners = {{-3, -3}, {3, -3}, {-3, 3}, {3, 3}};
-        for (int[] c : corners) {
-            for (int y = topY + 1; y <= topY + 3; y++) {
-                writes.add(new BlockWrite(shaftX + c[0], y, shaftZ + c[1], post));
-            }
-            writes.add(new BlockWrite(shaftX + c[0], topY + 4, shaftZ + c[1], lantern));
-        }
-    }
-
-    private void finalizeDungeonContainers(World world, DungeonInstance inst) {
+    private void finalizeDungeonAfterPaste(World world, DungeonInstance inst) {
         inst.setStatus(DungeonStatus.READY);
 
         if (inst.getCategory() == DungeonCategory.SURFACE) {
-            int chestStacks = plugin.getConfig().getInt("surface-dungeon.chest-stacks", 5);
-            int barrelStacks = plugin.getConfig().getInt("surface-dungeon.barrel-stacks", 4);
+            int chestStacks = plugin.getConfig().getInt("surface-dungeon.chest-stacks", 6);
             for (BlockPosKey p : inst.getChestPositions()) {
                 Block b = world.getBlockAt(p.x(), p.y(), p.z());
                 if (b.getState() instanceof InventoryHolder holder) {
@@ -612,9 +678,10 @@ public final class DungeonManager {
             for (BlockPosKey p : inst.getBarrelPositions()) {
                 Block b = world.getBlockAt(p.x(), p.y(), p.z());
                 if (b.getState() instanceof InventoryHolder holder) {
-                    plugin.getLootRegistry().fillContainerRandomSlots(holder.getInventory(), LootPoolType.SURFACE_BARREL, barrelStacks);
+                    plugin.getLootRegistry().fillContainerRandomSlots(holder.getInventory(), LootPoolType.SURFACE_CHEST, chestStacks);
                 }
             }
+            plugin.getGhostController().populateInitialGhosts(inst);
         } else {
             int sideStacks = plugin.getConfig().getInt("underground-dungeon.side-container-stacks", 4);
             for (BlockPosKey p : inst.getChestPositions()) {
@@ -629,20 +696,18 @@ public final class DungeonManager {
                     plugin.getLootRegistry().fillContainerRandomSlots(holder.getInventory(), LootPoolType.UNDERGROUND_CONTAINER, sideStacks);
                 }
             }
-        }
-
-        // All locked shulkers start empty until unlocked by Unique Key (SURFACE) or defeating all guards (UNDERGROUND)
-        for (BlockPosKey sp : inst.getShulkerUnlocked().keySet()) {
-            Block b = world.getBlockAt(sp.x(), sp.y(), sp.z());
-            if (b.getState() instanceof InventoryHolder holder) {
-                holder.getInventory().clear();
+            for (BlockPosKey sp : inst.getShulkerUnlocked().keySet()) {
+                Block b = world.getBlockAt(sp.x(), sp.y(), sp.z());
+                if (b.getState() instanceof InventoryHolder holder) {
+                    holder.getInventory().clear();
+                }
             }
         }
 
         Location safe = inst.teleportLocation();
         if (safe != null) {
             for (Player p : world.getPlayers()) {
-                if (inst.getBounds().contains(p.getLocation())) {
+                if (inst.getSnapshotBounds().contains(p.getLocation())) {
                     p.setFallDistance(0f);
                     p.teleport(safe);
                     p.playSound(safe, Sound.BLOCK_PORTAL_TRAVEL, 0.5f, 1.35f);
@@ -657,60 +722,57 @@ public final class DungeonManager {
         this.heartbeatTask = new BukkitRunnable() {
             @Override
             public void run() {
+                if (hiddenFromWorld) return;
                 long now = System.currentTimeMillis();
                 plugin.getTrialController().tickOncePerSecond();
+                plugin.getGhostController().tickHousesOncePerSecond(dungeons.values());
 
                 for (DungeonInstance d : new ArrayList<>(dungeons.values())) {
                     if (d.getStatus() != DungeonStatus.REGENERATING && now >= d.getNextResetEpochMs()) {
-                        enqueueBuildJob(() -> regenerateDungeon(d, false));
+                        enqueueJob(() -> regenerateDungeon(d, false));
                         continue;
                     }
                     World w = d.getOrigin().world();
                     BlockPosKey anchor = d.getHologramAnchor();
                     if (w != null && anchor != null && w.isChunkLoaded(anchor.x() >> 4, anchor.z() >> 4)) {
                         updateDungeonHologram(d);
-                        if (d.getCategory() == DungeonCategory.SKY) {
-                            for (BlockPosKey sh : d.getShardExplosions().keySet()) {
-                                w.spawnParticle(Particle.END_ROD, sh.centerLocation().add(0, 0.35, 0), 1, 0.18, 0.22, 0.18, 0.01);
-                            }
-                        }
                     }
                 }
             }
         }.runTaskTimer(plugin, 20L, 20L);
     }
 
-    private void enqueueBuildJob(Runnable job) {
+    private void enqueueJob(Runnable job) {
         jobQueue.addLast(job);
-        if (pasteWorkerTask == null || pasteWorkerTask.isCancelled()) {
-            pasteWorkerTask = new BukkitRunnable() {
+        if (workerTask == null || workerTask.isCancelled()) {
+            long stepTicks = Math.max(2L, plugin.getConfig().getLong("auto-spawn.scan-interval-ticks", 4L));
+            workerTask = new BukkitRunnable() {
                 @Override
                 public void run() {
                     Runnable next = jobQueue.pollFirst();
                     if (next == null) {
                         cancel();
-                        pasteWorkerTask = null;
+                        workerTask = null;
                         return;
                     }
                     next.run();
                 }
-            }.runTaskTimer(plugin, 5L, 35L);
+            }.runTaskTimer(plugin, 2L, stepTicks);
         }
     }
 
     public void updateDungeonHologram(DungeonInstance d) {
-        if (!plugin.getConfig().getBoolean("hologram.enabled", true)) {
+        if (!plugin.getConfig().getBoolean("hologram.enabled", true) || hiddenFromWorld) {
             removeHologram(d);
             return;
         }
         BlockPosKey anchor = d.getHologramAnchor();
         if (anchor == null) return;
         World w = anchor.world();
-        if (w == null || !w.isChunkLoaded(anchor.x() >> 4, anchor.z() >> 4)) {
-            return;
-        }
+        if (w == null || !w.isChunkLoaded(anchor.x() >> 4, anchor.z() >> 4)) return;
 
-        Location holoLoc = new Location(w, anchor.x() + 0.5, anchor.y() + 2.45, anchor.z() + 0.5);
+        double yOff = d.getCategory() == DungeonCategory.UNDERGROUND ? 2.35 : 2.15;
+        Location holoLoc = new Location(w, anchor.x() + 0.5, anchor.y() + yOff, anchor.z() + 0.5);
         TextDisplay td = findHologram(w, d, holoLoc);
         if (td == null) {
             Entity spawned = w.spawnEntity(holoLoc, EntityType.TEXT_DISPLAY);
@@ -740,17 +802,12 @@ public final class DungeonManager {
     private String buildHologramText(DungeonInstance d) {
         String timer = TextUtil.formatDuration(d.secondsUntilReset());
         List<String> lines;
-        int left = 0, total = 0, mobs = 0;
+        int ghosts = 0, mobs = 0;
         String clock = "00:00";
 
         if (d.getCategory() == DungeonCategory.SURFACE) {
             lines = plugin.getConfig().getStringList("hologram.surface-lines");
-            left = d.countLockedShulkers();
-            total = d.getShulkerUnlocked().size();
-        } else if (d.getCategory() == DungeonCategory.SKY) {
-            lines = plugin.getConfig().getStringList("hologram.sky-lines");
-            left = d.getShardExplosions().size();
-            total = d.getInitialShardCount();
+            ghosts = plugin.getGhostController().countAliveGhosts(d.getId());
         } else {
             TrialController.ActiveFight f = plugin.getTrialController().getFight(d.getId());
             if (f != null) {
@@ -768,8 +825,7 @@ public final class DungeonManager {
         for (int i = 0; i < lines.size(); i++) {
             if (i > 0) sb.append('\n');
             sb.append(TextUtil.color(lines.get(i)
-                    .replace("{left}", String.valueOf(left))
-                    .replace("{total}", String.valueOf(total))
+                    .replace("{ghosts}", String.valueOf(ghosts))
                     .replace("{mobs}", String.valueOf(mobs))
                     .replace("{clock}", clock)
                     .replace("{timer}", timer)));
@@ -807,9 +863,13 @@ public final class DungeonManager {
         for (Entity e : chunk.getEntities()) {
             if (e instanceof TextDisplay td) {
                 String id = td.getPersistentDataContainer().get(hologramPdc, PersistentDataType.STRING);
-                if (id != null && !dungeons.containsKey(id)) td.remove();
+                if (id != null && (!dungeons.containsKey(id) || hiddenFromWorld)) {
+                    td.remove();
+                }
             }
         }
+        plugin.getGhostController().handleChunkLoad(chunk);
+        if (hiddenFromWorld) return;
         for (DungeonInstance d : dungeons.values()) {
             BlockPosKey anchor = d.getHologramAnchor();
             if (anchor != null && anchor.worldName().equals(chunk.getWorld().getName())
@@ -819,17 +879,20 @@ public final class DungeonManager {
         }
     }
 
-    public DungeonInstance getByInteractiveBlock(BlockPosKey pos) {
-        String id = interactiveBlockIndex.get(pos);
+    public DungeonInstance getByProtectedContainer(BlockPosKey pos) {
+        String id = protectedContainerIndex.get(pos);
         return id == null ? null : dungeons.get(id);
     }
 
-    public void unregisterSingleInteractiveBlock(BlockPosKey pos) {
-        interactiveBlockIndex.remove(pos);
+    public DungeonInstance findContainingStructureOrBuffer(Location loc) {
+        for (DungeonInstance d : dungeons.values()) {
+            if (d.getBounds().expand(3, 3).contains(loc)) return d;
+        }
+        return null;
     }
 
     public DungeonInstance findContainingClaimZone(Location loc) {
-        int pad = plugin.getConfig().getInt("protection.claim-padding-blocks", 12);
+        int pad = plugin.getConfig().getInt("protection.claim-padding-blocks", 40);
         for (DungeonInstance d : dungeons.values()) {
             if (d.claimGuardRegion(pad).contains(loc)) return d;
         }
@@ -837,28 +900,17 @@ public final class DungeonManager {
     }
 
     public DungeonInstance findIntersectingClaimZone(CuboidRegion selection) {
-        int pad = plugin.getConfig().getInt("protection.claim-padding-blocks", 12);
+        int pad = plugin.getConfig().getInt("protection.claim-padding-blocks", 40);
         for (DungeonInstance d : dungeons.values()) {
             if (d.claimGuardRegion(pad).intersects3D(selection)) return d;
         }
         return null;
     }
 
-    public Collection<DungeonInstance> getAllDungeons() {
-        return Collections.unmodifiableCollection(dungeons.values());
-    }
-
-    public DungeonInstance getDungeon(String id) {
-        return dungeons.get(id);
-    }
-
-    public Map<String, DungeonTemplate> getTemplates() {
-        return Collections.unmodifiableMap(templatesById);
-    }
-
-    public DungeonTemplate getTemplate(String id) {
-        return templatesById.get(id.toLowerCase(Locale.ROOT));
-    }
+    public Collection<DungeonInstance> getAllDungeons() { return Collections.unmodifiableCollection(dungeons.values()); }
+    public DungeonInstance getDungeon(String id) { return dungeons.get(id); }
+    public Map<String, DungeonTemplate> getTemplates() { return Collections.unmodifiableMap(templatesById); }
+    public DungeonTemplate getTemplate(String id) { return templatesById.get(id.toLowerCase(Locale.ROOT)); }
 
     public long resetIntervalMs() {
         return Math.max(60L, plugin.getConfig().getLong("regeneration.interval-seconds", 43200L)) * 1000L;

@@ -3,37 +3,32 @@ package ru.elytrix.dungeons.service;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
-import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffectType;
 import ru.elytrix.dungeons.ElytrixDungeonsPlugin;
 import ru.elytrix.dungeons.hook.VaultAndItemsHook;
 import ru.elytrix.dungeons.hook.VaultAndItemsHook.MapEnchant;
 import ru.elytrix.dungeons.model.DungeonLootEntry;
+import ru.elytrix.dungeons.model.DungeonLootEntry.SourceKind;
 import ru.elytrix.dungeons.model.LootPoolType;
 
 public final class DungeonLootRegistry {
 
-    private static final String SNAKE_ORB_B64 =
-            "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTFiNGIyMDE4OWQ5MDJiYzZjM2ZhYmUyM2Q5ZjU3ODY5N2Y1NDRjZjQxNTMxNzc4NzM3NDExODM5M2RhNCJ9fX0=";
-
     private final ElytrixDungeonsPlugin plugin;
-    private final File lootFile;
+    private final File file;
     private final Map<LootPoolType, List<DungeonLootEntry>> pools = new EnumMap<>(LootPoolType.class);
 
     public DungeonLootRegistry(ElytrixDungeonsPlugin plugin) {
         this.plugin = plugin;
-        this.lootFile = new File(plugin.getDataFolder(), "loot.yml");
+        this.file = new File(plugin.getDataFolder(), "loot.yml");
     }
 
     public void load() {
@@ -41,286 +36,187 @@ public final class DungeonLootRegistry {
         for (LootPoolType type : LootPoolType.values()) {
             pools.put(type, new ArrayList<>());
         }
-        if (!lootFile.exists()) {
-            populateDefaults();
+        if (!file.exists()) {
+            seedDefaults();
             save();
             return;
         }
-        YamlConfiguration yml = YamlConfiguration.loadConfiguration(lootFile);
+        YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
         for (LootPoolType type : LootPoolType.values()) {
-            readPool(yml.getConfigurationSection("pools." + type.name()), pools.get(type));
-        }
-    }
-
-    private void readPool(ConfigurationSection sec, List<DungeonLootEntry> target) {
-        if (sec == null) return;
-        for (String id : sec.getKeys(false)) {
-            ConfigurationSection e = sec.getConfigurationSection(id);
-            if (e == null) continue;
-            DungeonLootEntry.SourceKind kind;
-            try {
-                kind = DungeonLootEntry.SourceKind.valueOf(e.getString("kind", "ITEM_STACK"));
-            } catch (IllegalArgumentException ex) {
-                kind = DungeonLootEntry.SourceKind.ITEM_STACK;
+            ConfigurationSection sec = yml.getConfigurationSection("pools." + type.name());
+            if (sec == null) continue;
+            List<DungeonLootEntry> list = pools.get(type);
+            for (String key : sec.getKeys(false)) {
+                ConfigurationSection e = sec.getConfigurationSection(key);
+                if (e == null) continue;
+                SourceKind kind;
+                try {
+                    kind = SourceKind.valueOf(e.getString("kind", "ITEM_STACK"));
+                } catch (IllegalArgumentException ex) {
+                    kind = SourceKind.ITEM_STACK;
+                }
+                String ext = e.getString("external-id", "");
+                ItemStack stack = e.getItemStack("item");
+                if (stack == null) stack = new ItemStack(Material.DIAMOND);
+                list.add(new DungeonLootEntry(
+                        key,
+                        kind,
+                        ext,
+                        stack,
+                        e.getDouble("chance", 40.0),
+                        e.getInt("min", 1),
+                        e.getInt("max", 1),
+                        e.getBoolean("guaranteed", false)
+                ));
             }
-            ItemStack item = e.getItemStack("item");
-            if (item == null || item.getType().isAir()) {
-                item = new ItemStack(Material.DIAMOND, 1);
-            }
-            target.add(new DungeonLootEntry(
-                    id,
-                    kind,
-                    e.getString("external-id", ""),
-                    item,
-                    e.getDouble("chance", 35.0),
-                    e.getInt("min", 1),
-                    e.getInt("max", 1),
-                    e.getBoolean("guaranteed", false)
-            ));
         }
     }
 
     public void save() {
         YamlConfiguration yml = new YamlConfiguration();
         for (LootPoolType type : LootPoolType.values()) {
-            writePool(yml, "pools." + type.name(), pools.get(type));
+            String base = "pools." + type.name();
+            int i = 0;
+            for (DungeonLootEntry e : pools.get(type)) {
+                String path = base + ".item_" + (i++);
+                yml.set(path + ".kind", e.getSourceKind().name());
+                yml.set(path + ".external-id", e.getExternalId());
+                yml.set(path + ".item", e.getFallbackStack());
+                yml.set(path + ".chance", e.getChancePercent());
+                yml.set(path + ".min", e.getMinAmount());
+                yml.set(path + ".max", e.getMaxAmount());
+                yml.set(path + ".guaranteed", e.isGuaranteed());
+            }
         }
         try {
-            yml.save(lootFile);
+            yml.save(file);
         } catch (IOException ex) {
             plugin.getLogger().severe("Failed to save loot.yml: " + ex.getMessage());
         }
     }
 
-    private void writePool(YamlConfiguration yml, String basePath, List<DungeonLootEntry> list) {
-        for (DungeonLootEntry e : list) {
-            String p = basePath + "." + e.getId();
-            yml.set(p + ".kind", e.getSourceKind().name());
-            yml.set(p + ".external-id", e.getExternalId());
-            yml.set(p + ".item", e.getFallbackStack());
-            yml.set(p + ".chance", e.getChancePercent());
-            yml.set(p + ".min", e.getMinAmount());
-            yml.set(p + ".max", e.getMaxAmount());
-            yml.set(p + ".guaranteed", e.isGuaranteed());
-        }
-    }
-
     public List<DungeonLootEntry> getPool(LootPoolType type) {
-        return pools.get(type);
+        return pools.computeIfAbsent(type, k -> new ArrayList<>());
     }
 
-    public ItemStack rollSingleItem(LootPoolType type) {
-        List<DungeonLootEntry> list = pools.get(type);
-        if (list == null || list.isEmpty()) {
-            return new ItemStack(Material.DIAMOND, 4);
-        }
-        ThreadLocalRandom rng = ThreadLocalRandom.current();
-        double totalWeight = 0.0;
-        for (DungeonLootEntry e : list) {
-            totalWeight += Math.max(0.5, e.getChancePercent());
-        }
-        double r = rng.nextDouble(totalWeight);
-        double cur = 0.0;
-        for (DungeonLootEntry e : list) {
-            cur += Math.max(0.5, e.getChancePercent());
-            if (r <= cur) {
-                return materialize(e, rng);
-            }
-        }
-        return materialize(list.get(rng.nextInt(list.size())), rng);
-    }
-
-    public void fillContainerRandomSlots(Inventory inv, LootPoolType type, int maxStacks) {
+    public void fillContainerRandomSlots(Inventory inv, LootPoolType poolType, int targetStacks) {
         inv.clear();
-        List<DungeonLootEntry> pool = pools.get(type);
-        if (pool == null || pool.isEmpty()) {
-            return;
-        }
+        List<ItemStack> items = rollStacks(poolType, targetStacks);
         ThreadLocalRandom rng = ThreadLocalRandom.current();
-        List<ItemStack> generated = new ArrayList<>();
-
-        for (DungeonLootEntry entry : pool) {
-            if (entry.isGuaranteed()) {
-                generated.add(materialize(entry, rng));
+        int size = inv.getSize();
+        for (ItemStack item : items) {
+            for (int tries = 0; tries < 14; tries++) {
+                int slot = rng.nextInt(size);
+                ItemStack cur = inv.getItem(slot);
+                if (cur == null || cur.getType().isAir()) {
+                    inv.setItem(slot, item);
+                    break;
+                }
             }
-        }
-        List<DungeonLootEntry> optional = new ArrayList<>();
-        for (DungeonLootEntry entry : pool) {
-            if (!entry.isGuaranteed()) optional.add(entry);
-        }
-        Collections.shuffle(optional, rng);
-        for (DungeonLootEntry entry : optional) {
-            if (generated.size() >= maxStacks) break;
-            if (rng.nextDouble(100.0) < entry.getChancePercent()) {
-                generated.add(materialize(entry, rng));
-            }
-        }
-        if (generated.isEmpty()) {
-            generated.add(materialize(pool.get(rng.nextInt(pool.size())), rng));
-        }
-
-        List<Integer> freeSlots = new ArrayList<>(inv.getSize());
-        for (int s = 0; s < inv.getSize(); s++) {
-            freeSlots.add(s);
-        }
-        Collections.shuffle(freeSlots, rng);
-        int limit = Math.min(generated.size(), Math.min(maxStacks, freeSlots.size()));
-        for (int i = 0; i < limit; i++) {
-            inv.setItem(freeSlots.get(i), generated.get(i));
         }
     }
 
-    public ItemStack materializePreview(DungeonLootEntry entry) {
-        VaultAndItemsHook hook = plugin.getItemsHook();
-        return switch (entry.getSourceKind()) {
-            case VAULT_KEY -> hook.createVaultKey(entry.getExternalId(), entry.getMinAmount());
-            case ELYTRIX_ITEM -> hook.resolveShopOrKitItem(entry.getExternalId(), entry.getMinAmount(), entry.getFallbackStack());
-            case ITEM_STACK -> entry.getFallbackStack();
-        };
+    public List<ItemStack> rollStacks(LootPoolType type, int targetStacks) {
+        List<DungeonLootEntry> entries = getPool(type);
+        List<ItemStack> out = new ArrayList<>();
+        if (entries.isEmpty()) return out;
+        ThreadLocalRandom rng = ThreadLocalRandom.current();
+
+        for (DungeonLootEntry e : entries) {
+            if (e.isGuaranteed()) {
+                out.add(materialize(e, rng));
+            }
+        }
+        int guard = 0;
+        while (out.size() < targetStacks && guard++ < 48) {
+            DungeonLootEntry cand = entries.get(rng.nextInt(entries.size()));
+            if (cand.isGuaranteed()) continue;
+            if (rng.nextDouble(100.0) <= cand.getChancePercent()) {
+                out.add(materialize(cand, rng));
+            }
+        }
+        return out;
     }
 
-    private ItemStack materialize(DungeonLootEntry entry, ThreadLocalRandom rng) {
-        int amt = entry.getMinAmount() == entry.getMaxAmount()
-                ? entry.getMinAmount()
-                : rng.nextInt(entry.getMinAmount(), entry.getMaxAmount() + 1);
-        VaultAndItemsHook hook = plugin.getItemsHook();
-        return switch (entry.getSourceKind()) {
-            case VAULT_KEY -> hook.createVaultKey(entry.getExternalId(), amt);
-            case ELYTRIX_ITEM -> hook.resolveShopOrKitItem(entry.getExternalId(), amt, entry.getFallbackStack());
+    public ItemStack materializePreview(DungeonLootEntry e) {
+        return materialize(e, ThreadLocalRandom.current());
+    }
+
+    private ItemStack materialize(DungeonLootEntry e, ThreadLocalRandom rng) {
+        int amt = e.getMinAmount() == e.getMaxAmount()
+                ? e.getMinAmount()
+                : rng.nextInt(e.getMinAmount(), e.getMaxAmount() + 1);
+        return switch (e.getSourceKind()) {
+            case VAULT_KEY -> plugin.getItemsHook().createVaultKey(e.getExternalId(), amt);
+            case ELYTRIX_ITEM -> plugin.getItemsHook().resolveShopOrKitItem(e.getExternalId(), amt);
             case ITEM_STACK -> {
-                ItemStack st = entry.getFallbackStack();
+                ItemStack st = e.getFallbackStack().clone();
                 st.setAmount(Math.min(st.getMaxStackSize(), amt));
                 yield st;
             }
         };
     }
 
-    private void populateDefaults() {
-        VaultAndItemsHook hook = plugin.getItemsHook();
+    private void seedDefaults() {
+        // 1. SURFACE_CHEST — Сундуки в Наземном Доме (вещи из /shop, китов и ПвП-ресурсы)
+        List<DungeonLootEntry> house = pools.get(LootPoolType.SURFACE_CHEST);
+        house.add(item("sc_gap", new ItemStack(Material.GOLDEN_APPLE), 80.0, 2, 7, true));
+        house.add(item("sc_pearl", new ItemStack(Material.ENDER_PEARL), 70.0, 2, 8, false));
+        house.add(item("sc_totem", new ItemStack(Material.TOTEM_OF_UNDYING), 32.0, 1, 1, false));
+        house.add(item("sc_diam", new ItemStack(Material.DIAMOND), 65.0, 3, 10, false));
+        house.add(item("sc_em", new ItemStack(Material.EMERALD), 60.0, 4, 14, false));
+        house.add(item("sc_exp", new ItemStack(Material.EXPERIENCE_BOTTLE), 65.0, 8, 24, false));
+        house.add(item("sc_scrap", new ItemStack(Material.NETHERITE_SCRAP), 24.0, 1, 2, false));
+        house.add(shopItem("sc_pot_war", "potion_voina", 36.0, 1, 2, false));
+        house.add(shopItem("sc_pot_heal", "potion_healt", 38.0, 1, 2, false));
+        house.add(shopItem("sc_trap", "explosive_trap", 18.0, 1, 2, false));
+        house.add(shopItem("sc_anti", "anti_pearl", 20.0, 1, 2, false));
+        house.add(item("sc_kit_chest", VaultAndItemsHook.enchantedGear(Material.DIAMOND_CHESTPLATE,
+                "&7« &#96FF91Нагрудник Искателя &7»",
+                new MapEnchant(Enchantment.PROTECTION, 4), new MapEnchant(Enchantment.UNBREAKING, 3)), 22.0, 1, 1, false));
+        house.add(item("sc_kit_sword", VaultAndItemsHook.enchantedGear(Material.DIAMOND_SWORD,
+                "&7« &#96FF91Клинок Искателя &7»",
+                new MapEnchant(Enchantment.SHARPNESS, 5), new MapEnchant(Enchantment.UNBREAKING, 3)), 20.0, 1, 1, false));
 
-        // 1. SURFACE_CHEST — Обычные сундуки Наземного данжа (основа + вещи из китов + расходники /shop)
-        List<DungeonLootEntry> surfChest = pools.get(LootPoolType.SURFACE_CHEST);
-        surfChest.add(stackEntry("sc_gapple", new ItemStack(Material.GOLDEN_APPLE, 1), 65.0, 3, 10, false));
-        surfChest.add(stackEntry("sc_pearl", new ItemStack(Material.ENDER_PEARL, 1), 55.0, 4, 12, false));
-        surfChest.add(stackEntry("sc_chorus", new ItemStack(Material.CHORUS_FRUIT, 1), 45.0, 8, 24, false));
-        surfChest.add(stackEntry("sc_diamond", new ItemStack(Material.DIAMOND, 1), 50.0, 4, 12, false));
-        surfChest.add(stackEntry("sc_exp", new ItemStack(Material.EXPERIENCE_BOTTLE, 1), 65.0, 12, 32, false));
-        surfChest.add(stackEntry("sc_totem", new ItemStack(Material.TOTEM_OF_UNDYING, 1), 30.0, 1, 1, false));
-        surfChest.add(stackEntry("sc_kit_sword", VaultAndItemsHook.enchantedGear(Material.DIAMOND_SWORD, null,
-                new MapEnchant(Enchantment.SHARPNESS, 3), new MapEnchant(Enchantment.FIRE_ASPECT, 1), new MapEnchant(Enchantment.UNBREAKING, 2)),
-                25.0, 1, 1, false));
-        surfChest.add(stackEntry("sc_kit_chest", VaultAndItemsHook.enchantedGear(Material.DIAMOND_CHESTPLATE, null,
-                new MapEnchant(Enchantment.PROTECTION, 3), new MapEnchant(Enchantment.UNBREAKING, 2)),
-                22.0, 1, 1, false));
-        surfChest.add(shopEntry("sc_pot_heal", "potion_healt",
-                VaultAndItemsHook.customPotion(Material.SPLASH_POTION, 1, "&#FF6B8BЗелье исцеления", Color.fromRGB(255, 80, 120),
-                        List.of(VaultAndItemsHook.eff(PotionEffectType.INSTANT_HEALTH, 1, 1), VaultAndItemsHook.eff(PotionEffectType.REGENERATION, 20, 1))),
-                32.0, 1, 2, false));
-        surfChest.add(keyEntry("sc_key_rusty", "rusty", hook.createVaultKey("rusty", 1), 28.0, 1, 1, false));
+        // 2. UNDERGROUND_SHULKER — Главный шалкер Подземного данжа (после убийства стражей!)
+        List<DungeonLootEntry> ugBoss = pools.get(LootPoolType.UNDERGROUND_SHULKER);
+        ugBoss.add(vaultKey("ug_royal_key", "royal", 100.0, 1, 1, true));
+        ugBoss.add(vaultKey("ug_void_key", "void", 38.0, 1, 1, false));
+        ugBoss.add(vaultKey("ug_unique_key", "unique", 18.0, 1, 1, false));
+        ugBoss.add(shopItem("ug_shulker_sword", "shulker_sword", 26.0, 1, 1, false));
+        ugBoss.add(shopItem("ug_shulker_pick", "shulker_pickaxe", 24.0, 1, 1, false));
+        ugBoss.add(shopItem("ug_kit_helm", "kit_helmet", 30.0, 1, 1, false));
+        ugBoss.add(shopItem("ug_kit_boots", "kit_boots", 30.0, 1, 1, false));
+        ugBoss.add(shopItem("ug_doc_totem", "totem1", 32.0, 1, 1, false));
+        ugBoss.add(shopItem("ug_snake_orb", "shar1", 16.0, 1, 1, false));
+        ugBoss.add(shopItem("ug_salv_pot", "potion_salvation", 52.0, 1, 2, false));
+        ugBoss.add(shopItem("ug_war_pot", "potion_voina", 55.0, 1, 2, false));
+        ugBoss.add(item("ug_egap", new ItemStack(Material.ENCHANTED_GOLDEN_APPLE), 44.0, 1, 2, false));
+        ugBoss.add(item("ug_ingot", new ItemStack(Material.NETHERITE_INGOT), 45.0, 1, 2, false));
+        ugBoss.add(item("ug_totem", new ItemStack(Material.TOTEM_OF_UNDYING), 65.0, 1, 2, false));
 
-        // 2. SURFACE_BARREL — Бочки Наземного данжа (базовые ресурсы + припасы китов)
-        List<DungeonLootEntry> surfBarrel = pools.get(LootPoolType.SURFACE_BARREL);
-        surfBarrel.add(stackEntry("sb_iron", new ItemStack(Material.IRON_INGOT, 1), 70.0, 12, 36, false));
-        surfBarrel.add(stackEntry("sb_gold", new ItemStack(Material.GOLD_INGOT, 1), 60.0, 8, 24, false));
-        surfBarrel.add(stackEntry("sb_arrows", new ItemStack(Material.ARROW, 1), 65.0, 16, 48, false));
-        surfBarrel.add(stackEntry("sb_beef", new ItemStack(Material.COOKED_BEEF, 1), 65.0, 16, 48, false));
-        surfBarrel.add(stackEntry("sb_obsidian", new ItemStack(Material.OBSIDIAN, 1), 50.0, 8, 24, false));
-        surfBarrel.add(stackEntry("sb_slime", new ItemStack(Material.SLIME_BALL, 1), 40.0, 4, 12, false));
-        surfBarrel.add(stackEntry("sb_firework", new ItemStack(Material.FIREWORK_ROCKET, 1), 45.0, 12, 32, false));
-        surfBarrel.add(stackEntry("sb_gapple", new ItemStack(Material.GOLDEN_APPLE, 1), 45.0, 2, 6, false));
-
-        // 3. SURFACE_UNIQUE_SHULKER — 3 Уникальных шалкера за Уникальный ключ (топ-лут /shop + киты elder/eternity!)
-        List<DungeonLootEntry> surfShulker = pools.get(LootPoolType.SURFACE_UNIQUE_SHULKER);
-        surfShulker.add(stackEntry("su_egapple", new ItemStack(Material.ENCHANTED_GOLDEN_APPLE, 1), 70.0, 1, 3, false));
-        surfShulker.add(stackEntry("su_ingot", new ItemStack(Material.NETHERITE_INGOT, 1), 75.0, 1, 3, false));
-        surfShulker.add(stackEntry("su_eternity_sword", VaultAndItemsHook.enchantedGear(Material.NETHERITE_SWORD,
-                "&#F8BEFB« Меч шалкера »",
-                new MapEnchant(Enchantment.SHARPNESS, 6), new MapEnchant(Enchantment.FIRE_ASPECT, 2),
-                new MapEnchant(Enchantment.MENDING, 1), new MapEnchant(Enchantment.UNBREAKING, 4)),
-                32.0, 1, 1, false));
-        surfShulker.add(stackEntry("su_eternity_pick", VaultAndItemsHook.enchantedGear(Material.NETHERITE_PICKAXE,
-                "&#F8BEFB« Кирка шалкера »",
-                new MapEnchant(Enchantment.EFFICIENCY, 6), new MapEnchant(Enchantment.FORTUNE, 3),
-                new MapEnchant(Enchantment.MENDING, 1), new MapEnchant(Enchantment.UNBREAKING, 4)),
-                30.0, 1, 1, false));
-        surfShulker.add(shopEntry("su_snake_orb", "shar1", VaultAndItemsHook.texturedHead(SNAKE_ORB_B64,
-                "&#F8BEFB« Шар Змеи »", List.of(
-                        "&#F8BEFB&l┃ &fЭффект: &#F8BEFBСила II",
-                        "&#F8BEFB&l┃ &fЭффект: &#F8BEFBСкорость I",
-                        "&#F8BEFB&l┃ &fЭффект: &#F8BEFBСопротивление I")),
-                35.0, 1, 1, false));
-        surfShulker.add(shopEntry("su_doc_totem", "totem1", VaultAndItemsHook.namedItem(Material.TOTEM_OF_UNDYING, 1,
-                "&#F8BEFB« Тотем доктора »", List.of("&#F8BEFB&l┃ &fБонус: &#F8BEFB+4 к макс. здоровью"), true),
-                42.0, 1, 1, false));
-        surfShulker.add(shopEntry("su_raskol", "kirkaraskola", VaultAndItemsHook.namedItem(Material.NETHERITE_PICKAXE, 1,
-                "&#F8BEFBКирка Раскола", List.of("&7Копает 3×3"), true),
-                26.0, 1, 1, false));
-        surfShulker.add(stackEntry("su_spawner", new ItemStack(Material.SPAWNER, 1), 24.0, 1, 1, false));
-        surfShulker.add(keyEntry("su_void_key", "void_key", hook.createVaultKey("void_key", 1), 45.0, 1, 1, false));
-
-        // 4. UNDERGROUND_SHULKER — Главный шалкер Подземного данжа после победы над сильными мобами
-        List<DungeonLootEntry> ugShulker = pools.get(LootPoolType.UNDERGROUND_SHULKER);
-        ugShulker.add(keyEntry("ug_key_unique", "unique", hook.createVaultKey("unique", 1), 65.0, 1, 1, false));
-        ugShulker.add(keyEntry("ug_key_void", "void_key", hook.createVaultKey("void_key", 1), 75.0, 1, 2, false));
-        ugShulker.add(keyEntry("ug_key_royal", "royal", hook.createVaultKey("royal", 1), 100.0, 1, 2, true));
-        ugShulker.add(shopEntry("ug_pot_war", "potion_voina",
-                VaultAndItemsHook.customPotion(Material.POTION, 1, "&#FF4D4DЗелье воина", Color.fromRGB(220, 45, 45),
-                        List.of(VaultAndItemsHook.eff(PotionEffectType.STRENGTH, 120, 1), VaultAndItemsHook.eff(PotionEffectType.SPEED, 120, 1))),
-                65.0, 1, 3, false));
-        ugShulker.add(shopEntry("ug_pot_salv", "potion_salvation",
-                VaultAndItemsHook.customPotion(Material.SPLASH_POTION, 1, "&#FFD55EЗелье спасения", Color.fromRGB(255, 210, 80),
-                        List.of(VaultAndItemsHook.eff(PotionEffectType.RESISTANCE, 25, 2), VaultAndItemsHook.eff(PotionEffectType.REGENERATION, 25, 2))),
-                55.0, 1, 2, false));
-        ugShulker.add(shopEntry("ug_anti_pearl", "anti_pearl",
-                VaultAndItemsHook.namedItem(Material.ENDER_EYE, 1, "&#B97BFFАнти-пёрл", List.of("&7Блокирует эндер-пёрл врага"), true),
-                50.0, 1, 3, false));
-        ugShulker.add(shopEntry("ug_trap", "explosive_trap",
-                VaultAndItemsHook.namedItem(Material.HEAVY_CORE, 1, "&#FF5555Взрывная трапка", List.of("&7Расходник из /shop"), true),
-                45.0, 1, 2, false));
-        ugShulker.add(stackEntry("ug_dragon_sword", VaultAndItemsHook.enchantedGear(Material.DIAMOND_SWORD, null,
-                new MapEnchant(Enchantment.SHARPNESS, 5), new MapEnchant(Enchantment.FIRE_ASPECT, 2), new MapEnchant(Enchantment.LOOTING, 3)),
-                45.0, 1, 1, false));
-        ugShulker.add(stackEntry("ug_egapple", new ItemStack(Material.ENCHANTED_GOLDEN_APPLE, 1), 50.0, 1, 2, false));
-        ugShulker.add(stackEntry("ug_totems", new ItemStack(Material.TOTEM_OF_UNDYING, 1), 80.0, 1, 3, false));
-        ugShulker.add(stackEntry("ug_ingot", new ItemStack(Material.NETHERITE_INGOT, 1), 55.0, 1, 2, false));
-
-        // 5. UNDERGROUND_CONTAINER — Бочки/сундуки в зале Подземного данжа
-        List<DungeonLootEntry> ugCont = pools.get(LootPoolType.UNDERGROUND_CONTAINER);
-        ugCont.add(stackEntry("ugc_gapple", new ItemStack(Material.GOLDEN_APPLE, 1), 70.0, 4, 12, false));
-        ugCont.add(stackEntry("ugc_pearl", new ItemStack(Material.ENDER_PEARL, 1), 60.0, 4, 16, false));
-        ugCont.add(stackEntry("ugc_scrap", new ItemStack(Material.NETHERITE_SCRAP, 1), 45.0, 1, 3, false));
-        ugCont.add(stackEntry("ugc_book_p4", VaultAndItemsHook.enchantedBook("&#7EC8FFКнига: Защита IV", Enchantment.PROTECTION, 4), 40.0, 1, 1, false));
-        ugCont.add(keyEntry("ugc_key_know", "knowledge", hook.createVaultKey("knowledge", 1), 35.0, 1, 1, false));
-
-        // 6. SKY_ANGELIC_SHARD — Предметы из Ангельских осколков Воздушного данжа (ветка Лут при 20% проке)
-        List<DungeonLootEntry> skyShard = pools.get(LootPoolType.SKY_ANGELIC_SHARD);
-        skyShard.add(stackEntry("sky_gapple", new ItemStack(Material.GOLDEN_APPLE, 1), 65.0, 2, 6, false));
-        skyShard.add(stackEntry("sky_diamond", new ItemStack(Material.DIAMOND, 1), 60.0, 3, 10, false));
-        skyShard.add(stackEntry("sky_totem", new ItemStack(Material.TOTEM_OF_UNDYING, 1), 45.0, 1, 1, false));
-        skyShard.add(stackEntry("sky_scrap", new ItemStack(Material.NETHERITE_SCRAP, 1), 35.0, 1, 2, false));
-        skyShard.add(stackEntry("sky_egapple", new ItemStack(Material.ENCHANTED_GOLDEN_APPLE, 1), 18.0, 1, 1, false));
-        skyShard.add(shopEntry("sky_arrow_levit", "arrow_levit",
-                VaultAndItemsHook.customPotion(Material.TIPPED_ARROW, 8, "&#F8BEFBСтрела левитации", Color.fromRGB(248, 190, 251),
-                        List.of(VaultAndItemsHook.eff(PotionEffectType.LEVITATION, 6, 1))),
-                40.0, 6, 12, false));
-        skyShard.add(shopEntry("sky_pot_sport", "potion_sportsmena",
-                VaultAndItemsHook.customPotion(Material.POTION, 1, "&#7EC8FFЗелье спортсмена", Color.fromRGB(90, 210, 255),
-                        List.of(VaultAndItemsHook.eff(PotionEffectType.SPEED, 150, 2), VaultAndItemsHook.eff(PotionEffectType.JUMP_BOOST, 150, 1))),
-                35.0, 1, 1, false));
-        skyShard.add(keyEntry("sky_key_royal", "royal", hook.createVaultKey("royal", 1), 22.0, 1, 1, false));
-        skyShard.add(keyEntry("sky_key_void", "void_key", hook.createVaultKey("void_key", 1), 14.0, 1, 1, false));
-        skyShard.add(keyEntry("sky_key_unique", "unique", hook.createVaultKey("unique", 1), 9.0, 1, 1, false));
+        // 3. UNDERGROUND_CONTAINER — Боковые сундуки и бочки Подземного данжа
+        List<DungeonLootEntry> ugSide = pools.get(LootPoolType.UNDERGROUND_CONTAINER);
+        ugSide.add(item("ugs_gap", new ItemStack(Material.GOLDEN_APPLE), 80.0, 2, 6, true));
+        ugSide.add(item("ugs_diam", new ItemStack(Material.DIAMOND), 65.0, 4, 12, false));
+        ugSide.add(item("ugs_scrap", new ItemStack(Material.NETHERITE_SCRAP), 35.0, 1, 3, false));
+        ugSide.add(item("ugs_pearl", new ItemStack(Material.ENDER_PEARL), 65.0, 2, 8, false));
+        ugSide.add(item("ugs_xp", new ItemStack(Material.EXPERIENCE_BOTTLE), 70.0, 10, 28, false));
+        ugSide.add(item("ugs_prot4", VaultAndItemsHook.enchantedBook(Enchantment.PROTECTION, 4), 28.0, 1, 1, false));
+        ugSide.add(vaultKey("ugs_know_key", "knowledge", 16.0, 1, 1, false));
     }
 
-    private static DungeonLootEntry keyEntry(String id, String keyId, ItemStack preview, double chance, int min, int max, boolean guaranteed) {
-        return new DungeonLootEntry(id, DungeonLootEntry.SourceKind.VAULT_KEY, keyId, preview, chance, min, max, guaranteed);
+    private DungeonLootEntry vaultKey(String id, String keyId, double chance, int min, int max, boolean guar) {
+        return new DungeonLootEntry(id, SourceKind.VAULT_KEY, keyId,
+                plugin.getItemsHook().createVaultKey(keyId, 1), chance, min, max, guar);
     }
 
-    private static DungeonLootEntry shopEntry(String id, String itemId, ItemStack fallback, double chance, int min, int max, boolean guaranteed) {
-        return new DungeonLootEntry(id, DungeonLootEntry.SourceKind.ELYTRIX_ITEM, itemId, fallback, chance, min, max, guaranteed);
+    private DungeonLootEntry shopItem(String id, String extId, double chance, int min, int max, boolean guar) {
+        return new DungeonLootEntry(id, SourceKind.ELYTRIX_ITEM, extId,
+                VaultAndItemsHook.buildCanonicalShopOrKitItem(extId), chance, min, max, guar);
     }
 
-    private static DungeonLootEntry stackEntry(String id, ItemStack stack, double chance, int min, int max, boolean guaranteed) {
-        return new DungeonLootEntry(id, DungeonLootEntry.SourceKind.ITEM_STACK, "", stack, chance, min, max, guaranteed);
+    private static DungeonLootEntry item(String id, ItemStack st, double chance, int min, int max, boolean guar) {
+        return new DungeonLootEntry(id, SourceKind.ITEM_STACK, "", st, chance, min, max, guar);
     }
 }

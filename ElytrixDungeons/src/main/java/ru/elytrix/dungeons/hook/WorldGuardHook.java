@@ -28,19 +28,13 @@ public final class WorldGuardHook {
         return REGION_PREFIX + dungeonId.toLowerCase();
     }
 
-    public void syncDungeonRegion(DungeonInstance dungeon, int padding, boolean allowPvp) {
-        if (!available) {
-            return;
-        }
+    public void syncDungeonRegion(DungeonInstance dungeon, int padding, boolean allowPvp, boolean allowBlockModify) {
+        if (!available) return;
         World bukkitWorld = dungeon.getOrigin().world();
-        if (bukkitWorld == null) {
-            return;
-        }
+        if (bukkitWorld == null) return;
         try {
             Object regionManager = getRegionManager(bukkitWorld);
-            if (regionManager == null) {
-                return;
-            }
+            if (regionManager == null) return;
             CuboidRegion box = dungeon.claimGuardRegion(padding);
             Class<?> bv3Class = Class.forName("com.sk89q.worldedit.math.BlockVector3");
             Method atMethod = bv3Class.getMethod("at", int.class, int.class, int.class);
@@ -49,8 +43,7 @@ public final class WorldGuardHook {
 
             Class<?> cuboidClass = Class.forName("com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion");
             Constructor<?> ctor = cuboidClass.getConstructor(String.class, bv3Class, bv3Class);
-            String regId = regionIdFor(dungeon.getId());
-            Object region = ctor.newInstance(regId, minVec, maxVec);
+            Object region = ctor.newInstance(regionIdFor(dungeon.getId()), minVec, maxVec);
 
             Class<?> prClass = Class.forName("com.sk89q.worldguard.protection.regions.ProtectedRegion");
             prClass.getMethod("setPriority", int.class).invoke(region, 100);
@@ -62,10 +55,13 @@ public final class WorldGuardHook {
             Object denyState = Enum.valueOf(stateEnum.asSubclass(Enum.class), "DENY");
             Method setFlag = prClass.getMethod("setFlag", flagInterface, Object.class);
 
-            setStateFlagIfPresent(flagsClass, setFlag, region, "PASSTHROUGH", allowState);
-            setStateFlagIfPresent(flagsClass, setFlag, region, "BUILD", allowState);
-            setStateFlagIfPresent(flagsClass, setFlag, region, "BLOCK_BREAK", allowState);
-            setStateFlagIfPresent(flagsClass, setFlag, region, "BLOCK_PLACE", allowState);
+            Object buildState = allowBlockModify ? allowState : denyState;
+            setStateFlagIfPresent(flagsClass, setFlag, region, "PASSTHROUGH", buildState);
+            setStateFlagIfPresent(flagsClass, setFlag, region, "BUILD", buildState);
+            setStateFlagIfPresent(flagsClass, setFlag, region, "BLOCK_BREAK", buildState);
+            setStateFlagIfPresent(flagsClass, setFlag, region, "BLOCK_PLACE", buildState);
+            setStateFlagIfPresent(flagsClass, setFlag, region, "OTHER_EXPLOSION", buildState);
+            setStateFlagIfPresent(flagsClass, setFlag, region, "TNT", buildState);
             setStateFlagIfPresent(flagsClass, setFlag, region, "INTERACT", allowState);
             setStateFlagIfPresent(flagsClass, setFlag, region, "USE", allowState);
             setStateFlagIfPresent(flagsClass, setFlag, region, "CHEST_ACCESS", allowState);
@@ -79,76 +75,53 @@ public final class WorldGuardHook {
     }
 
     public void removeDungeonRegion(World bukkitWorld, String dungeonId) {
-        if (!available || bukkitWorld == null) {
-            return;
-        }
+        if (!available || bukkitWorld == null) return;
         try {
             Object regionManager = getRegionManager(bukkitWorld);
-            if (regionManager == null) {
-                return;
+            if (regionManager != null) {
+                regionManager.getClass().getMethod("removeRegion", String.class)
+                        .invoke(regionManager, regionIdFor(dungeonId));
             }
-            regionManager.getClass().getMethod("removeRegion", String.class)
-                    .invoke(regionManager, regionIdFor(dungeonId));
         } catch (Throwable ignored) {
         }
     }
 
     @SuppressWarnings("unchecked")
     public boolean hasForeignRegions(World bukkitWorld, CuboidRegion area) {
-        if (!available || bukkitWorld == null) {
-            return false;
-        }
+        if (!available || bukkitWorld == null) return false;
         try {
             Object regionManager = getRegionManager(bukkitWorld);
-            if (regionManager == null) {
-                return false;
-            }
+            if (regionManager == null) return false;
             Map<String, Object> regions = (Map<String, Object>) regionManager.getClass()
                     .getMethod("getRegions").invoke(regionManager);
-            if (regions == null || regions.isEmpty()) {
-                return false;
-            }
+            if (regions == null || regions.isEmpty()) return false;
+
             Class<?> prClass = Class.forName("com.sk89q.worldguard.protection.regions.ProtectedRegion");
             Method minPoint = prClass.getMethod("getMinimumPoint");
             Method maxPoint = prClass.getMethod("getMaximumPoint");
             Class<?> bv3Class = Class.forName("com.sk89q.worldedit.math.BlockVector3");
-            Method gx = bv3Class.getMethod("x");
-            Method gy = bv3Class.getMethod("y");
-            Method gz = bv3Class.getMethod("z");
+            Method gx = bv3Class.getMethod("x"), gy = bv3Class.getMethod("y"), gz = bv3Class.getMethod("z");
 
             for (Map.Entry<String, Object> e : regions.entrySet()) {
                 String id = e.getKey();
-                if (id == null || id.equalsIgnoreCase("__global__") || id.startsWith(REGION_PREFIX)) {
-                    continue;
-                }
+                if (id == null || id.equalsIgnoreCase("__global__") || id.startsWith(REGION_PREFIX)) continue;
                 Object reg = e.getValue();
-                Object mn = minPoint.invoke(reg);
-                Object mx = maxPoint.invoke(reg);
-                int rMinX = (int) gx.invoke(mn), rMinY = (int) gy.invoke(mn), rMinZ = (int) gz.invoke(mn);
-                int rMaxX = (int) gx.invoke(mx), rMaxY = (int) gy.invoke(mx), rMaxZ = (int) gz.invoke(mx);
-                CuboidRegion foreign = new CuboidRegion(bukkitWorld.getName(), rMinX, rMinY, rMinZ, rMaxX, rMaxY, rMaxZ);
-                if (foreign.intersects3D(area)) {
-                    return true;
-                }
+                Object mn = minPoint.invoke(reg), mx = maxPoint.invoke(reg);
+                CuboidRegion foreign = new CuboidRegion(bukkitWorld.getName(),
+                        (int) gx.invoke(mn), (int) gy.invoke(mn), (int) gz.invoke(mn),
+                        (int) gx.invoke(mx), (int) gy.invoke(mx), (int) gz.invoke(mx));
+                if (foreign.intersects3D(area)) return true;
             }
         } catch (Throwable ignored) {
         }
         return false;
     }
 
-    private static void setStateFlagIfPresent(
-            Class<?> flagsClass,
-            Method setFlag,
-            Object region,
-            String fieldName,
-            Object stateValue
-    ) {
+    private static void setStateFlagIfPresent(Class<?> flagsClass, Method setFlag, Object region, String fieldName, Object stateValue) {
         try {
             Field f = flagsClass.getField(fieldName);
             Object flagObj = f.get(null);
-            if (flagObj != null) {
-                setFlag.invoke(region, flagObj, stateValue);
-            }
+            if (flagObj != null) setFlag.invoke(region, flagObj, stateValue);
         } catch (Throwable ignored) {
         }
     }

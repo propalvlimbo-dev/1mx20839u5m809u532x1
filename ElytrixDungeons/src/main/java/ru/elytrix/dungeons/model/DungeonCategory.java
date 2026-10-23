@@ -3,9 +3,8 @@ package ru.elytrix.dungeons.model;
 import org.bukkit.Material;
 
 public enum DungeonCategory {
-    SURFACE("Наземный", "&#96FF91", Material.MOSSY_STONE_BRICKS),
-    UNDERGROUND("Подземный", "&#89A0FF", Material.DEEPSLATE_TILES),
-    SKY("Воздушный", "&#F8BEFB", Material.AMETHYST_BLOCK);
+    SURFACE("Наземный (Дом)", "&#96FF91", Material.DARK_OAK_DOOR),
+    UNDERGROUND("Подземный", "&#89A0FF", Material.DEEPSLATE_TILES);
 
     private final String title;
     private final String colorHex;
@@ -17,15 +16,7 @@ public enum DungeonCategory {
         this.icon = icon;
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public String getColorHex() {
-        return colorHex;
-    }
-
-    public Material getIcon() {
-        return icon;
-    }
+    public String getTitle() { return title; }
+    public String getColorHex() { return colorHex; }
+    public Material getIcon() { return icon; }
 }

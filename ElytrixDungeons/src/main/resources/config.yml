@@ -1,114 +1,115 @@
-config-version: 1
+# ═══════════════════════════════════════════════════════════════════════════════
+# ElytrixDungeons — 7 Наземных (Дома Призраков) + 7 Подземных данжей из .schem
+# ═══════════════════════════════════════════════════════════════════════════════
+# КУДА ЗАЛИВАТЬ СХЕМАТИКИ:
+#   1) Наземные дома (7 шт. = 4 на первой схеме + 3 на второй):
+#      plugins/ElytrixDungeons/schematics/surface/surface_1.schem
+#      plugins/ElytrixDungeons/schematics/surface/surface_2.schem
+#   2) Подземные данжи (7 шт. = 4 на первой схеме + 3 на второй):
+#      plugins/ElytrixDungeons/schematics/underground/underground_1.schem
+#      plugins/ElytrixDungeons/schematics/underground/underground_2.schem
+# ═══════════════════════════════════════════════════════════════════════════════
 
 world-settings:
-  world: "world"
+  world: world
   center-x: 0
   center-z: 0
-  # Граница мира 3000×3000 (±1500), отступ чтобы любая .schem постройка целиком помещалась внутри границы
   half-size: 1420
-  spawn-exclusion-radius: 180
-  min-distance-between-dungeons: 320
-  sky-min-y: 148
-  sky-max-y: 182
-  underground-min-y: -26
-  underground-max-y: 6
+  spawn-exclusion-radius: 200
+  min-distance-between-dungeons: 340
+  underground-min-y: -24
+  underground-max-y: 8
 
 auto-spawn:
   enabled: true
-  # Количество данжей каждого типа из папок schematics/surface, schematics/underground, schematics/sky
-  surface-count: 5
-  underground-count: 5
-  sky-count: 5
-  # Если папка schematics/<тип>/ пока пустая — создать туда стартовый .schem для теста
+  # Ровно 7 Наземных + 7 Подземных = 14 данжей (при 2 .schem в папке: 4 шт. #1 и 3 шт. #2)
+  surface-count: 7
+  underground-count: 7
+  # Создавать стартовые surface_1/surface_2 и underground_1/underground_2 .schem, если папка пустая
   write-starter-schems-if-empty: true
-  # Создавать ли аккуратную шахту-спуск с поверхности к подземному данжу
-  underground-surface-shaft: true
-  blocks-per-tick: 900
-
-regeneration:
-  # Каждые полдня (12 часов = 43200 сек) все 15 данжей обновляют постройку, сундуки, шалкеры и осколки
-  interval-seconds: 43200
-  # false — данж обновляется на своём месте (защищён от привата); true — при обновлении откатывает рельеф и ищет новое место
-  relocate-on-reset: false
+  # Количество кандидатов, из которых плагин выбирает самое ровное и чистое место перед вайпом
+  candidates-per-dungeon: 24
+  # Сколько проверок чанков делать за один шаг поиска (не нагружает TPS при генерации новых чанков)
+  scan-interval-ticks: 4
+  blocks-per-tick: 1200
+  # Если плагин выключен / удалён — все 14 данжей скрываются, возвращая чистый природный ландшафт,
+  # но найденные координаты сохраняются в dungeons.yml и не ищутся заново после перезагрузки!
+  hide-dungeons-on-disable: true
 
 protection:
-  prevent-claims: true
-  claim-padding-blocks: 12
+  # Радиус запрета приватов (/rg claim и WorldGuard регион без владельцев) вокруг всей зоны данжа
+  claim-padding-blocks: 40
+  # Широкий буфер природного рельефа ВОКРУГ .schem (X/Z и Y), который полностью восстанавливается!
+  # Решает проблему больших подземных схематик и полных раскопок данжа гриферами.
+  surround-restore-padding-xz: 12
+  surround-restore-padding-y: 8
+  # Для подземного данжа сохранять и восстанавливать столб породы до самой травы на поверхности
+  restore-column-to-surface: true
   allow-pvp: true
-  blocked-claim-commands:
-    - "rg claim"
-    - "rg create"
-    - "rg define"
-    - "region claim"
-    - "region create"
-    - "region define"
-    - "worldguard:rg claim"
-    - "worldguard:region claim"
-    - "claim"
-    - "ps"
+  # true = ломать/ставить блоки в зоне данжа разрешено (при ресете всё вокруг +12 блоков восстановится),
+  # false = стены и порода в зоне данжа защищены от раскопок и взрывов (переключается в 1 клик в /edungeon!)
+  allow-block-modify-in-zone: true
 
+player-teleport:
+  # false = телепорт в /dungeons доступен по праву elytrixdungeons.tp (OP/админы), игрокам видны координаты
+  # true  = все игроки могут телепортироваться к данжам прямо из /dungeons
+  allow-all-players: false
+
+regeneration:
+  # Полное обновление данжей и рельефа вокруг каждые 12 часов (43200 сек)
+  interval-seconds: 43200
+  relocate-on-reset: false
+
+# 1. НАЗЕМНЫЕ ДАНЖИ (7 шт. — Дома с Призраками Allay и сундуками)
 surface-dungeon:
-  # В наземном данже: обычные сундуки + бочки открыты сразу, а 3 Уникальных шалкера открываются за Уникальный ключ (1 ключ = 1 шалкер)
-  unique-shulker-count: 3
-  required-vault-key-id: "unique"
-  chest-stacks: 5
-  barrel-stacks: 4
-  unique-shulker-stacks: 6
+  chest-stacks: 6
+  ghosts:
+    initial-count: 6
+    max-alive: 6
+    respawn-every-seconds: 60
+    health: 16.0
+    # 100% шанс выпадения Призрачного осколка (amethyst_shard для обмена у Торговца)
+    shard-drop-chance: 100.0
+    shard-min-amount: 1
+    shard-max-amount: 1
+    # 5% шанс выпадения ключа Хранилища (любой редкости, чаще обычный)
+    key-drop-chance: 5.0
+    key-weights:
+      rusty: 52
+      knowledge: 25
+      royal: 13
+      void: 7
+      unique: 3
 
+# 2. ПОДЗЕМНЫЕ ДАНЖИ (7 шт. — Закрытый шалкер + сильные мобы под Алмазку З3)
 underground-dungeon:
-  # В подземном данже: при клике по шалкеру спавнятся сильные мобы (тяжело в алмазке З3); после убийства всех шалкер открывается и данж уходит на перезарядку
-  fight-timeout-seconds: 210
+  shulker-stacks: 7
+  side-container-stacks: 4
   mob-count: 5
   spawn-leader: true
   guard-health: 64.0
   guard-damage: 14.5
   leader-health: 150.0
   leader-damage: 18.5
-  shulker-stacks: 7
-  side-container-stacks: 4
-
-sky-dungeon:
-  # Воздушный данж: Ангельские осколки — 20% награда (лут / монеты / опыт), 30% взрыв, пропадает через 5 взрывов
-  shard-block-types:
-    - "AMETHYST_CLUSTER"
-    - "LARGE_AMETHYST_BUD"
-    - "BUDDING_AMETHYST"
-  min-shards-if-missing-in-schem: 8
-  reward-chance: 20.0
-  explosion-chance: 30.0
-  max-explosions: 5
-  explosion-damage: 7.5
-  explosion-knockback: 1.05
-  coins-min: 300
-  coins-max: 1200
-  economy-fallback-command: "eco give {player} {amount}"
-  exp-min: 45
-  exp-max: 140
+  fight-timeout-seconds: 210
 
 hologram:
   enabled: true
-  line-width: 270
   view-range: 0.75
+  line-width: 270
   surface-lines:
-    - "&#96FF91Наземный данж &8[&fШалкеров: &#F8BEFB{left}/{total}&8]"
-    - "&7Сундуки, бочки + шалкеры за Уникальный ключ"
-    - "&fВозобновление через: &#F8BEFB{timer}"
+    - "&#F8BEFBНаземный данж &8[&#96FF91Дом призраков&8]"
+    - "&fПризраков внутри: &#F8BEFB{ghosts} &8┃ &fСундуки с лутом"
+    - "&7Обновление через: &#F8BEFB{timer}"
   underground-ready-lines:
-    - "&#89A0FFПодземный данж &8[&aАктивен&8]"
-    - "&7Нажмите ПКМ по шалкеру — вызов стражей"
-    - "&fВозобновление через: &#F8BEFB{timer}"
+    - "&#F8BEFBПодземный данж &8[&#89A0FFЗакрыт&8]"
+    - "&fПКМ по шалкеру — призвать стражей"
+    - "&7Обновление через: &#F8BEFB{timer}"
   underground-fight-lines:
-    - "&#89A0FFПодземный данж &8[&cИдёт бой&8]"
+    - "&#F8BEFBПодземный данж &8[&cИдёт бой&8]"
     - "&fОсталось мобов: &#F8BEFB{mobs} &8(&7{clock}&8)"
-    - "&fВозобновление через: &#F8BEFB{timer}"
+    - "&7Обновление через: &#F8BEFB{timer}"
   underground-cooldown-lines:
-    - "&#89A0FFПодземный данж &8[&7Перезарядка&8]"
-    - "&aШалкер открыт &8┃ &7Ожидает возобновления"
-    - "&fВозобновление через: &#F8BEFB{timer}"
-  sky-lines:
-    - "&#F8BEFBВоздушный данж &8[&fОсколков: &#F8BEFB{left}/{total}&8]"
-    - "&7Добывайте Ангельские осколки &8(&f20% награда &8/ &c30% взрыв&8)"
-    - "&fВозобновление через: &#F8BEFB{timer}"
-
-player-menu:
-  show-coordinates: false
+    - "&#F8BEFBПодземный данж &8[&7Перезарядка&8]"
+    - "&fШалкер открыт &8┃ &7Ожидает обновления"
+    - "&7Обновление через: &#F8BEFB{timer}"

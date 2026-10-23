@@ -27,9 +27,15 @@ public final class DungeonMenuService {
         this.plugin = plugin;
     }
 
+    public boolean canTeleportFromPlayerMenu(Player player) {
+        return player.hasPermission("elytrixdungeons.tp")
+                || player.hasPermission("elytrixdungeons.admin")
+                || plugin.getConfig().getBoolean("player-teleport.allow-all-players", false);
+    }
+
     public void openPlayerOverview(Player player) {
         DungeonGuiHolder holder = new DungeonGuiHolder(DungeonGuiHolder.Screen.PLAYER_OVERVIEW, null);
-        Inventory inv = Bukkit.createInventory(holder, 54, TextUtil.color("&#F8BEFB&lДанжи мира"));
+        Inventory inv = Bukkit.createInventory(holder, 54, TextUtil.color("&#F8BEFB&lДанжи мира (14)"));
         holder.setInventory(inv);
         fillBorder(inv);
 
@@ -39,45 +45,21 @@ public final class DungeonMenuService {
         }
         String nearestTimer = nearestSec == Long.MAX_VALUE ? "12ч 00м 00с" : TextUtil.formatDuration(nearestSec);
 
-        inv.setItem(13, icon(Material.TRIAL_KEY, "&7« &#F8BEFBДанжи мира 3000×3000 &7»", List.of(
-                "&#F8BEFB&l┃",
-                "&#F8BEFB&l┃ &fВсего данжей в мире: &#F8BEFB" + plugin.getDungeonManager().getAllDungeons().size(),
+        inv.setItem(4, icon(Material.TRIAL_KEY, "&7« &#F8BEFBДанжи мира &7»", List.of(
+                "&#F8BEFB&l┃ &fАктивно данжей: &#F8BEFB" + plugin.getDungeonManager().getAllDungeons().size() + " &8(7 Наземных + 7 Подземных)",
                 "&#F8BEFB&l┃ &fБлижайшее обновление: &#F8BEFB" + nearestTimer,
-                "&#F8BEFB&l┃ &fЦикл возобновления: &#F8BEFBКаждые 12 часов",
-                "&#F8BEFB&l┃ &fЛут: &fОбщий — кто первый успел, того и добыча",
-                "&#F8BEFB&l┃"
+                "&#F8BEFB&l┃",
+                "&#F8BEFB&l┃ &#96FF91Наземные дома: &fсундуки + Призраки (100% осколки, 5% ключ)",
+                "&#F8BEFB&l┃ &#89A0FFПодземные залы: &fбой со стражами за главный шалкер"
         )));
 
-        inv.setItem(20, icon(Material.MOSSY_STONE_BRICKS,
-                "&7« &#96FF91Наземные данжи &8(" + plugin.getDungeonManager().countByCategory(DungeonCategory.SURFACE) + " шт.) &7»",
-                List.of(
-                        "&#F8BEFB&l┃ &fНаграды внутри:",
-                        "&#F8BEFB&l┃ &7● &fОбычные сундуки и бочки с ресурсами",
-                        "&#F8BEFB&l┃ &7● &f3 Уникальных шалкера с топ-лутом",
-                        "&#F8BEFB&l┃",
-                        "&#F8BEFB&l┃ &fУсловие: &#F8BEFB1 Уникальный ключ = 1 шалкер"
-                )));
-        inv.setItem(22, icon(Material.DEEPSLATE_TILES,
-                "&7« &#89A0FFПодземные данжи &8(" + plugin.getDungeonManager().countByCategory(DungeonCategory.UNDERGROUND) + " шт.) &7»",
-                List.of(
-                        "&#F8BEFB&l┃ &fМеханика:",
-                        "&#F8BEFB&l┃ &7● &fПКМ по шалкеру спавнит сильных мобов",
-                        "&#F8BEFB&l┃ &7● &fУбейте всех стражей — шалкер откроется,",
-                        "&#F8BEFB&l┃ &7  &fа данж уйдёт на перезарядку"
-                )));
-        inv.setItem(24, icon(Material.AMETHYST_CLUSTER,
-                "&7« &#F8BEFBВоздушные данжи &8(" + plugin.getDungeonManager().countByCategory(DungeonCategory.SKY) + " шт.) &7»",
-                List.of(
-                        "&#F8BEFB&l┃ &fАнгельские осколки:",
-                        "&#F8BEFB&l┃ &7● &f20% шанс: &#96FF91Лут / Монеты / Опыт",
-                        "&#F8BEFB&l┃ &7● &f30% шанс: &#FF5555Взрыв осколка",
-                        "&#F8BEFB&l┃ &7● &fПосле &#F8BEFB5 взрывов &fосколок исчезает"
-                )));
+        boolean allowTp = canTeleportFromPlayerMenu(player);
+        placeSevenRow(inv, DungeonCategory.SURFACE, 19, false, allowTp);
+        placeSevenRow(inv, DungeonCategory.UNDERGROUND, 28, false, allowTp);
 
         if (player.hasPermission("elytrixdungeons.admin")) {
             inv.setItem(48, icon(Material.COMPARATOR, "&7« &#F8BEFBПанель администратора &7»", List.of(
-                    "&#F8BEFB&l┃ &fТелепорт по всем 15 данжам,",
-                    "&#F8BEFB&l┃ &fнастройка лута и перезагрузка .schem",
+                    "&#F8BEFB&l┃ &fУправление данжами, лутом, защитой и .schem",
                     "&7● &fНажмите, чтобы открыть"
             )));
         }
@@ -87,73 +69,98 @@ public final class DungeonMenuService {
 
     public void openAdminBoard(Player player) {
         DungeonGuiHolder holder = new DungeonGuiHolder(DungeonGuiHolder.Screen.ADMIN_BOARD, null);
-        Inventory inv = Bukkit.createInventory(holder, 54, TextUtil.color("&#F8BEFB&lУправление Данжами (15)"));
+        Inventory inv = Bukkit.createInventory(holder, 54, TextUtil.color("&#F8BEFB&lУправление Данжами (7 + 7)"));
         holder.setInventory(inv);
         fillBorder(inv);
 
-        inv.setItem(10, icon(Material.MOSSY_STONE_BRICKS, "&#96FF91Наземные &7(5)",
-                List.of("&7Папка схем: &fschematics/surface/")));
-        inv.setItem(19, icon(Material.DEEPSLATE_TILES, "&#89A0FFПодземные &7(5)",
-                List.of("&7Папка схем: &fschematics/underground/")));
-        inv.setItem(28, icon(Material.AMETHYST_CLUSTER, "&#F8BEFBВоздушные &7(5)",
-                List.of("&7Папка схем: &fschematics/sky/")));
+        String scanLine = plugin.getDungeonManager().isScanning()
+                ? "&#96FF91Идёт поиск мест: " + plugin.getDungeonManager().getPendingScanDone() + "/" + plugin.getDungeonManager().getPendingScanTotal()
+                : "&#96FF91Места зафиксированы в dungeons.yml (" + plugin.getDungeonManager().getAllDungeons().size() + "/14)";
 
-        placeCategoryRow(inv, DungeonCategory.SURFACE, 11);
-        placeCategoryRow(inv, DungeonCategory.UNDERGROUND, 20);
-        placeCategoryRow(inv, DungeonCategory.SKY, 29);
-
-        boolean relocate = plugin.getConfig().getBoolean("regeneration.relocate-on-reset", false);
-        inv.setItem(46, icon(Material.CHEST, "&7« &#F8BEFBНастройка лута (GUI) &7»", List.of(
-                "&#F8BEFB&l┃ &fСундуки, бочки, Уникальные шалкеры,",
-                "&#F8BEFB&l┃ &fПодземный шалкер и Ангельские осколки",
-                "&7● &fНажмите для настройки"
+        inv.setItem(4, icon(Material.BEACON, "&7« &#F8BEFBСтатус Данжей &7»", List.of(
+                "&#F8BEFB&l┃ &fСостояние: " + scanLine,
+                "&#F8BEFB&l┃ &fНаземные (.schem): &fschematics/surface/ &8(surface_1, surface_2)",
+                "&#F8BEFB&l┃ &fПодземные (.schem): &fschematics/underground/ &8(underground_1, underground_2)"
         )));
-        inv.setItem(47, icon(Material.STRUCTURE_BLOCK, "&7« &#F8BEFBПоставить .schem здесь &7»", List.of(
-                "&#F8BEFB&l┃ &fРучной спавн любой схемы на вашей точке",
+
+        // Row 2 (slots 19..25 = 7 inner slots!): all 7 Surface Houses
+        // Row 3 (slots 28..34 = 7 inner slots!): all 7 Underground Vaults
+        placeSevenRow(inv, DungeonCategory.SURFACE, 19, true, true);
+        placeSevenRow(inv, DungeonCategory.UNDERGROUND, 28, true, true);
+
+        boolean allowBreak = plugin.getConfig().getBoolean("protection.allow-block-modify-in-zone", true);
+        boolean hidden = plugin.getDungeonManager().isHiddenFromWorld();
+
+        inv.setItem(45, icon(Material.CHEST, "&7« &#F8BEFBНастройка лута (GUI) &7»", List.of(
+                "&#F8BEFB&l┃ &fСундуки Дома, Главный шалкер и бочки Подземелья",
+                "&7● &fНажмите для редактирования"
+        )));
+        inv.setItem(46, icon(Material.STRUCTURE_BLOCK, "&7« &#F8BEFBПоставить .schem здесь &7»", List.of(
+                "&#F8BEFB&l┃ &fРучной спавн схемы на вашей точке",
                 "&7● &fНажмите для выбора"
         )));
-        inv.setItem(49, closeButton());
-        inv.setItem(51, icon(Material.ENDER_PEARL, "&7« &#F8BEFBРежим обновления 12ч &7»", List.of(
-                "&#F8BEFB&l┃ &fСейчас: " + (relocate ? "&#96FF91Новые места каждые 12ч" : "&#F8BEFBНа своих местах (защита от привата)"),
-                "&7● &fЛКМ — переключить"
+        inv.setItem(47, icon(Material.AMETHYST_SHARD, "&7« &#F8BEFBВзять Призрачный осколок &7»", List.of(
+                "&#F8BEFB&l┃ &fВыдать себе 16 Призрачных осколков",
+                "&7● &fНажмите для выдачи"
         )));
-        inv.setItem(52, icon(Material.RECOVERY_COMPASS, "&7« &#F8BEFBОбновить все 15 данжей &7»", List.of(
-                "&#F8BEFB&l┃ &fВосстановить постройки, шалкеры и осколки сейчас",
-                "&7● &fЛКМ — обновить на местах",
-                "&7● &fShift+ПКМ — пересоздать с нуля из .schem"
+        inv.setItem(49, closeButton());
+        inv.setItem(51, icon(Material.SHIELD, "&7« &#F8BEFBРежим раскопки данжей &7»", List.of(
+                "&#F8BEFB&l┃ &fСейчас: " + (allowBreak
+                        ? "&#96FF91Ломать можно &7(авто-восстановление +12 бл. вокруг)"
+                        : "&#FF5555Защита включена &7(раскапывать нельзя)"),
+                "&#F8BEFB&l┃ &fЗапрет привата рядом: &#F8BEFB" + plugin.getConfig().getInt("protection.claim-padding-blocks", 40) + " блоков",
+                "&7● &fЛКМ — переключить режим"
+        )));
+        inv.setItem(52, icon(hidden ? Material.GRAY_DYE : Material.LIME_DYE,
+                "&7« &#F8BEFBВидимость на карте &7»", List.of(
+                        "&#F8BEFB&l┃ &fСейчас: " + (hidden ? "&cСкрыты (чистый рельеф)" : "&#96FF91Активны в мире"),
+                        "&7● &fЛКМ — " + (hidden ? "вернуть на сохранённые места" : "скрыть и вернуть чистый рельеф")
+                )));
+        inv.setItem(53, icon(Material.RECOVERY_COMPASS, "&7« &#F8BEFBОбновление и поиск мест &7»", List.of(
+                "&#F8BEFB&l┃ &fВосстановить блоки вокруг и внутри всех 14 данжей",
+                "&7● &fЛКМ — восстановить все 14 на своих местах",
+                "&7● &fShift+ПКМ — стереть и найти 14 идеальных мест заново"
         )));
 
         player.openInventory(inv);
     }
 
-    private void placeCategoryRow(Inventory inv, DungeonCategory cat, int startSlot) {
-        int offset = 0;
+    private void placeSevenRow(Inventory inv, DungeonCategory cat, int startSlot, boolean adminControls, boolean allowTp) {
+        int col = 0;
         for (DungeonInstance d : plugin.getDungeonManager().getAllDungeons()) {
-            if (d.getCategory() != cat || offset >= 6) continue;
+            if (d.getCategory() != cat || col >= 7) continue;
             BlockPosKey anchor = d.getHologramAnchor();
-            String extra = switch (cat) {
-                case SURFACE -> "Закрыто шалкеров: &#F8BEFB" + d.countLockedShulkers() + "/" + d.getShulkerUnlocked().size();
-                case UNDERGROUND -> "Статус шалкера: &#F8BEFB" + d.getStatus().getTitle();
-                case SKY -> "Целых осколков: &#F8BEFB" + d.getShardExplosions().size() + "/" + d.getInitialShardCount();
-            };
+            String stateInfo = cat == DungeonCategory.SURFACE
+                    ? "Призраков внутри: &#F8BEFB" + plugin.getGhostController().countAliveGhosts(d.getId())
+                    : "Шалкер: &#F8BEFB" + d.getStatus().getTitle();
+
+            List<String> lore = new ArrayList<>();
+            if (adminControls) {
+                lore.add("&#F8BEFB&l┃ &fСхема: &7" + d.getTemplateId() + ".schem");
+            }
+            lore.add("&#F8BEFB&l┃ &f" + stateInfo);
+            lore.add("&#F8BEFB&l┃ &fКоординаты: &#F8BEFB" + anchor.x() + ", " + anchor.y() + ", " + anchor.z());
+            lore.add("&#F8BEFB&l┃ &fОбновление: &#F8BEFB" + TextUtil.formatDuration(d.secondsUntilReset()));
+
+            if (adminControls) {
+                lore.add("&#F8BEFB&l┃");
+                lore.add("&7● &fЛКМ — телепортироваться внутрь");
+                lore.add("&7● &fПКМ — восстановить данж и блоки вокруг");
+                lore.add("&7● &fShift+ПКМ — перенести на новое место");
+            } else if (allowTp) {
+                lore.add("&#F8BEFB&l┃");
+                lore.add("&7● &fНажмите для телепортации");
+            }
+
             ItemStack item = icon(cat.getIcon(),
                     "&7« " + cat.getColorHex() + d.getDisplayName() + " &8#" + d.getId() + " &7»",
-                    List.of(
-                            "&#F8BEFB&l┃ &fСхема: &7" + d.getTemplateId(),
-                            "&#F8BEFB&l┃ &f" + extra,
-                            "&#F8BEFB&l┃ &fКоординаты: &#F8BEFB" + anchor.x() + ", " + anchor.y() + ", " + anchor.z(),
-                            "&#F8BEFB&l┃ &fВозобновление: &#F8BEFB" + TextUtil.formatDuration(d.secondsUntilReset()),
-                            "&#F8BEFB&l┃",
-                            "&7● &fЛКМ — телепортироваться внутрь",
-                            "&7● &fПКМ — мгновенно обновить данж",
-                            "&7● &fShift+ПКМ — перенести на новое место"
-                    ));
+                    lore);
             ItemMeta meta = item.getItemMeta();
             if (meta != null) {
                 meta.getPersistentDataContainer().set(plugin.getGuiTargetPdc(), PersistentDataType.STRING, d.getId());
                 item.setItemMeta(meta);
             }
-            inv.setItem(startSlot + (offset++), item);
+            inv.setItem(startSlot + (col++), item);
         }
     }
 
@@ -163,7 +170,7 @@ public final class DungeonMenuService {
         holder.setInventory(inv);
         fillBorder(inv);
 
-        int[] slots = {11, 12, 13, 20, 21, 23};
+        int[] slots = {20, 22, 24};
         LootPoolType[] types = LootPoolType.values();
         for (int i = 0; i < types.length; i++) {
             LootPoolType pt = types[i];
@@ -172,7 +179,7 @@ public final class DungeonMenuService {
                     List.of(
                             "&#F8BEFB&l┃ &fПредметов в пуле: &#F8BEFB" + plugin.getLootRegistry().getPool(pt).size(),
                             "&#F8BEFB&l┃",
-                            "&7● &fНажмите для редактирования предметов и шансов"
+                            "&7● &fНажмите для настройки предметов и шансов"
                     ));
             ItemMeta meta = it.getItemMeta();
             if (meta != null) {
@@ -235,7 +242,7 @@ public final class DungeonMenuService {
             if (slot == 26) slot = 28;
             if (slot >= 35) break;
             ItemStack it = icon(tpl.getCategory().getIcon(),
-                    "&7« " + tpl.getCategory().getColorHex() + tpl.getId() + " &7»",
+                    "&7« " + tpl.getCategory().getColorHex() + tpl.getId() + ".schem &7»",
                     List.of(
                             "&#F8BEFB&l┃ &fКатегория: " + tpl.getCategory().getColorHex() + tpl.getCategory().getTitle(),
                             "&#F8BEFB&l┃ &fРазмер: &#F8BEFB" + tpl.getSizeX() + "×" + tpl.getSizeY() + "×" + tpl.getSizeZ(),

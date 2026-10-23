@@ -46,9 +46,25 @@ public final class DungeonMenuListener implements Listener {
 
         switch (holder.getScreen()) {
             case PLAYER_OVERVIEW -> {
-                if (raw == 49) player.closeInventory();
-                else if (raw == 48 && player.hasPermission("elytrixdungeons.admin")) {
+                if (raw == 49) {
+                    player.closeInventory();
+                    return;
+                }
+                if (raw == 48 && player.hasPermission("elytrixdungeons.admin")) {
                     plugin.getMenuService().openAdminBoard(player);
+                    return;
+                }
+                if (clicked != null && clicked.hasItemMeta() && plugin.getMenuService().canTeleportFromPlayerMenu(player)) {
+                    String id = clicked.getItemMeta().getPersistentDataContainer()
+                            .get(plugin.getGuiTargetPdc(), PersistentDataType.STRING);
+                    if (id != null) {
+                        DungeonInstance d = plugin.getDungeonManager().getDungeon(id);
+                        if (d != null && d.teleportLocation() != null) {
+                            player.closeInventory();
+                            player.teleport(d.teleportLocation());
+                            player.playSound(d.teleportLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 0.8f, 1.15f);
+                        }
+                    }
                 }
             }
             case ADMIN_BOARD -> handleAdminBoard(player, raw, clicked, event.getClick());
@@ -95,27 +111,46 @@ public final class DungeonMenuListener implements Listener {
             admin.closeInventory();
             return;
         }
-        if (raw == 46) {
+        if (raw == 45) {
             plugin.getMenuService().openLootPoolSelector(admin);
             return;
         }
-        if (raw == 47) {
+        if (raw == 46) {
             plugin.getMenuService().openTemplateSpawner(admin);
             return;
         }
+        if (raw == 47) {
+            admin.getInventory().addItem(plugin.getItemsHook().createGhostShard(16));
+            admin.playSound(admin.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.9f, 1.3f);
+            admin.sendMessage(plugin.prefix() + "Выдано §f16× Призрачный осколок§7.");
+            return;
+        }
         if (raw == 51) {
-            boolean cur = plugin.getConfig().getBoolean("regeneration.relocate-on-reset", false);
-            plugin.getConfig().set("regeneration.relocate-on-reset", !cur);
+            boolean cur = plugin.getConfig().getBoolean("protection.allow-block-modify-in-zone", true);
+            plugin.getConfig().set("protection.allow-block-modify-in-zone", !cur);
             plugin.saveConfig();
+            plugin.getDungeonManager().syncAllWorldGuardRegions();
             admin.playSound(admin.getLocation(), Sound.UI_BUTTON_CLICK, 0.8f, 1.2f);
             plugin.getMenuService().openAdminBoard(admin);
             return;
         }
         if (raw == 52) {
+            if (plugin.getDungeonManager().isHiddenFromWorld()) {
+                plugin.getDungeonManager().showAllDungeonsNow();
+                admin.sendMessage(plugin.prefix() + "Возвращаем все 14 данжей на их сохранённые места!");
+            } else {
+                plugin.getDungeonManager().hideAllDungeonsNow();
+                admin.sendMessage(plugin.prefix() + "Все данжи скрыты с карты, природный рельеф восстановлен!");
+            }
+            admin.playSound(admin.getLocation(), Sound.BLOCK_PORTAL_TRIGGER, 0.6f, 1.3f);
+            plugin.getMenuService().openAdminBoard(admin);
+            return;
+        }
+        if (raw == 53) {
             admin.closeInventory();
             if (click == ClickType.SHIFT_RIGHT) {
                 plugin.getDungeonManager().rebuildAllFromSchematics();
-                admin.sendMessage(plugin.prefix() + "Старые данжи очищены, запущена новая генерация 5 / 5 / 5 из папок schematics/!");
+                admin.sendMessage(plugin.prefix() + "Старые данжи очищены, запущен поиск 7 Наземных + 7 Подземных идеальных мест!");
             } else {
                 for (DungeonInstance d : plugin.getDungeonManager().getAllDungeons()) {
                     plugin.getDungeonManager().regenerateDungeon(d, false);
@@ -124,6 +159,7 @@ public final class DungeonMenuListener implements Listener {
             }
             return;
         }
+
         if (clicked == null || !clicked.hasItemMeta()) return;
         String dungeonId = clicked.getItemMeta().getPersistentDataContainer()
                 .get(plugin.getGuiTargetPdc(), PersistentDataType.STRING);
@@ -134,7 +170,7 @@ public final class DungeonMenuListener implements Listener {
         if (click == ClickType.SHIFT_RIGHT) {
             admin.closeInventory();
             plugin.getDungeonManager().regenerateDungeon(d, true);
-            admin.sendMessage(plugin.prefix() + "Данж §f" + d.getId() + " §7перенесён на новые координаты!");
+            admin.sendMessage(plugin.prefix() + "Данж §f" + d.getId() + " §7перенесён на новые идеальные координаты!");
         } else if (click.isRightClick()) {
             plugin.getDungeonManager().regenerateDungeon(d, false);
             admin.playSound(admin.getLocation(), Sound.BLOCK_ANVIL_USE, 0.7f, 1.25f);
@@ -149,13 +185,7 @@ public final class DungeonMenuListener implements Listener {
         }
     }
 
-    private void handleLootEditor(
-            Player admin,
-            LootPoolType poolType,
-            int raw,
-            ItemStack clicked,
-            ClickType click
-    ) {
+    private void handleLootEditor(Player admin, LootPoolType poolType, int raw, ItemStack clicked, ClickType click) {
         if (raw == 48) {
             plugin.getMenuService().openLootPoolSelector(admin);
             return;

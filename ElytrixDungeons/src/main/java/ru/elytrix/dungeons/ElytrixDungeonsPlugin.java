@@ -16,6 +16,7 @@ import ru.elytrix.dungeons.listener.DungeonListener;
 import ru.elytrix.dungeons.listener.DungeonMenuListener;
 import ru.elytrix.dungeons.service.DungeonLootRegistry;
 import ru.elytrix.dungeons.service.DungeonManager;
+import ru.elytrix.dungeons.service.GhostController;
 import ru.elytrix.dungeons.service.TrialController;
 import ru.elytrix.dungeons.util.TextUtil;
 
@@ -26,6 +27,7 @@ public final class ElytrixDungeonsPlugin extends JavaPlugin {
     private WorldEditHook worldEditHook;
     private VaultAndItemsHook itemsHook;
     private DungeonLootRegistry lootRegistry;
+    private GhostController ghostController;
     private TrialController trialController;
     private DungeonManager dungeonManager;
     private DungeonMenuService menuService;
@@ -49,6 +51,7 @@ public final class ElytrixDungeonsPlugin extends JavaPlugin {
         this.lootRegistry = new DungeonLootRegistry(this);
         this.lootRegistry.load();
 
+        this.ghostController = new GhostController(this);
         this.trialController = new TrialController(this);
         this.dungeonManager = new DungeonManager(this);
         this.menuService = new DungeonMenuService(this);
@@ -69,7 +72,7 @@ public final class ElytrixDungeonsPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new DungeonMenuListener(this), this);
 
         this.dungeonManager.startup();
-        getLogger().info("ElytrixDungeons enabled! WorldGuard hook: " + worldGuardHook.isAvailable());
+        getLogger().info("ElytrixDungeons enabled! 7 Surface + 7 Underground mode. WorldGuard: " + worldGuardHook.isAvailable());
     }
 
     @Override
@@ -84,6 +87,7 @@ public final class ElytrixDungeonsPlugin extends JavaPlugin {
         reloadMessages();
         lootRegistry.load();
         dungeonManager.loadSchematics();
+        dungeonManager.syncAllWorldGuardRegions();
     }
 
     private void saveResourceIfMissing(String name) {
@@ -109,6 +113,7 @@ public final class ElytrixDungeonsPlugin extends JavaPlugin {
     public WorldEditHook getWorldEditHook() { return worldEditHook; }
     public VaultAndItemsHook getItemsHook() { return itemsHook; }
     public DungeonLootRegistry getLootRegistry() { return lootRegistry; }
+    public GhostController getGhostController() { return ghostController; }
     public TrialController getTrialController() { return trialController; }
     public DungeonManager getDungeonManager() { return dungeonManager; }
     public DungeonMenuService getMenuService() { return menuService; }

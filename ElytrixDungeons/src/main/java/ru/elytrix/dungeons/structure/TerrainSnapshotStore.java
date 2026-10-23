@@ -19,9 +19,12 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.inventory.InventoryHolder;
 import ru.elytrix.dungeons.model.CuboidRegion;
 
 public final class TerrainSnapshotStore {
+
+    public record BlockRestoreDiff(int x, int y, int z, BlockData data) {}
 
     private final File folder;
 
@@ -49,17 +52,22 @@ public final class TerrainSnapshotStore {
 
     public void saveWorldSnapshot(String dungeonId, World world, CuboidRegion box) throws IOException {
         CuboidRegion norm = box.normalized();
-        int sx = norm.sizeX(), sy = norm.sizeY(), sz = norm.sizeZ();
+        int minY = Math.max(world.getMinHeight(), norm.minY());
+        int maxY = Math.min(world.getMaxHeight() - 1, norm.maxY());
+        CuboidRegion clamped = new CuboidRegion(norm.worldName(), norm.minX(), minY, norm.minZ(), norm.maxX(), maxY, norm.maxZ());
+
+        ensureChunksLoaded(world, clamped);
+
+        int sx = clamped.sizeX(), sy = clamped.sizeY(), sz = clamped.sizeZ();
         List<String> palette = new ArrayList<>();
         Map<String, Integer> map = new HashMap<>();
         int[] raw = new int[sx * sy * sz];
 
         int idx = 0;
-        for (int y = norm.minY(); y <= norm.maxY(); y++) {
-            for (int z = norm.minZ(); z <= norm.maxZ(); z++) {
-                for (int x = norm.minX(); x <= norm.maxX(); x++) {
-                    Block b = world.getBlockAt(x, y, z);
-                    String state = b.getBlockData().getAsString(true);
+        for (int y = minY; y <= maxY; y++) {
+            for (int z = clamped.minZ(); z <= clamped.maxZ(); z++) {
+                for (int x = clamped.minX(); x <= clamped.maxX(); x++) {
+                    String state = world.getBlockAt(x, y, z).getBlockData().getAsString(true);
                     Integer pid = map.get(state);
                     if (pid == null) {
                         pid = palette.size();
@@ -73,10 +81,10 @@ public final class TerrainSnapshotStore {
 
         File outFile = snapshotFile(dungeonId);
         try (DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(outFile))))) {
-            out.writeUTF(norm.worldName());
-            out.writeInt(norm.minX());
-            out.writeInt(norm.minY());
-            out.writeInt(norm.minZ());
+            out.writeUTF(clamped.worldName());
+            out.writeInt(clamped.minX());
+            out.writeInt(minY);
+            out.writeInt(clamped.minZ());
             out.writeInt(sx);
             out.writeInt(sy);
             out.writeInt(sz);
@@ -104,19 +112,24 @@ public final class TerrainSnapshotStore {
         }
     }
 
-    public void restoreWorldSnapshotInstant(String dungeonId) throws IOException {
+    /**
+     * Collects ONLY blocks around & inside the dungeon whose current world state differs
+     * from original natural worldgen, allowing zero-lag batched restoration on live servers!
+     */
+    public List<BlockRestoreDiff> collectRestoreDiffs(String dungeonId) throws IOException {
+        List<BlockRestoreDiff> diffs = new ArrayList<>();
         File inFile = snapshotFile(dungeonId);
-        if (!inFile.isFile()) {
-            return;
-        }
+        if (!inFile.isFile()) return diffs;
+
         try (DataInputStream in = new DataInputStream(new BufferedInputStream(new GZIPInputStream(new FileInputStream(inFile))))) {
             String worldName = in.readUTF();
             World world = Bukkit.getWorld(worldName);
-            if (world == null) {
-                return;
-            }
+            if (world == null) return diffs;
+
             int minX = in.readInt(), minY = in.readInt(), minZ = in.readInt();
             int sx = in.readInt(), sy = in.readInt(), sz = in.readInt();
+            ensureChunksLoaded(world, new CuboidRegion(worldName, minX, minY, minZ, minX + sx - 1, minY + sy - 1, minZ + sz - 1));
+
             int pCount = in.readInt();
             BlockData[] datas = new BlockData[pCount];
             for (int i = 0; i < pCount; i++) {
@@ -128,8 +141,7 @@ public final class TerrainSnapshotStore {
                 }
             }
             int runCount = in.readInt();
-            int cursor = 0;
-            int total = sx * sy * sz;
+            int cursor = 0, total = sx * sy * sz;
             for (int r = 0; r < runCount; r++) {
                 int pid = in.readInt();
                 int len = in.readInt();
@@ -140,12 +152,53 @@ public final class TerrainSnapshotStore {
                     int z = rem / sx;
                     int x = rem % sx;
                     Block b = world.getBlockAt(minX + x, minY + y, minZ + z);
-                    if (b.getState() instanceof org.bukkit.inventory.InventoryHolder holder) {
-                        holder.getInventory().clear();
+                    if (!b.getBlockData().equals(bd)) {
+                        diffs.add(new BlockRestoreDiff(minX + x, minY + y, minZ + z, bd));
                     }
-                    b.setBlockData(bd, false);
                 }
             }
         }
+        return diffs;
+    }
+
+    /**
+     * Ultra-fast instant diff restore used on plugin disable / hide / removal so the entire
+     * dungeon AND any surrounding grief craters disappear cleanly without holding shutdown.
+     */
+    public void restoreWorldSnapshotInstant(String dungeonId) throws IOException {
+        File inFile = snapshotFile(dungeonId);
+        if (!inFile.isFile()) return;
+
+        List<BlockRestoreDiff> diffs = collectRestoreDiffs(dungeonId);
+        if (diffs.isEmpty()) return;
+
+        try (DataInputStream in = new DataInputStream(new BufferedInputStream(new GZIPInputStream(new FileInputStream(inFile))))) {
+            World world = Bukkit.getWorld(in.readUTF());
+            if (world == null) return;
+            for (BlockRestoreDiff diff : diffs) {
+                Block b = world.getBlockAt(diff.x(), diff.y(), diff.z());
+                if (isContainerType(b.getType()) && b.getState() instanceof InventoryHolder holder) {
+                    holder.getInventory().clear();
+                }
+                b.setBlockData(diff.data(), false);
+            }
+        }
+    }
+
+    public static void ensureChunksLoaded(World world, CuboidRegion box) {
+        int minCx = box.minX() >> 4, maxCx = box.maxX() >> 4;
+        int minCz = box.minZ() >> 4, maxCz = box.maxZ() >> 4;
+        for (int cx = minCx; cx <= maxCx; cx++) {
+            for (int cz = minCz; cz <= maxCz; cz++) {
+                if (!world.isChunkLoaded(cx, cz)) {
+                    world.getChunkAt(cx, cz);
+                }
+            }
+        }
+    }
+
+    private static boolean isContainerType(Material m) {
+        String n = m.name();
+        return m == Material.CHEST || m == Material.TRAPPED_CHEST || m == Material.BARREL || n.endsWith("SHULKER_BOX");
     }
 }
