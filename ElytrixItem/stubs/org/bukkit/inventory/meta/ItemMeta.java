@@ -10,6 +10,9 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.persistence.PersistentDataContainer;
 
 public interface ItemMeta {
+    boolean hasMaxStackSize();
+    int getMaxStackSize();
+    void setMaxStackSize(Integer max);
     void setDisplayName(String name);
     String getDisplayName();
     boolean hasDisplayName();

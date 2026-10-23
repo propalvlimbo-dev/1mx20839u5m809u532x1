@@ -77,6 +77,9 @@ public final class BrewItem implements CustomItem {
             lore.add(ColorUtil.color("&#F8BEFB&l┃ "));
             meta.setLore(lore);
 
+            if (material != Material.TIPPED_ARROW) {
+                meta.setMaxStackSize(64);
+            }
             meta.getPersistentDataContainer().set(key, PersistentDataType.STRING, id);
             item.setItemMeta(meta);
         }

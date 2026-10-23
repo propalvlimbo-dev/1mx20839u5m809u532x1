@@ -1,0 +1,16 @@
+name: ElytrixPotionStacker
+main: ru.rooyzee.potionstacker.Main
+version: '1.0.0'
+api-version: '1.21'
+authors: [Elytrix]
+description: Стакер зелий без виртуальных количеств и дюпов.
+commands:
+  potionstacker:
+    description: Управление стакером зелий.
+    usage: /potionstacker <reload|stack|info>
+    aliases: [pstacker, зелья]
+    permission: elytrix.potionstacker.admin
+permissions:
+  elytrix.potionstacker.admin:
+    description: Доступ к /potionstacker.
+    default: op
