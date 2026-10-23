@@ -1,0 +1,38 @@
+prefix: "&7« &#F8BEFBХранилище &7» &f"
+
+no-permission: "Недостаточно прав."
+only-players: "Эта команда доступна только в игре."
+need-key: "Для открытия нужен ключ хранилища."
+vault-busy: "Хранилище сейчас открывает &#F8BEFB{player}&f. Подождите пару секунд."
+empty-pool: "В этом ключе пока нет наград."
+wrong-vanilla-vault: "Этот ключ подходит только к &#F8BEFBХранилищу &fна спавне."
+cannot-break: "Блок хранилища защищён. Удаление: &#F8BEFB/evault remove"
+
+opened-summary-header: "&7« &#F8BEFBХранилище &7» &fНаграды из ключа {key}&f:"
+opened-summary-line: " &#F8BEFB&l┃ {rarity_color}{item} &7x{amount}"
+pending-delivered: "Вам выданы сохранённые награды из хранилища (&7{count} шт.&f)."
+
+admin-help:
+  - "&7« &#F8BEFBХранилище &7» &fКоманды администратора:"
+  - " &#F8BEFB&l┃ &#F8BEFB/evault edit [ключ] &7- меню редактирования ключей и редкостей"
+  - " &#F8BEFB&l┃ &#F8BEFB/evault give <игрок> <ключ> [кол-во] &7- выдать ключ"
+  - " &#F8BEFB&l┃ &#F8BEFB/evault set [id] &7- поставить или привязать блок хранилища"
+  - " &#F8BEFB&l┃ &#F8BEFB/evault remove [id] &7- удалить блок хранилища"
+  - " &#F8BEFB&l┃ &#F8BEFB/evault list &7- список установленных хранилищ"
+  - " &#F8BEFB&l┃ &#F8BEFB/evault reload &7- перезагрузить конфигурацию"
+
+vault-created: "Хранилище &#F8BEFB{id} &fустановлено (&7{world} {x}, {y}, {z}&f)."
+vault-already-exists: "Этот блок уже привязан к хранилищу &#F8BEFB{id}&f."
+vault-removed: "Хранилище &#F8BEFB{id} &fудалено."
+vault-not-found: "Блок под прицелом не является хранилищем (или укажите ID)."
+look-at-block: "Посмотрите на блок на расстоянии до 6 блоков."
+vault-list-empty: "Установленных хранилищ пока нет."
+vault-list-header: "&7« &#F8BEFBХранилище &7» &fУстановленные точки (&7{count}&f):"
+vault-list-line: " &#F8BEFB&l┃ &#F8BEFB{id} &7- &f{world} &7({x}, {y}, {z})"
+
+unknown-key: "Ключ &#F8BEFB{key} &fне найден. Доступны: &#F8BEFB{keys}"
+invalid-amount: "Укажите корректное количество от 1 до 64."
+key-given-sender: "Выдано &#F8BEFBx{amount} &fключа {key} &fигроку &#F8BEFB{player}&f."
+key-given-queued: "Игрок &#F8BEFB{player} &fоффлайн — ключ {key} &7(x{amount}) &fвыдастся при входе."
+key-received: "Вы получили {key} &7x{amount}&f."
+reloaded: "Конфигурация и ключи перезагружены (&7ключей: {keys}, хранилищ: {vaults}&f)."

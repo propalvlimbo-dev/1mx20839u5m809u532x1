@@ -1,0 +1,62 @@
+drop_items_if_full_inventory: true
+claim_kit_short_command: false
+close_inventory_on_claim: false
+kit_preview: true
+kit_preview_requires_kit_permission: false
+first_join_kit: start
+new_kit_default_save_mode_original: true
+new_kit_default_inventory: main_inventory
+new_kit_default_values:
+  cooldown: 3600
+  permission_required: false
+  actions:
+    claim:
+      1:
+        action: 'playsound: ENTITY_EXPERIENCE_ORB_PICKUP;1;1.2'
+    error:
+      1:
+        action: 'playsound: BLOCK_NOTE_BLOCK_BASS;1;0.8'
+  display:
+    default:
+      id: STONE_SWORD
+      name: '#F8BEFB%kit_name%'
+      lore:
+        - '#F8BEFB&l┃ '
+        - '#F8BEFB&l┃ &fЛКМ &7— &fвзять набор'
+        - '#F8BEFB&l┃ &fПКМ &7— &fпосмотреть'
+        - '#F8BEFB&l┃ '
+      item_flags:
+        - HIDE_ATTRIBUTES
+    no_permission:
+      id: BARRIER
+      name: '#F8BEFB%kit_name%'
+      lore:
+        - '#F8BEFB&l┃ '
+        - '#F8BEFB&l┃ &fСтатус: &cНет доступа'
+        - '#F8BEFB&l┃ '
+    cooldown:
+      id: STONE_SWORD
+      name: '#F8BEFB%kit_name%'
+      lore:
+        - '#F8BEFB&l┃ '
+        - '#F8BEFB&l┃ &fСтатус: &eПерезарядка'
+        - '#F8BEFB&l┃ &fОсталось: &f%time%'
+        - '#F8BEFB&l┃ '
+      item_flags:
+        - HIDE_ATTRIBUTES
+player_data_save_time: 300
+update_notify: false
+use_minimessage: false
+mysql_database:
+  enabled: false
+  host: localhost
+  port: 3306
+  username: root
+  password: root
+  database: database
+  pool:
+    connectionTimeout: 5000
+  advanced:
+    verifyServerCertificate: false
+    useSSL: true
+    allowPublicKeyRetrieval: true

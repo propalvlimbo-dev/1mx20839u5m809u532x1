@@ -1,0 +1,75 @@
+name: '§x§F§8§B§E§F§B« §x§F§8§B§E§F§BТ§x§F§4§B§E§F§Bо§x§F§0§B§F§F§Bт§x§E§C§B§F§F§Bе§x§E§8§B§F§F§Bм §x§E§4§B§F§F§Bш§x§E§0§C§0§F§Bа§x§D§C§C§0§F§Bл§x§D§8§C§0§F§Bк§x§D§4§C§0§F§Bе§x§D§0§C§0§F§Bр§x§C§C§C§1§F§Bа §x§F§8§B§E§F§B»'
+lore:
+  - '§x§F§8§B§E§F§B§l┃ '
+  - '§x§F§8§B§E§F§B§l┃ §fУсловие: §x§F§8§B§E§F§BВ левой руке'
+  - '§x§F§8§B§E§F§B§l┃ §fБонус: §x§F§8§B§E§F§B+2 к броне'
+  - '§x§F§8§B§E§F§B§l┃ §fБонус: §x§F§8§B§E§F§B+4 к урону'
+  - '§x§F§8§B§E§F§B§l┃ §fШтраф: §cминус 4 к макс. здоровью'
+  - '§x§F§8§B§E§F§B§l┃ '
+material: TOTEM_OF_UNDYING
+glow: true
+disableStack: false
+keepItemOnDeath: false
+canBeUsedOnlyByTheOwner: false
+cancelEventIfNotOwner: false
+onlyOwnerBlackListedActivators: []
+storeItemInfo: false
+unbreakable: false
+usage: 1
+usageLimit: -1
+cancelEventIfNoPerm: false
+disabledWorlds: []
+recognitions: []
+config_5: true
+config_update: false
+config_5_98: true
+dropFeatures:
+  glowDrop: false
+  glowDropColor: WHITE
+  displayNameDrop: false
+hiders:
+  hideEnchantments: false
+  hideUnbreakable: false
+  hideAttributes: true
+  hidePotionEffects: false
+  hideUsage: true
+  hideDestroys: false
+  hidePlacedOn: false
+enchantments: {}
+giveFirstJoinFeatures:
+  giveFirstJoin: false
+  giveFirstJoinAmount: 1
+  giveFirstJoinSlot: 0
+restrictions: {}
+variables: {}
+activators: {}
+displayConditions:
+  playerConditions:
+    ifIsOnTheBlock:
+      blocks: []
+  worldConditions: {}
+  itemConditions: {}
+  placeholdersConditions: {}
+  enableFeature: false
+attributes:
+  attribute0:
+    attribute: GENERIC_ARMOR
+    operation: ADD_NUMBER
+    amount: 2.0
+    slot: OFF_HAND
+    name: generic.armor
+    uuid: 98109494-62d7-4f66-83c4-a2042411114e
+  attribute1:
+    attribute: GENERIC_ATTACK_DAMAGE
+    operation: ADD_NUMBER
+    amount: 4.0
+    slot: OFF_HAND
+    name: generic.attack_damage
+    uuid: 29f6243e-09ad-4a4b-b98e-fd0a3118a624
+  attribute3:
+    attribute: GENERIC_MAX_HEALTH
+    operation: ADD_NUMBER
+    amount: -4.0
+    slot: OFF_HAND
+    name: generic.max_health
+    uuid: 1f363282-0ad8-41ee-8afe-4c6b1e28ebda

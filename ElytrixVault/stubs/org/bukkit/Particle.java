@@ -1,0 +1,17 @@
+package org.bukkit;
+
+public enum Particle {
+    CLOUD,
+    CRIT,
+    ENCHANT,
+    END_ROD,
+    FLAME,
+    PORTAL,
+    SCULK_SOUL,
+    SOUL_FIRE_FLAME,
+    TOTEM_OF_UNDYING,
+    TRIAL_SPAWNER_DETECTION,
+    TRIAL_SPAWNER_DETECTION_OMINOUS,
+    VILLAGER_HAPPY,
+    WITCH
+}

@@ -1,0 +1,76 @@
+furnaces:
+  twoFurnace:
+    name: '§x§F§8§B§E§F§B« §x§F§8§B§E§F§BБ§x§F§4§B§E§F§Bы§x§F§0§B§F§F§Bс§x§E§C§B§F§F§Bт§x§E§8§B§F§F§Bр§x§E§4§B§F§F§Bа§x§E§0§C§0§F§Bя §x§D§C§C§0§F§Bп§x§D§8§C§0§F§Bе§x§D§4§C§0§F§Bч§x§D§0§C§0§F§Bк§x§C§C§C§1§F§Bа §x§F§8§B§E§F§B»'
+    lore:
+      - '§x§F§8§B§E§F§B§l┃ '
+      - '§x§F§8§B§E§F§B§l┃ §fСкорость плавки: §x§F§8§B§E§F§BВ 2 раза быстрее'
+      - '§x§F§8§B§E§F§B§l┃ '
+    cooktime: 2
+    enchant: false
+
+  threeFurnace:
+    name: '§x§F§8§B§E§F§B« §x§F§8§B§E§F§BП§x§F§4§B§E§F§Bе§x§F§0§B§F§F§Bч§x§E§C§B§F§F§Bк§x§E§8§B§F§F§Bа §x§E§4§B§F§F§Bд§x§E§0§C§0§F§Bю§x§D§C§C§0§F§Bп§x§D§8§C§0§F§Bе§x§D§4§C§0§F§Bр§x§D§0§C§0§F§Bа §x§F§8§B§E§F§B»'
+    lore:
+      - '§x§F§8§B§E§F§B§l┃ '
+      - '§x§F§8§B§E§F§B§l┃ §fЭффективность: §x§F§8§B§E§F§BВ 2 раза больше руды'
+      - '§x§F§8§B§E§F§B§l┃ '
+    cooktime: 1
+    result: 2
+    enchant: false
+
+  fourFurnace:
+    name: '§x§F§8§B§E§F§B« §x§F§8§B§E§F§BП§x§F§4§B§E§F§Bе§x§F§0§B§F§F§Bч§x§E§C§B§F§F§Bк§x§E§8§B§F§F§Bа §x§E§4§B§F§F§Bэ§x§E§0§C§0§F§Bк§x§D§C§C§0§F§Bо§x§D§8§C§0§F§Bн§x§D§4§C§0§F§Bо§x§D§0§C§0§F§Bм§x§C§C§C§1§F§Bи§x§C§8§C§1§F§Bс§x§C§4§C§1§F§Bт§x§C§0§C§1§F§Bа §x§F§8§B§E§F§B»'
+    lore:
+      - '§x§F§8§B§E§F§B§l┃ '
+      - '§x§F§8§B§E§F§B§l┃ §fЭкономия: §x§F§8§B§E§F§BВ 2 раза меньше топлива'
+      - '§x§F§8§B§E§F§B§l┃ '
+    cooktime: 2
+    result: 3
+    enchant: false
+
+brewing-stands:
+  onebrew:
+    name: '§x§F§8§B§E§F§B« §x§F§8§B§E§F§BБ§x§F§4§B§E§F§Bы§x§F§0§B§F§F§Bс§x§E§C§B§F§F§Bт§x§E§8§B§F§F§Bр§x§E§4§B§F§F§Bа§x§E§0§C§0§F§Bя §x§D§C§C§0§F§Bз§x§D§8§C§0§F§Bе§x§D§4§C§0§F§Bл§x§D§0§C§0§F§Bь§x§C§C§C§1§F§Bе§x§C§8§C§1§F§Bв§x§C§4§C§1§F§Bа§x§C§0§C§1§F§Bр§x§B§C§C§1§F§Bк§x§B§8§C§1§F§Bа §x§F§8§B§E§F§B»'
+    lore:
+      - '§x§F§8§B§E§F§B§l┃ '
+      - '§x§F§8§B§E§F§B§l┃ §fЭкономия: §x§F§8§B§E§F§BВ 2 раза меньше топлива'
+      - '§x§F§8§B§E§F§B§l┃ '
+    fuel-power: 2
+    enchant: false
+
+  twobrew:
+    name: '§x§F§8§B§E§F§B« §x§F§8§B§E§F§BС§x§F§4§B§E§F§Bк§x§F§0§B§F§F§Bо§x§E§C§B§F§F§Bр§x§E§8§B§F§F§Bо§x§E§4§B§F§F§Bс§x§E§0§C§0§F§Bт§x§D§C§C§0§F§Bн§x§D§8§C§0§F§Bа§x§D§4§C§0§F§Bя §x§D§0§C§0§F§Bз§x§C§C§C§1§F§Bе§x§C§8§C§1§F§Bл§x§C§4§C§1§F§Bь§x§C§0§C§1§F§Bе§x§B§C§C§1§F§Bв§x§B§8§C§1§F§Bа§x§B§4§C§1§F§Bр§x§B§0§C§1§F§Bк§x§A§C§C§1§F§Bа §x§F§8§B§E§F§B»'
+    lore:
+      - '§x§F§8§B§E§F§B§l┃ '
+      - '§x§F§8§B§E§F§B§l┃ §fЭкономия: §x§F§8§B§E§F§BВ 4 раза меньше топлива'
+      - '§x§F§8§B§E§F§B§l┃ '
+    fuel-power: 4
+    enchant: false
+
+messages:
+  prefix: '§f☁ §x§F§8§B§E§F§Bᴇ§x§F§6§B§E§F§Bʟ§x§F§3§B§E§F§Bʏ§x§F§1§B§F§F§Bᴛ§x§E§E§B§F§F§Bʀ§x§E§C§B§F§F§Bɪ§x§E§9§B§F§F§Bx §7» '
+  no-permission: '&cУ вас нет прав.;title:§x§F§8§B§E§F§BПечки %nl% &cУ вас нет прав.'
+  command-notfound: '&cНеизвестная команда.'
+  give:
+    usage: '§x§F§8§B§E§F§B/shadowfurnace give &f<игрок> <печь> &7— &fвыдать игроку печку.'
+    player-null: '&cИгрок не найден.'
+    furnace-null: '&cПечка не найдена.'
+    complete: '&aПечка успешно выдана игроку §x§F§8§B§E§F§B%player%'
+  list:
+    usage: '§x§F§8§B§E§F§B/shadowfurnace list &7— &fсписок печей.'
+    title: '§x§F§8§B§E§F§BСписок печек:'
+    format: '§x§F§8§B§E§F§B%step%&f. %name%'
+
+messages-brewing-stand:
+  prefix: '§f☁ §x§F§8§B§E§F§Bᴇ§x§F§6§B§E§F§Bʟ§x§F§3§B§E§F§Bʏ§x§F§1§B§F§F§Bᴛ§x§E§E§B§F§F§Bʀ§x§E§C§B§F§F§Bɪ§x§E§9§B§F§F§Bx §7» '
+  no-permission: '&cУ вас нет прав.;title:§x§F§8§B§E§F§BЗельеварка %nl% &cУ вас нет прав.'
+  command-notfound: '&cНеизвестная команда.'
+  give:
+    usage: '§x§F§8§B§E§F§B/shadowbrewing give &f<игрок> <стол> &7— &fвыдать игроку зельеварку.'
+    player-null: '&cИгрок не найден.'
+    furnace-null: '&cСтол не найден.'
+    complete: '&aЗельеварка успешно выдана игроку §x§F§8§B§E§F§B%player%'
+  list:
+    usage: '§x§F§8§B§E§F§B/shadowbrewing list &7— &fсписок зельеварок.'
+    title: '§x§F§8§B§E§F§BСписок зельеварок:'
+    format: '§x§F§8§B§E§F§B%step%&f. %name%'

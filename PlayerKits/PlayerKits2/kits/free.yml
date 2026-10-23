@@ -1,0 +1,173 @@
+cooldown: 259200
+permission_required: true
+items:
+  1:
+    id: DIAMOND_SWORD
+    name: '&fНабор &x&E&8&B&6&F&F&lꜰ&x&E&B&C&3&F&F&lʀ&x&E&F&C&F&F&F&lᴇ&x&F&2&D&C&F&F&lᴇ'
+    enchants:
+      - SHARPNESS;1
+      - UNBREAKING;1
+    preview_slot: 0
+  2:
+    id: ENDER_PEARL
+    amount: 8
+    preview_slot: 1
+  3:
+    id: GOLDEN_APPLE
+    amount: 4
+    preview_slot: 2
+  4:
+    id: BOW
+    name: '&fНабор &x&E&8&B&6&F&F&lꜰ&x&E&B&C&3&F&F&lʀ&x&E&F&C&F&F&F&lᴇ&x&F&2&D&C&F&F&lᴇ'
+    enchants:
+      - POWER;1
+      - UNBREAKING;1
+    preview_slot: 3
+  5:
+    id: TOTEM_OF_UNDYING
+    name: '&fНабор &x&E&8&B&6&F&F&lꜰ&x&E&B&C&3&F&F&lʀ&x&E&F&C&F&F&F&lᴇ&x&F&2&D&C&F&F&lᴇ'
+    preview_slot: 4
+  6:
+    id: SHIELD
+    preview_slot: 5
+  7:
+    id: DIAMOND_PICKAXE
+    name: '&fНабор &x&E&8&B&6&F&F&lꜰ&x&E&B&C&3&F&F&lʀ&x&E&F&C&F&F&F&lᴇ&x&F&2&D&C&F&F&lᴇ'
+    enchants:
+      - EFFICIENCY;1
+      - UNBREAKING;1
+    preview_slot: 6
+  8:
+    id: DIAMOND_AXE
+    name: '&fНабор &x&E&8&B&6&F&F&lꜰ&x&E&B&C&3&F&F&lʀ&x&E&F&C&F&F&F&lᴇ&x&F&2&D&C&F&F&lᴇ'
+    enchants:
+      - EFFICIENCY;1
+      - UNBREAKING;1
+    preview_slot: 7
+  9:
+    id: DIAMOND_SHOVEL
+    name: '&fНабор &x&E&8&B&6&F&F&lꜰ&x&E&B&C&3&F&F&lʀ&x&E&F&C&F&F&F&lᴇ&x&F&2&D&C&F&F&lᴇ'
+    enchants:
+      - EFFICIENCY;1
+      - UNBREAKING;1
+    preview_slot: 8
+  10:
+    id: MAGENTA_WOOL
+    amount: 16
+    preview_slot: 9
+  11:
+    id: MAGENTA_CONCRETE
+    amount: 16
+    preview_slot: 10
+  12:
+    id: BIRCH_LOG
+    amount: 8
+    preview_slot: 11
+  13:
+    id: OAK_LOG
+    amount: 8
+    preview_slot: 12
+  14:
+    id: BRICKS
+    amount: 16
+    offhand: true
+    preview_slot: 13
+  15:
+    id: COOKED_BEEF
+    amount: 16
+    preview_slot: 14
+  16:
+    id: POTION
+    potion_data:
+      type: STRONG_STRENGTH
+      upgraded: true
+      extended: false
+    preview_slot: 15
+  17:
+    id: POTION
+    potion_data:
+      type: STRONG_SWIFTNESS
+      upgraded: true
+      extended: false
+    preview_slot: 16
+  18:
+    id: EXPERIENCE_BOTTLE
+    amount: 8
+    preview_slot: 17
+  19:
+    id: ARROW
+    amount: 16
+    preview_slot: 18
+  20:
+    id: MAGENTA_STAINED_GLASS
+    amount: 16
+    preview_slot: 19
+  21:
+    id: DIAMOND_HELMET
+    name: '&fНабор &x&E&8&B&6&F&F&lꜰ&x&E&B&C&3&F&F&lʀ&x&E&F&C&F&F&F&lᴇ&x&F&2&D&C&F&F&lᴇ'
+    enchants:
+      - PROTECTION;1
+      - UNBREAKING;1
+    preview_slot: 36
+  22:
+    id: DIAMOND_CHESTPLATE
+    name: '&fНабор &x&E&8&B&6&F&F&lꜰ&x&E&B&C&3&F&F&lʀ&x&E&F&C&F&F&F&lᴇ&x&F&2&D&C&F&F&lᴇ'
+    enchants:
+      - PROTECTION;1
+      - UNBREAKING;1
+    preview_slot: 37
+  23:
+    id: DIAMOND_LEGGINGS
+    name: '&fНабор &x&E&8&B&6&F&F&lꜰ&x&E&B&C&3&F&F&lʀ&x&E&F&C&F&F&F&lᴇ&x&F&2&D&C&F&F&lᴇ'
+    enchants:
+      - PROTECTION;1
+      - UNBREAKING;1
+    preview_slot: 38
+  24:
+    id: DIAMOND_BOOTS
+    name: '&fНабор &x&E&8&B&6&F&F&lꜰ&x&E&B&C&3&F&F&lʀ&x&E&F&C&F&F&F&lᴇ&x&F&2&D&C&F&F&lᴇ'
+    enchants:
+      - PROTECTION;1
+      - UNBREAKING;1
+    preview_slot: 39
+actions:
+  claim:
+    1:
+      action: 'title: 10;35;20;#F8BEFBНабор &fꜰʀᴇᴇ;&7получен'
+    2:
+      action: 'playsound: ENTITY_EXPERIENCE_ORB_PICKUP;1;1.6'
+  error:
+    1:
+      action: 'playsound: BLOCK_NOTE_BLOCK_BASS;1;0.8'
+    2:
+      action: 'actionbar: &7Набор &cнедоступен;60'
+display:
+  default:
+    id: PINK_DYE
+    name: '&fНабор &x&E&8&B&6&F&F&lꜰ&x&E&B&C&3&F&F&lʀ&x&E&F&C&F&F&F&lᴇ&x&F&2&D&C&F&F&lᴇ'
+    lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &aМожно получить'
+      - '#F8BEFB&l┃ &fПредметов: &f24'
+      - '#F8BEFB&l┃ &fПерезарядка: &f3 дн'
+      - '#F8BEFB&l┃ '
+      - '&7● &fВзять набор &7(ЛКМ)'
+      - '&7● &fПосмотреть набор &7(ПКМ)'
+  no_permission:
+    id: BARRIER
+    name: '&fНабор &x&E&8&B&6&F&F&lꜰ&x&E&B&C&3&F&F&lʀ&x&E&F&C&F&F&F&lᴇ&x&F&2&D&C&F&F&lᴇ'
+    lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &cНет доступа'
+      - '#F8BEFB&l┃ &fПредметов: &f24'
+      - '#F8BEFB&l┃ '
+      - '&7● &fПосмотреть набор &7(ПКМ)'
+  cooldown:
+    id: PINK_DYE
+    name: '&fНабор &x&E&8&B&6&F&F&lꜰ&x&E&B&C&3&F&F&lʀ&x&E&F&C&F&F&F&lᴇ&x&F&2&D&C&F&F&lᴇ'
+    lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &eПерезарядка'
+      - '#F8BEFB&l┃ &fОсталось: &f%time%'
+      - '#F8BEFB&l┃ '
+      - '&7● &fПосмотреть набор &7(ПКМ)'

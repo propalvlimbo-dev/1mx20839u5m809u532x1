@@ -1,0 +1,32 @@
+type: ITEM
+location:
+  world: spawn
+  x: 82.5
+  y: 53.5
+  z: -25.5
+  yaw: 0.0
+  pitch: 0.0
+settings:
+  enabled: true
+  display-range: 48.0
+  update-interval: 20
+attributes:
+  display-type:
+    value-type: item_display_type
+    value: FIXED
+  translation:
+    value-type: vector3f
+    value:
+      x: -3.299999952316284
+      y: -1.350000023841858
+      z: 0.0
+  scale:
+    value-type: vector3f
+    value:
+      x: 0.8999999761581421
+      y: 0.8999999761581421
+      z: 0.8999999761581421
+  billboard:
+    value-type: billboard_constraints
+    value: VERTICAL
+item: minecraft:shield

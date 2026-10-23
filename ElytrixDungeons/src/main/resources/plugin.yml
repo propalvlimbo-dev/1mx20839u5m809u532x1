@@ -1,0 +1,28 @@
+name: ElytrixDungeons
+version: 1.0.0
+main: ru.elytrix.dungeons.ElytrixDungeonsPlugin
+api-version: '1.21'
+author: ElytriX
+softdepend:
+  - WorldGuard
+  - WorldEdit
+  - FastAsyncWorldEdit
+  - ElytrixVault
+  - ElytrixItem
+  - Vault
+
+commands:
+  dungeons:
+    description: Навигация и список активных данжей мира
+    aliases: [dungeon, danzh]
+  edungeon:
+    description: Управление данжами, схематиками .schem, телепортом и лутом
+    aliases: [edungeons, ed, elytrixdungeon]
+
+permissions:
+  elytrixdungeons.admin:
+    description: Полное управление ElytrixDungeons
+    default: op
+  elytrixdungeons.tp:
+    description: Право на телепорт к данжам через /dungeons и /edungeon tp
+    default: op

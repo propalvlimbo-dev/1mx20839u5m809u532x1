@@ -1,0 +1,19 @@
+limits:
+  POTION: 64
+  SPLASH_POTION: 64
+  LINGERING_POTION: 64
+
+effect-limits: {}
+
+custom-limits: {}
+
+refresh-ticks: 40
+
+messages:
+  prefix: '&f☁ &#F8BEFBꜱ&#F1BEFBᴛ&#EEBFFBᴀ&#ECBFFBᴄ&#E9BFFBᴋ &7» &f'
+  reloaded: '&fНастройки стакера перечитаны.'
+  stacked: '&fОбновлено стаков: &#F8BEFB%count%&f.'
+  info: '&fСтакер зелий &#F8BEFBv1.0.0'
+  usage: '&fИспользование: &#F8BEFB/pstacker <reload|stack|info>'
+  only-player: '&fЭта команда только для игрока.'
+  no-permission: '&cНедостаточно прав.'

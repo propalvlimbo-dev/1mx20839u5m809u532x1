@@ -1,0 +1,1067 @@
+package dev.epicduels.manager;
+
+import dev.epicduels.EpicDuels;
+import dev.epicduels.i18n.Messages;
+import dev.epicduels.model.Arena;
+import dev.epicduels.model.DuelInstance;
+import dev.epicduels.model.DuelRequest;
+import dev.epicduels.model.Kit;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.title.Title;
+import org.bukkit.*;
+import org.bukkit.entity.Player;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
+
+import java.io.File;
+import java.io.IOException;
+import java.time.Duration;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiConsumer;
+
+public class DuelManager {
+
+    private final EpicDuels plugin;
+    private final Map<UUID, DuelRequest> outgoingRequests = new ConcurrentHashMap<>();
+    // receiver -> (sender -> request), so multiple players can challenge the same target
+    private final Map<UUID, Map<UUID, DuelRequest>> incomingRequests = new ConcurrentHashMap<>();
+    private final Map<UUID, DuelInstance> activeDuels = new ConcurrentHashMap<>();
+    private final Set<UUID> frozenPlayers = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    private final Map<UUID, DuelInstance> spectators = new ConcurrentHashMap<>();
+    private final Map<UUID, BiConsumer<UUID, UUID>> endCallbacks = new ConcurrentHashMap<>();
+    private BukkitTask expirationTask;
+    private BukkitTask timeLimitTask;
+    // Players who turned off incoming duel requests (/duel toggle), persisted to toggles.yml
+    private final Set<UUID> requestsDisabled = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    private final File togglesFile;
+
+    public DuelManager(EpicDuels plugin) {
+        this.plugin = plugin;
+        this.togglesFile = new File(plugin.getDataFolder(), "toggles.yml");
+        loadToggles();
+        startExpirationTask();
+        startTimeLimitTask();
+    }
+
+    private void loadToggles() {
+        if (!togglesFile.exists()) return;
+        YamlConfiguration config = YamlConfiguration.loadConfiguration(togglesFile);
+        for (String entry : config.getStringList("requests-disabled")) {
+            try {
+                requestsDisabled.add(UUID.fromString(entry));
+            } catch (IllegalArgumentException ignored) {}
+        }
+    }
+
+    private void saveToggles() {
+        YamlConfiguration config = new YamlConfiguration();
+        config.set("requests-disabled", requestsDisabled.stream().map(UUID::toString).toList());
+        try {
+            config.save(togglesFile);
+        } catch (IOException e) {
+            plugin.getLogger().warning("Failed to save toggles.yml: " + e.getMessage());
+        }
+    }
+
+    public boolean hasRequestsDisabled(UUID playerId) {
+        return requestsDisabled.contains(playerId);
+    }
+
+    /**
+     * Toggles incoming duel requests for a player. Returns the new state:
+     * true = requests are now disabled.
+     */
+    public boolean toggleRequests(UUID playerId) {
+        boolean disabled;
+        if (requestsDisabled.remove(playerId)) {
+            disabled = false;
+        } else {
+            requestsDisabled.add(playerId);
+            disabled = true;
+        }
+        saveToggles();
+        return disabled;
+    }
+
+    private void startExpirationTask() {
+        expirationTask = new BukkitRunnable() {
+            @Override
+            public void run() {
+                Iterator<Map.Entry<UUID, DuelRequest>> it = outgoingRequests.entrySet().iterator();
+                while (it.hasNext()) {
+                    Map.Entry<UUID, DuelRequest> entry = it.next();
+                    DuelRequest request = entry.getValue();
+                    if (request.isExpired()) {
+                        it.remove();
+                        removeIncoming(request.getReceiver(), request.getSender());
+
+                        Player sender = Bukkit.getPlayer(request.getSender());
+                        Player receiver = Bukkit.getPlayer(request.getReceiver());
+                        if (sender != null) {
+                            Messages.send(sender, "duel.request-expired-sender");
+                        }
+                        if (receiver != null) {
+                            Messages.send(receiver, "duel.request-expired-receiver");
+                        }
+                    }
+                }
+            }
+        }.runTaskTimer(plugin, 20L, 20L);
+    }
+
+    /**
+     * True if the player is in any kind of match: 1v1 duel, team duel or tournament.
+     */
+    public boolean isBusy(UUID playerId) {
+        if (isInDuel(playerId)) return true;
+        if (plugin.getTeamDuelManager() != null && plugin.getTeamDuelManager().isInTeamDuel(playerId)) return true;
+        return plugin.getTournamentManager() != null && plugin.getTournamentManager().isInTournament(playerId);
+    }
+
+    public boolean sendRequest(UUID sender, UUID receiver, String arenaName, String kitName, int bestOf) {
+        Player requester = Bukkit.getPlayer(sender);
+        if (!plugin.isFeatureEnabled("challenges") || requester == null
+                || !requester.hasPermission("epicduels.duel")) return false;
+        if (!plugin.isFeatureEnabled("best-of-n") && bestOf != 1) return false;
+        if (outgoingRequests.containsKey(sender)) return false;
+        if (isBusy(sender) || isBusy(receiver)) return false;
+        if (requestsDisabled.contains(receiver)) return false;
+
+        DuelRequest request = new DuelRequest(sender, receiver, arenaName, kitName, bestOf);
+        outgoingRequests.put(sender, request);
+        incomingRequests.computeIfAbsent(receiver, k -> new ConcurrentHashMap<>()).put(sender, request);
+        return true;
+    }
+
+    /**
+     * All non-expired incoming requests for a player. Expired entries are pruned.
+     */
+    public List<DuelRequest> getIncomingRequests(UUID receiver) {
+        Map<UUID, DuelRequest> map = incomingRequests.get(receiver);
+        if (map == null) return List.of();
+        List<DuelRequest> valid = new ArrayList<>();
+        for (DuelRequest request : map.values()) {
+            if (request.isExpired()) {
+                map.remove(request.getSender());
+                outgoingRequests.remove(request.getSender(), request);
+            } else {
+                valid.add(request);
+            }
+        }
+        if (map.isEmpty()) incomingRequests.remove(receiver, map);
+        return valid;
+    }
+
+    /**
+     * The single pending incoming request, or null if there are none or several.
+     */
+    public DuelRequest getIncomingRequest(UUID receiver) {
+        List<DuelRequest> valid = getIncomingRequests(receiver);
+        return valid.size() == 1 ? valid.get(0) : null;
+    }
+
+    public DuelRequest getIncomingRequestFrom(UUID receiver, UUID sender) {
+        Map<UUID, DuelRequest> map = incomingRequests.get(receiver);
+        if (map == null) return null;
+        DuelRequest request = map.get(sender);
+        if (request != null && request.isExpired()) {
+            removeIncoming(receiver, sender);
+            outgoingRequests.remove(sender, request);
+            return null;
+        }
+        return request;
+    }
+
+    public DuelRequest getOutgoingRequest(UUID sender) {
+        DuelRequest request = outgoingRequests.get(sender);
+        if (request != null && request.isExpired()) {
+            outgoingRequests.remove(sender);
+            removeIncoming(request.getReceiver(), sender);
+            return null;
+        }
+        return request;
+    }
+
+    public void cancelRequest(UUID sender) {
+        DuelRequest request = outgoingRequests.remove(sender);
+        if (request != null) {
+            removeIncoming(request.getReceiver(), sender);
+        }
+    }
+
+    public void denyRequest(UUID receiver, UUID sender) {
+        Map<UUID, DuelRequest> map = incomingRequests.get(receiver);
+        if (map == null) return;
+        DuelRequest request = map.remove(sender);
+        if (map.isEmpty()) incomingRequests.remove(receiver, map);
+        if (request != null) {
+            outgoingRequests.remove(sender, request);
+        }
+    }
+
+    /**
+     * Drop every pending incoming request for a player (quit, duel start, ...).
+     */
+    public void denyAllIncoming(UUID receiver) {
+        Map<UUID, DuelRequest> map = incomingRequests.remove(receiver);
+        if (map == null) return;
+        for (DuelRequest request : map.values()) {
+            outgoingRequests.remove(request.getSender(), request);
+        }
+    }
+
+    private void removeIncoming(UUID receiver, UUID sender) {
+        Map<UUID, DuelRequest> map = incomingRequests.get(receiver);
+        if (map != null) {
+            map.remove(sender);
+            if (map.isEmpty()) incomingRequests.remove(receiver, map);
+        }
+    }
+
+    public void acceptRequest(UUID receiver, UUID senderId) {
+        if (!plugin.isFeatureEnabled("challenges")) return;
+        DuelRequest request = getIncomingRequestFrom(receiver, senderId);
+        if (request == null) return;
+        denyRequest(receiver, senderId); // consume the request
+
+        Player player1 = Bukkit.getPlayer(request.getSender());
+        Player player2 = Bukkit.getPlayer(receiver);
+        if (player1 == null || player2 == null) return;
+
+        if (isBusy(player1.getUniqueId()) || isBusy(player2.getUniqueId())) {
+            Messages.send(player1, "duel.start-busy");
+            Messages.send(player2, "duel.start-busy");
+            return;
+        }
+
+        boolean ownInventory = Kit.OWN_INVENTORY.equals(request.getKitName());
+        Arena arena = plugin.getArenaManager().getArena(request.getArenaName());
+        Kit kit = ownInventory ? null : plugin.getKitManager().getKit(request.getKitName());
+        if (arena == null || (!ownInventory && kit == null)) {
+            Messages.send(player1, "duel.start-gone");
+            Messages.send(player2, "duel.start-gone");
+            return;
+        }
+
+        startDuel(player1, player2, arena, kit, request.getBestOf());
+    }
+
+    public void startQueueDuel(Player player1, Player player2, String arenaName, String kitName) {
+        Arena arena = plugin.getArenaManager().getArena(arenaName);
+        Kit kit = plugin.getKitManager().getKit(kitName);
+        if (arena == null || kit == null) {
+            Messages.send(player1, "duel.start-gone");
+            Messages.send(player2, "duel.start-gone");
+            return;
+        }
+        startDuel(player1, player2, arena, kit);
+    }
+
+    public DuelInstance startQueueDuelWithCallback(Player player1, Player player2, String arenaName, String kitName,
+                                                    BiConsumer<UUID, UUID> onEnd) {
+        Arena arena = plugin.getArenaManager().getArena(arenaName);
+        Kit kit = plugin.getKitManager().getKit(kitName);
+        if (arena == null || kit == null) {
+            Messages.send(player1, "duel.start-gone");
+            Messages.send(player2, "duel.start-gone");
+            return null;
+        }
+        DuelInstance duel = startDuel(player1, player2, arena, kit);
+        if (duel != null && onEnd != null) {
+            endCallbacks.put(duel.getId(), onEnd);
+        }
+        return duel;
+    }
+
+    /**
+     * Starts a duel without a challenge request (rematch, ...). Same busy
+     * checks as any other duel start. A null kit means an "Own Inventory"
+     * duel — players fight with what they carry.
+     */
+    public DuelInstance startDirectDuel(Player player1, Player player2, Arena arena, Kit kit, int bestOf) {
+        return startDuel(player1, player2, arena, kit, bestOf);
+    }
+
+    private DuelInstance startDuel(Player player1, Player player2, Arena arena, Kit kit) {
+        return startDuel(player1, player2, arena, kit, 1);
+    }
+
+    private DuelInstance startDuel(Player player1, Player player2, Arena arena, Kit kit, int bestOf) {
+        if (!player1.hasPermission("epicduels.duel") || !player2.hasPermission("epicduels.duel")) return null;
+        if (!plugin.isFeatureEnabled("best-of-n") && bestOf != 1) return null;
+        boolean ownInventory = kit == null;
+        if (ownInventory && !plugin.isOwnInventoryDuelsEnabled()) return null;
+        // Guard: never start a duel for someone who is already fighting.
+        // Tournament membership is intentionally NOT checked here — tournament
+        // matches are themselves started through this method.
+        boolean inTeamDuel = plugin.getTeamDuelManager() != null
+                && (plugin.getTeamDuelManager().isInTeamDuel(player1.getUniqueId())
+                    || plugin.getTeamDuelManager().isInTeamDuel(player2.getUniqueId()));
+        if (isInDuel(player1.getUniqueId()) || isInDuel(player2.getUniqueId()) || inTeamDuel) {
+            Messages.send(player1, "duel.start-busy");
+            Messages.send(player2, "duel.start-busy");
+            return null;
+        }
+
+        String kitName = ownInventory ? Kit.OWN_INVENTORY : kit.getName();
+        DuelInstance duel = new DuelInstance(player1.getUniqueId(), player2.getUniqueId(), arena.getName(), kitName, bestOf);
+        activeDuels.put(player1.getUniqueId(), duel);
+        activeDuels.put(player2.getUniqueId(), duel);
+
+        // Safety: ensure neither player is still sitting in a matchmaking queue
+        plugin.getQueueManager().removePlayer(player1.getUniqueId());
+        plugin.getQueueManager().removePlayer(player2.getUniqueId());
+
+        // Safety: cancel any outgoing/incoming duel requests for both players
+        cancelRequest(player1.getUniqueId());
+        cancelRequest(player2.getUniqueId());
+        denyAllIncoming(player1.getUniqueId());
+        denyAllIncoming(player2.getUniqueId());
+
+        // Safety: drop spectator tracking — otherwise the end of the watched
+        // duel would teleport them out of their own match (counting as forfeit)
+        clearSpectatorState(player1.getUniqueId());
+        clearSpectatorState(player2.getUniqueId());
+
+        Messages.send(player1, "duel.preparing");
+        Messages.send(player2, "duel.preparing");
+
+        // Copy and load the arena world, passing the duel instance to record original blocks
+        plugin.getArenaManager().createInstanceWorld(arena, duel).handle((world, error) -> world).thenAccept(world -> {
+            if (world == null) {
+                Bukkit.getScheduler().runTask(plugin, () -> {
+                    Messages.send(player1, "duel.fail-create");
+                    Messages.send(player2, "duel.fail-create");
+                    abortStart(duel);
+                });
+                return;
+            }
+
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                // A disconnect during the async world copy is not caught by
+                // handleDisconnect (the duel is not active yet) — clean up
+                // here so nobody stays marked as busy forever.
+                if (!player1.isOnline() || !player2.isOnline()
+                        || activeDuels.get(player1.getUniqueId()) != duel
+                        || activeDuels.get(player2.getUniqueId()) != duel) {
+                    abortStart(duel);
+                    Player online = player1.isOnline() ? player1 : player2.isOnline() ? player2 : null;
+                    if (online != null) {
+                        Messages.send(online, "duel.cancelled-left");
+                    }
+                    return;
+                }
+
+                duel.setInstanceWorld(world);
+                originalEntities.put(duel.getId(), world.getEntities().stream().map(org.bukkit.entity.Entity::getUniqueId).collect(java.util.stream.Collectors.toSet()));
+                duel.setActive(true);
+
+                // Validate spawn locations
+                if (arena.getSpawn1() == null || arena.getSpawn2() == null) {
+                    plugin.getLogger().severe("Arena '" + arena.getName() + "' has null spawn points! spawn1="
+                            + arena.getSpawn1() + ", spawn2=" + arena.getSpawn2());
+                    Messages.send(player1, "duel.fail-spawns");
+                    Messages.send(player2, "duel.fail-spawns");
+                    duel.setActive(false);
+                    abortStart(duel);
+                    return;
+                }
+
+                // Calculate spawn locations in the instance world
+                Location spawn1 = arena.getSpawn1().clone();
+                spawn1.setWorld(world);
+                Location spawn2 = arena.getSpawn2().clone();
+                spawn2.setWorld(world);
+
+                // Every mode needs both snapshots before modifying either player.
+                boolean firstSaved = plugin.getInventoryBackupManager().backup(player1);
+                boolean secondSaved = firstSaved && plugin.getInventoryBackupManager().backup(player2);
+                if (!secondSaved) {
+                    if (firstSaved) plugin.getInventoryBackupManager().restore(player1);
+                    abortStart(duel);
+                    return;
+                }
+
+                // Clear and prepare players
+                preparePlayer(player1, !ownInventory);
+                preparePlayer(player2, !ownInventory);
+
+                // Teleport players
+                player1.teleport(spawn1);
+                player2.teleport(spawn2);
+
+                // Apply kit
+                if (!ownInventory) {
+                    applyKit(player1, kit);
+                    applyKit(player2, kit);
+                }
+
+                // Freeze players during countdown
+                frozenPlayers.add(player1.getUniqueId());
+                frozenPlayers.add(player2.getUniqueId());
+
+                // Countdown
+                startCountdown(duel);
+            });
+        });
+        return duel;
+    }
+
+    private void startCountdown(DuelInstance duel) {
+        new BukkitRunnable() {
+            int count = Math.min(60, Math.max(0, plugin.getConfig().getInt("duel.countdown-seconds", 5)));
+
+            @Override
+            public void run() {
+                Player p1 = Bukkit.getPlayer(duel.getPlayer1());
+                Player p2 = Bukkit.getPlayer(duel.getPlayer2());
+
+                if (p1 == null || p2 == null || !duel.isActive()) {
+                    cancel();
+                    return;
+                }
+
+                if (count > 0) {
+                    NamedTextColor color = switch (count) {
+                        case 5, 4 -> NamedTextColor.RED;
+                        case 3, 2 -> NamedTextColor.YELLOW;
+                        case 1 -> NamedTextColor.GREEN;
+                        default -> NamedTextColor.WHITE;
+                    };
+
+                    Title title = Title.title(
+                            Component.text(String.valueOf(count), color, TextDecoration.BOLD),
+                            Messages.get("countdown.get-ready"),
+                            Title.Times.times(Duration.ZERO, Duration.ofMillis(1100), Duration.ZERO)
+                    );
+                    p1.showTitle(title);
+                    p2.showTitle(title);
+
+                    p1.playSound(p1.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1f);
+                    p2.playSound(p2.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1f);
+
+                    count--;
+                } else {
+                    // Fight!
+                    Title title = Title.title(
+                            Messages.get("countdown.fight"),
+                            Component.empty(),
+                            Title.Times.times(Duration.ZERO, Duration.ofSeconds(1), Duration.ofMillis(500))
+                    );
+                    p1.showTitle(title);
+                    p2.showTitle(title);
+
+                    p1.playSound(p1.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1f, 1f);
+                    p2.playSound(p2.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1f, 1f);
+
+                    frozenPlayers.remove(duel.getPlayer1());
+                    frozenPlayers.remove(duel.getPlayer2());
+                    duel.setCountdownComplete(true);
+
+                    int timeLimit = plugin.getConfig().getInt("duel.time-limit-seconds", 300);
+                    if (timeLimit > 0) {
+                        duel.setDeadlineMillis(System.currentTimeMillis() + timeLimit * 1000L);
+                    }
+
+                    cancel();
+                }
+            }
+        }.runTaskTimer(plugin, 20L, 20L);
+    }
+
+    // ========== Time limit & draws ==========
+
+    private void startTimeLimitTask() {
+        timeLimitTask = new BukkitRunnable() {
+            @Override
+            public void run() {
+                Set<UUID> seen = new HashSet<>();
+                for (DuelInstance duel : activeDuels.values()) {
+                    if (!seen.add(duel.getId())) continue;
+                    if (!duel.isActive() || !duel.isCountdownComplete() || duel.getDeadlineMillis() <= 0) continue;
+
+                    long remaining = duel.getDeadlineMillis() - System.currentTimeMillis();
+                    if (remaining <= 0) {
+                        handleTimeUp(duel);
+                    } else {
+                        sendTimeActionBar(duel, remaining);
+                    }
+                }
+            }
+        }.runTaskTimer(plugin, 20L, 20L);
+    }
+
+    private void sendTimeActionBar(DuelInstance duel, long remainingMillis) {
+        long seconds = (remainingMillis + 999) / 1000;
+        NamedTextColor color = seconds <= 30 ? NamedTextColor.RED
+                : seconds <= 60 ? NamedTextColor.YELLOW
+                : NamedTextColor.GRAY;
+        String key = duel.isSuddenDeath() ? "duel.sudden-death-bar" : "duel.time-left";
+        Component bar = Messages.get(key, Messages.unparsed("time", formatTime(seconds))).color(color);
+
+        Player p1 = Bukkit.getPlayer(duel.getPlayer1());
+        Player p2 = Bukkit.getPlayer(duel.getPlayer2());
+        if (p1 != null) p1.sendActionBar(bar);
+        if (p2 != null) p2.sendActionBar(bar);
+    }
+
+    private static String formatTime(long totalSeconds) {
+        return String.format("%d:%02d", totalSeconds / 60, totalSeconds % 60);
+    }
+
+    private void handleTimeUp(DuelInstance duel) {
+        // Best-of-N: whoever leads on rounds when the time runs out wins
+        int wins1 = duel.getWins(duel.getPlayer1());
+        int wins2 = duel.getWins(duel.getPlayer2());
+        if (wins1 != wins2) {
+            UUID winnerId = wins1 > wins2 ? duel.getPlayer1() : duel.getPlayer2();
+            UUID loserId = duel.getOpponent(winnerId);
+            Player w = Bukkit.getPlayer(winnerId);
+            Component msg = w != null
+                    ? Messages.get("duel.timeup-rounds", Messages.unparsed("player", w.getName()))
+                    : Messages.get("duel.timeup-rounds-leader");
+            for (UUID id : List.of(duel.getPlayer1(), duel.getPlayer2())) {
+                Player p = Bukkit.getPlayer(id);
+                if (p != null) p.sendMessage(msg);
+            }
+            endDuel(duel, winnerId, loserId);
+            return;
+        }
+
+        // Tournament matches always need a winner — resolve per config
+        if (endCallbacks.containsKey(duel.getId())) {
+            String resolution = plugin.getConfig().getString("duel.tournament-draw", "sudden-death");
+            if (resolution.equalsIgnoreCase("sudden-death") && !duel.isSuddenDeath()) {
+                startSuddenDeath(duel);
+                return;
+            }
+
+            endDuelDraw(duel);
+            return;
+        }
+
+        endDuelDraw(duel);
+    }
+
+    private void startSuddenDeath(DuelInstance duel) {
+        int extension = plugin.getConfig().getInt("duel.sudden-death-seconds", 60);
+        duel.setSuddenDeath(true);
+        duel.setDeadlineMillis(System.currentTimeMillis() + extension * 1000L);
+
+        Title title = Title.title(
+                Messages.get("duel.sudden-death-title"),
+                Messages.get("duel.sudden-death-subtitle", Messages.unparsed("time", formatTime(extension))),
+                Title.Times.times(Duration.ZERO, Duration.ofSeconds(3), Duration.ofSeconds(1))
+        );
+        for (UUID id : List.of(duel.getPlayer1(), duel.getPlayer2())) {
+            Player p = Bukkit.getPlayer(id);
+            if (p != null) {
+                p.showTitle(title);
+                p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 0.6f, 1.4f);
+            }
+        }
+    }
+
+    /**
+     * Ends a duel with no winner: no stats are recorded and both players are
+     * returned to the lobby.
+     */
+    public void endDuelDraw(DuelInstance duel) {
+        if (!duel.isActive()) return;
+        duel.setActive(false);
+
+        frozenPlayers.remove(duel.getPlayer1());
+        frozenPlayers.remove(duel.getPlayer2());
+
+        Player p1 = Bukkit.getPlayer(duel.getPlayer1());
+        Player p2 = Bukkit.getPlayer(duel.getPlayer2());
+        String name1 = p1 != null ? p1.getName() : "Unknown";
+        String name2 = p2 != null ? p2.getName() : "Unknown";
+
+        Component announcement = Messages.get("duel.draw-announce",
+                Messages.unparsed("player1", name1), Messages.unparsed("player2", name2));
+        announceResult(announcement, p1, p2);
+
+        Title drawTitle = Title.title(
+                Messages.get("duel.draw-title"),
+                Messages.get("duel.draw-subtitle"),
+                Title.Times.times(Duration.ZERO, Duration.ofSeconds(3), Duration.ofSeconds(1))
+        );
+        if (p1 != null) p1.showTitle(drawTitle);
+        if (p2 != null) p2.showTitle(drawTitle);
+
+        removeSpectatorsForDuel(duel);
+
+        // A registered end callback (tournament match) always needs a winner —
+        // never swallow it on a draw, or the bracket would hang forever.
+        BiConsumer<UUID, UUID> cb = endCallbacks.remove(duel.getId());
+        if (cb != null) {
+            UUID winnerId = new Random().nextBoolean() ? duel.getPlayer1() : duel.getPlayer2();
+            Component coinFlip = Messages.get("duel.draw-coinflip");
+            if (p1 != null) p1.sendMessage(coinFlip);
+            if (p2 != null) p2.sendMessage(coinFlip);
+            try {
+                cb.accept(winnerId, duel.getOpponent(winnerId));
+            } catch (Throwable t) {
+                plugin.getLogger().warning("Duel end callback threw: " + t.getMessage());
+            }
+        } else if (p1 != null && p2 != null && plugin.getRematchManager() != null) {
+            plugin.getRematchManager().offerRematch(duel);
+        }
+
+        scheduleReturnToLobby(duel, p1, p2);
+    }
+
+    // ========== Best-of-N rounds ==========
+
+    /**
+     * Called when a participant dies. Scores the round; ends the match if
+     * decided, otherwise resets the arena and starts the next round in the
+     * same instance world.
+     */
+    public void handleRoundEnd(DuelInstance duel, UUID roundWinnerId, UUID roundLoserId) {
+        if (!duel.isActive()) return;
+
+        duel.addRoundWin(roundWinnerId);
+        if (duel.getWins(roundWinnerId) >= duel.getRoundsToWin()) {
+            endDuel(duel, roundWinnerId, roundLoserId);
+            return;
+        }
+
+        startNextRound(duel, roundWinnerId);
+    }
+
+    private void startNextRound(DuelInstance duel, UUID roundWinnerId) {
+        duel.setDeadlineMillis(0); // pause the clock during the break
+
+        UUID roundLoserId = duel.getOpponent(roundWinnerId);
+        Player roundWinner = Bukkit.getPlayer(roundWinnerId);
+        Player roundLoser = Bukkit.getPlayer(roundLoserId);
+        String winnerName = roundWinner != null ? roundWinner.getName() : "Unknown";
+
+        String score = duel.getWins(duel.getPlayer1()) + ":" + duel.getWins(duel.getPlayer2());
+        Title roundTitle = Title.title(
+                Messages.get("duel.round-title", Messages.unparsed("score", score)),
+                Messages.get("duel.round-subtitle", Messages.unparsed("player", winnerName),
+                        Messages.unparsed("round", duel.getCurrentRound())),
+                Title.Times.times(Duration.ZERO, Duration.ofSeconds(2), Duration.ofMillis(500))
+        );
+
+        // Freeze both players during the break (also blocks damage)
+        frozenPlayers.add(duel.getPlayer1());
+        frozenPlayers.add(duel.getPlayer2());
+
+        for (Player p : new Player[]{roundWinner, roundLoser}) {
+            if (p != null) {
+                p.showTitle(roundTitle);
+                p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, 1f, 1.2f);
+            }
+        }
+
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (!duel.isActive()) return;
+
+            Player p1 = Bukkit.getPlayer(duel.getPlayer1());
+            Player p2 = Bukkit.getPlayer(duel.getPlayer2());
+            if (p1 == null || p2 == null) {
+                // Someone left during the break — the quit handler ends the duel
+                return;
+            }
+
+            Arena arena = plugin.getArenaManager().getArena(duel.getArenaName());
+            Kit kit = duel.isOwnInventory() ? null : plugin.getKitManager().getKit(duel.getKitName());
+            World world = duel.getInstanceWorld();
+            if (arena == null || (!duel.isOwnInventory() && kit == null) || world == null
+                    || arena.getSpawn1() == null || arena.getSpawn2() == null) {
+                Messages.send(p1, "duel.round-next-failed");
+                Messages.send(p2, "duel.round-next-failed");
+                endDuelDraw(duel);
+                return;
+            }
+
+            // Reuse the instance world: just remove the blocks players placed
+            resetPlayerPlacedBlocks(duel);
+            duel.startNextRound();
+
+            Location spawn1 = arena.getSpawn1().clone();
+            spawn1.setWorld(world);
+            Location spawn2 = arena.getSpawn2().clone();
+            spawn2.setWorld(world);
+
+            preparePlayer(p1, !duel.isOwnInventory());
+            preparePlayer(p2, !duel.isOwnInventory());
+            p1.teleport(spawn1);
+            p2.teleport(spawn2);
+            if (duel.isOwnInventory()) {
+                // Refill from the backup taken at duel start
+                plugin.getInventoryBackupManager().apply(p1);
+                plugin.getInventoryBackupManager().apply(p2);
+            } else {
+                applyKit(p1, kit);
+                applyKit(p2, kit);
+            }
+
+            String newScore = duel.getWins(duel.getPlayer1()) + ":" + duel.getWins(duel.getPlayer2());
+            Component roundInfo = Messages.get("duel.round-info",
+                    Messages.unparsed("round", duel.getCurrentRound()), Messages.unparsed("score", newScore));
+            p1.sendMessage(roundInfo);
+            p2.sendMessage(roundInfo);
+
+            startCountdown(duel);
+        }, 60L); // 3 seconds
+    }
+
+    private final Map<UUID, Set<UUID>> originalEntities = new HashMap<>();
+
+    private void resetPlayerPlacedBlocks(DuelInstance duel) {
+        World world = duel.getInstanceWorld();
+        if (world == null) return;
+        for (int[] pos : duel.getPlayerPlacedBlockPositions()) {
+            // Apply physics so flowing water/lava from removed sources drains
+            world.getBlockAt(pos[0], pos[1], pos[2]).setType(Material.AIR, true);
+        }
+        duel.clearPlayerPlacedBlocks();
+        Set<UUID> originals = originalEntities.getOrDefault(duel.getId(), Set.of());
+        for (org.bukkit.entity.Entity entity : world.getEntities()) {
+            if (!(entity instanceof Player) && !originals.contains(entity.getUniqueId())) entity.remove();
+        }
+    }
+
+    public void endDuel(DuelInstance duel, UUID winnerId, UUID loserId) {
+        if (!duel.isActive()) return;
+        duel.setActive(false);
+
+        frozenPlayers.remove(duel.getPlayer1());
+        frozenPlayers.remove(duel.getPlayer2());
+
+        Player winner = Bukkit.getPlayer(winnerId);
+        Player loser = Bukkit.getPlayer(loserId);
+        String winnerName = winner != null ? winner.getName() : "Unknown";
+        String loserName = loser != null ? loser.getName() : "Unknown";
+
+        // Update stats
+        plugin.getStatsManager().recordMatch(List.of(winnerId), List.of(loserId));
+
+        // Run configured integrations once, after the complete match result is final.
+        plugin.getResultCommandManager().execute(
+                List.of(winnerId), List.of(loserId), duel.getArenaName(), duel.getKitName(),
+                duel.getWins(winnerId), duel.getWins(loserId));
+
+        // Announce — server-wide or participants-only, per config
+        Component announcement = Messages.get("duel.win-announce",
+                Messages.unparsed("winner", winnerName), Messages.unparsed("loser", loserName));
+
+        announceResult(announcement, winner, loser);
+
+        if (winner != null) {
+            Title winTitle = Title.title(
+                    Messages.get("duel.victory-title"),
+                    Messages.get("duel.victory-subtitle"),
+                    Title.Times.times(Duration.ZERO, Duration.ofSeconds(3), Duration.ofSeconds(1))
+            );
+            winner.showTitle(winTitle);
+        }
+
+        if (loser != null) {
+            Title loseTitle = Title.title(
+                    Messages.get("duel.defeat-title"),
+                    Messages.get("duel.defeat-subtitle"),
+                    Title.Times.times(Duration.ZERO, Duration.ofSeconds(3), Duration.ofSeconds(1))
+            );
+            loser.showTitle(loseTitle);
+        }
+
+        // Return spectators to lobby
+        removeSpectatorsForDuel(duel);
+
+        // Fire end callback (e.g. tournament bracket advancement)
+        BiConsumer<UUID, UUID> cb = endCallbacks.remove(duel.getId());
+        if (cb != null) {
+            try {
+                cb.accept(winnerId, loserId);
+            } catch (Throwable t) {
+                plugin.getLogger().warning("Duel end callback threw: " + t.getMessage());
+            }
+        } else if (winner != null && loser != null && plugin.getRematchManager() != null) {
+            // Regular duel (not a tournament match) — offer a rematch
+            plugin.getRematchManager().offerRematch(duel);
+        }
+
+        scheduleReturnToLobby(duel, winner, loser);
+    }
+
+    /**
+     * Sends a duel result to the whole server, or only to the two
+     * participants when duel.broadcast-results is false.
+     */
+    private void announceResult(Component announcement, Player a, Player b) {
+        if (plugin.getConfig().getBoolean("duel.broadcast-results", true)) {
+            Bukkit.broadcast(announcement);
+            return;
+        }
+        if (a != null) a.sendMessage(announcement);
+        if (b != null) b.sendMessage(announcement);
+    }
+
+    /**
+     * Waits 3 seconds, then returns both players to the lobby and deletes the
+     * instance world.
+     */
+    private void scheduleReturnToLobby(DuelInstance duel, Player playerA, Player playerB) {
+        Bukkit.getScheduler().runTaskLater(plugin, () -> finishReturn(duel), 60L);
+    }
+
+    private void finishReturn(DuelInstance duel) {
+        duel.setActive(false);
+        boolean pendingReturn = false;
+        for (UUID id : List.of(duel.getPlayer1(), duel.getPlayer2())) {
+            if (activeDuels.get(id) != duel) continue;
+            Player player = Bukkit.getPlayer(id);
+            if (player != null && player.isOnline() && plugin.getInventoryBackupManager().hasBackup(id)
+                    && !resetAfterBattle(player)) {
+                pendingReturn = true;
+                continue;
+            }
+            activeDuels.remove(id, duel);
+            frozenPlayers.remove(id);
+        }
+        if (pendingReturn) {
+            if (plugin.isEnabled()) Bukkit.getScheduler().runTaskLater(plugin, () -> finishReturn(duel), 20L);
+            return;
+        }
+        originalEntities.remove(duel.getId());
+        plugin.getArenaManager().deleteInstanceWorld(duel.getInstanceWorldName());
+    }
+
+    public boolean resetAfterBattle(Player player) {
+        player.setFireTicks(0);
+        player.getActivePotionEffects().forEach(effect -> player.removePotionEffect(effect.getType()));
+        player.setHealth(player.getMaxHealth());
+        player.setFoodLevel(20);
+        player.setSaturation(20f);
+        if (plugin.getConfig().getBoolean("lobby.handle-join", true)) {
+            if (!player.teleport(plugin.getLobbyLocation())) return false;
+            player.setGameMode(GameMode.ADVENTURE);
+        }
+        // Never clear the current inventory before a fully validated restore.
+        return plugin.getInventoryBackupManager().restore(player);
+    }
+
+    private void abortStart(DuelInstance duel) {
+        duel.setActive(false);
+        activeDuels.remove(duel.getPlayer1(), duel);
+        activeDuels.remove(duel.getPlayer2(), duel);
+        frozenPlayers.remove(duel.getPlayer1());
+        frozenPlayers.remove(duel.getPlayer2());
+        originalEntities.remove(duel.getId());
+        plugin.getArenaManager().deleteInstanceWorld(duel.getInstanceWorldName());
+        BiConsumer<UUID, UUID> callback = endCallbacks.remove(duel.getId());
+        if (callback != null) callback.accept(null, null);
+    }
+
+    public void handleDisconnect(UUID playerId) {
+        DuelInstance duel = activeDuels.get(playerId);
+        if (duel == null || !duel.isActive()) return;
+
+        UUID opponent = duel.getOpponent(playerId);
+        endDuel(duel, opponent, playerId);
+    }
+
+    /**
+     * Called when a duel participant leaves the arena world (e.g. teleported
+     * away by another plugin). Counts as a forfeit — the opponent wins.
+     */
+    public void handleForfeit(UUID playerId) {
+        DuelInstance duel = activeDuels.get(playerId);
+        if (duel == null || !duel.isActive()) return;
+
+        Player player = Bukkit.getPlayer(playerId);
+        if (player != null) {
+            Messages.send(player, "duel.left-arena");
+        }
+        UUID opponent = duel.getOpponent(playerId);
+        endDuel(duel, opponent, playerId);
+    }
+
+    /**
+     * Player gives up via /duel forfeit — the opponent wins.
+     */
+    public void forfeitDuel(UUID playerId) {
+        DuelInstance duel = activeDuels.get(playerId);
+        if (duel == null || !duel.isActive()) return;
+
+        Player player = Bukkit.getPlayer(playerId);
+        if (player != null) {
+            Messages.send(player, "duel.forfeited");
+        }
+        endDuel(duel, duel.getOpponent(playerId), playerId);
+    }
+
+    public boolean isInDuel(UUID playerId) {
+        // Map presence (not isActive) so players count as busy while the
+        // instance world is still being copied asynchronously and during the
+        // short post-match phase before they are returned to the lobby.
+        return activeDuels.containsKey(playerId);
+    }
+
+    public boolean isFrozen(UUID playerId) {
+        DuelInstance duel = activeDuels.get(playerId);
+        return frozenPlayers.contains(playerId) || (duel != null && !duel.isActive() && duel.getInstanceWorld() != null);
+    }
+
+    public DuelInstance getDuel(UUID playerId) {
+        return activeDuels.get(playerId);
+    }
+
+    public DuelInstance getDuelByWorld(String worldName) {
+        for (DuelInstance duel : activeDuels.values()) {
+            if (duel.getInstanceWorldName().equals(worldName)) {
+                return duel;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * All distinct duels that are currently being fought (active with a loaded
+     * instance world). {@code activeDuels} holds one entry per participant, so
+     * the result is deduplicated by duel id.
+     */
+    public Collection<DuelInstance> getActiveDuels() {
+        Map<UUID, DuelInstance> distinct = new LinkedHashMap<>();
+        for (DuelInstance duel : activeDuels.values()) {
+            if (duel.isActive() && duel.getInstanceWorld() != null) {
+                distinct.putIfAbsent(duel.getId(), duel);
+            }
+        }
+        return distinct.values();
+    }
+
+    public DuelInstance getDuelById(UUID duelId) {
+        if (duelId == null) return null;
+        for (DuelInstance duel : activeDuels.values()) {
+            if (duel.getId().equals(duelId)) return duel;
+        }
+        return null;
+    }
+
+    // ========== Spectator methods ==========
+
+    public boolean addSpectator(Player spectator, DuelInstance duel) {
+        if (duel.getInstanceWorld() == null) return false;
+        spectators.put(spectator.getUniqueId(), duel);
+
+        // Teleport to the duel arena and set spectator mode
+        Player p1 = Bukkit.getPlayer(duel.getPlayer1());
+        Location spawnLoc = p1 != null ? p1.getLocation() : duel.getInstanceWorld().getSpawnLocation();
+        spectator.setGameMode(GameMode.SPECTATOR);
+        spectator.teleport(spawnLoc);
+        Messages.send(spectator, "duel.spectate-start");
+        return true;
+    }
+
+    public void removeSpectator(UUID spectatorId) {
+        DuelInstance duel = spectators.remove(spectatorId);
+        if (duel == null) return;
+        Player spectator = Bukkit.getPlayer(spectatorId);
+        if (spectator != null && spectator.isOnline()) {
+            spectator.setGameMode(GameMode.ADVENTURE);
+            spectator.teleport(plugin.getLobbyLocation());
+            Messages.send(spectator, "duel.spectate-stop");
+        }
+    }
+
+    public DuelInstance getSpectatedDuel(UUID playerId) { return spectators.get(playerId); }
+
+    public boolean isSpectating(UUID playerId) {
+        return spectators.containsKey(playerId);
+    }
+
+    /**
+     * Drops spectator tracking without teleporting — used when the player is
+     * about to enter a match themselves.
+     */
+    public void clearSpectatorState(UUID playerId) {
+        spectators.remove(playerId);
+    }
+
+    /** True if any current duel (active or starting) runs on the given arena. */
+    public boolean isArenaInUse(String arenaName) {
+        for (DuelInstance duel : activeDuels.values()) {
+            if (duel.getArenaName().equalsIgnoreCase(arenaName)) return true;
+        }
+        return false;
+    }
+
+    private void removeSpectatorsForDuel(DuelInstance duel) {
+        Iterator<Map.Entry<UUID, DuelInstance>> it = spectators.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<UUID, DuelInstance> entry = it.next();
+            if (entry.getValue().getId().equals(duel.getId())) {
+                Player spectator = Bukkit.getPlayer(entry.getKey());
+                if (spectator != null && spectator.isOnline()) {
+                    spectator.setGameMode(GameMode.ADVENTURE);
+                    spectator.teleport(plugin.getLobbyLocation());
+                    Messages.send(spectator, "duel.spectate-ended");
+                }
+                it.remove();
+            }
+        }
+    }
+
+    public void cleanupAll() {
+        if (expirationTask != null) {
+            expirationTask.cancel();
+            expirationTask = null;
+        }
+        if (timeLimitTask != null) {
+            timeLimitTask.cancel();
+            timeLimitTask = null;
+        }
+
+        for (UUID specId : new HashSet<>(spectators.keySet())) {
+            removeSpectator(specId);
+        }
+
+        for (DuelInstance duel : new HashSet<>(activeDuels.values())) {
+            removeSpectatorsForDuel(duel);
+            finishReturn(duel);
+        }
+        activeDuels.clear();
+        frozenPlayers.clear();
+        spectators.clear();
+        endCallbacks.clear();
+    }
+
+    private void preparePlayer(Player player) {
+        preparePlayer(player, true);
+    }
+
+    private void preparePlayer(Player player, boolean clearInventory) {
+        if (clearInventory) {
+            player.getInventory().clear();
+        }
+        player.setHealth(player.getMaxHealth());
+        player.setFoodLevel(20);
+        player.setSaturation(20f);
+        player.setFireTicks(0);
+        player.getActivePotionEffects().forEach(e -> player.removePotionEffect(e.getType()));
+        player.setGameMode(GameMode.SURVIVAL);
+    }
+
+    private void applyKit(Player player, Kit kit) {
+        // Use the player's personalized layout (Kit Editor) if one exists
+        kit = plugin.getPlayerKitManager().getPersonalizedKit(player.getUniqueId(), kit);
+        player.getInventory().setContents(kit.getContents());
+        if (kit.getArmorContents() != null) {
+            player.getInventory().setArmorContents(kit.getArmorContents());
+        }
+        if (kit.getOffHand() != null) {
+            player.getInventory().setItemInOffHand(kit.getOffHand());
+        }
+    }
+}

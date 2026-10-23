@@ -1,0 +1,58 @@
+name: §x§F§8§B§E§F§B« §x§F§8§B§E§F§BШ§x§F§3§B§E§F§Bл§x§E§E§B§F§F§Bе§x§E§9§B§F§F§Bм §x§E§4§B§F§F§Bш§x§D§F§C§0§F§Bа§x§D§A§C§0§F§Bл§x§D§5§C§0§F§Bк§x§D§0§C§0§F§Bе§x§C§B§C§1§F§Bр§x§C§6§C§1§F§Bа §x§F§8§B§E§F§B»
+lore: []
+material: NETHERITE_HELMET
+glow: false
+disableStack: false
+keepItemOnDeath: false
+canBeUsedOnlyByTheOwner: false
+cancelEventIfNotOwner: false
+onlyOwnerBlackListedActivators: []
+storeItemInfo: false
+unbreakable: false
+usage: 0
+usageLimit: -1
+cancelEventIfNoPermission: false
+whitelistedWorlds: []
+recognitions: []
+keepDefaultAttributes: false
+ignoreKeepDefaultAttributesFeature: true
+config_5: true
+config_update: true
+dropFeatures:
+  glowDrop: false
+  glowDropColor: WHITE
+  displayNameDrop: false
+hiders:
+  hideEnchantments: false
+  hideUnbreakable: false
+  hideAttributes: false
+  hidePotionEffects: false
+  hideUsage: false
+  hideDestroys: false
+  hidePlacedOn: false
+enchantments:
+  enchantment1:
+    enchantment: Mending
+    level: 1
+  enchantment2:
+    enchantment: Protection
+    level: 4
+  enchantment3:
+    enchantment: Respiration
+    level: 2
+  enchantment4:
+    enchantment: Unbreaking
+    level: 4
+giveFirstJoinFeatures:
+  giveFirstJoin: false
+  giveFirstJoinAmount: 1
+  giveFirstJoinSlot: 0
+restrictions: {}
+variables: {}
+activators: {}
+displayConditions:
+  playerConditions: {}
+  worldConditions: {}
+  itemConditions: {}
+  placeholdersConditions: {}
+  enableFeature: false

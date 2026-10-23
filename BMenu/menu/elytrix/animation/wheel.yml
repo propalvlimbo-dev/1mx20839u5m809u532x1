@@ -1,0 +1,799 @@
+# Анимация колеса призов в стиле BCases (wheel.yml), адаптированная под GUI BMenu.
+# Подключается через extends; призы задаются в меню-кейсе в слотах кольца.
+#
+# Соответствие настройкам BCases wheel.yml:
+#   prize_count: 8  -> кольцо из 8 слотов: 11,13,15,25,33,31,29,19
+#   max_speed: 15   -> 1 тик на шаг в начале
+#   speed_fade 0.07 -> интервал между шагами растёт: 1,1,1,1,1,1,2,2,2,3,...
+#   min_speed: 2    -> 13 тиков на шаг в конце
+#
+# BCases вращает 3D-призы вокруг кейса виртуальными стойками; здесь вращается
+# содержимое GUI-кольца: кадры копируют призы из базового слоя (copy-from-base).
+# Победитель — приз, оказавшийся под указателем в слоте 11.
+# Все 8 вариантов одинаковы по длительности (~5.5 c) и различаются только стартовым
+# сдвигом кольца, поэтому [run_rand] выбирает случайный приз без разной задержки.
+
+animations:
+  wheel-0: # выигрывает приз №1 (слот 11)
+    - tick: 0
+      opcodes:
+        - copy-from-base: "19,11,13,15,25,33,31,29 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.1'
+    - tick: 1
+      opcodes:
+        - copy-from-base: "29,19,11,13,15,25,33,31 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.13'
+    - tick: 2
+      opcodes:
+        - copy-from-base: "31,29,19,11,13,15,25,33 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.16'
+    - tick: 3
+      opcodes:
+        - copy-from-base: "33,31,29,19,11,13,15,25 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.19'
+    - tick: 4
+      opcodes:
+        - copy-from-base: "25,33,31,29,19,11,13,15 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.22'
+    - tick: 5
+      opcodes:
+        - copy-from-base: "15,25,33,31,29,19,11,13 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.25'
+    - tick: 6
+      opcodes:
+        - copy-from-base: "13,15,25,33,31,29,19,11 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.28'
+    - tick: 8
+      opcodes:
+        - copy-from-base: "11,13,15,25,33,31,29,19 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.31'
+    - tick: 10
+      opcodes:
+        - copy-from-base: "19,11,13,15,25,33,31,29 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.34'
+    - tick: 12
+      opcodes:
+        - copy-from-base: "29,19,11,13,15,25,33,31 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.37'
+    - tick: 15
+      opcodes:
+        - copy-from-base: "31,29,19,11,13,15,25,33 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.4'
+    - tick: 18
+      opcodes:
+        - copy-from-base: "33,31,29,19,11,13,15,25 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.43'
+    - tick: 22
+      opcodes:
+        - copy-from-base: "25,33,31,29,19,11,13,15 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.46'
+    - tick: 26
+      opcodes:
+        - copy-from-base: "15,25,33,31,29,19,11,13 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.49'
+    - tick: 31
+      opcodes:
+        - copy-from-base: "13,15,25,33,31,29,19,11 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.52'
+    - tick: 36
+      opcodes:
+        - copy-from-base: "11,13,15,25,33,31,29,19 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.55'
+    - tick: 42
+      opcodes:
+        - copy-from-base: "19,11,13,15,25,33,31,29 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.58'
+    - tick: 49
+      opcodes:
+        - copy-from-base: "29,19,11,13,15,25,33,31 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.61'
+    - tick: 57
+      opcodes:
+        - copy-from-base: "31,29,19,11,13,15,25,33 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.64'
+    - tick: 66
+      opcodes:
+        - copy-from-base: "33,31,29,19,11,13,15,25 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.67'
+    - tick: 76
+      opcodes:
+        - copy-from-base: "25,33,31,29,19,11,13,15 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.7'
+    - tick: 87
+      opcodes:
+        - copy-from-base: "15,25,33,31,29,19,11,13 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.7'
+    - tick: 99
+      opcodes:
+        - copy-from-base: "13,15,25,33,31,29,19,11 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.7'
+    - tick: 112
+      opcodes:
+        - copy-from-base: "11,13,15,25,33,31,29,19 11,13,15,25,33,31,29,19"
+        - sound: 'entity.player.levelup 0.7 1.2'
+
+  wheel-1: # выигрывает приз №8 (слот 19)
+    - tick: 0
+      opcodes:
+        - copy-from-base: "29,19,11,13,15,25,33,31 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.1'
+    - tick: 1
+      opcodes:
+        - copy-from-base: "31,29,19,11,13,15,25,33 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.13'
+    - tick: 2
+      opcodes:
+        - copy-from-base: "33,31,29,19,11,13,15,25 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.16'
+    - tick: 3
+      opcodes:
+        - copy-from-base: "25,33,31,29,19,11,13,15 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.19'
+    - tick: 4
+      opcodes:
+        - copy-from-base: "15,25,33,31,29,19,11,13 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.22'
+    - tick: 5
+      opcodes:
+        - copy-from-base: "13,15,25,33,31,29,19,11 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.25'
+    - tick: 6
+      opcodes:
+        - copy-from-base: "11,13,15,25,33,31,29,19 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.28'
+    - tick: 8
+      opcodes:
+        - copy-from-base: "19,11,13,15,25,33,31,29 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.31'
+    - tick: 10
+      opcodes:
+        - copy-from-base: "29,19,11,13,15,25,33,31 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.34'
+    - tick: 12
+      opcodes:
+        - copy-from-base: "31,29,19,11,13,15,25,33 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.37'
+    - tick: 15
+      opcodes:
+        - copy-from-base: "33,31,29,19,11,13,15,25 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.4'
+    - tick: 18
+      opcodes:
+        - copy-from-base: "25,33,31,29,19,11,13,15 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.43'
+    - tick: 22
+      opcodes:
+        - copy-from-base: "15,25,33,31,29,19,11,13 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.46'
+    - tick: 26
+      opcodes:
+        - copy-from-base: "13,15,25,33,31,29,19,11 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.49'
+    - tick: 31
+      opcodes:
+        - copy-from-base: "11,13,15,25,33,31,29,19 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.52'
+    - tick: 36
+      opcodes:
+        - copy-from-base: "19,11,13,15,25,33,31,29 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.55'
+    - tick: 42
+      opcodes:
+        - copy-from-base: "29,19,11,13,15,25,33,31 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.58'
+    - tick: 49
+      opcodes:
+        - copy-from-base: "31,29,19,11,13,15,25,33 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.61'
+    - tick: 57
+      opcodes:
+        - copy-from-base: "33,31,29,19,11,13,15,25 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.64'
+    - tick: 66
+      opcodes:
+        - copy-from-base: "25,33,31,29,19,11,13,15 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.67'
+    - tick: 76
+      opcodes:
+        - copy-from-base: "15,25,33,31,29,19,11,13 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.7'
+    - tick: 87
+      opcodes:
+        - copy-from-base: "13,15,25,33,31,29,19,11 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.7'
+    - tick: 99
+      opcodes:
+        - copy-from-base: "11,13,15,25,33,31,29,19 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.7'
+    - tick: 112
+      opcodes:
+        - copy-from-base: "19,11,13,15,25,33,31,29 11,13,15,25,33,31,29,19"
+        - sound: 'entity.player.levelup 0.7 1.2'
+
+  wheel-2: # выигрывает приз №7 (слот 29)
+    - tick: 0
+      opcodes:
+        - copy-from-base: "31,29,19,11,13,15,25,33 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.1'
+    - tick: 1
+      opcodes:
+        - copy-from-base: "33,31,29,19,11,13,15,25 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.13'
+    - tick: 2
+      opcodes:
+        - copy-from-base: "25,33,31,29,19,11,13,15 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.16'
+    - tick: 3
+      opcodes:
+        - copy-from-base: "15,25,33,31,29,19,11,13 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.19'
+    - tick: 4
+      opcodes:
+        - copy-from-base: "13,15,25,33,31,29,19,11 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.22'
+    - tick: 5
+      opcodes:
+        - copy-from-base: "11,13,15,25,33,31,29,19 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.25'
+    - tick: 6
+      opcodes:
+        - copy-from-base: "19,11,13,15,25,33,31,29 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.28'
+    - tick: 8
+      opcodes:
+        - copy-from-base: "29,19,11,13,15,25,33,31 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.31'
+    - tick: 10
+      opcodes:
+        - copy-from-base: "31,29,19,11,13,15,25,33 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.34'
+    - tick: 12
+      opcodes:
+        - copy-from-base: "33,31,29,19,11,13,15,25 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.37'
+    - tick: 15
+      opcodes:
+        - copy-from-base: "25,33,31,29,19,11,13,15 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.4'
+    - tick: 18
+      opcodes:
+        - copy-from-base: "15,25,33,31,29,19,11,13 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.43'
+    - tick: 22
+      opcodes:
+        - copy-from-base: "13,15,25,33,31,29,19,11 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.46'
+    - tick: 26
+      opcodes:
+        - copy-from-base: "11,13,15,25,33,31,29,19 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.49'
+    - tick: 31
+      opcodes:
+        - copy-from-base: "19,11,13,15,25,33,31,29 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.52'
+    - tick: 36
+      opcodes:
+        - copy-from-base: "29,19,11,13,15,25,33,31 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.55'
+    - tick: 42
+      opcodes:
+        - copy-from-base: "31,29,19,11,13,15,25,33 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.58'
+    - tick: 49
+      opcodes:
+        - copy-from-base: "33,31,29,19,11,13,15,25 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.61'
+    - tick: 57
+      opcodes:
+        - copy-from-base: "25,33,31,29,19,11,13,15 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.64'
+    - tick: 66
+      opcodes:
+        - copy-from-base: "15,25,33,31,29,19,11,13 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.67'
+    - tick: 76
+      opcodes:
+        - copy-from-base: "13,15,25,33,31,29,19,11 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.7'
+    - tick: 87
+      opcodes:
+        - copy-from-base: "11,13,15,25,33,31,29,19 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.7'
+    - tick: 99
+      opcodes:
+        - copy-from-base: "19,11,13,15,25,33,31,29 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.7'
+    - tick: 112
+      opcodes:
+        - copy-from-base: "29,19,11,13,15,25,33,31 11,13,15,25,33,31,29,19"
+        - sound: 'entity.player.levelup 0.7 1.2'
+
+  wheel-3: # выигрывает приз №6 (слот 31)
+    - tick: 0
+      opcodes:
+        - copy-from-base: "33,31,29,19,11,13,15,25 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.1'
+    - tick: 1
+      opcodes:
+        - copy-from-base: "25,33,31,29,19,11,13,15 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.13'
+    - tick: 2
+      opcodes:
+        - copy-from-base: "15,25,33,31,29,19,11,13 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.16'
+    - tick: 3
+      opcodes:
+        - copy-from-base: "13,15,25,33,31,29,19,11 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.19'
+    - tick: 4
+      opcodes:
+        - copy-from-base: "11,13,15,25,33,31,29,19 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.22'
+    - tick: 5
+      opcodes:
+        - copy-from-base: "19,11,13,15,25,33,31,29 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.25'
+    - tick: 6
+      opcodes:
+        - copy-from-base: "29,19,11,13,15,25,33,31 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.28'
+    - tick: 8
+      opcodes:
+        - copy-from-base: "31,29,19,11,13,15,25,33 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.31'
+    - tick: 10
+      opcodes:
+        - copy-from-base: "33,31,29,19,11,13,15,25 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.34'
+    - tick: 12
+      opcodes:
+        - copy-from-base: "25,33,31,29,19,11,13,15 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.37'
+    - tick: 15
+      opcodes:
+        - copy-from-base: "15,25,33,31,29,19,11,13 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.4'
+    - tick: 18
+      opcodes:
+        - copy-from-base: "13,15,25,33,31,29,19,11 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.43'
+    - tick: 22
+      opcodes:
+        - copy-from-base: "11,13,15,25,33,31,29,19 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.46'
+    - tick: 26
+      opcodes:
+        - copy-from-base: "19,11,13,15,25,33,31,29 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.49'
+    - tick: 31
+      opcodes:
+        - copy-from-base: "29,19,11,13,15,25,33,31 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.52'
+    - tick: 36
+      opcodes:
+        - copy-from-base: "31,29,19,11,13,15,25,33 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.55'
+    - tick: 42
+      opcodes:
+        - copy-from-base: "33,31,29,19,11,13,15,25 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.58'
+    - tick: 49
+      opcodes:
+        - copy-from-base: "25,33,31,29,19,11,13,15 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.61'
+    - tick: 57
+      opcodes:
+        - copy-from-base: "15,25,33,31,29,19,11,13 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.64'
+    - tick: 66
+      opcodes:
+        - copy-from-base: "13,15,25,33,31,29,19,11 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.67'
+    - tick: 76
+      opcodes:
+        - copy-from-base: "11,13,15,25,33,31,29,19 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.7'
+    - tick: 87
+      opcodes:
+        - copy-from-base: "19,11,13,15,25,33,31,29 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.7'
+    - tick: 99
+      opcodes:
+        - copy-from-base: "29,19,11,13,15,25,33,31 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.7'
+    - tick: 112
+      opcodes:
+        - copy-from-base: "31,29,19,11,13,15,25,33 11,13,15,25,33,31,29,19"
+        - sound: 'entity.player.levelup 0.7 1.2'
+
+  wheel-4: # выигрывает приз №5 (слот 33)
+    - tick: 0
+      opcodes:
+        - copy-from-base: "25,33,31,29,19,11,13,15 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.1'
+    - tick: 1
+      opcodes:
+        - copy-from-base: "15,25,33,31,29,19,11,13 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.13'
+    - tick: 2
+      opcodes:
+        - copy-from-base: "13,15,25,33,31,29,19,11 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.16'
+    - tick: 3
+      opcodes:
+        - copy-from-base: "11,13,15,25,33,31,29,19 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.19'
+    - tick: 4
+      opcodes:
+        - copy-from-base: "19,11,13,15,25,33,31,29 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.22'
+    - tick: 5
+      opcodes:
+        - copy-from-base: "29,19,11,13,15,25,33,31 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.25'
+    - tick: 6
+      opcodes:
+        - copy-from-base: "31,29,19,11,13,15,25,33 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.28'
+    - tick: 8
+      opcodes:
+        - copy-from-base: "33,31,29,19,11,13,15,25 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.31'
+    - tick: 10
+      opcodes:
+        - copy-from-base: "25,33,31,29,19,11,13,15 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.34'
+    - tick: 12
+      opcodes:
+        - copy-from-base: "15,25,33,31,29,19,11,13 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.37'
+    - tick: 15
+      opcodes:
+        - copy-from-base: "13,15,25,33,31,29,19,11 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.4'
+    - tick: 18
+      opcodes:
+        - copy-from-base: "11,13,15,25,33,31,29,19 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.43'
+    - tick: 22
+      opcodes:
+        - copy-from-base: "19,11,13,15,25,33,31,29 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.46'
+    - tick: 26
+      opcodes:
+        - copy-from-base: "29,19,11,13,15,25,33,31 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.49'
+    - tick: 31
+      opcodes:
+        - copy-from-base: "31,29,19,11,13,15,25,33 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.52'
+    - tick: 36
+      opcodes:
+        - copy-from-base: "33,31,29,19,11,13,15,25 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.55'
+    - tick: 42
+      opcodes:
+        - copy-from-base: "25,33,31,29,19,11,13,15 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.58'
+    - tick: 49
+      opcodes:
+        - copy-from-base: "15,25,33,31,29,19,11,13 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.61'
+    - tick: 57
+      opcodes:
+        - copy-from-base: "13,15,25,33,31,29,19,11 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.64'
+    - tick: 66
+      opcodes:
+        - copy-from-base: "11,13,15,25,33,31,29,19 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.67'
+    - tick: 76
+      opcodes:
+        - copy-from-base: "19,11,13,15,25,33,31,29 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.7'
+    - tick: 87
+      opcodes:
+        - copy-from-base: "29,19,11,13,15,25,33,31 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.7'
+    - tick: 99
+      opcodes:
+        - copy-from-base: "31,29,19,11,13,15,25,33 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.7'
+    - tick: 112
+      opcodes:
+        - copy-from-base: "33,31,29,19,11,13,15,25 11,13,15,25,33,31,29,19"
+        - sound: 'entity.player.levelup 0.7 1.2'
+
+  wheel-5: # выигрывает приз №4 (слот 25)
+    - tick: 0
+      opcodes:
+        - copy-from-base: "15,25,33,31,29,19,11,13 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.1'
+    - tick: 1
+      opcodes:
+        - copy-from-base: "13,15,25,33,31,29,19,11 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.13'
+    - tick: 2
+      opcodes:
+        - copy-from-base: "11,13,15,25,33,31,29,19 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.16'
+    - tick: 3
+      opcodes:
+        - copy-from-base: "19,11,13,15,25,33,31,29 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.19'
+    - tick: 4
+      opcodes:
+        - copy-from-base: "29,19,11,13,15,25,33,31 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.22'
+    - tick: 5
+      opcodes:
+        - copy-from-base: "31,29,19,11,13,15,25,33 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.25'
+    - tick: 6
+      opcodes:
+        - copy-from-base: "33,31,29,19,11,13,15,25 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.28'
+    - tick: 8
+      opcodes:
+        - copy-from-base: "25,33,31,29,19,11,13,15 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.31'
+    - tick: 10
+      opcodes:
+        - copy-from-base: "15,25,33,31,29,19,11,13 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.34'
+    - tick: 12
+      opcodes:
+        - copy-from-base: "13,15,25,33,31,29,19,11 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.37'
+    - tick: 15
+      opcodes:
+        - copy-from-base: "11,13,15,25,33,31,29,19 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.4'
+    - tick: 18
+      opcodes:
+        - copy-from-base: "19,11,13,15,25,33,31,29 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.43'
+    - tick: 22
+      opcodes:
+        - copy-from-base: "29,19,11,13,15,25,33,31 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.46'
+    - tick: 26
+      opcodes:
+        - copy-from-base: "31,29,19,11,13,15,25,33 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.49'
+    - tick: 31
+      opcodes:
+        - copy-from-base: "33,31,29,19,11,13,15,25 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.52'
+    - tick: 36
+      opcodes:
+        - copy-from-base: "25,33,31,29,19,11,13,15 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.55'
+    - tick: 42
+      opcodes:
+        - copy-from-base: "15,25,33,31,29,19,11,13 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.58'
+    - tick: 49
+      opcodes:
+        - copy-from-base: "13,15,25,33,31,29,19,11 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.61'
+    - tick: 57
+      opcodes:
+        - copy-from-base: "11,13,15,25,33,31,29,19 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.64'
+    - tick: 66
+      opcodes:
+        - copy-from-base: "19,11,13,15,25,33,31,29 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.67'
+    - tick: 76
+      opcodes:
+        - copy-from-base: "29,19,11,13,15,25,33,31 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.7'
+    - tick: 87
+      opcodes:
+        - copy-from-base: "31,29,19,11,13,15,25,33 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.7'
+    - tick: 99
+      opcodes:
+        - copy-from-base: "33,31,29,19,11,13,15,25 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.7'
+    - tick: 112
+      opcodes:
+        - copy-from-base: "25,33,31,29,19,11,13,15 11,13,15,25,33,31,29,19"
+        - sound: 'entity.player.levelup 0.7 1.2'
+
+  wheel-6: # выигрывает приз №3 (слот 15)
+    - tick: 0
+      opcodes:
+        - copy-from-base: "13,15,25,33,31,29,19,11 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.1'
+    - tick: 1
+      opcodes:
+        - copy-from-base: "11,13,15,25,33,31,29,19 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.13'
+    - tick: 2
+      opcodes:
+        - copy-from-base: "19,11,13,15,25,33,31,29 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.16'
+    - tick: 3
+      opcodes:
+        - copy-from-base: "29,19,11,13,15,25,33,31 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.19'
+    - tick: 4
+      opcodes:
+        - copy-from-base: "31,29,19,11,13,15,25,33 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.22'
+    - tick: 5
+      opcodes:
+        - copy-from-base: "33,31,29,19,11,13,15,25 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.25'
+    - tick: 6
+      opcodes:
+        - copy-from-base: "25,33,31,29,19,11,13,15 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.28'
+    - tick: 8
+      opcodes:
+        - copy-from-base: "15,25,33,31,29,19,11,13 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.31'
+    - tick: 10
+      opcodes:
+        - copy-from-base: "13,15,25,33,31,29,19,11 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.34'
+    - tick: 12
+      opcodes:
+        - copy-from-base: "11,13,15,25,33,31,29,19 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.37'
+    - tick: 15
+      opcodes:
+        - copy-from-base: "19,11,13,15,25,33,31,29 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.4'
+    - tick: 18
+      opcodes:
+        - copy-from-base: "29,19,11,13,15,25,33,31 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.43'
+    - tick: 22
+      opcodes:
+        - copy-from-base: "31,29,19,11,13,15,25,33 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.46'
+    - tick: 26
+      opcodes:
+        - copy-from-base: "33,31,29,19,11,13,15,25 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.49'
+    - tick: 31
+      opcodes:
+        - copy-from-base: "25,33,31,29,19,11,13,15 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.52'
+    - tick: 36
+      opcodes:
+        - copy-from-base: "15,25,33,31,29,19,11,13 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.55'
+    - tick: 42
+      opcodes:
+        - copy-from-base: "13,15,25,33,31,29,19,11 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.58'
+    - tick: 49
+      opcodes:
+        - copy-from-base: "11,13,15,25,33,31,29,19 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.61'
+    - tick: 57
+      opcodes:
+        - copy-from-base: "19,11,13,15,25,33,31,29 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.64'
+    - tick: 66
+      opcodes:
+        - copy-from-base: "29,19,11,13,15,25,33,31 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.67'
+    - tick: 76
+      opcodes:
+        - copy-from-base: "31,29,19,11,13,15,25,33 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.7'
+    - tick: 87
+      opcodes:
+        - copy-from-base: "33,31,29,19,11,13,15,25 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.7'
+    - tick: 99
+      opcodes:
+        - copy-from-base: "25,33,31,29,19,11,13,15 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.7'
+    - tick: 112
+      opcodes:
+        - copy-from-base: "15,25,33,31,29,19,11,13 11,13,15,25,33,31,29,19"
+        - sound: 'entity.player.levelup 0.7 1.2'
+
+  wheel-7: # выигрывает приз №2 (слот 13)
+    - tick: 0
+      opcodes:
+        - copy-from-base: "11,13,15,25,33,31,29,19 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.1'
+    - tick: 1
+      opcodes:
+        - copy-from-base: "19,11,13,15,25,33,31,29 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.13'
+    - tick: 2
+      opcodes:
+        - copy-from-base: "29,19,11,13,15,25,33,31 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.16'
+    - tick: 3
+      opcodes:
+        - copy-from-base: "31,29,19,11,13,15,25,33 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.19'
+    - tick: 4
+      opcodes:
+        - copy-from-base: "33,31,29,19,11,13,15,25 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.22'
+    - tick: 5
+      opcodes:
+        - copy-from-base: "25,33,31,29,19,11,13,15 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.25'
+    - tick: 6
+      opcodes:
+        - copy-from-base: "15,25,33,31,29,19,11,13 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.28'
+    - tick: 8
+      opcodes:
+        - copy-from-base: "13,15,25,33,31,29,19,11 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.31'
+    - tick: 10
+      opcodes:
+        - copy-from-base: "11,13,15,25,33,31,29,19 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.34'
+    - tick: 12
+      opcodes:
+        - copy-from-base: "19,11,13,15,25,33,31,29 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.37'
+    - tick: 15
+      opcodes:
+        - copy-from-base: "29,19,11,13,15,25,33,31 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.4'
+    - tick: 18
+      opcodes:
+        - copy-from-base: "31,29,19,11,13,15,25,33 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.43'
+    - tick: 22
+      opcodes:
+        - copy-from-base: "33,31,29,19,11,13,15,25 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.46'
+    - tick: 26
+      opcodes:
+        - copy-from-base: "25,33,31,29,19,11,13,15 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.49'
+    - tick: 31
+      opcodes:
+        - copy-from-base: "15,25,33,31,29,19,11,13 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.52'
+    - tick: 36
+      opcodes:
+        - copy-from-base: "13,15,25,33,31,29,19,11 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.55'
+    - tick: 42
+      opcodes:
+        - copy-from-base: "11,13,15,25,33,31,29,19 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.58'
+    - tick: 49
+      opcodes:
+        - copy-from-base: "19,11,13,15,25,33,31,29 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.61'
+    - tick: 57
+      opcodes:
+        - copy-from-base: "29,19,11,13,15,25,33,31 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.64'
+    - tick: 66
+      opcodes:
+        - copy-from-base: "31,29,19,11,13,15,25,33 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.67'
+    - tick: 76
+      opcodes:
+        - copy-from-base: "33,31,29,19,11,13,15,25 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.7'
+    - tick: 87
+      opcodes:
+        - copy-from-base: "25,33,31,29,19,11,13,15 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.7'
+    - tick: 99
+      opcodes:
+        - copy-from-base: "15,25,33,31,29,19,11,13 11,13,15,25,33,31,29,19"
+        - sound: 'block.note_block.hat 0.35 1.7'
+    - tick: 112
+      opcodes:
+        - copy-from-base: "13,15,25,33,31,29,19,11 11,13,15,25,33,31,29,19"
+        - sound: 'entity.player.levelup 0.7 1.2'

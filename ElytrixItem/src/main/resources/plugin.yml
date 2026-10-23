@@ -1,0 +1,16 @@
+name: ElytrixItem
+version: '2.5.5'
+main: ru.rooyzee.elytrixitem.Main
+api-version: '1.21'
+authors: [rooyzee]
+softdepend: [WorldGuard, Vault]
+description: плагин на кастомные предметы для Elytrix
+website: https://elytrix.pw
+
+commands:
+  elytrixitems:
+    aliases: [eitems]
+
+permissions:
+  elytrixitems.admin:
+    default: op

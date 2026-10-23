@@ -14,6 +14,115 @@ open_commands:
         type: player
         exx: [ ]
 
+# Перенесённые команды DeluxeMenus (исходные файлы DeluxeMenus не изменялись)
+  help_freedonate:
+    menu: elytrix:help_freedonate
+    aliases:
+      - фришка
+  help_basics:
+    menu: elytrix:help_basics
+    aliases:
+      - основы
+  help:
+    menu: elytrix:help
+    aliases:
+      - помощь
+      - гайд
+  menu:
+    menu: elytrix:menu
+  duels:
+    menu: elytrix:duel
+    aliases:
+      - duels
+      - дуэли
+  duel_help_menu:
+    menu: elytrix:duel_help
+    aliases:
+      - duelshelp
+      - дуэлипомощь
+  rtp:
+    menu: elytrix:rtp
+    aliases:
+      - rtps
+      - ртп
+  sub:
+    menu: elytrix:sub
+    aliases:
+      - подписка
+  donate:
+    menu: elytrix:don
+    aliases:
+      - donat
+      - don
+      - d
+      - донат
+  shop:
+    menu: elytrix:shop
+    aliases:
+      - магазин
+  arrows:
+    menu: elytrix:arrows
+  customize:
+    menu: elytrix:customizemenu
+    aliases:
+      - custom
+      - title
+      - titles
+      - titul
+      - титулы
+      - титул
+      - кастомизация
+      - ешеду
+      - ешедуы
+      - сгыещьшяу
+  talisman_event:
+    menu: elytrix:talisman_event
+    aliases:
+      - event_talisman
+      - talisman_menu
+  merchant_event:
+    menu: elytrix:merchant_event
+    aliases:
+      - event_merchant
+      - merchant_menu
+  shulkerpvp_event:
+    menu: elytrix:shulkerpvp_event
+    aliases:
+      - event_shulkerpvp
+      - shulkerpvp_menu
+  airdrop_event:
+    menu: elytrix:airdrop_event
+    aliases:
+      - event_airdrop
+      - airdrops_menu
+  paradise_event:
+    menu: elytrix:paradise_event
+    aliases:
+      - event_paradise
+      - paradise_menu
+  events:
+    menu: elytrix:events
+    aliases:
+      - ивенты
+      - event
+      - таймеры
+  help_events:
+    menu: elytrix:help_events
+    permission: deluxemenus.admin
+  elytrix_lobby:
+    menu: elytrix:lobby
+  rub:
+    menu: elytrix:salary_rub
+    aliases:
+      - rubsalary
+  elytrix_frun_legacy:
+    menu: elytrix:zelevarki_fr_legacy
+  elytrix_wheel:
+    menu: elytrix:cases_wheel
+    aliases:
+      - wheel
+      # - case   ← убрано: /case вёл на рулетку и перебивал /bcases give
+
 # все виды аргуметов
 tab-completer:
   PLAYER:

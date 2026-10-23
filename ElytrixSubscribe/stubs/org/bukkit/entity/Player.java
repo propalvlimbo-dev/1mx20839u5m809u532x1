@@ -1,0 +1,34 @@
+package org.bukkit.entity;
+import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.command.CommandSender;
+public interface Player extends HumanEntity, OfflinePlayer, CommandSender {
+    boolean performCommand(String command);
+    void closeInventory();
+    boolean isOnline();
+    boolean hasPermission(String name);
+    boolean isOp();
+    Location getLocation();
+    World getWorld();
+    boolean teleport(Location location);
+    void sendActionBar(net.kyori.adventure.text.Component message);
+    boolean addPotionEffect(org.bukkit.potion.PotionEffect effect);
+    boolean removePotionEffect(org.bukkit.potion.PotionEffectType type);
+    java.util.Collection<org.bukkit.potion.PotionEffect> getActivePotionEffects();
+    double getHealth();
+    void setHealth(double health);
+    int getFoodLevel();
+    void setFoodLevel(int food);
+    AttributeInstance getAttribute(Attribute attribute);
+    void playSound(Location location, Sound sound, float volume, float pitch);
+    void setNoGravity(boolean gravity);
+    float getPitch();
+    Location getEyeLocation();
+    void sendTitle(String title, String subtitle, int fadeIn, int stay, int fadeOut);
+    void openSign(org.bukkit.block.Sign sign);
+    float getYaw();
+}

@@ -1,0 +1,125 @@
+stack:
+  potion: 64
+  splash-potion: 64
+messages:
+  prefix: '&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» '
+  no-allowed: '&cНет доступных команд.'
+  no-permission: '&cУ вас нет прав.'
+  unknown-command: '&cНеизвестная команда.'
+  only-players: '&cКоманда только для игроков.'
+  give:
+    usage: '&#F8BEFB/shadowcustomitems give &f(игрок) (предмет) &7— &fвыдать игроку предмет.'
+    player-null: '&cИгрок не найден.'
+    item-null: '&cПредмет не найден.'
+    gived: '&aПредмет успешно выдан.'
+    received: '&fВам был выдан предмет: &#F8BEFB%name%'
+  reload:
+    usage: '&#F8BEFB/shadowcustomitems reload &7— &fперезагрузить конфиг.'
+    reload: '&aКонфиг перезагружен.'
+disable-worlds:
+  - ''
+whitelist-blocks:
+  - GRASS
+  - DIRT
+items:
+  shar1:
+    item:
+      type: PLAYER_HEAD
+      texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTQ1ZmQyYzM3MzZhZjRiZDI4MTEyOTY2NjFlMGNiNDliYWIyY2ZhNjVmNWM5ZTU5OGFhNDNiZWJmYTFlYTM2OCJ9fX0=
+      data: 3
+      title: "§x§F§8§B§E§F§B« §x§F§8§B§E§F§BШ§x§F§4§B§E§F§Bа§x§F§0§B§F§F§Bр §x§E§C§B§F§F§BН§x§E§8§B§F§F§Bо§x§E§4§B§F§F§Bв§x§E§0§C§0§F§Bи§x§D§C§C§0§F§Bч§x§D§8§C§0§F§Bк§x§D§4§C§0§F§Bа §x§F§8§B§E§F§B»"
+      lore:
+        - "§x§F§8§B§E§F§B§l┃ "
+        - "§x§F§8§B§E§F§B§l┃ §fЭффект: §x§F§8§B§E§F§BСила II"
+        - "§x§F§8§B§E§F§B§l┃ §fЭффект: §x§F§8§B§E§F§BСопротивление I"
+        - "§x§F§8§B§E§F§B§l┃ §fЭффект: §x§F§8§B§E§F§BОгнестойкость I"
+        - "§x§F§8§B§E§F§B§l┃ "
+    type: RUNE
+    effects:
+      - 'INCREASE_DAMAGE:2'
+      - 'FIRE_RESISTANCE:1'
+      - 'DAMAGE_RESISTANCE:1'
+
+  shar2:
+    item:
+      type: PLAYER_HEAD
+      texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTFiNGIyMDE4OWQ5MDJiYzZjM2ZhYmUyM2Q5ZjU3ODY5N2Y1NDRjZjQxNTMxNzc4NzM3NDExODM5M2RhNCJ9fX0=
+      data: 3
+      title: "§x§F§8§B§E§F§B« §x§F§8§B§E§F§BШ§x§F§4§B§E§F§Bа§x§F§0§B§F§F§Bр §x§E§C§B§F§F§BЗ§x§E§8§B§F§F§Bм§x§E§4§B§F§F§Bе§x§E§0§C§0§F§Bи §x§F§8§B§E§F§B»"
+      lore:
+        - "§x§F§8§B§E§F§B§l┃ "
+        - "§x§F§8§B§E§F§B§l┃ §fЭффект: §x§F§8§B§E§F§BСила II"
+        - "§x§F§8§B§E§F§B§l┃ §fЭффект: §x§F§8§B§E§F§BСкорость I"
+        - "§x§F§8§B§E§F§B§l┃ §fЭффект: §x§F§8§B§E§F§BСопротивление I"
+        - "§x§F§8§B§E§F§B§l┃ §fЭффект: §x§F§8§B§E§F§BОгнестойкость I"
+        - "§x§F§8§B§E§F§B§l┃ "
+    type: RUNE
+    effects:
+      - 'INCREASE_DAMAGE:2'
+      - 'SPEED:1'
+      - 'FIRE_RESISTANCE:1'
+      - 'DAMAGE_RESISTANCE:1'
+
+  shar3:
+    item:
+      type: PLAYER_HEAD
+      texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjg5MDQyMDgyYmI3YTc2MThiNzg0ZWU3NjA1YTEzNGM1ODgzNGUyMWUzNzRjODg4OTM3MTYxMDU3ZjZjNyJ9fX0=
+      data: 3
+      title: "§x§F§8§B§E§F§B« §x§F§8§B§E§F§BШ§x§F§4§B§E§F§Bа§x§F§0§B§F§F§Bр §x§E§C§B§F§F§BС§x§E§8§B§F§F§Bо§x§E§4§B§F§F§Bл§x§E§0§C§0§F§Bн§x§D§C§C§0§F§Bц§x§D§8§C§0§F§Bа §x§F§8§B§E§F§B»"
+      lore:
+        - "§x§F§8§B§E§F§B§l┃ "
+        - "§x§F§8§B§E§F§B§l┃ §fЭффект: §x§F§8§B§E§F§BСила II"
+        - "§x§F§8§B§E§F§B§l┃ §fЭффект: §x§F§8§B§E§F§BСкорость II"
+        - "§x§F§8§B§E§F§B§l┃ §fЭффект: §x§F§8§B§E§F§BСопротивление I"
+        - "§x§F§8§B§E§F§B§l┃ §fЭффект: §x§F§8§B§E§F§BОгнестойкость I"
+        - "§x§F§8§B§E§F§B§l┃ "
+    type: RUNE
+    effects:
+      - 'INCREASE_DAMAGE:2'
+      - 'SPEED:2'
+      - 'FIRE_RESISTANCE:1'
+      - 'DAMAGE_RESISTANCE:1'
+
+  shar4:
+    item:
+      type: PLAYER_HEAD
+      texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjVjNGQyNGFmZmRkNDgxMDI2MjAzNjE1MjdkMjE1NmUxOGMyMjNiYWU1MTg5YWM0Mzk4MTU2NDNmM2NmZjlkIn19fQ==
+      data: 3
+      title: "§x§F§8§B§E§F§B« §x§F§8§B§E§F§BШ§x§F§4§B§E§F§Bа§x§F§0§B§F§F§Bр §x§E§C§B§F§F§BШ§x§E§8§B§F§F§Bа§x§E§4§B§F§F§Bл§x§E§0§C§0§F§Bк§x§D§C§C§0§F§Bе§x§D§8§C§0§F§Bр§x§D§4§C§0§F§Bа §x§F§8§B§E§F§B»"
+      lore:
+        - "§x§F§8§B§E§F§B§l┃ "
+        - "§x§F§8§B§E§F§B§l┃ §fЭффект: §x§F§8§B§E§F§BСила II"
+        - "§x§F§8§B§E§F§B§l┃ §fЭффект: §x§F§8§B§E§F§BСкорость II"
+        - "§x§F§8§B§E§F§B§l┃ §fЭффект: §x§F§8§B§E§F§BСопротивление II"
+        - "§x§F§8§B§E§F§B§l┃ §fЭффект: §x§F§8§B§E§F§BОгнестойкость I"
+        - "§x§F§8§B§E§F§B§l┃ "
+    type: RUNE
+    effects:
+      - 'INCREASE_DAMAGE:2'
+      - 'SPEED:2'
+      - 'DAMAGE_RESISTANCE:2'
+      - 'FIRE_RESISTANCE:1'
+
+  donshar:
+    item:
+      type: PLAYER_HEAD
+      texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzg0NzU3ZWM3MjYxMmVlYWMxOWNjYWY4MGIzMWM4NjFjNzkxZjI1ZDMyZGRhM2ZiMzdmNTUyMDU3NTVhMDQifX19
+      data: 3
+      title: "§x§F§8§B§E§F§B« §x§F§8§B§E§F§BШ§x§F§4§B§E§F§Bа§x§F§0§B§F§F§Bр §x§E§C§B§F§F§BП§x§E§8§B§F§F§Bо§x§E§4§B§F§F§Bв§x§E§0§C§0§F§Bе§x§D§C§C§0§F§Bл§x§D§8§C§0§F§Bи§x§D§4§C§0§F§Bт§x§D§0§C§0§F§Bе§x§C§C§C§1§F§Bл§x§C§8§C§1§F§Bя §x§F§8§B§E§F§B»"
+      lore:
+        - "§x§F§8§B§E§F§B§l┃ "
+        - "§x§F§8§B§E§F§B§l┃ §fЭффект: §x§F§8§B§E§F§BСила III"
+        - "§x§F§8§B§E§F§B§l┃ §fЭффект: §x§F§8§B§E§F§BСкорость II"
+        - "§x§F§8§B§E§F§B§l┃ §fЭффект: §x§F§8§B§E§F§BРегенерация I"
+        - "§x§F§8§B§E§F§B§l┃ §fЭффект: §x§F§8§B§E§F§BСопротивление I"
+        - "§x§F§8§B§E§F§B§l┃ §fЭффект: §x§F§8§B§E§F§BОгнестойкость I"
+        - "§x§F§8§B§E§F§B§l┃ "
+    type: RUNE
+    effects:
+      - 'INCREASE_DAMAGE:3'
+      - 'SPEED:2'
+      - 'REGENERATION:1'
+      - 'DAMAGE_RESISTANCE:1'
+      - 'FIRE_RESISTANCE:1'
+    enchants:
+      - 'VANISHING_CURSE:1'

@@ -1,0 +1,35 @@
+enabled: true
+update-interval-ticks: 20
+views:
+  lobby:
+    enabled: false
+    title: '<#F8BEFB><bold>ElytriX</bold>'
+    lines:
+      - '<#F8BEFB><bold>┃</bold> <white>Игрок: <#F8BEFB><player>'
+  duel:
+    enabled: true
+    title: '<#F8BEFB><bold>Дуэль</bold>'
+    lines:
+      - '<#F8BEFB><bold>┃</bold> <white>Соперник: <#F8BEFB><opponent>'
+      - '<#F8BEFB><bold>┃</bold> <white>Кит: <#F8BEFB><kit>'
+      - '<#F8BEFB><bold>┃</bold> <white>Карта: <#F8BEFB><arena>'
+      - '<#F8BEFB><bold>┃</bold> '
+      - '<#F8BEFB><bold>┃</bold> <white>Раунд: <#F8BEFB><round> <dark_gray>/ <best_of>'
+      - '<#F8BEFB><bold>┃</bold> <white>Счёт: <green><score> <dark_gray>: <red><opponent_score>'
+      - '<#F8BEFB><bold>┃</bold> <white>Время: <#F8BEFB><time>'
+  spectator:
+    enabled: true
+    title: '<#F8BEFB><bold>Наблюдение</bold>'
+    lines:
+      - '<#F8BEFB><bold>┃</bold> <white>Игроки: <#F8BEFB><opponent>'
+      - '<#F8BEFB><bold>┃</bold> <white>Кит: <#F8BEFB><kit>'
+      - '<#F8BEFB><bold>┃</bold> <white>Карта: <#F8BEFB><arena>'
+      - '<#F8BEFB><bold>┃</bold> <white>Счёт: <white><score> <dark_gray>: <opponent_score>'
+      - '<#F8BEFB><bold>┃</bold> <white>Время: <#F8BEFB><time>'
+  queue:
+    enabled: true
+    title: '<#F8BEFB><bold>Поиск соперника</bold>'
+    lines:
+      - '<#F8BEFB><bold>┃</bold> <white>Игрок: <#F8BEFB><player>'
+      - '<#F8BEFB><bold>┃</bold> <white>Кит: <#F8BEFB><kit>'
+      - '<#F8BEFB><bold>┃</bold> <white>Ищем соперника'

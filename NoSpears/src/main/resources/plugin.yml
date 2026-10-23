@@ -1,0 +1,15 @@
+name: NoSpears
+version: '1.1.0'
+main: ru.rooyzee.nospears.Main
+api-version: '1.21'
+author: Rooyzee
+description: Полностью убирает копья с сервера (крафт, лут, мобы, инвентари).
+commands:
+  nospears:
+    description: Убрать копья у игроков / перезагрузить конфиг
+    usage: /nospears [clean|reload]
+    permission: nospears.admin
+    permission-message: §cНет прав.
+permissions:
+  nospears.admin:
+    default: op

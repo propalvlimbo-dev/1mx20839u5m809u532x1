@@ -1,0 +1,76 @@
+name: §x§F§8§B§E§F§B« §x§F§8§B§E§F§BЗ§x§F§5§B§E§F§Bе§x§F§2§B§E§F§Bл§x§E§F§B§F§F§Bь§x§E§C§B§F§F§Bе
+  §x§E§9§B§F§F§BЛ§x§E§6§B§F§F§Bё§x§E§3§B§F§F§Bг§x§E§0§C§0§F§Bк§x§D§D§C§0§F§Bо§x§D§A§C§0§F§Bс§x§D§7§C§0§F§Bт§x§D§4§C§0§F§Bи
+  §x§F§8§B§E§F§B»
+lore: []
+material: POTION
+glow: false
+disableStack: false
+keepItemOnDeath: false
+canBeUsedOnlyByTheOwner: false
+cancelEventIfNotOwner: false
+onlyOwnerBlackListedActivators: []
+storeItemInfo: false
+unbreakable: false
+usage: 1
+usageLimit: -1
+cancelEventIfNoPerm: false
+disabledWorlds: []
+config_5: true
+config_update: true
+config_5_98: true
+usageFeatures:
+  usage: 1
+  isRefreshableClean: true
+  usageLimit: -1
+dropFeatures:
+  glowDrop: false
+  glowDropColor: WHITE
+  displayNameDrop: false
+enchantments: {}
+hiders:
+  hideEnchantments: false
+  hideUnbreakable: false
+  hideAttributes: false
+  hideUsage: true
+  hideDestroys: false
+  hidePlacedOn: false
+  hidePotionEffects: false
+giveFirstJoinFeatures:
+  giveFirstJoin: false
+  giveFirstJoinAmount: 1
+  giveFirstJoinSlot: 0
+restrictions:
+  locked-in-inventory: false
+cancelEventIfNoPermission: false
+whitelistedWorlds: []
+variables: {}
+activators: {}
+displayConditions:
+  playerConditions: {}
+  worldConditions: {}
+  itemConditions: {}
+  placeholdersConditions: {}
+  enableFeature: false
+attributes: {}
+keepDefaultAttributes: false
+ignoreKeepDefaultAttributesFeature: true
+potionFeatures:
+  potionColor: 13513912
+  potionType: WATER
+  potionExtended: false
+  potionUpgraded: false
+  potionEffects:
+    pEffect0:
+      isAmbient: false
+      duration: 900
+      potionEffectType: SPEED
+      amplifier: 2
+      hasParticles: true
+      hasIcon: true
+    pEffect1:
+      isAmbient: false
+      duration: 3600
+      potionEffectType: FAST_DIGGING
+      amplifier: 0
+      hasParticles: true
+      hasIcon: true

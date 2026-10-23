@@ -1,0 +1,258 @@
+# Converted from DeluxeMenus/gui_menus/shop/shari.yml; source kept unchanged.
+id: elytrix:shari
+provider: default
+type: chest
+size: 54
+title: '&#F8BEFB&lМагические шары'
+items:
+  donshar:
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzg0NzU3ZWM3MjYxMmVlYWMxOWNjYWY4MGIzMWM4NjFjNzkxZjI1ZDMyZGRhM2ZiMzdmNTUyMDU3NTVhMDQifX19
+    name: '&7« &#F8BEFBШар Повелителя &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &f+4 к урону'
+    - '&#F8BEFB&l┃ &f+3 к броне'
+    - '&#F8BEFB&l┃ &f+4 к здоровью'
+    - '&#F8BEFB&l┃ &cМинус: &#F8BEFB5% шанс обратного удара'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fПробуждение: &#F8BEFB25 убийств'
+    - '&#F8BEFB&l┃ &fПосле: &#F8BEFBСила II, Скорость II, Сопротивление I, Огнестойкость I'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB99 рублей'
+    - '&7● &fНажмите для получения ссылки'
+    on_click:
+    - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &fПриобрести предмет можно на сайте: &#F8BEFBelytrix.pw'
+    - '[close]'
+  shar1:
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTQ1ZmQyYzM3MzZhZjRiZDI4MTEyOTY2NjFlMGNiNDliYWIyY2ZhNjVmNWM5ZTU5OGFhNDNiZWJmYTFlYTM2OCJ9fX0=
+    name: '&7« &#F8BEFBШар Новичка &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &f+1 к урону'
+    - '&#F8BEFB&l┃ &f+2 к броне'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fПробуждение: &#F8BEFB5 убийств'
+    - '&#F8BEFB&l┃ &fПосле: &#F8BEFBСкорость I, Огнестойкость I'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB389 коинов'
+    - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&7● &fНажмите для покупки'
+    on_click:
+    - if: '%playerpoints_points% >= 389'
+      do:
+      - '[console] eitems give %player_name% shar1 1'
+      - '[console] p take %player_name% 389'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+  shar2:
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTFiNGIyMDE4OWQ5MDJiYzZjM2ZhYmUyM2Q5ZjU3ODY5N2Y1NDRjZjQxNTMxNzc4NzM3NDExODM5M2RhNCJ9fX0=
+    name: '&7« &#F8BEFBШар Змеи &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &f+1 к урону'
+    - '&#F8BEFB&l┃ &f+1 к броне'
+    - '&#F8BEFB&l┃ &f+2 к здоровью'
+    - '&#F8BEFB&l┃ &cМинус: &#F8BEFB5% шанс отравления после удара'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fПробуждение: &#F8BEFB10 убийств'
+    - '&#F8BEFB&l┃ &fПосле: &#F8BEFBСила I, Скорость I, Огнестойкость I'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB679 коинов'
+    - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&7● &fНажмите для покупки'
+    on_click:
+    - if: '%playerpoints_points% >= 679'
+      do:
+      - '[console] eitems give %player_name% shar2 1'
+      - '[console] p take %player_name% 679'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+  shar3:
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjg5MDQyMDgyYmI3YTc2MThiNzg0ZWU3NjA1YTEzNGM1ODgzNGUyMWUzNzRjODg4OTM3MTYxMDU3ZjZjNyJ9fX0=
+    name: '&7« &#F8BEFBШар Солнца &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &f+4 к урону'
+    - '&#F8BEFB&l┃ &c-2 к броне'
+    - '&#F8BEFB&l┃ &cМинус: &#F8BEFB10% шанс загореться после удара (сквозь огнестойкость)'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fПробуждение: &#F8BEFB15 убийств'
+    - '&#F8BEFB&l┃ &fПосле: &#F8BEFBСила I, Скорость II, Огнестойкость I'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB949 коинов'
+    - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&7● &fНажмите для покупки'
+    on_click:
+    - if: '%playerpoints_points% >= 949'
+      do:
+      - '[console] eitems give %player_name% shar3 1'
+      - '[console] p take %player_name% 949'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+  shar4:
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjVjNGQyNGFmZmRkNDgxMDI2MjAzNjE1MjdkMjE1NmUxOGMyMjNiYWU1MTg5YWM0Mzk4MTU2NDNmM2NmZjlkIn19fQ==
+    name: '&7« &#F8BEFBШар Шалкера &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &f+2 к урону'
+    - '&#F8BEFB&l┃ &f+3 к броне'
+    - '&#F8BEFB&l┃ &f+2 к здоровью'
+    - '&#F8BEFB&l┃ &c-30% скорости'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fПробуждение: &#F8BEFB20 убийств'
+    - '&#F8BEFB&l┃ &fПосле: &#F8BEFBСила II, Скорость II, Огнестойкость I'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB1379 коинов'
+    - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&7● &fНажмите для покупки'
+    on_click:
+    - if: '%playerpoints_points% >= 1379'
+      do:
+      - '[console] eitems give %player_name% shar4 1'
+      - '[console] p take %player_name% 1379'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+  info:
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0=
+    name: '&7« &#F8BEFBНаши сообщества &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fБудьте в курсе: &#F8BEFBВсех новостей'
+    - '&#F8BEFB&l┃ &fСвежие обновления: &#F8BEFBАнонсы'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для отправки ссылок в чат'
+    on_click:
+    - '[message]'
+    - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBСообщества'
+    - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+    - '[message] &#F8BEFB&l┃ &fTelegram канал: &#229ED9t.me/elytrix_ru'
+    - '[message] &#F8BEFB&l┃ &fDiscord сервер: &#5865F2dsc.gg/elytrix'
+    - '[message]'
+    - '[close]'
+  close:
+    material: black_dye
+    name: '&7« &#F8BEFBНазад &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fВернуться в предыдущее меню.'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для перехода'
+    on_click:
+    - '[open] elytrix:shop'
+  design_purple_panel:
+    material: purple_stained_glass_pane
+    name: '&r'
+  design_black_panel:
+    material: black_stained_glass_pane
+    name: '&r'
+
+# ---------------------------------------------------------------------------
+# Звук открытия — мягкий слой из sounds.json 1.21.4, без резких кликов:
+#   1-й кадр — block.enchantment_table.use: тихий воздушный «вжух»;
+#   рамка    — block.note_block.chime через кадр, тон плавно растёт;
+#   кнопки   — block.note_block.pling на каждой кнопке, тон плавно растёт;
+#   финал    — block.amethyst_block.chime: аметистовый «дзинь».
+# Громкость 0.2–0.45, питч 0.85–1.5: звуки почти не перекрываются и не
+# «пищат». Чтобы сделать тише/громче — правьте 2-е число у sound.
+# ---------------------------------------------------------------------------
+animation:
+  - tick: 0
+    opcodes:
+      - st: close 45
+      - st: info 49
+      - st: design_purple_panel 46,47
+      - sound: 'block.enchantment_table.use 0.3 1.5'
+  - opcodes:
+      - st: design_purple_panel 48,50
+      - sound: 'block.note_block.chime 0.2 0.85'
+  - opcodes:
+      - st: design_purple_panel 51,52
+  - opcodes:
+      - st: design_purple_panel 53,36
+      - sound: 'block.note_block.chime 0.22 0.91'
+  - opcodes:
+      - st: design_purple_panel 37,43
+  - opcodes:
+      - st: design_purple_panel 44,27
+      - sound: 'block.note_block.chime 0.23 0.98'
+  - opcodes:
+      - st: design_purple_panel 35
+  - opcodes:
+      - st: design_black_panel 18,9
+      - sound: 'block.note_block.chime 0.25 1.05'
+  - opcodes:
+      - st: design_black_panel 10,0
+  - opcodes:
+      - st: design_black_panel 1,2
+      - sound: 'block.note_block.chime 0.27 1.13'
+  - opcodes:
+      - st: design_black_panel 3,4
+  - opcodes:
+      - st: design_black_panel 5,6
+      - sound: 'block.note_block.chime 0.28 1.21'
+  - opcodes:
+      - st: design_black_panel 7,8
+  - opcodes:
+      - st: design_black_panel 16,17
+      - sound: 'block.note_block.chime 0.3 1.3'
+  - opcodes:
+      - st: design_black_panel 26
+  - opcodes:
+      - st: shar1 20
+      - sound: 'block.note_block.pling 0.26 1.0'
+  - opcodes:
+      - st: shar2 21
+      - sound: 'block.note_block.pling 0.29 1.14'
+  - opcodes:
+      - st: shar3 23
+      - sound: 'block.note_block.pling 0.31 1.31'
+  - opcodes:
+      - st: shar4 24
+      - sound: 'block.note_block.pling 0.34 1.5'
+  - opcodes:
+      - st: donshar 31
+      - sound: 'block.amethyst_block.chime 0.45 1.4'

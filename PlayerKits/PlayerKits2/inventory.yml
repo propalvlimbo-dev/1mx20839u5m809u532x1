@@ -1,0 +1,90 @@
+inventories:
+  main_inventory:
+    slots: 54
+    title: '#F8BEFB&lНаборы'
+    0-10;16-18;26:
+      item:
+        id: GRAY_STAINED_GLASS_PANE
+        name: ' '
+    27;35-37;43-48;50-53:
+      item:
+        id: PURPLE_STAINED_GLASS_PANE
+        name: ' '
+    '12':
+      type: 'kit: start'
+    '13':
+      type: 'kit: lite'
+    '14':
+      type: 'kit: prime'
+    '21':
+      type: 'kit: griefer'
+    '22':
+      type: 'kit: wither'
+    '23':
+      type: 'kit: immortal'
+    '30':
+      type: 'kit: dragon'
+    '31':
+      type: 'kit: elder'
+    '32':
+      type: 'kit: eternity'
+    '39':
+      type: 'kit: free'
+    '40':
+      type: 'kit: plus'
+    '41':
+      type: 'kit: custom'
+    '49':
+      item:
+        id: PAPER
+        name: '#F8BEFBКак это работает'
+        lore:
+          - '#F8BEFB&l┃ '
+          - '#F8BEFB&l┃ &fЛКМ &7— &fвзять набор'
+          - '#F8BEFB&l┃ &fПКМ &7— &fпосмотреть содержимое'
+          - '#F8BEFB&l┃ '
+          - '#F8BEFB&l┃ &fСтатус виден в лоре набора:'
+          - '#F8BEFB&l┃ &7● &aМожно получить'
+          - '#F8BEFB&l┃ &7● &eПерезарядка'
+          - '#F8BEFB&l┃ &7● &cНет доступа'
+          - '#F8BEFB&l┃ '
+          - '&7● &fОткрыть меню наборов: &f/kit'
+      click_actions:
+        - 'playsound: ITEM_BOOK_PAGE_TURN;1;1.2'
+  preview_inventory:
+    slots: 54
+    title: '#F8BEFB&lПросмотр набора'
+    45-48;50-53:
+      item:
+        id: PURPLE_STAINED_GLASS_PANE
+        name: ' '
+    '49':
+      item:
+        id: BLACK_DYE
+        name: '&7« #F8BEFBНазад &7»'
+        lore:
+          - '#F8BEFB&l┃ '
+          - '#F8BEFB&l┃ &fВернуться к списку наборов'
+          - '#F8BEFB&l┃ '
+      click_actions:
+        - 'playsound: UI_BUTTON_CLICK;1;1.4'
+      open_inventory: previous
+  buy_requirements_inventory:
+    slots: 27
+    title: '#F8BEFB&lПокупка набора'
+    '13':
+      item:
+        id: PAPER
+        name: '#F8BEFBУсловия'
+        lore:
+          - '%kit_requirements_message%'
+    '11':
+      item:
+        id: RED_STAINED_GLASS_PANE
+        name: '#F8BEFBОтмена'
+      type: buy_no
+    '15':
+      item:
+        id: LIME_STAINED_GLASS_PANE
+        name: '#F8BEFBКупить'
+      type: buy_yes

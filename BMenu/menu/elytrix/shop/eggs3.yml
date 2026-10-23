@@ -1,0 +1,568 @@
+# Магазин: яйца призыва, страница 3 из 3.
+id: elytrix:eggs3
+provider: default
+type: chest
+size: 54
+title: '&#F8BEFB&lЯйца призыва &7(3/3)'
+items:
+  phantom:
+    material: phantom_spawn_egg
+    name: '&7« &#F8BEFBЯйцо фантома &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB599 коинов'
+    - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    amount: 1
+    item_flags:
+    - hide_additional_tooltip
+    on_click:
+    - if: '%playerpoints_points% >= 599'
+      do:
+      - '[console] minecraft:give %player_name% minecraft:phantom_spawn_egg'
+      - '[console] p take %player_name% 599'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+  hoglin:
+    material: hoglin_spawn_egg
+    name: '&7« &#F8BEFBЯйцо хоглина &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB799 коинов'
+    - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    amount: 1
+    item_flags:
+    - hide_additional_tooltip
+    on_click:
+    - if: '%playerpoints_points% >= 799'
+      do:
+      - '[console] minecraft:give %player_name% minecraft:hoglin_spawn_egg'
+      - '[console] p take %player_name% 799'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+  zoglin:
+    material: zoglin_spawn_egg
+    name: '&7« &#F8BEFBЯйцо зоглина &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB849 коинов'
+    - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    amount: 1
+    item_flags:
+    - hide_additional_tooltip
+    on_click:
+    - if: '%playerpoints_points% >= 849'
+      do:
+      - '[console] minecraft:give %player_name% minecraft:zoglin_spawn_egg'
+      - '[console] p take %player_name% 849'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+  vex:
+    material: vex_spawn_egg
+    name: '&7« &#F8BEFBЯйцо векса &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB899 коинов'
+    - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    amount: 1
+    item_flags:
+    - hide_additional_tooltip
+    on_click:
+    - if: '%playerpoints_points% >= 899'
+      do:
+      - '[console] minecraft:give %player_name% minecraft:vex_spawn_egg'
+      - '[console] p take %player_name% 899'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+  vindicator:
+    material: vindicator_spawn_egg
+    name: '&7« &#F8BEFBЯйцо поборника &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB1049 коинов'
+    - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    amount: 1
+    item_flags:
+    - hide_additional_tooltip
+    on_click:
+    - if: '%playerpoints_points% >= 1049'
+      do:
+      - '[console] minecraft:give %player_name% minecraft:vindicator_spawn_egg'
+      - '[console] p take %player_name% 1049'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+  evoker:
+    material: evoker_spawn_egg
+    name: '&7« &#F8BEFBЯйцо заклинателя &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB1099 коинов'
+    - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    amount: 1
+    item_flags:
+    - hide_additional_tooltip
+    on_click:
+    - if: '%playerpoints_points% >= 1099'
+      do:
+      - '[console] minecraft:give %player_name% minecraft:evoker_spawn_egg'
+      - '[console] p take %player_name% 1099'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+  allay:
+    material: allay_spawn_egg
+    name: '&7« &#F8BEFBЯйцо аллея &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB1299 коинов'
+    - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    amount: 1
+    item_flags:
+    - hide_additional_tooltip
+    on_click:
+    - if: '%playerpoints_points% >= 1299'
+      do:
+      - '[console] minecraft:give %player_name% minecraft:allay_spawn_egg'
+      - '[console] p take %player_name% 1299'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+  piglin_brute:
+    material: piglin_brute_spawn_egg
+    name: '&7« &#F8BEFBЯйцо брутального пиглина &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB1299 коинов'
+    - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    amount: 1
+    item_flags:
+    - hide_additional_tooltip
+    on_click:
+    - if: '%playerpoints_points% >= 1299'
+      do:
+      - '[console] minecraft:give %player_name% minecraft:piglin_brute_spawn_egg'
+      - '[console] p take %player_name% 1299'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+  snow_golem:
+    material: snow_golem_spawn_egg
+    name: '&7« &#F8BEFBЯйцо снежного голема &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB1399 коинов'
+    - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    amount: 1
+    item_flags:
+    - hide_additional_tooltip
+    on_click:
+    - if: '%playerpoints_points% >= 1399'
+      do:
+      - '[console] minecraft:give %player_name% minecraft:snow_golem_spawn_egg'
+      - '[console] p take %player_name% 1399'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+  iron_golem:
+    material: iron_golem_spawn_egg
+    name: '&7« &#F8BEFBЯйцо железного голема &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB1499 коинов'
+    - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    amount: 1
+    item_flags:
+    - hide_additional_tooltip
+    on_click:
+    - if: '%playerpoints_points% >= 1499'
+      do:
+      - '[console] minecraft:give %player_name% minecraft:iron_golem_spawn_egg'
+      - '[console] p take %player_name% 1499'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+  breeze:
+    material: breeze_spawn_egg
+    name: '&7« &#F8BEFBЯйцо бриза &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB1599 коинов'
+    - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    amount: 1
+    item_flags:
+    - hide_additional_tooltip
+    on_click:
+    - if: '%playerpoints_points% >= 1599'
+      do:
+      - '[console] minecraft:give %player_name% minecraft:breeze_spawn_egg'
+      - '[console] p take %player_name% 1599'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+  ravager:
+    material: ravager_spawn_egg
+    name: '&7« &#F8BEFBЯйцо опустошителя &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB1899 коинов'
+    - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    amount: 1
+    item_flags:
+    - hide_additional_tooltip
+    on_click:
+    - if: '%playerpoints_points% >= 1899'
+      do:
+      - '[console] minecraft:give %player_name% minecraft:ravager_spawn_egg'
+      - '[console] p take %player_name% 1899'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+  elder_guardian:
+    material: elder_guardian_spawn_egg
+    name: '&7« &#F8BEFBЯйцо древнего стража &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB1999 коинов'
+    - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    amount: 1
+    item_flags:
+    - hide_additional_tooltip
+    on_click:
+    - if: '%playerpoints_points% >= 1999'
+      do:
+      - '[console] minecraft:give %player_name% minecraft:elder_guardian_spawn_egg'
+      - '[console] p take %player_name% 1999'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+  warden:
+    material: warden_spawn_egg
+    name: '&7« &#F8BEFBЯйцо вардена &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fСтоимость: &#F8BEFB2999 коинов'
+    - '&#F8BEFB&l┃ &fВаш баланс: &#F8BEFB%playerpoints_points% коинов'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для покупки'
+    amount: 1
+    item_flags:
+    - hide_additional_tooltip
+    on_click:
+    - if: '%playerpoints_points% >= 2999'
+      do:
+      - '[console] minecraft:give %player_name% minecraft:warden_spawn_egg'
+      - '[console] p take %player_name% 2999'
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
+      - '[message] &#F8BEFB&l┃ &fТранзакция прошла &aуспешно!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+      else:
+      - '[message]'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &cОшибка'
+      - '[message] &#F8BEFB&l┃ &fУ вас &cнедостаточно &fкоинов!'
+      - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+      - '[message]'
+      - '[update]'
+  info:
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0=
+    name: '&7« &#F8BEFBНаши сообщества &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fБудьте в курсе: &#F8BEFBВсех новостей'
+    - '&#F8BEFB&l┃ &fСвежие обновления: &#F8BEFBАнонсы'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для отправки ссылок в чат'
+    on_click:
+    - '[message]'
+    - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBСообщества'
+    - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+    - '[message] &#F8BEFB&l┃ &fTelegram канал: &#229ED9t.me/elytrix_ru'
+    - '[message] &#F8BEFB&l┃ &fDiscord сервер: &#5865F2dsc.gg/elytrix'
+    - '[message]'
+    - '[close]'
+  close:
+    material: black_dye
+    name: '&7« &#F8BEFBНазад &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fВернуться в предыдущее меню.'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для перехода'
+    on_click:
+    - '[open] elytrix:shop'
+  prev:
+    material: black_dye
+    name: '&7« &#F8BEFBПредыдущая страница &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fПерелистнуть раздел назад.'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для перехода'
+    on_click:
+    - '[open] elytrix:eggs2'
+  design_purple_panel:
+    material: purple_stained_glass_pane
+    name: '&r'
+  design_black_panel:
+    material: black_stained_glass_pane
+    name: '&r'
+
+animation:
+  - tick: 0
+    opcodes:
+      - st: close 45
+      - st: info 49
+      - st: design_purple_panel 46,47
+      - sound: 'block.enchantment_table.use 0.3 1.5'
+      - st: prev 48
+      - st: design_purple_panel 50
+  - opcodes:
+      - st: design_purple_panel 51,52
+      - sound: 'block.note_block.chime 0.2 0.85'
+  - opcodes:
+      - st: design_purple_panel 53,44
+      - sound: 'block.note_block.chime 0.22 0.91'
+  - opcodes:
+      - st: design_purple_panel 36,37
+  - opcodes:
+      - st: design_purple_panel 38,39
+      - sound: 'block.note_block.chime 0.24 0.98'
+  - opcodes:
+      - st: design_purple_panel 40,41
+  - opcodes:
+      - st: design_purple_panel 42,43
+      - sound: 'block.note_block.chime 0.26 1.05'
+  - opcodes:
+      - st: design_black_panel 27,28
+  - opcodes:
+      - st: design_black_panel 29,30
+      - sound: 'block.note_block.chime 0.28 1.13'
+  - opcodes:
+      - st: design_black_panel 31,32
+  - opcodes:
+      - st: design_black_panel 33,34
+      - sound: 'block.note_block.chime 0.3 1.21'
+  - opcodes:
+      - st: design_black_panel 35,26
+  - opcodes:
+      - st: design_black_panel 18,17,9
+      - sound: 'block.note_block.chime 0.31 1.29'
+  - opcodes:
+      - st: design_black_panel 0,1
+      - sound: 'block.note_block.pling 0.26 1.0'
+  - opcodes:
+      - st: design_black_panel 2,3
+      - sound: 'block.note_block.pling 0.27 1.05'
+  - opcodes:
+      - st: design_black_panel 4,5
+      - sound: 'block.note_block.pling 0.28 1.11'
+  - opcodes:
+      - st: design_black_panel 6,7
+      - sound: 'block.note_block.pling 0.29 1.17'
+  - opcodes:
+      - st: design_black_panel 8
+      - sound: 'block.note_block.pling 0.3 1.23'
+  - opcodes:
+      - st: phantom 10
+      - sound: 'block.note_block.pling 0.26 1.00'
+  - opcodes:
+      - st: hoglin 11
+      - sound: 'block.note_block.pling 0.26 1.04'
+  - opcodes:
+      - st: zoglin 12
+      - sound: 'block.note_block.pling 0.26 1.08'
+  - opcodes:
+      - st: vex 13
+      - sound: 'block.note_block.pling 0.26 1.12'
+  - opcodes:
+      - st: vindicator 14
+      - sound: 'block.note_block.pling 0.26 1.16'
+  - opcodes:
+      - st: evoker 15
+      - sound: 'block.note_block.pling 0.26 1.20'
+  - opcodes:
+      - st: allay 16
+      - sound: 'block.note_block.pling 0.26 1.24'
+  - opcodes:
+      - st: piglin_brute 19
+      - sound: 'block.note_block.pling 0.26 1.28'
+  - opcodes:
+      - st: snow_golem 20
+      - sound: 'block.note_block.pling 0.26 1.32'
+  - opcodes:
+      - st: iron_golem 21
+      - sound: 'block.note_block.pling 0.26 1.36'
+  - opcodes:
+      - st: breeze 22
+      - sound: 'block.note_block.pling 0.26 1.40'
+  - opcodes:
+      - st: ravager 23
+      - sound: 'block.note_block.pling 0.26 1.44'
+  - opcodes:
+      - st: elder_guardian 24
+      - sound: 'block.note_block.pling 0.26 1.48'
+  - opcodes:
+      - st: warden 25
+      - sound: 'block.amethyst_block.chime 0.45 1.4'

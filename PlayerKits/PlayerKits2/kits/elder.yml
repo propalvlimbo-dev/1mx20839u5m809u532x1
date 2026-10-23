@@ -1,0 +1,242 @@
+cooldown: 86400
+permission_required: true
+auto_armor: true
+items:
+  1:
+    id: NETHERITE_SWORD
+    enchants:
+      - FIRE_ASPECT;2
+      - LOOTING;3
+      - SHARPNESS;5
+      - UNBREAKING;3
+    preview_slot: 0
+  2:
+    id: NETHERITE_PICKAXE
+    enchants:
+      - EFFICIENCY;5
+      - FORTUNE;3
+      - UNBREAKING;3
+    preview_slot: 1
+  3:
+    id: NETHERITE_AXE
+    enchants:
+      - EFFICIENCY;5
+      - UNBREAKING;3
+    preview_slot: 2
+  4:
+    id: NETHERITE_SHOVEL
+    enchants:
+      - EFFICIENCY;5
+      - FORTUNE;3
+      - UNBREAKING;3
+    preview_slot: 3
+  5:
+    id: BOW
+    enchants:
+      - FLAME;1
+      - MENDING;1
+      - POWER;5
+      - UNBREAKING;3
+    preview_slot: 4
+  6:
+    id: GOLDEN_APPLE
+    amount: 64
+    preview_slot: 5
+  7:
+    id: ENCHANTED_GOLDEN_APPLE
+    preview_slot: 6
+  8:
+    id: GOLDEN_CARROT
+    amount: 64
+    preview_slot: 7
+  9:
+    id: PLAYER_HEAD
+    name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BШ&x&F&4&B&E&F&Bа&x&F&0&B&F&F&Bр &x&E&C&B&F&F&BЗ&x&E&8&B&F&F&Bм&x&E&4&B&F&F&Bе&x&E&0&C&0&F&Bи &x&F&8&B&E&F&B»'
+    lore:
+      - '&x&F&8&B&E&F&B&l┃ '
+      - '&x&F&8&B&E&F&B&l┃ &fЭффект: &x&F&8&B&E&F&BСила II'
+      - '&x&F&8&B&E&F&B&l┃ &fЭффект: &x&F&8&B&E&F&BСкорость I'
+      - '&x&F&8&B&E&F&B&l┃ &fЭффект: &x&F&8&B&E&F&BСопротивление I'
+      - '&x&F&8&B&E&F&B&l┃ &fЭффект: &x&F&8&B&E&F&BОгнестойкость I'
+      - '&x&F&8&B&E&F&B&l┃ '
+    skull_data:
+      texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTFiNGIyMDE4OWQ5MDJiYzZjM2ZhYmUyM2Q5ZjU3ODY5N2Y1NDRjZjQxNTMxNzc4NzM3NDExODM5M2RhNCJ9fX0=
+    preview_slot: 8
+  10:
+    id: TOTEM_OF_UNDYING
+    name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BТ&x&F&4&B&E&F&Bо&x&F&0&B&F&F&Bт&x&E&C&B&F&F&Bе&x&E&8&B&F&F&Bм &x&E&4&B&F&F&Bд&x&E&0&C&0&F&Bо&x&D&C&C&0&F&Bк&x&D&8&C&0&F&Bт&x&D&4&C&0&F&Bо&x&D&0&C&0&F&Bр&x&C&C&C&1&F&Bа &x&F&8&B&E&F&B»'
+    lore:
+      - '&x&F&8&B&E&F&B&l┃ '
+      - '&x&F&8&B&E&F&B&l┃ &fУсловие: &x&F&8&B&E&F&BВ левой руке'
+      - '&x&F&8&B&E&F&B&l┃ &fБонус: &x&F&8&B&E&F&B+4 к макс. здоровью'
+      - '&x&F&8&B&E&F&B&l┃ '
+    enchants:
+      - FEATHER_FALLING;6
+    item_flags:
+      - HIDE_ENCHANTS
+      - HIDE_ATTRIBUTES
+    attributes:
+      - MAX_HEALTH;ADD_NUMBER;4.0;elytrix:max_health;offhand
+    preview_slot: 9
+  11:
+    id: TOTEM_OF_UNDYING
+    name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BТ&x&F&4&B&E&F&Bо&x&F&0&B&F&F&Bт&x&E&C&B&F&F&Bе&x&E&8&B&F&F&Bм &x&E&4&B&F&F&Bд&x&E&0&C&0&F&Bо&x&D&C&C&0&F&Bк&x&D&8&C&0&F&Bт&x&D&4&C&0&F&Bо&x&D&0&C&0&F&Bр&x&C&C&C&1&F&Bа &x&F&8&B&E&F&B»'
+    lore:
+      - '&x&F&8&B&E&F&B&l┃ '
+      - '&x&F&8&B&E&F&B&l┃ &fУсловие: &x&F&8&B&E&F&BВ левой руке'
+      - '&x&F&8&B&E&F&B&l┃ &fБонус: &x&F&8&B&E&F&B+4 к макс. здоровью'
+      - '&x&F&8&B&E&F&B&l┃ '
+    enchants:
+      - FEATHER_FALLING;6
+    item_flags:
+      - HIDE_ENCHANTS
+      - HIDE_ATTRIBUTES
+    attributes:
+      - MAX_HEALTH;ADD_NUMBER;4.0;elytrix:max_health;offhand
+    preview_slot: 10
+  12:
+    id: TOTEM_OF_UNDYING
+    preview_slot: 11
+  13:
+    id: TOTEM_OF_UNDYING
+    preview_slot: 12
+  14:
+    id: TOTEM_OF_UNDYING
+    preview_slot: 13
+  15:
+    id: TOTEM_OF_UNDYING
+    preview_slot: 14
+  16:
+    id: TOTEM_OF_UNDYING
+    preview_slot: 15
+  17:
+    id: ENDER_PEARL
+    amount: 16
+    preview_slot: 16
+  18:
+    id: ENDER_PEARL
+    amount: 16
+    preview_slot: 17
+  19:
+    id: OBSIDIAN
+    amount: 16
+    preview_slot: 18
+  20:
+    id: END_CRYSTAL
+    amount: 16
+    preview_slot: 19
+  21:
+    id: POTION
+    amount: 4
+    name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BЗ&x&F&4&B&E&F&Bе&x&F&0&B&F&F&Bл&x&E&C&B&F&F&Bь&x&E&8&B&F&F&Bе &x&E&4&B&F&F&BВ&x&E&0&C&0&F&Bо&x&D&C&C&0&F&Bй&x&D&8&C&0&F&Bн&x&D&4&C&0&F&Bы &x&F&8&B&E&F&B»'
+    potion_data:
+      type: WATER
+      upgraded: false
+      extended: false
+      effects:
+        - STRENGTH;1;1800
+        - SPEED;1;1800
+        - FIRE_RESISTANCE;0;9600
+      color: 13103616
+    preview_slot: 20
+  22:
+    id: SPIDER_SPAWN_EGG
+    preview_slot: 21
+  23:
+    id: FURNACE
+    name: '&x&F&8&B&E&F&B« &x&F&8&B&E&F&BБ&x&F&4&B&E&F&Bы&x&F&0&B&F&F&Bс&x&E&C&B&F&F&Bт&x&E&8&B&F&F&Bр&x&E&4&B&F&F&Bа&x&E&0&C&0&F&Bя &x&D&C&C&0&F&Bп&x&D&8&C&0&F&Bе&x&D&4&C&0&F&Bч&x&D&0&C&0&F&Bк&x&C&C&C&1&F&Bа &x&F&8&B&E&F&B»&5'
+    lore:
+      - '&x&F&8&B&E&F&B&l┃ '
+      - '&x&F&8&B&E&F&B&l┃ &fСкорость плавки: &x&F&8&B&E&F&BВ 2 раза быстрее'
+      - '&x&F&8&B&E&F&B&l┃ '
+    preview_slot: 22
+  24:
+    id: COOKED_BEEF
+    amount: 64
+    preview_slot: 23
+  25:
+    id: CHORUS_FRUIT
+    amount: 64
+    preview_slot: 24
+  26:
+    id: EXPERIENCE_BOTTLE
+    amount: 64
+    preview_slot: 25
+  27:
+    id: EXPERIENCE_BOTTLE
+    amount: 32
+    preview_slot: 26
+  28:
+    id: ARROW
+    amount: 64
+    preview_slot: 27
+  29:
+    id: NETHERITE_HELMET
+    enchants:
+      - FIRE_PROTECTION;2
+      - PROTECTION;4
+      - RESPIRATION;2
+      - UNBREAKING;3
+    preview_slot: 36
+  30:
+    id: NETHERITE_CHESTPLATE
+    enchants:
+      - FIRE_PROTECTION;3
+      - PROTECTION;4
+      - UNBREAKING;3
+    preview_slot: 37
+  31:
+    id: NETHERITE_LEGGINGS
+    enchants:
+      - FIRE_PROTECTION;3
+      - PROTECTION;4
+      - UNBREAKING;3
+    preview_slot: 38
+  32:
+    id: NETHERITE_BOOTS
+    enchants:
+      - FIRE_PROTECTION;2
+      - PROTECTION;4
+      - UNBREAKING;3
+    preview_slot: 39
+actions:
+  claim:
+    1:
+      action: 'title: 10;35;20;#F8BEFBНабор &fᴇʟᴅᴇʀ;&7получен'
+    2:
+      action: 'playsound: ENTITY_ELDER_GUARDIAN_CURSE;1;1.0'
+  error:
+    1:
+      action: 'playsound: BLOCK_NOTE_BLOCK_BASS;1;0.8'
+    2:
+      action: 'actionbar: &7Набор &cнедоступен;60'
+display:
+  default:
+    id: PURPLE_SHULKER_BOX
+    name: '&fНабор &x&A&C&7&2&F&F&lᴇ&x&A&F&7&4&F&F&lʟ&x&B&3&7&6&F&F&lᴅ&x&B&6&7&8&F&F&lᴇ&x&B&9&7&A&F&F&lʀ'
+    lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &aМожно получить'
+      - '#F8BEFB&l┃ &fПредметов: &f32'
+      - '#F8BEFB&l┃ &fПерезарядка: &f1 дн'
+      - '#F8BEFB&l┃ '
+      - '&7● &fВзять набор &7(ЛКМ)'
+      - '&7● &fПосмотреть набор &7(ПКМ)'
+  no_permission:
+    id: BARRIER
+    name: '&fНабор &x&A&C&7&2&F&F&lᴇ&x&A&F&7&4&F&F&lʟ&x&B&3&7&6&F&F&lᴅ&x&B&6&7&8&F&F&lᴇ&x&B&9&7&A&F&F&lʀ'
+    lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &cНет доступа'
+      - '#F8BEFB&l┃ &fПредметов: &f32'
+      - '#F8BEFB&l┃ '
+      - '&7● &fПосмотреть набор &7(ПКМ)'
+  cooldown:
+    id: PURPLE_SHULKER_BOX
+    name: '&fНабор &x&A&C&7&2&F&F&lᴇ&x&A&F&7&4&F&F&lʟ&x&B&3&7&6&F&F&lᴅ&x&B&6&7&8&F&F&lᴇ&x&B&9&7&A&F&F&lʀ'
+    lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &eПерезарядка'
+      - '#F8BEFB&l┃ &fОсталось: &f%time%'
+      - '#F8BEFB&l┃ '
+      - '&7● &fПосмотреть набор &7(ПКМ)'

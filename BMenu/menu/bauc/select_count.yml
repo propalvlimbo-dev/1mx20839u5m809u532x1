@@ -2,7 +2,7 @@ id: bauc:select_count
 provider: bauc:select_count
 type: hopper
 size: 5
-title: "Покупка предмета"
+title: '<#F8BEFB>☁ <white>Количество'
 
 args:
   on_accept_command: '[console] say bauc:select_count no command!'
@@ -10,36 +10,53 @@ args:
 show_item:
   slot: 2
   lore:
-    - ""
-    - "<b><u><#00D8FF>▍<reset><#D5DBDC> Продавец:<#00D8FF> {seller_name}"
-    - "<b><u><#00D8FF>▍<reset><#D5DBDC> Цена:<#00D8FF> {result_price}"
-    - "<b><#00D8FF>▍<reset><#D5DBDC> Цена за 1 ед.:<#00D8FF> {price_for_one}"
-    - ""
+    - '<#F8BEFB><b>┃</b> '
+    - '<#F8BEFB><b>┃</b> <white>Продавец: <#F8BEFB>{seller_name}'
+    - '<#F8BEFB><b>┃</b> <white>Итого: <#F8BEFB>{result_price}'
+    - '<#F8BEFB><b>┃</b> <white>За штуку: <#F8BEFB>{price_for_one}'
+    - '<#F8BEFB><b>┃</b> '
+    - '<gray>● <white>Нажмите, чтобы купить'
   on_click:
     - accept: ''
 
 items:
   sub1:
     slot: 0
-    name: "<#FF2222>▶ Уменьшить на 1 единиц"
-    material: red_concrete
+    name: '<red>−1'
+    lore:
+      - '<#F8BEFB><b>┃</b> '
+      - '<gray>● <white>Убрать одну единицу'
+    material: red_dye
     on_click:
+      - sound: 'ui.button.click 0.30 1.10'
       - sub: '1'
   sub10:
     slot: 1
-    name: "<#FF2222>▶ Уменьшить на 10 единиц"
-    material: red_concrete
+    name: '<red>−10'
+    lore:
+      - '<#F8BEFB><b>┃</b> '
+      - '<gray>● <white>Убрать десять единиц'
+    material: red_dye
     on_click:
+      - sound: 'ui.button.click 0.30 1.00'
       - sub: '10'
   add1:
     slot: 3
-    name: "<#05FB00>▶ Увеличить на 1 единиц"
-    material: lime_concrete
+    name: '<green>+1'
+    lore:
+      - '<#F8BEFB><b>┃</b> '
+      - '<gray>● <white>Добавить одну единицу'
+    material: lime_dye
     on_click:
+      - sound: 'ui.button.click 0.30 1.20'
       - add: '1'
   add10:
     slot: 4
-    name: "<#05FB00>▶ Увеличить на 10 единиц"
-    material: lime_concrete
+    name: '<green>+10'
+    lore:
+      - '<#F8BEFB><b>┃</b> '
+      - '<gray>● <white>Добавить десять единиц'
+    material: lime_dye
     on_click:
+      - sound: 'ui.button.click 0.30 1.30'
       - add: '10'

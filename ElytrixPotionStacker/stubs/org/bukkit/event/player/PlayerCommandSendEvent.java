@@ -1,0 +1,7 @@
+package org.bukkit.event.player;
+import java.util.Collection;
+import org.bukkit.entity.Player;
+public class PlayerCommandSendEvent extends org.bukkit.event.Event {
+    public Player getPlayer() { return null; }
+    public Collection<String> getCommands() { return null; }
+}

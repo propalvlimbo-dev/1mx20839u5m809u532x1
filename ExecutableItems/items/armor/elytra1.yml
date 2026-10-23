@@ -1,0 +1,47 @@
+name: §x§F§8§B§E§F§B« §x§F§8§B§E§F§BЭ§x§F§5§B§E§F§Bл§x§F§2§B§E§F§Bи§x§E§F§B§F§F§Bт§x§E§C§B§F§F§Bр§x§E§9§B§F§F§Bа §x§E§6§B§F§F§BБ§x§E§3§B§F§F§Bо§x§E§0§C§0§F§Bг§x§D§D§C§0§F§Bа§x§D§A§C§0§F§Bт§x§D§7§C§0§F§Bы§x§D§4§C§0§F§Bр§x§D§1§C§0§F§Bя §x§F§8§B§E§F§B»
+lore: []
+material: elytra
+glow: false
+disableStack: false
+keepItemOnDeath: false
+canBeUsedOnlyByTheOwner: false
+cancelEventIfNotOwner: false
+onlyOwnerBlackListedActivators: []
+storeItemInfo: false
+unbreakable: true
+usage: 0
+usageLimit: -1
+cancelEventIfNoPermission: false
+whitelistedWorlds: []
+recognitions: []
+keepDefaultAttributes: false
+ignoreKeepDefaultAttributesFeature: true
+config_5: true
+config_update: true
+dropFeatures:
+  glowDrop: false
+  glowDropColor: WHITE
+  displayNameDrop: false
+hiders:
+  hideEnchantments: false
+  hideUnbreakable: false
+  hideAttributes: false
+  hidePotionEffects: false
+  hideUsage: false
+  hideDestroys: false
+  hidePlacedOn: false
+enchantments:
+giveFirstJoinFeatures:
+  giveFirstJoin: false
+  giveFirstJoinAmount: 1
+  giveFirstJoinSlot: 0
+restrictions: {}
+variables: {}
+activators: {}
+displayConditions:
+  playerConditions: {}
+  worldConditions: {}
+  itemConditions: {}
+  placeholdersConditions: {}
+  enableFeature: false
+attributes:

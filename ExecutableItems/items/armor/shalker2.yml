@@ -1,0 +1,59 @@
+name: §x§F§8§B§E§F§B« §x§F§8§B§E§F§BН§x§F§5§B§E§F§Bа§x§F§2§B§E§F§Bг§x§E§F§B§F§F§Bр§x§E§C§B§F§F§Bу§x§E§9§B§F§F§Bд§x§E§6§B§F§F§Bн§x§E§3§B§F§F§Bи§x§E§0§C§0§F§Bк §x§D§D§C§0§F§Bш§x§D§A§C§0§F§Bа§x§D§7§C§0§F§Bл§x§D§4§C§0§F§Bк§x§D§1§C§0§F§Bе§x§C§E§C§0§F§Bр§x§C§B§C§1§F§Bа §x§F§8§B§E§F§B»
+lore: []
+material: NETHERITE_CHESTPLATE
+glow: false
+disableStack: false
+keepItemOnDeath: false
+canBeUsedOnlyByTheOwner: false
+cancelEventIfNotOwner: false
+onlyOwnerBlackListedActivators: []
+storeItemInfo: false
+unbreakable: false
+usage: 0
+usageLimit: -1
+cancelEventIfNoPermission: false
+whitelistedWorlds: []
+recognitions: []
+keepDefaultAttributes: false
+ignoreKeepDefaultAttributesFeature: true
+config_5: true
+config_update: true
+dropFeatures:
+  glowDrop: false
+  glowDropColor: WHITE
+  displayNameDrop: false
+hiders:
+  hideEnchantments: false
+  hideUnbreakable: false
+  hideAttributes: false
+  hidePotionEffects: false
+  hideUsage: false
+  hideDestroys: false
+  hidePlacedOn: false
+enchantments:
+  enchantment0:
+    enchantment: Blast_protection
+    level: 4
+  enchantment1:
+    enchantment: Mending
+    level: 1
+  enchantment2:
+    enchantment: Protection
+    level: 4
+  enchantment3:
+    enchantment: Unbreaking
+    level: 4
+giveFirstJoinFeatures:
+  giveFirstJoin: false
+  giveFirstJoinAmount: 1
+  giveFirstJoinSlot: 0
+restrictions: {}
+variables: {}
+activators: {}
+displayConditions:
+  playerConditions: {}
+  worldConditions: {}
+  itemConditions: {}
+  placeholdersConditions: {}
+  enableFeature: false
+attributes:

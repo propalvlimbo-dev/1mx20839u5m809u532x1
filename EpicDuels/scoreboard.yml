@@ -1,0 +1,50 @@
+enabled: true
+update-interval-ticks: 20
+views:
+  lobby:
+    enabled: false
+    title: '<#F8BEFB><bold>Дуэли</bold>'
+    lines:
+      - '<#F8BEFB><bold>┃</bold> <white>Игрок: <#F8BEFB><player>'
+  duel:
+    enabled: true
+    title: '<#F8BEFB><bold>Дуэли</bold>'
+    lines:
+      - ''
+      - '<#F8BEFB><bold>┃</bold> <white>Время боя: <#F8BEFB><time>'
+      - '<#F8BEFB><bold>┃</bold> <red>Запрещено выходить!'
+      - ''
+      - '<#F8BEFB><bold>┃</bold> <white>Противники:'
+      - '<#F8BEFB><bold>┃</bold> <gray>● <white><opponent>'
+      - ''
+      - '<#F8BEFB><bold>┃</bold> <white>Кит: <#F8BEFB><kit>'
+      - '<#F8BEFB><bold>┃</bold> <white>Раунд: <#F8BEFB><round> <dark_gray>/ <best_of>'
+      - '<#F8BEFB><bold>┃</bold> <white>Счёт: <green><score> <dark_gray>: <red><opponent_score>'
+      - ''
+      - '         <dark_gray><italic>elytrix.pw'
+  spectator:
+    enabled: true
+    title: '<#F8BEFB><bold>Дуэли</bold>'
+    lines:
+      - ''
+      - '<#F8BEFB><bold>┃</bold> <white>Время боя: <#F8BEFB><time>'
+      - ''
+      - '<#F8BEFB><bold>┃</bold> <white>Противники:'
+      - '<#F8BEFB><bold>┃</bold> <gray>● <white><opponent>'
+      - ''
+      - '<#F8BEFB><bold>┃</bold> <white>Кит: <#F8BEFB><kit>'
+      - '<#F8BEFB><bold>┃</bold> <white>Счёт: <white><score> <dark_gray>: <opponent_score>'
+  queue:
+    # поиск показываем внизу экрана, а не в сайдбаре: не перекрываем
+    # главное меню/баланс другого плагина
+    enabled: false
+    title: '<#F8BEFB><bold>Поиск боя</bold>'
+    lines:
+      - ''
+      - '<#F8BEFB><bold>┃</bold> <white>Игрок: <#F8BEFB><player>'
+      - '<#F8BEFB><bold>┃</bold> <white>Кит: <#F8BEFB><kit>'
+      - ''
+      - '<#F8BEFB><bold>┃</bold> <white>Ищем соперника'
+      - '<#F8BEFB><bold>┃</bold> <gray>Выйти: <white>/duel queue leave'
+      - ''
+      - '         <dark_gray><italic>elytrix.pw'

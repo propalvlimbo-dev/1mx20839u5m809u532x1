@@ -1,0 +1,34 @@
+receiveItem: ''
+fullInventory: '&8[&4Executable&7Items&8] &cВаш инвентарь полон, предмет &e%item%
+  &cбыл выброшен.'
+timeLeft: '&8[&4Executable&7Items&8] &cПодождите &e%time% &cперед использованием &6%activator%&c!'
+requirePermission: '&8[&4Executable&7Items&8] &cУ вас нет разрешения на использование
+  &e%item%&c!'
+giveMessage: '&8[&aExecutable&7Items&8] &aВы передали &e&n%player%&r &a%quantity%x
+  &e%item%'
+use: '&7&oОсталось использований: '
+noHit: '&8[&4Executable&7Items&8] &cНи один игрок не был поражен'
+noEntityHit: '&8[&4Executable&7Items&8] &cНи одна сущность не была поражена'
+cancelCraft: '&8[&4Executable&7Items&8] &cВы не можете создавать предметы с помощью
+  ExecutableItems!'
+pickupLimitMessage: '&8[&4Executable&7Items&8] &cУ вас не может быть больше %limit%
+  Выполняемых предметов!'
+disableWorld: '&8[&4Executable&7Items&8] &cВы не можете использовать &e%item%&c в
+  этом мире!'
+requiredEIFirstPart: '&4Необходимые Выполняемые предметы: '
+requiredEIQuantity: ' &cx &6'
+requiredEISeparator: '&c | '
+requiredItemsFirstPart: '&4Необходимые предметы: '
+requiredItemsQuantity: ' &cx &6'
+requiredItemsSeparator: '&c | '
+requiredLevel: '&8[&4Executable&7Items&8] &cДля использования этого предмета вам нужно
+  как минимум &6уровень &6&l%level%&c!'
+waitProjectile: '&cВы должны подождать, пока снаряд не попадет во что-то!'
+invalidOwner: '&8[&4Executable&7Items&8] &cЭтот предмет может использовать только
+  игрок, который является владельцем этого предмета!'
+errorUPDItem: '&7[&4Executable&7Items] &cВы'
+errorUPDActivator: '&8[&4Executable&7Items&8]&c Вы'
+customCommandDamageKillMessage: '%player% уничтожил %target% с помощью %item%'
+noOwner: '&cНет владельца'
+refreshValid: '&2&l[ExecutableItems] &aExecutableItem(s) &e%id% &ain the inventory
+  of player(s) &e%player% &ais/are correctly reset !'

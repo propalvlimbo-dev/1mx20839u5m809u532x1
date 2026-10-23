@@ -1,0 +1,4 @@
+package net.kyori.adventure.text;
+
+public interface BuildableComponent<C extends BuildableComponent<C, B>, B extends ComponentBuilder<C, B>> extends Component {
+}
