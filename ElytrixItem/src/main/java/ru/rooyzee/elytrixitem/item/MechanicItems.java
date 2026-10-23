@@ -43,26 +43,26 @@ public final class MechanicItems {
                 .awaken(PotionEffectType.FIRE_RESISTANCE, 1, "Огнестойкость"));
 
         registry.register(new RuneItem(plugin, "shar3", "Шар Солнца",
-                "b89042082bb7a7618b784ee7605a134c58834e21e374c888937161057f6c7", 20)
+                "b89042082bb7a7618b784ee7605a134c58834e21e374c888937161057f6c7", 15)
                 .stat(Attribute.ATTACK_DAMAGE, 4.0D, "к урону")
                 .stat(Attribute.ARMOR, -2.0D, "к броне")
-                .percent(Attribute.MOVEMENT_SPEED, -0.30D, "скорости")
+                .drawback(OffhandBonusItem.Drawback.fire(40, 0.10D))
                 .awaken(PotionEffectType.STRENGTH, 1, "Сила")
                 .awaken(PotionEffectType.SPEED, 2, "Скорость")
                 .awaken(PotionEffectType.FIRE_RESISTANCE, 1, "Огнестойкость"));
 
         registry.register(new RuneItem(plugin, "shar4", "Шар Шалкера",
-                "25c4d24affdd48102620361527d2156e18c223bae5189ac439815643f3cff9d", 35)
+                "25c4d24affdd48102620361527d2156e18c223bae5189ac439815643f3cff9d", 20)
                 .stat(Attribute.ATTACK_DAMAGE, 2.0D, "к урону")
                 .stat(Attribute.ARMOR, 3.0D, "к броне")
                 .stat(Attribute.MAX_HEALTH, 2.0D, "к здоровью")
-                .drawback(OffhandBonusItem.Drawback.fire(40, 0.10D))
+                .percent(Attribute.MOVEMENT_SPEED, -0.30D, "скорости")
                 .awaken(PotionEffectType.STRENGTH, 2, "Сила")
                 .awaken(PotionEffectType.SPEED, 2, "Скорость")
                 .awaken(PotionEffectType.FIRE_RESISTANCE, 1, "Огнестойкость"));
 
         registry.register(new RuneItem(plugin, "donshar", "Шар Повелителя",
-                "c84757ec72612eeac19ccaf80b31c861c791f25d32dda3fb37f55205755a04", 50)
+                "c84757ec72612eeac19ccaf80b31c861c791f25d32dda3fb37f55205755a04", 25)
                 .stat(Attribute.ATTACK_DAMAGE, 4.0D, "к урону")
                 .stat(Attribute.ARMOR, 3.0D, "к броне")
                 .stat(Attribute.MAX_HEALTH, 4.0D, "к здоровью")
