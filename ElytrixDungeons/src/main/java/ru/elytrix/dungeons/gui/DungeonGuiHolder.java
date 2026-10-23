@@ -2,38 +2,30 @@ package ru.elytrix.dungeons.gui;
 
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
+import ru.elytrix.dungeons.model.LootPoolType;
 
 public final class DungeonGuiHolder implements InventoryHolder {
 
     public enum Screen {
         PLAYER_OVERVIEW,
         ADMIN_BOARD,
-        LOOT_TIER_SELECT,
+        LOOT_POOL_SELECT,
         LOOT_POOL_EDITOR,
         TEMPLATE_SPAWNER
     }
 
     private final Screen screen;
-    private final int tier;
-    private final boolean rewardPool;
+    private final LootPoolType poolType;
     private Inventory inventory;
 
-    public DungeonGuiHolder(Screen screen, int tier, boolean rewardPool) {
+    public DungeonGuiHolder(Screen screen, LootPoolType poolType) {
         this.screen = screen;
-        this.tier = tier;
-        this.rewardPool = rewardPool;
+        this.poolType = poolType;
     }
 
     @Override
-    public Inventory getInventory() {
-        return inventory;
-    }
-
-    public void setInventory(Inventory inventory) {
-        this.inventory = inventory;
-    }
-
+    public Inventory getInventory() { return inventory; }
+    public void setInventory(Inventory inventory) { this.inventory = inventory; }
     public Screen getScreen() { return screen; }
-    public int getTier() { return tier; }
-    public boolean isRewardPool() { return rewardPool; }
+    public LootPoolType getPoolType() { return poolType; }
 }

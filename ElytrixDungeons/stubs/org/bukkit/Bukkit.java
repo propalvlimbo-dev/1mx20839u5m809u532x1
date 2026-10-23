@@ -17,6 +17,7 @@ public final class Bukkit {
     public static org.bukkit.block.data.BlockData createBlockData(String data) { return null; }
     public static BossBar createBossBar(String title, BarColor color, BarStyle style, BarFlag... flags) { return null; }
     public static PluginManager getPluginManager() { return null; }
+    public static org.bukkit.plugin.ServicesManager getServicesManager() { return null; }
     public static ConsoleCommandSender getConsoleSender() { return null; }
     public static BukkitScheduler getScheduler() { return null; }
     public static org.bukkit.profile.PlayerProfile createPlayerProfile(java.util.UUID uniqueId, String name) { return null; }

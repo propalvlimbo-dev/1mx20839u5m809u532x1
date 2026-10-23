@@ -83,7 +83,7 @@ public final class ElytrixDungeonsPlugin extends JavaPlugin {
         reloadConfig();
         reloadMessages();
         lootRegistry.load();
-        dungeonManager.loadTemplates();
+        dungeonManager.loadSchematics();
     }
 
     private void saveResourceIfMissing(String name) {
