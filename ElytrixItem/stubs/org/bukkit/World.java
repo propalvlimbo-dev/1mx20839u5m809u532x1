@@ -22,6 +22,8 @@ public interface World {
     void playSound(Location location, Sound sound, float volume, float pitch);
     void playSound(Location location, String sound, float volume, float pitch);
     void spawnParticle(org.bukkit.Particle particle, Location location, int count);
+    <T> void spawnParticle(org.bukkit.Particle particle, Location location, int count, T data);
+    <T> void spawnParticle(org.bukkit.Particle particle, Location location, int count, double offsetX, double offsetY, double offsetZ, T data);
     void spawnParticle(org.bukkit.Particle particle, Location location, int count, double offsetX, double offsetY, double offsetZ);
     void spawnParticle(org.bukkit.Particle particle, Location location, int count, double offsetX, double offsetY, double offsetZ, double extra);
     <T> void spawnParticle(org.bukkit.Particle particle, Location location, int count, double offsetX, double offsetY, double offsetZ, double extra, T data);

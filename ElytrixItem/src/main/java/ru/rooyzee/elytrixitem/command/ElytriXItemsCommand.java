@@ -1,6 +1,7 @@
 package ru.rooyzee.elytrixitem.command;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -9,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.StringUtil;
 import ru.rooyzee.elytrixitem.Main;
 import ru.rooyzee.elytrixitem.item.CustomItem;
+import ru.rooyzee.elytrixitem.item.impl.SpawnerAnimation;
 import ru.rooyzee.elytrixitem.util.ItemNameUtil;
 import ru.rooyzee.elytrixitem.util.ItemStackUtil;
 
@@ -52,6 +54,10 @@ public final class ElytriXItemsCommand implements TabExecutor {
 
         if (args[0].equalsIgnoreCase("menu")) {
             return handleMenu(sender, args);
+        }
+
+        if (args[0].equalsIgnoreCase("anim")) {
+            return handleAnim(sender, args);
         }
 
         plugin.getMessages().sendList(sender, "help");
@@ -133,6 +139,34 @@ public final class ElytriXItemsCommand implements TabExecutor {
         return true;
     }
 
+    private boolean handleAnim(CommandSender sender, String[] args) {
+        if (!(sender instanceof Player)) {
+            plugin.getMessages().send(sender, "only-player");
+            return true;
+        }
+
+        int animation = 1;
+        if (args.length >= 2) {
+            try {
+                animation = Integer.parseInt(args[1]);
+            } catch (NumberFormatException exception) {
+                animation = 0;
+            }
+        }
+
+        if (animation < 1 || animation > SpawnerAnimation.VARIANTS) {
+            plugin.getMessages().send(sender, "usage-anim");
+            return true;
+        }
+
+        Player player = (Player) sender;
+        Location eye = player.getEyeLocation();
+        Location target = eye.clone().add(eye.getDirection().normalize().multiply(2.5D));
+        SpawnerAnimation.play(plugin, target.getBlock().getLocation(), animation);
+        plugin.getMessages().send(sender, "anim-preview", "{n}", String.valueOf(animation));
+        return true;
+    }
+
     private boolean handleMenu(CommandSender sender, String[] args) {
         if (!(sender instanceof Player)) {
             plugin.getMessages().send(sender, "only-player");
@@ -161,7 +195,7 @@ public final class ElytriXItemsCommand implements TabExecutor {
         }
 
         if (args.length == 1) {
-            return partial(args[0], Arrays.asList("help", "reload", "give", "menu"));
+            return partial(args[0], Arrays.asList("help", "reload", "give", "menu", "anim"));
         }
 
         if (args[0].equalsIgnoreCase("give")) {
@@ -184,6 +218,10 @@ public final class ElytriXItemsCommand implements TabExecutor {
 
         if (args[0].equalsIgnoreCase("menu") && args.length == 2) {
             return partial(args[1], Arrays.asList("1"));
+        }
+
+        if (args[0].equalsIgnoreCase("anim") && args.length == 2) {
+            return partial(args[1], Arrays.asList("1", "2", "3"));
         }
 
         return Collections.emptyList();

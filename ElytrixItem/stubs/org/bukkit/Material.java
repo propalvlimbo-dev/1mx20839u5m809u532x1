@@ -2,6 +2,8 @@ package org.bukkit;
 
 public enum Material {
     SPAWNER,
+    POTION,
+    TIPPED_ARROW,
     NETHER_QUARTZ_ORE, NETHER_GOLD_ORE, LAPIS_ORE,
     AIR,
     ALLAY_SPAWN_EGG,
@@ -91,4 +93,5 @@ public enum Material {
     public float getHardness() { return 0F; }
     public boolean isItem() { return true; }
     public boolean isBlock() { return true; }
+    public org.bukkit.block.data.BlockData createBlockData() { return null; }
 }

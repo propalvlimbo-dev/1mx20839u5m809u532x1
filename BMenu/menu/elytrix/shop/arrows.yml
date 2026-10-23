@@ -24,7 +24,7 @@ items:
     - if: '%playerpoints_points% >= 599'
       do:
       - '[sound] block.chest.close'
-      - '[console] ei give %player_name% arrow1 8'
+      - '[console] eitems give %player_name% arrow1 8'
       - '[console] p take %player_name% 599'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
@@ -59,7 +59,7 @@ items:
     - if: '%playerpoints_points% >= 719'
       do:
       - '[sound] block.chest.close'
-      - '[console] ei give %player_name% arrow2 8'
+      - '[console] eitems give %player_name% arrow2 8'
       - '[console] p take %player_name% 719'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
@@ -94,7 +94,7 @@ items:
     - if: '%playerpoints_points% >= 459'
       do:
       - '[sound] block.chest.close'
-      - '[console] ei give %player_name% arrow3 8'
+      - '[console] eitems give %player_name% arrow3 8'
       - '[console] p take %player_name% 459'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
@@ -129,7 +129,7 @@ items:
     - if: '%playerpoints_points% >= 679'
       do:
       - '[sound] block.chest.close'
-      - '[console] ei give %player_name% arrow5 8'
+      - '[console] eitems give %player_name% arrow5 8'
       - '[console] p take %player_name% 679'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
@@ -163,7 +163,7 @@ items:
     - if: '%playerpoints_points% >= 559'
       do:
       - '[sound] block.chest.close'
-      - '[console] ei give %player_name% arrow_levit 8'
+      - '[console] eitems give %player_name% arrow_levit 8'
       - '[console] p take %player_name% 559'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'

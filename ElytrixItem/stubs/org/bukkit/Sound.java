@@ -15,4 +15,10 @@ public interface Sound {
     Sound BLOCK_STONE_BREAK = null;
     Sound ENTITY_ITEM_BREAK = null;
     Sound UI_BUTTON_CLICK = null;
+    Sound BLOCK_AMETHYST_BLOCK_BREAK = null;
+    Sound BLOCK_AMETHYST_CLUSTER_BREAK = null;
+    Sound BLOCK_RESPAWN_ANCHOR_DEPLETE = null;
+    Sound BLOCK_BEACON_DEACTIVATE = null;
+    Sound BLOCK_SOUL_SAND_BREAK = null;
+    Sound BLOCK_SOUL_SOIL_BREAK = null;
 }

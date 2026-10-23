@@ -58,10 +58,12 @@ public final class SplitPickaxeListener implements Listener {
         ItemStack drop = createSpawnerItem();
         World world = block.getWorld();
         Location center = block.getLocation().add(0.5D, 0.5D, 0.5D);
+        int animation = plugin.getSettings().getInt("split-pickaxe.animation", 1);
 
+        Location blockLocation = block.getLocation();
         block.setType(Material.AIR, false);
         world.dropItemNaturally(center, drop);
-        world.playSound(center, Sound.BLOCK_STONE_BREAK, 1.0F, 0.8F);
+        SpawnerAnimation.play(plugin, blockLocation, animation);
 
         breakTool(player, tool);
         world.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);

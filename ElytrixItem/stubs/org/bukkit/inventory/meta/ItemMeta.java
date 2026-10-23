@@ -32,5 +32,6 @@ public interface ItemMeta {
     void setCustomModelData(Integer data);
     Integer getCustomModelData();
     boolean addAttributeModifier(Attribute attribute, AttributeModifier modifier);
+    void setEnchantmentGlintOverride(Boolean override);
     Set<AttributeModifier> getAttributeModifiers(Attribute attribute);
 }

@@ -12,5 +12,15 @@ public class PotionEffectType {
     public static final PotionEffectType NIGHT_VISION = null;
     public static final PotionEffectType WEAKNESS = null;
     public static final PotionEffectType HEALTH_BOOST = null;
+    public static final PotionEffectType HASTE = null;
+    public static final PotionEffectType STRENGTH = null;
+    public static final PotionEffectType NAUSEA = null;
+    public static final PotionEffectType RESISTANCE = null;
+    public static final PotionEffectType HUNGER = null;
+    public static final PotionEffectType POISON = null;
+    public static final PotionEffectType BLINDNESS = null;
+    public static final PotionEffectType GLOWING = null;
+    public static final PotionEffectType LEVITATION = null;
+    public static final PotionEffectType LUCK = null;
     public String getName() { return ""; }
 }

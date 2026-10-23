@@ -19,7 +19,7 @@ items:
     on_click:
     - if: '%playerpoints_points% >= 689'
       do:
-      - '[console] ei give %player_name% totem1'
+      - '[console] eitems give %player_name% totem1 1'
       - '[console] p take %player_name% 689'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
@@ -48,7 +48,7 @@ items:
     on_click:
     - if: '%playerpoints_points% >= 479'
       do:
-      - '[console] ei give %player_name% totem2'
+      - '[console] eitems give %player_name% totem2 1'
       - '[console] p take %player_name% 479'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
@@ -77,7 +77,7 @@ items:
     on_click:
     - if: '%playerpoints_points% >= 549'
       do:
-      - '[console] ei give %player_name% totem3'
+      - '[console] eitems give %player_name% totem3 1'
       - '[console] p take %player_name% 549'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
@@ -107,7 +107,7 @@ items:
     on_click:
     - if: '%playerpoints_points% >= 1129'
       do:
-      - '[console] ei give %player_name% totem4'
+      - '[console] eitems give %player_name% totem4 1'
       - '[console] p take %player_name% 1129'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
@@ -138,7 +138,7 @@ items:
     on_click:
     - if: '%playerpoints_points% >= 2439'
       do:
-      - '[console] ei give %player_name% totem5'
+      - '[console] eitems give %player_name% totem5 1'
       - '[console] p take %player_name% 2439'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'

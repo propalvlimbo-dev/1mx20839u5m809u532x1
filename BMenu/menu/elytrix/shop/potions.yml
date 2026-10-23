@@ -23,7 +23,7 @@ items:
     on_click:
     - if: '%playerpoints_points% >= 299'
       do:
-      - '[console] ei give %player_name% potion_healt 1'
+      - '[console] eitems give %player_name% potion_healt 1'
       - '[console] p take %player_name% 299'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
@@ -56,7 +56,7 @@ items:
     on_click:
     - if: '%playerpoints_points% >= 359'
       do:
-      - '[console] ei give %player_name% potion_lightness 1'
+      - '[console] eitems give %player_name% potion_lightness 1'
       - '[console] p take %player_name% 359'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
@@ -91,7 +91,7 @@ items:
     on_click:
     - if: '%playerpoints_points% >= 499'
       do:
-      - '[console] ei give %player_name% potion_voina 3'
+      - '[console] eitems give %player_name% potion_voina 3'
       - '[console] p take %player_name% 499'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
@@ -125,7 +125,7 @@ items:
     on_click:
     - if: '%playerpoints_points% >= 229'
       do:
-      - '[console] ei give %player_name% potion_disappearances 1'
+      - '[console] eitems give %player_name% potion_disappearances 1'
       - '[console] p take %player_name% 229'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
@@ -159,7 +159,7 @@ items:
     on_click:
     - if: '%playerpoints_points% >= 199'
       do:
-      - '[console] ei give %player_name% potion_sportsmena 1'
+      - '[console] eitems give %player_name% potion_sportsmena 1'
       - '[console] p take %player_name% 199'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
@@ -192,7 +192,7 @@ items:
     on_click:
     - if: '%playerpoints_points% >= 159'
       do:
-      - '[console] ei give %player_name% potion_salvation 1'
+      - '[console] eitems give %player_name% potion_salvation 1'
       - '[console] p take %player_name% 159'
       - '[message]'
       - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &aУспешно'
