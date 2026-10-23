@@ -1,0 +1,166 @@
+package ru.elytrix.dungeons.model;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public final class DungeonTemplate {
+
+    private final String id;
+    private String displayName;
+    private DungeonCategory category;
+    private int tier;
+    private TrialType trialType;
+    private final int sizeX;
+    private final int sizeY;
+    private final int sizeZ;
+    private final List<String> palette = new ArrayList<>();
+    private final Map<String, Short> paletteIndex = new HashMap<>();
+    private final short[] grid;
+
+    private int[] entranceOffset;
+    private int[] altarOffset;
+    private final List<int[]> sealOffsets = new ArrayList<>();
+    private final List<int[]> explorerChestOffsets = new ArrayList<>();
+    private final List<int[]> rewardChestOffsets = new ArrayList<>();
+    private final List<int[]> mobSpawnOffsets = new ArrayList<>();
+
+    public DungeonTemplate(
+            String id,
+            String displayName,
+            DungeonCategory category,
+            int tier,
+            TrialType trialType,
+            int sizeX,
+            int sizeY,
+            int sizeZ
+    ) {
+        this.id = id;
+        this.displayName = displayName;
+        this.category = category;
+        this.tier = Math.max(1, Math.min(5, tier));
+        this.trialType = trialType;
+        this.sizeX = sizeX;
+        this.sizeY = sizeY;
+        this.sizeZ = sizeZ;
+        this.grid = new short[sizeX * sizeY * sizeZ];
+        paletteId("minecraft:air");
+        this.entranceOffset = new int[]{sizeX / 2, 1, Math.max(1, sizeZ - 3)};
+        this.altarOffset = new int[]{sizeX / 2, 1, sizeZ / 2};
+    }
+
+    public short paletteId(String blockDataString) {
+        Short existing = paletteIndex.get(blockDataString);
+        if (existing != null) {
+            return existing;
+        }
+        short idVal = (short) palette.size();
+        palette.add(blockDataString);
+        paletteIndex.put(blockDataString, idVal);
+        return idVal;
+    }
+
+    public boolean inBounds(int x, int y, int z) {
+        return x >= 0 && x < sizeX && y >= 0 && y < sizeY && z >= 0 && z < sizeZ;
+    }
+
+    public void setBlock(int x, int y, int z, String blockDataString) {
+        if (!inBounds(x, y, z)) {
+            return;
+        }
+        grid[(y * sizeZ + z) * sizeX + x] = paletteId(blockDataString);
+    }
+
+    public void fill(int x1, int y1, int z1, int x2, int y2, int z2, String blockDataString) {
+        short pid = paletteId(blockDataString);
+        int ax1 = Math.max(0, Math.min(x1, x2)), ax2 = Math.min(sizeX - 1, Math.max(x1, x2));
+        int ay1 = Math.max(0, Math.min(y1, y2)), ay2 = Math.min(sizeY - 1, Math.max(y1, y2));
+        int az1 = Math.max(0, Math.min(z1, z2)), az2 = Math.min(sizeZ - 1, Math.max(z1, z2));
+        for (int y = ay1; y <= ay2; y++) {
+            for (int z = az1; z <= az2; z++) {
+                int base = (y * sizeZ + z) * sizeX;
+                for (int x = ax1; x <= ax2; x++) {
+                    grid[base + x] = pid;
+                }
+            }
+        }
+    }
+
+    public String getBlock(int x, int y, int z) {
+        if (!inBounds(x, y, z)) {
+            return "minecraft:air";
+        }
+        int idx = grid[(y * sizeZ + z) * sizeX + x] & 0xFFFF;
+        return idx < palette.size() ? palette.get(idx) : "minecraft:air";
+    }
+
+    public String encodeRle() {
+        StringBuilder sb = new StringBuilder();
+        if (grid.length == 0) {
+            return "";
+        }
+        int current = grid[0] & 0xFFFF;
+        int count = 1;
+        for (int i = 1; i < grid.length; i++) {
+            int val = grid[i] & 0xFFFF;
+            if (val == current) {
+                count++;
+            } else {
+                if (sb.length() > 0) sb.append(',');
+                sb.append(current).append(':').append(count);
+                current = val;
+                count = 1;
+            }
+        }
+        if (sb.length() > 0) sb.append(',');
+        sb.append(current).append(':').append(count);
+        return sb.toString();
+    }
+
+    public void loadPaletteAndRle(List<String> loadedPalette, String rle) {
+        palette.clear();
+        paletteIndex.clear();
+        for (String entry : loadedPalette) {
+            paletteId(entry);
+        }
+        if (palette.isEmpty()) {
+            paletteId("minecraft:air");
+        }
+        if (rle == null || rle.isEmpty()) {
+            return;
+        }
+        int cursor = 0;
+        for (String part : rle.split(",")) {
+            int colon = part.indexOf(':');
+            if (colon <= 0) continue;
+            short pid = (short) Integer.parseInt(part.substring(0, colon));
+            int count = Integer.parseInt(part.substring(colon + 1));
+            for (int i = 0; i < count && cursor < grid.length; i++) {
+                grid[cursor++] = pid;
+            }
+        }
+    }
+
+    public String getId() { return id; }
+    public String getDisplayName() { return displayName; }
+    public void setDisplayName(String displayName) { this.displayName = displayName; }
+    public DungeonCategory getCategory() { return category; }
+    public void setCategory(DungeonCategory category) { this.category = category; }
+    public int getTier() { return tier; }
+    public void setTier(int tier) { this.tier = Math.max(1, Math.min(5, tier)); }
+    public TrialType getTrialType() { return trialType; }
+    public void setTrialType(TrialType trialType) { this.trialType = trialType; }
+    public int getSizeX() { return sizeX; }
+    public int getSizeY() { return sizeY; }
+    public int getSizeZ() { return sizeZ; }
+    public List<String> getPalette() { return palette; }
+    public int[] getEntranceOffset() { return entranceOffset; }
+    public void setEntranceOffset(int x, int y, int z) { this.entranceOffset = new int[]{x, y, z}; }
+    public int[] getAltarOffset() { return altarOffset; }
+    public void setAltarOffset(int x, int y, int z) { this.altarOffset = new int[]{x, y, z}; }
+    public List<int[]> getSealOffsets() { return sealOffsets; }
+    public List<int[]> getExplorerChestOffsets() { return explorerChestOffsets; }
+    public List<int[]> getRewardChestOffsets() { return rewardChestOffsets; }
+    public List<int[]> getMobSpawnOffsets() { return mobSpawnOffsets; }
+}

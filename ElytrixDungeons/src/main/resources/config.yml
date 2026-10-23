@@ -1,0 +1,71 @@
+config-version: 1
+
+world-settings:
+  world: "world"
+  center-x: 0
+  center-z: 0
+  # Граница мира 3000x3000 (±1500), отступ от края границы чтобы постройки целиком помещались внутри
+  half-size: 1420
+  spawn-exclusion-radius: 180
+  min-distance-between-dungeons: 320
+  sky-min-y: 148
+  sky-max-y: 182
+  underground-min-y: -26
+  underground-max-y: 6
+
+auto-spawn:
+  enabled: true
+  surface-count: 5
+  underground-count: 5
+  sky-count: 5
+  blocks-per-tick: 900
+
+regeneration:
+  # Каждые полдня (12 часов = 43200 секунд) данж полностью восстанавливает блоки, сундуки и испытание
+  interval-seconds: 43200
+  # false — данж обновляется на своём месте (защищён от привата); true — при каждом обновлении откатывает рельеф и ищет новое место
+  relocate-on-reset: false
+  broadcast-on-reset: true
+
+protection:
+  prevent-claims: true
+  claim-padding-blocks: 12
+  allow-block-break-and-place: true
+  allow-pvp: true
+  blocked-claim-commands:
+    - "rg claim"
+    - "rg create"
+    - "rg define"
+    - "region claim"
+    - "region create"
+    - "region define"
+    - "worldguard:rg claim"
+    - "worldguard:region claim"
+    - "claim"
+    - "ps"
+
+trials:
+  timeout-seconds: 210
+  capture-radius: 7.0
+  capture-required-seconds: 45
+  bossbar-radius: 34.0
+
+hologram:
+  enabled: true
+  line-width: 260
+  view-range: 0.75
+  ready-lines:
+    - "&#F8BEFB{name} &8[&7{stars}&8]"
+    - "&fИспытание: &aГотово &8(&7ПКМ по алтарю&8)"
+    - "&7Возобновление через: &#F8BEFB{timer}"
+  active-lines:
+    - "&#F8BEFB{name} &8[&cИспытание&8]"
+    - "{progress}"
+    - "&7Возобновление через: &#F8BEFB{timer}"
+  cleared-lines:
+    - "&#F8BEFB{name} &8[&7Зачищен&8]"
+    - "&fСундуки открыты &8┃ &7Ожидает обновления"
+    - "&7Возобновление через: &#F8BEFB{timer}"
+
+player-menu:
+  show-coordinates: false

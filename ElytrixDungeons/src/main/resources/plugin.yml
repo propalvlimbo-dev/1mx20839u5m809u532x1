@@ -1,0 +1,25 @@
+name: ElytrixDungeons
+version: 1.0.0
+main: ru.elytrix.dungeons.ElytrixDungeonsPlugin
+api-version: '1.21'
+author: ElytriX
+description: Custom surface, underground and sky dungeons with trials, anti-claim protection and 12h auto-regeneration
+softdepend:
+  - WorldGuard
+  - WorldEdit
+  - FastAsyncWorldEdit
+  - ElytrixVault
+  - ElytrixItem
+
+commands:
+  dungeons:
+    description: Меню данжей сервера
+    aliases: [dungeon, danzh]
+  edungeon:
+    description: Управление кастомными данжами ElytriX
+    aliases: [elytrixdungeons, edungeons]
+
+permissions:
+  elytrixdungeons.admin:
+    description: Полный доступ к управлению данжами и редактору лута
+    default: op
