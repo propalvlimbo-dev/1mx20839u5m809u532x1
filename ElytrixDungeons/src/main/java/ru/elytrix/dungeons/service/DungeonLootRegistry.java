@@ -91,7 +91,7 @@ public final class DungeonLootRegistry {
         try {
             yml.save(file);
         } catch (IOException ex) {
-            plugin.getLogger().severe("Failed to save loot.yml: " + ex.getMessage());
+            plugin.getLogger().severe("Не удалось сохранить loot.yml: " + ex.getMessage());
         }
     }
 

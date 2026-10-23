@@ -47,7 +47,6 @@ import ru.elytrix.dungeons.model.DungeonStatus;
 import ru.elytrix.dungeons.model.DungeonTemplate;
 import ru.elytrix.dungeons.model.LootPoolType;
 import ru.elytrix.dungeons.structure.SpongeSchematicCodec;
-import ru.elytrix.dungeons.structure.StarterSchemFactory;
 import ru.elytrix.dungeons.structure.TerrainSnapshotStore;
 import ru.elytrix.dungeons.structure.TerrainSnapshotStore.BlockRestoreDiff;
 import ru.elytrix.dungeons.util.TextUtil;
@@ -62,6 +61,9 @@ public final class DungeonManager {
         INVALID_ID,
         ID_ALREADY_EXISTS,
         MISSING_SCHEMATIC,
+        TEMPLATE_REQUIRED,
+        INVALID_TEMPLATE,
+        TEMPLATE_CATEGORY_MISMATCH,
         WORLD_NOT_FOUND,
         NO_SAFE_SPOT,
         SNAPSHOT_FAILED,
@@ -75,7 +77,7 @@ public final class DungeonManager {
     }
 
     private record BlockWrite(int x, int y, int z, BlockData data) {}
-    private record CreateRequest(DungeonCategory category, String dungeonId, int slotNumber, DungeonTemplate preferredTemplate) {}
+    private record CreateRequest(DungeonCategory category, String dungeonId, int slotNumber) {}
 
     private final ElytrixDungeonsPlugin plugin;
     private final File dungeonsFile;
@@ -83,11 +85,13 @@ public final class DungeonManager {
     private final TerrainSnapshotStore snapshotStore;
     private final SpotFinder spotFinder;
     private final NamespacedKey hologramPdc;
+    private final NamespacedKey containerHintPdc;
 
     private final Map<String, DungeonTemplate> templatesById = new LinkedHashMap<>();
     private final Map<DungeonCategory, List<DungeonTemplate>> templatesByCategory = new EnumMap<>(DungeonCategory.class);
     private final Map<String, DungeonInstance> dungeons = new LinkedHashMap<>();
     private final Map<BlockPosKey, String> protectedContainerIndex = new HashMap<>();
+    private final Map<UUID, String> houseMusicPlayers = new HashMap<>();
 
     private boolean hiddenFromWorld = false;
     private int pendingScanTotal = 0;
@@ -105,6 +109,7 @@ public final class DungeonManager {
         this.snapshotStore = new TerrainSnapshotStore(plugin.getDataFolder());
         this.spotFinder = new SpotFinder(plugin);
         this.hologramPdc = new NamespacedKey(plugin, "dungeon_hologram");
+        this.containerHintPdc = new NamespacedKey(plugin, "container_hint");
     }
 
     public File categorySchemDir(DungeonCategory cat) {
@@ -121,15 +126,12 @@ public final class DungeonManager {
         if (hadSaved) {
             // Re-place previously found dungeons onto their saved spots WITHOUT searching for new locations!
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                plugin.getLogger().info("Restoring " + dungeons.size() + " saved dungeons onto locked coordinates...");
                 for (DungeonInstance d : new ArrayList<>(dungeons.values())) {
                     enqueueJob(() -> restoreSavedDungeonOnStartup(d));
                 }
             }, 20L);
         } else if (plugin.getConfig().getBoolean("auto-spawn.startup-enabled", false)) {
             Bukkit.getScheduler().runTaskLater(plugin, this::ensureTargetDungeonCounts, 20L);
-        } else {
-            plugin.getLogger().info("No saved dungeons; first-run auto-placement is disabled. Use /elytrixdungeon create <surface|underground> to create dungeons one at a time.");
         }
     }
 
@@ -150,18 +152,19 @@ public final class DungeonManager {
             workerTask = null;
         }
         jobQueue.clear();
+        stopHouseMusic();
         plugin.getTrialController().shutdownAll();
         plugin.getGhostController().shutdownAll(dungeons.values());
         saveDungeons();
 
         if (plugin.getConfig().getBoolean("auto-spawn.hide-dungeons-on-disable", true) && !hiddenFromWorld) {
-            plugin.getLogger().info("Hiding " + dungeons.size() + " dungeons & restoring natural terrain (locations stay saved in dungeons.yml)...");
             for (DungeonInstance d : dungeons.values()) {
                 removeHologram(d);
+                removeContainerHolograms(d);
                 try {
                     snapshotStore.restoreWorldSnapshotInstant(d.getId());
                 } catch (IOException ex) {
-                    plugin.getLogger().warning("Could not restore snapshot on disable for " + d.getId() + ": " + ex.getMessage());
+                    plugin.getLogger().severe("Не удалось восстановить исходный рельеф для " + d.getId() + ": " + ex.getMessage());
                 }
             }
             hiddenFromWorld = true;
@@ -169,13 +172,16 @@ public final class DungeonManager {
     }
 
     public void hideAllDungeonsNow() {
+        stopHouseMusic();
         plugin.getTrialController().shutdownAll();
         plugin.getGhostController().shutdownAll(dungeons.values());
         for (DungeonInstance d : dungeons.values()) {
             removeHologram(d);
+            removeContainerHolograms(d);
             try {
                 snapshotStore.restoreWorldSnapshotInstant(d.getId());
-            } catch (IOException ignored) {
+            } catch (IOException ex) {
+                plugin.getLogger().severe("Не удалось восстановить исходный рельеф для " + d.getId() + ": " + ex.getMessage());
             }
         }
         hiddenFromWorld = true;
@@ -197,44 +203,23 @@ public final class DungeonManager {
 
     public void loadSchematics() {
         templatesById.clear();
-        for (DungeonCategory cat : DungeonCategory.values()) {
-            templatesByCategory.put(cat, new ArrayList<>());
-            File dir = categorySchemDir(cat);
-            if (plugin.getConfig().getBoolean("auto-spawn.write-starter-schems-if-empty", true) && !hasAnySchemFile(dir)) {
-                try {
-                    switch (cat) {
-                        case SURFACE -> StarterSchemFactory.writeStarterSurfacePair(dir);
-                        case UNDERGROUND -> StarterSchemFactory.writeStarterUndergroundPair(dir);
-                    }
-                } catch (IOException ex) {
-                    plugin.getLogger().warning("Failed writing starter .schem in " + dir + ": " + ex.getMessage());
-                }
-            }
-            File[] files = dir.listFiles();
+        for (DungeonCategory category : DungeonCategory.values()) {
+            templatesByCategory.put(category, new ArrayList<>());
+            File[] files = categorySchemDir(category).listFiles();
             if (files == null) continue;
             Arrays.sort(files, Comparator.comparing(f -> f.getName().toLowerCase(Locale.ROOT)));
-            for (File f : files) {
-                String n = f.getName().toLowerCase(Locale.ROOT);
-                if (!n.endsWith(".schem") && !n.endsWith(".schematic")) continue;
+            for (File file : files) {
+                String name = file.getName().toLowerCase(Locale.ROOT);
+                if (!name.endsWith(".schem") && !name.endsWith(".schematic")) continue;
                 try {
-                    DungeonTemplate tpl = SpongeSchematicCodec.readSchem(f, cat);
-                    templatesById.put(tpl.getId(), tpl);
-                    templatesByCategory.get(cat).add(tpl);
+                    DungeonTemplate template = SpongeSchematicCodec.readSchem(file, category);
+                    templatesById.put(template.getId(), template);
+                    templatesByCategory.get(category).add(template);
                 } catch (Exception ex) {
-                    plugin.getLogger().warning("Could not load .schem " + f.getName() + ": " + ex.getMessage());
+                    plugin.getLogger().severe("Не удалось загрузить схему " + file.getName() + ": " + ex.getMessage());
                 }
             }
         }
-    }
-
-    private static boolean hasAnySchemFile(File dir) {
-        File[] files = dir.listFiles();
-        if (files == null) return false;
-        for (File f : files) {
-            String n = f.getName().toLowerCase(Locale.ROOT);
-            if (n.endsWith(".schem") || n.endsWith(".schematic")) return true;
-        }
-        return false;
     }
 
     private boolean loadDungeonsFromDisk() {
@@ -311,7 +296,9 @@ public final class DungeonManager {
         if (!snapshotStore.hasSnapshot(inst.getId())) {
             try {
                 snapshotStore.saveWorldSnapshot(inst.getId(), w, inst.getSnapshotBounds());
-            } catch (IOException ignored) {
+            } catch (IOException ex) {
+                plugin.getLogger().severe("Не удалось сохранить исходный рельеф для " + inst.getId() + ": " + ex.getMessage());
+                return;
             }
         }
         DungeonStatus savedStatus = inst.getStatus();
@@ -353,7 +340,7 @@ public final class DungeonManager {
         try {
             yml.save(dungeonsFile);
         } catch (IOException ex) {
-            plugin.getLogger().severe("Failed to save dungeons.yml: " + ex.getMessage());
+            plugin.getLogger().severe("Не удалось сохранить dungeons.yml: " + ex.getMessage());
         }
     }
 
@@ -403,10 +390,8 @@ public final class DungeonManager {
     }
 
     /**
-     * Round-robin across sorted .schem files in the category folder:
-     * With 2 files (e.g. surface_1.schem, surface_2.schem) and targetCount = 7:
-     *   slots 0, 2, 4, 6 -> surface_1.schem (4 dungeons!)
-     *   slots 1, 3, 5    -> surface_2.schem (3 dungeons!)
+     * Round-robin across the administrator's sorted .schem files if mass placement is explicitly enabled.
+     * With two loaded templates and a target of seven, the first is used four times and the second three times.
      */
     private void scheduleCategory(World world, DungeonCategory cat, int targetCount) {
         targetCount = Math.min(MAX_DUNGEONS_PER_CATEGORY, Math.max(0, targetCount));
@@ -415,7 +400,6 @@ public final class DungeonManager {
         int need = Math.max(0, targetCount - have);
         if (available == null || available.isEmpty()) {
             pendingScanDone += need;
-            plugin.getLogger().warning("No .schem files in schematics/" + cat.name().toLowerCase(Locale.ROOT) + "/");
             return;
         }
         for (int i = 0; i < need; i++) {
@@ -448,8 +432,8 @@ public final class DungeonManager {
         return c;
     }
 
-    /** Creates exactly one dungeon through an explicit admin command; no first-start batch is needed. */
-    public CreateResult createDungeonFromCommand(String rawId) {
+    /** Creates one dungeon from the administrator's explicit category and loaded schematic selection. */
+    public CreateResult createDungeonFromCommand(String rawId, String rawTemplateId) {
         CreateRequest request = parseCreateRequest(rawId);
         if (request == null) {
             return new CreateResult(CreateStatus.INVALID_ID, null, null, 0);
@@ -471,9 +455,14 @@ public final class DungeonManager {
         if (available == null || available.isEmpty()) {
             return new CreateResult(CreateStatus.MISSING_SCHEMATIC, null, category, count);
         }
-        DungeonTemplate template = request.preferredTemplate();
+        if (rawTemplateId == null || rawTemplateId.isBlank()) {
+            return new CreateResult(CreateStatus.TEMPLATE_REQUIRED, null, category, count);
+        }
+        DungeonTemplate template = getTemplate(category, rawTemplateId);
         if (template == null) {
-            template = available.get((request.slotNumber() - 1) % available.size());
+            DungeonTemplate otherCategoryTemplate = getTemplate(rawTemplateId);
+            return new CreateResult(otherCategoryTemplate == null
+                    ? CreateStatus.INVALID_TEMPLATE : CreateStatus.TEMPLATE_CATEGORY_MISMATCH, null, category, count);
         }
 
         String worldName = plugin.getConfig().getString("world-settings.world", "world");
@@ -495,9 +484,6 @@ public final class DungeonManager {
         if (created == null) {
             return new CreateResult(CreateStatus.SNAPSHOT_FAILED, null, category, count);
         }
-
-        plugin.getLogger().info("Created " + created.getId() + " using " + template.getId()
-                + " at " + plan.origin().worldName() + " " + plan.origin().x() + ", " + plan.origin().y() + ", " + plan.origin().z());
         return new CreateResult(CreateStatus.CREATED, created, category, count + 1);
     }
 
@@ -505,40 +491,35 @@ public final class DungeonManager {
         if (rawId == null || rawId.isBlank()) return null;
         String input = rawId.trim().toLowerCase(Locale.ROOT);
 
-        if (input.equals("surface")) return nextCreateRequest(DungeonCategory.SURFACE, null);
-        if (input.equals("underground")) return nextCreateRequest(DungeonCategory.UNDERGROUND, null);
+        if (input.equals("surface")) return nextCreateRequest(DungeonCategory.SURFACE);
+        if (input.equals("underground")) return nextCreateRequest(DungeonCategory.UNDERGROUND);
 
         int separator = input.indexOf('_');
-        if (separator > 0) {
-            DungeonCategory category = parseCategory(input.substring(0, separator));
-            if (category != null) {
-                String suffix = input.substring(separator + 1);
-                if (suffix.isEmpty()) return null;
-                for (int i = 0; i < suffix.length(); i++) {
-                    if (!Character.isDigit(suffix.charAt(i))) return null;
-                }
-                int number;
-                try {
-                    number = Integer.parseInt(suffix);
-                } catch (NumberFormatException ex) {
-                    number = MAX_DUNGEONS_PER_CATEGORY + 1;
-                }
-                if (number < 1) return null;
-                String id = category.name().toLowerCase(Locale.ROOT) + "_" + number;
-                return new CreateRequest(category, id, number, null);
-            }
-        }
+        if (separator <= 0) return null;
+        DungeonCategory category = parseCategory(input.substring(0, separator));
+        if (category == null) return null;
 
-        DungeonTemplate template = getTemplate(input);
-        if (template != null) return nextCreateRequest(template.getCategory(), template);
-        return null;
+        String suffix = input.substring(separator + 1);
+        if (suffix.isEmpty()) return null;
+        for (int i = 0; i < suffix.length(); i++) {
+            if (!Character.isDigit(suffix.charAt(i))) return null;
+        }
+        int number;
+        try {
+            number = Integer.parseInt(suffix);
+        } catch (NumberFormatException ex) {
+            number = MAX_DUNGEONS_PER_CATEGORY + 1;
+        }
+        if (number < 1) return null;
+        String id = category.name().toLowerCase(Locale.ROOT) + "_" + number;
+        return new CreateRequest(category, id, number);
     }
 
-    private CreateRequest nextCreateRequest(DungeonCategory category, DungeonTemplate preferredTemplate) {
+    private CreateRequest nextCreateRequest(DungeonCategory category) {
         int number = nextAvailableDungeonNumber(category);
         if (number < 1) number = MAX_DUNGEONS_PER_CATEGORY + 1;
         String id = category.name().toLowerCase(Locale.ROOT) + "_" + number;
-        return new CreateRequest(category, id, number, preferredTemplate);
+        return new CreateRequest(category, id, number);
     }
 
     private int nextAvailableDungeonNumber(DungeonCategory category) {
@@ -561,23 +542,9 @@ public final class DungeonManager {
         pendingScanDone++;
         if (dungeons.containsKey(id) || countByCategory(tpl.getCategory()) >= MAX_DUNGEONS_PER_CATEGORY) return;
         SpotFinder.PlacementPlan plan = spotFinder.findPlacement(world, tpl, dungeons.values(), id);
-        if (plan == null) {
-            plugin.getLogger().warning("[" + pendingScanDone + "/" + pendingScanTotal + "] Could not find ideal spot for " + id);
-            return;
-        }
-        DungeonInstance created = placeDungeonWithSnapshot(
+        if (plan == null) return;
+        placeDungeonWithSnapshot(
                 id, tpl, plan.origin(), plan.structureBounds(), plan.snapshotBounds(), plan.surfaceY(), true);
-        if (created != null) {
-            String logMsg = "[" + pendingScanDone + "/" + Math.max(pendingScanDone, pendingScanTotal) + "] Найден идеальный участок для "
-                    + id + " (" + tpl.getId() + ") -> X: " + plan.origin().x()
-                    + ", Y: " + plan.origin().y() + ", Z: " + plan.origin().z();
-            plugin.getLogger().info(logMsg);
-            for (Player op : Bukkit.getOnlinePlayers()) {
-                if (op.hasPermission("elytrixdungeons.admin")) {
-                    op.sendMessage(plugin.prefix() + "§7" + logMsg);
-                }
-            }
-        }
     }
 
     public DungeonInstance manualSpawnHere(Player admin, DungeonTemplate tpl) {
@@ -634,7 +601,7 @@ public final class DungeonManager {
                 snapshotStore.saveWorldSnapshot(id, w, snapBounds);
             } catch (IOException ex) {
                 snapshotStore.deleteSnapshot(id);
-                plugin.getLogger().warning("Snapshot error for " + id + ": " + ex.getMessage());
+                plugin.getLogger().severe("Не удалось сохранить исходный рельеф для " + id + ": " + ex.getMessage());
                 return null;
             }
         }
@@ -691,6 +658,7 @@ public final class DungeonManager {
         }
         plugin.getTrialController().abortFight(inst.getId(), false);
         plugin.getGhostController().clearHouseGhosts(inst.getId());
+        removeContainerHolograms(inst);
         inst.setStatus(DungeonStatus.REGENERATING);
 
         boolean relocate = forceRelocate || plugin.getConfig().getBoolean("regeneration.relocate-on-reset", false);
@@ -726,12 +694,14 @@ public final class DungeonManager {
     }
 
     public boolean removeDungeon(String id, boolean restoreTerrain) {
-        DungeonInstance inst = dungeons.remove(id);
+        DungeonInstance inst = dungeons.get(id);
         if (inst == null) return false;
         plugin.getTrialController().abortFight(id, false);
         plugin.getGhostController().clearHouseGhosts(id);
+        dungeons.remove(id);
         protectedContainerIndex.entrySet().removeIf(e -> e.getValue().equals(id));
         removeHologram(inst);
+        removeContainerHolograms(inst);
         World w = inst.getOrigin().world();
         plugin.getWorldGuardHook().removeDungeonRegion(w, id);
         if (restoreTerrain) {
@@ -835,6 +805,8 @@ public final class DungeonManager {
 
     private void finalizeDungeonAfterPaste(World world, DungeonInstance inst) {
         inst.setStatus(DungeonStatus.READY);
+        inst.clearOpenedContainers();
+        removeContainerHolograms(inst);
 
         if (inst.getCategory() == DungeonCategory.SURFACE) {
             int chestStacks = plugin.getConfig().getInt("surface-dungeon.chest-stacks", 6);
@@ -873,6 +845,7 @@ public final class DungeonManager {
             }
         }
 
+        updateContainerHolograms(inst);
         Location safe = inst.teleportLocation();
         if (safe != null) {
             for (Player p : world.getPlayers()) {
@@ -887,12 +860,60 @@ public final class DungeonManager {
         updateDungeonHologram(inst);
     }
 
+    private void updateHouseMusic() {
+        if (!plugin.getConfig().getBoolean("surface-dungeon.ambience.enabled", true)) {
+            stopHouseMusic();
+            return;
+        }
+
+        float volume = (float) Math.max(0.0, plugin.getConfig().getDouble("surface-dungeon.ambience.volume", 0.55));
+        float pitch = (float) Math.max(0.5, plugin.getConfig().getDouble("surface-dungeon.ambience.pitch", 0.85));
+        Map<UUID, String> insideNow = new HashMap<>();
+
+        for (DungeonInstance house : dungeons.values()) {
+            if (house.getCategory() != DungeonCategory.SURFACE || house.getStatus() == DungeonStatus.REGENERATING) continue;
+            World world = house.getOrigin().world();
+            if (world == null) continue;
+            for (Player player : world.getPlayers()) {
+                UUID playerId = player.getUniqueId();
+                if (!house.getBounds().contains(player.getLocation()) || insideNow.containsKey(playerId)) continue;
+                insideNow.put(playerId, house.getId());
+                String previousHouse = houseMusicPlayers.get(playerId);
+                if (!house.getId().equals(previousHouse)) {
+                    if (previousHouse != null) player.stopSound(Sound.MUSIC_DISC_5);
+                    player.playSound(player.getLocation(), Sound.MUSIC_DISC_5, volume, pitch);
+                }
+            }
+        }
+
+        for (UUID playerId : new ArrayList<>(houseMusicPlayers.keySet())) {
+            if (!insideNow.containsKey(playerId)) {
+                Player player = Bukkit.getPlayer(playerId);
+                if (player != null) player.stopSound(Sound.MUSIC_DISC_5);
+            }
+        }
+        houseMusicPlayers.clear();
+        houseMusicPlayers.putAll(insideNow);
+    }
+
+    private void stopHouseMusic() {
+        for (UUID playerId : houseMusicPlayers.keySet()) {
+            Player player = Bukkit.getPlayer(playerId);
+            if (player != null) player.stopSound(Sound.MUSIC_DISC_5);
+        }
+        houseMusicPlayers.clear();
+    }
+
     private void startHeartbeat() {
         this.heartbeatTask = new BukkitRunnable() {
             @Override
             public void run() {
-                if (hiddenFromWorld) return;
+                if (hiddenFromWorld) {
+                    stopHouseMusic();
+                    return;
+                }
                 long now = System.currentTimeMillis();
+                updateHouseMusic();
                 plugin.getTrialController().tickOncePerSecond();
                 plugin.getGhostController().tickHousesOncePerSecond(dungeons.values());
 
@@ -934,6 +955,7 @@ public final class DungeonManager {
     public void updateDungeonHologram(DungeonInstance d) {
         if (!plugin.getConfig().getBoolean("hologram.enabled", true) || hiddenFromWorld) {
             removeHologram(d);
+            removeContainerHolograms(d);
             return;
         }
         BlockPosKey anchor = d.getHologramAnchor();
@@ -967,6 +989,89 @@ public final class DungeonManager {
         td.setLineWidth(plugin.getConfig().getInt("hologram.line-width", 270));
         td.setViewRange((float) plugin.getConfig().getDouble("hologram.view-range", 0.75));
         td.setText(buildHologramText(d));
+        updateContainerHolograms(d);
+    }
+
+    private void updateContainerHolograms(DungeonInstance dungeon) {
+        if (!plugin.getConfig().getBoolean("hologram.enabled", true)
+                || !plugin.getConfig().getBoolean("hologram.chest-hint.enabled", true)
+                || hiddenFromWorld) return;
+        for (BlockPosKey pos : dungeon.getChestPositions()) {
+            if (!dungeon.isContainerOpened(pos)) ensureContainerHologram(dungeon, pos);
+        }
+        for (BlockPosKey pos : dungeon.getBarrelPositions()) {
+            if (!dungeon.isContainerOpened(pos)) ensureContainerHologram(dungeon, pos);
+        }
+    }
+
+    private void ensureContainerHologram(DungeonInstance dungeon, BlockPosKey pos) {
+        if (!plugin.getConfig().getBoolean("hologram.enabled", true)
+                || !plugin.getConfig().getBoolean("hologram.chest-hint.enabled", true)
+                || hiddenFromWorld || dungeon.isContainerOpened(pos)) {
+            removeContainerHologram(pos);
+            return;
+        }
+        World world = pos.world();
+        if (world == null || !world.isChunkLoaded(pos.x() >> 4, pos.z() >> 4)) return;
+        Block block = world.getBlockAt(pos.x(), pos.y(), pos.z());
+        if (!(block.getState() instanceof InventoryHolder)) return;
+
+        double yOffset = plugin.getConfig().getDouble("hologram.chest-hint.y-offset", 1.15);
+        Location location = new Location(world, pos.x() + 0.5, pos.y() + yOffset, pos.z() + 0.5);
+        TextDisplay display = findContainerHologram(world, pos, location);
+        if (display == null) {
+            Entity spawned = world.spawnEntity(location, EntityType.TEXT_DISPLAY);
+            if (!(spawned instanceof TextDisplay created)) {
+                spawned.remove();
+                return;
+            }
+            display = created;
+        } else if (display.getLocation().distanceSquared(location) > 0.04) {
+            display.teleport(location);
+        }
+
+        display.setPersistent(false);
+        display.getPersistentDataContainer().set(containerHintPdc, PersistentDataType.STRING, pos.serialize());
+        display.setBillboard(Display.Billboard.CENTER);
+        display.setAlignment(TextDisplay.TextAlignment.CENTER);
+        display.setDefaultBackground(false);
+        display.setBackgroundColor(Color.fromARGB(0, 0, 0, 0));
+        display.setShadowed(true);
+        display.setSeeThrough(false);
+        display.setLineWidth(160);
+        display.setViewRange((float) plugin.getConfig().getDouble("hologram.view-range", 0.75));
+        display.setText(TextUtil.color(plugin.getConfig().getString("hologram.chest-hint.text", "&#F8BEFB&lОТКРЫТЬ")));
+    }
+
+    private TextDisplay findContainerHologram(World world, BlockPosKey pos, Location near) {
+        for (Entity entity : world.getNearbyEntities(near, 2.0, 2.0, 2.0)) {
+            if (entity instanceof TextDisplay display) {
+                String tag = display.getPersistentDataContainer().get(containerHintPdc, PersistentDataType.STRING);
+                if (pos.serialize().equals(tag)) return display;
+            }
+        }
+        return null;
+    }
+
+    private void removeContainerHologram(BlockPosKey pos) {
+        World world = pos.world();
+        if (world == null || !world.isChunkLoaded(pos.x() >> 4, pos.z() >> 4)) return;
+        Location near = new Location(world, pos.x() + 0.5, pos.y() + 1.5, pos.z() + 0.5);
+        for (Entity entity : world.getNearbyEntities(near, 2.0, 2.0, 2.0)) {
+            if (entity instanceof TextDisplay display
+                    && pos.serialize().equals(display.getPersistentDataContainer().get(containerHintPdc, PersistentDataType.STRING))) {
+                display.remove();
+            }
+        }
+    }
+
+    private void removeContainerHolograms(DungeonInstance dungeon) {
+        for (BlockPosKey pos : dungeon.getChestPositions()) removeContainerHologram(pos);
+        for (BlockPosKey pos : dungeon.getBarrelPositions()) removeContainerHologram(pos);
+    }
+
+    private boolean isLootContainerPosition(DungeonInstance dungeon, BlockPosKey pos) {
+        return dungeon.getChestPositions().contains(pos) || dungeon.getBarrelPositions().contains(pos);
     }
 
     private String buildHologramText(DungeonInstance d) {
@@ -1030,21 +1135,45 @@ public final class DungeonManager {
     }
 
     public void handleChunkLoad(Chunk chunk) {
-        for (Entity e : chunk.getEntities()) {
-            if (e instanceof TextDisplay td) {
-                String id = td.getPersistentDataContainer().get(hologramPdc, PersistentDataType.STRING);
-                if (id != null && (!dungeons.containsKey(id) || hiddenFromWorld)) {
-                    td.remove();
+        for (Entity entity : chunk.getEntities()) {
+            if (!(entity instanceof TextDisplay display)) continue;
+            String dungeonId = display.getPersistentDataContainer().get(hologramPdc, PersistentDataType.STRING);
+            if (dungeonId != null && (!dungeons.containsKey(dungeonId) || hiddenFromWorld)) {
+                display.remove();
+                continue;
+            }
+            String serializedPos = display.getPersistentDataContainer().get(containerHintPdc, PersistentDataType.STRING);
+            if (serializedPos != null) {
+                BlockPosKey pos = BlockPosKey.deserialize(serializedPos);
+                DungeonInstance owner = pos == null ? null : getByProtectedContainer(pos);
+                if (owner == null || hiddenFromWorld || owner.isContainerOpened(pos) || !isLootContainerPosition(owner, pos)) {
+                    display.remove();
                 }
             }
         }
         plugin.getGhostController().handleChunkLoad(chunk);
         if (hiddenFromWorld) return;
-        for (DungeonInstance d : dungeons.values()) {
-            BlockPosKey anchor = d.getHologramAnchor();
+        for (DungeonInstance dungeon : dungeons.values()) {
+            BlockPosKey anchor = dungeon.getHologramAnchor();
             if (anchor != null && anchor.worldName().equals(chunk.getWorld().getName())
                     && (anchor.x() >> 4) == chunk.getX() && (anchor.z() >> 4) == chunk.getZ()) {
-                updateDungeonHologram(d);
+                updateDungeonHologram(dungeon);
+            }
+            ensureContainerHologramsInChunk(dungeon, chunk);
+        }
+    }
+
+    private void ensureContainerHologramsInChunk(DungeonInstance dungeon, Chunk chunk) {
+        for (BlockPosKey pos : dungeon.getChestPositions()) {
+            if (pos.worldName().equals(chunk.getWorld().getName()) && (pos.x() >> 4) == chunk.getX()
+                    && (pos.z() >> 4) == chunk.getZ() && !dungeon.isContainerOpened(pos)) {
+                ensureContainerHologram(dungeon, pos);
+            }
+        }
+        for (BlockPosKey pos : dungeon.getBarrelPositions()) {
+            if (pos.worldName().equals(chunk.getWorld().getName()) && (pos.x() >> 4) == chunk.getX()
+                    && (pos.z() >> 4) == chunk.getZ() && !dungeon.isContainerOpened(pos)) {
+                ensureContainerHologram(dungeon, pos);
             }
         }
     }
@@ -1052,6 +1181,14 @@ public final class DungeonManager {
     public DungeonInstance getByProtectedContainer(BlockPosKey pos) {
         String id = protectedContainerIndex.get(pos);
         return id == null ? null : dungeons.get(id);
+    }
+
+    public boolean markContainerOpened(BlockPosKey pos) {
+        DungeonInstance dungeon = getByProtectedContainer(pos);
+        if (dungeon == null || !isLootContainerPosition(dungeon, pos)) return false;
+        dungeon.markContainerOpened(pos);
+        removeContainerHologram(pos);
+        return true;
     }
 
     public DungeonInstance findContainingStructureOrBuffer(Location loc) {
@@ -1080,7 +1217,20 @@ public final class DungeonManager {
     public Collection<DungeonInstance> getAllDungeons() { return Collections.unmodifiableCollection(dungeons.values()); }
     public DungeonInstance getDungeon(String id) { return dungeons.get(id); }
     public Map<String, DungeonTemplate> getTemplates() { return Collections.unmodifiableMap(templatesById); }
-    public DungeonTemplate getTemplate(String id) { return templatesById.get(id.toLowerCase(Locale.ROOT)); }
+    public List<DungeonTemplate> getTemplates(DungeonCategory category) {
+        List<DungeonTemplate> templates = templatesByCategory.get(category);
+        return templates == null ? List.of() : Collections.unmodifiableList(templates);
+    }
+    public DungeonTemplate getTemplate(String id) {
+        return id == null ? null : templatesById.get(id.toLowerCase(Locale.ROOT));
+    }
+    public DungeonTemplate getTemplate(DungeonCategory category, String id) {
+        if (category == null || id == null) return null;
+        for (DungeonTemplate template : getTemplates(category)) {
+            if (template.getId().equalsIgnoreCase(id.trim())) return template;
+        }
+        return null;
+    }
 
     public long resetIntervalMs() {
         return Math.max(60L, plugin.getConfig().getLong("regeneration.interval-seconds", 43200L)) * 1000L;

@@ -1,9 +1,11 @@
 package ru.elytrix.dungeons.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import org.bukkit.Location;
 
@@ -27,6 +29,7 @@ public final class DungeonInstance {
     private BlockPosKey entrancePos;
     private final List<BlockPosKey> chestPositions = new ArrayList<>();
     private final List<BlockPosKey> barrelPositions = new ArrayList<>();
+    private final Set<BlockPosKey> openedContainers = new HashSet<>();
     private final Map<BlockPosKey, Boolean> shulkerUnlocked = new LinkedHashMap<>();
     private final List<BlockPosKey> mobSpawns = new ArrayList<>();
 
@@ -67,6 +70,7 @@ public final class DungeonInstance {
         for (int[] off : tpl.getBarrelOffsets()) {
             this.barrelPositions.add(origin.add(off[0], off[1], off[2]));
         }
+        this.openedContainers.clear();
 
         this.shulkerUnlocked.clear();
         if (this.category == DungeonCategory.UNDERGROUND) {
@@ -123,6 +127,10 @@ public final class DungeonInstance {
     public BlockPosKey getEntrancePos() { return entrancePos; }
     public List<BlockPosKey> getChestPositions() { return chestPositions; }
     public List<BlockPosKey> getBarrelPositions() { return barrelPositions; }
+    public Set<BlockPosKey> getOpenedContainers() { return openedContainers; }
+    public boolean isContainerOpened(BlockPosKey pos) { return openedContainers.contains(pos); }
+    public void markContainerOpened(BlockPosKey pos) { openedContainers.add(pos); }
+    public void clearOpenedContainers() { openedContainers.clear(); }
     public Map<BlockPosKey, Boolean> getShulkerUnlocked() { return shulkerUnlocked; }
     public List<BlockPosKey> getMobSpawns() { return mobSpawns; }
 }

@@ -72,7 +72,6 @@ public final class ElytrixDungeonsPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new DungeonMenuListener(this), this);
 
         this.dungeonManager.startup();
-        getLogger().info("ElytrixDungeons enabled! 7 Surface + 7 Underground mode. WorldGuard: " + worldGuardHook.isAvailable());
     }
 
     @Override

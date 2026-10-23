@@ -44,15 +44,21 @@ import ru.elytrix.dungeons.util.TextUtil;
  */
 public final class GhostController {
 
+    private static final int GHOSTS_PER_WAVE = 6;
+    private static final long WAVE_DURATION_MS = 30L * 60L * 1000L;
+
     private final ElytrixDungeonsPlugin plugin;
     private final NamespacedKey ghostPdc;
+    private final NamespacedKey ghostWavePdc;
     private final Map<String, Set<UUID>> houseGhosts = new HashMap<>();
     private final Map<UUID, String> ghostToHouse = new HashMap<>();
-    private final Map<String, Long> nextRespawnMs = new HashMap<>();
+    private final Map<String, Long> waveStartedAtMs = new HashMap<>();
+    private final Map<String, Integer> killedInWave = new HashMap<>();
 
     public GhostController(ElytrixDungeonsPlugin plugin) {
         this.plugin = plugin;
         this.ghostPdc = new NamespacedKey(plugin, "house_ghost");
+        this.ghostWavePdc = new NamespacedKey(plugin, "house_ghost_wave");
     }
 
     public boolean isGhost(Entity entity) {
@@ -68,61 +74,90 @@ public final class GhostController {
     public void populateInitialGhosts(DungeonInstance house) {
         if (house.getCategory() != DungeonCategory.SURFACE) return;
         clearHouseGhosts(house.getId());
-        World w = house.getOrigin().world();
-        if (w == null) return;
-        BlockPosKey anchor = house.getHologramAnchor();
-        if (anchor == null || !w.isChunkLoaded(anchor.x() >> 4, anchor.z() >> 4)) return;
-
-        int initial = Math.max(1, plugin.getConfig().getInt("surface-dungeon.ghosts.initial-count", 6));
-        spawnUpTo(w, house, initial);
+        World world = house.getOrigin().world();
+        if (world == null) return;
+        startFreshWave(house, world, System.currentTimeMillis(), false);
     }
 
     public void tickHousesOncePerSecond(Iterable<DungeonInstance> allDungeons) {
         long now = System.currentTimeMillis();
-        int maxAlive = Math.max(1, plugin.getConfig().getInt("surface-dungeon.ghosts.max-alive", 6));
-        long intervalMs = Math.max(15L, plugin.getConfig().getLong("surface-dungeon.ghosts.respawn-every-seconds", 60L)) * 1000L;
-
-        for (DungeonInstance d : allDungeons) {
-            if (d.getCategory() != DungeonCategory.SURFACE || d.getStatus() == DungeonStatus.REGENERATING) {
+        for (DungeonInstance house : allDungeons) {
+            if (house.getCategory() != DungeonCategory.SURFACE || house.getStatus() == DungeonStatus.REGENERATING) {
                 continue;
             }
-            World w = d.getOrigin().world();
-            BlockPosKey anchor = d.getHologramAnchor();
-            if (w == null || anchor == null || !w.isChunkLoaded(anchor.x() >> 4, anchor.z() >> 4)) {
+            World world = house.getOrigin().world();
+            BlockPosKey anchor = house.getHologramAnchor();
+            if (world == null || anchor == null || !world.isChunkLoaded(anchor.x() >> 4, anchor.z() >> 4)) {
                 continue;
             }
 
-            // Re-attach any loaded tagged ghosts after chunk reload & leash all ghosts strictly inside the House
-            Set<UUID> set = houseGhosts.computeIfAbsent(d.getId(), k -> new HashSet<>());
-            CuboidRegion box = d.getBounds();
+            Set<UUID> set = houseGhosts.computeIfAbsent(house.getId(), key -> new HashSet<>());
+            CuboidRegion bounds = house.getBounds();
             Iterator<UUID> it = set.iterator();
             while (it.hasNext()) {
                 UUID uid = it.next();
-                Entity e = w.getEntity(uid);
-                if (!(e instanceof LivingEntity le) || le.isDead() || !le.isValid()) {
+                Entity entity = world.getEntity(uid);
+                // A ghost in an unloaded chunk is still part of this wave; keep its UUID until it loads.
+                if (entity == null) continue;
+                if (!(entity instanceof LivingEntity ghost) || ghost.isDead() || !ghost.isValid()) {
                     it.remove();
                     ghostToHouse.remove(uid);
                     continue;
                 }
-                if (le.isInsideVehicle()) {
-                    le.eject();
+                if (ghost.isInsideVehicle()) {
+                    ghost.eject();
                 }
-                if (!box.contains(le.getLocation())) {
-                    Location back = randomInteriorPoint(d);
+                if (!bounds.contains(ghost.getLocation())) {
+                    Location back = randomInteriorPoint(house);
                     if (back != null) {
-                        le.setFallDistance(0f);
-                        le.teleport(back);
-                        w.spawnParticle(Particle.SOUL, back.clone().add(0, 0.5, 0), 6, 0.2, 0.2, 0.2, 0.02);
+                        ghost.setFallDistance(0f);
+                        ghost.teleport(back);
+                        world.spawnParticle(Particle.SOUL, back.clone().add(0, 0.5, 0), 6, 0.2, 0.2, 0.2, 0.02);
                     }
                 }
             }
 
-            if (set.size() < maxAlive) {
-                long due = nextRespawnMs.computeIfAbsent(d.getId(), k -> now + intervalMs);
-                if (now >= due) {
-                    nextRespawnMs.put(d.getId(), now + intervalMs);
-                    spawnUpTo(w, d, set.size() + 2 <= maxAlive ? set.size() + 2 : maxAlive);
+            Long waveStartedAt = waveStartedAtMs.get(house.getId());
+            if (waveStartedAt == null) {
+                startFreshWave(house, world, now, true);
+            } else if (now - waveStartedAt >= WAVE_DURATION_MS) {
+                // If the wave was not fully defeated, replace all remaining ghosts after 30 minutes.
+                startFreshWave(house, world, now, true);
+            }
+        }
+    }
+
+    private void startFreshWave(DungeonInstance house, World world, long now, boolean removePreviousWave) {
+        String id = house.getId();
+        if (removePreviousWave) {
+            Set<UUID> previous = houseGhosts.get(id);
+            if (previous != null) {
+                for (UUID uid : previous) {
+                    ghostToHouse.remove(uid);
+                    Entity entity = world.getEntity(uid);
+                    if (entity != null && entity.isValid()) entity.remove();
                 }
+            }
+            removeTaggedGhostsNearHouse(world, house);
+        }
+
+        houseGhosts.put(id, new HashSet<>());
+        waveStartedAtMs.put(id, now);
+        killedInWave.put(id, 0);
+        spawnUpTo(world, house, GHOSTS_PER_WAVE);
+    }
+
+    private void removeTaggedGhostsNearHouse(World world, DungeonInstance house) {
+        BlockPosKey anchor = house.getHologramAnchor();
+        Location center = anchor == null ? null : anchor.centerLocation();
+        if (center == null || !world.isChunkLoaded(center.getBlockX() >> 4, center.getBlockZ() >> 4)) return;
+        double rx = house.getBounds().sizeX() / 2.0 + 4.0;
+        double ry = house.getBounds().sizeY() / 2.0 + 4.0;
+        double rz = house.getBounds().sizeZ() / 2.0 + 4.0;
+        for (Entity entity : world.getNearbyEntities(center, rx, ry, rz)) {
+            if (house.getId().equals(entity.getPersistentDataContainer().get(ghostPdc, PersistentDataType.STRING))) {
+                ghostToHouse.remove(entity.getUniqueId());
+                entity.remove();
             }
         }
     }
@@ -139,7 +174,8 @@ public final class GhostController {
                 break;
             }
             le.getPersistentDataContainer().set(ghostPdc, PersistentDataType.STRING, house.getId());
-            le.setPersistent(false);
+            le.getPersistentDataContainer().set(ghostWavePdc, PersistentDataType.LONG,
+                    waveStartedAtMs.getOrDefault(house.getId(), System.currentTimeMillis()));
             le.setRemoveWhenFarAway(false);
             le.setCanPickupItems(false);
             le.setCustomName(TextUtil.color("&#F8BEFBПризрак"));
@@ -167,7 +203,19 @@ public final class GhostController {
         }
         if (dungeonId != null) {
             Set<UUID> set = houseGhosts.get(dungeonId);
-            if (set != null) set.remove(dead.getUniqueId());
+            boolean belongedToCurrentWave = set != null && set.remove(dead.getUniqueId());
+            if (belongedToCurrentWave) {
+                int killed = killedInWave.getOrDefault(dungeonId, 0) + 1;
+                killedInWave.put(dungeonId, killed);
+                if (killed >= GHOSTS_PER_WAVE) {
+                    DungeonInstance house = plugin.getDungeonManager().getDungeon(dungeonId);
+                    World world = house == null ? null : house.getOrigin().world();
+                    if (house != null && world != null && house.getStatus() != DungeonStatus.REGENERATING) {
+                        // The sixth kill starts a complete new wave immediately.
+                        startFreshWave(house, world, System.currentTimeMillis(), false);
+                    }
+                }
+            }
         }
 
         event.getDrops().clear();
@@ -196,8 +244,8 @@ public final class GhostController {
             dead.getWorld().spawnParticle(Particle.TOTEM_OF_UNDYING, deathLoc.clone().add(0, 0.5, 0), 22, 0.3, 0.3, 0.3, 0.1);
             Player killer = dead.getKiller();
             if (killer != null) {
-                killer.sendMessage(plugin.msg("ghost-key-dropped")
-                        .replace("{key}", VaultAndItemsHook.vaultKeyDisplayName(keyId)));
+                killer.sendMessage(TextUtil.color(plugin.msg("ghost-key-dropped")
+                        .replace("{key}", VaultAndItemsHook.vaultKeyDisplayName(keyId))));
             }
         }
 
@@ -238,7 +286,10 @@ public final class GhostController {
         for (Entity e : chunk.getEntities()) {
             String tag = e.getPersistentDataContainer().get(ghostPdc, PersistentDataType.STRING);
             if (tag != null) {
-                if (plugin.getDungeonManager().getDungeon(tag) == null) {
+                Long entityWave = e.getPersistentDataContainer().get(ghostWavePdc, PersistentDataType.LONG);
+                Long currentWave = waveStartedAtMs.get(tag);
+                if (plugin.getDungeonManager().getDungeon(tag) == null
+                        || entityWave != null && currentWave != null && !entityWave.equals(currentWave)) {
                     e.remove();
                 } else {
                     houseGhosts.computeIfAbsent(tag, k -> new HashSet<>()).add(e.getUniqueId());
@@ -250,30 +301,21 @@ public final class GhostController {
 
     public void clearHouseGhosts(String dungeonId) {
         Set<UUID> set = houseGhosts.remove(dungeonId);
-        nextRespawnMs.remove(dungeonId);
-        DungeonInstance d = plugin.getDungeonManager().getDungeon(dungeonId);
-        World w = d != null ? d.getOrigin().world() : null;
+        waveStartedAtMs.remove(dungeonId);
+        killedInWave.remove(dungeonId);
+        DungeonInstance house = plugin.getDungeonManager().getDungeon(dungeonId);
+        World world = house == null ? null : house.getOrigin().world();
         if (set != null) {
             for (UUID uid : set) {
                 ghostToHouse.remove(uid);
-                if (w != null) {
-                    Entity e = w.getEntity(uid);
-                    if (e != null && e.isValid()) e.remove();
+                if (world != null) {
+                    Entity entity = world.getEntity(uid);
+                    if (entity != null && entity.isValid()) entity.remove();
                 }
             }
         }
-        if (w != null && d != null) {
-            Location center = d.getHologramAnchor() != null ? d.getHologramAnchor().centerLocation() : null;
-            if (center != null && w.isChunkLoaded(center.getBlockX() >> 4, center.getBlockZ() >> 4)) {
-                double rx = d.getBounds().sizeX() / 2.0 + 4.0;
-                double ry = d.getBounds().sizeY() / 2.0 + 4.0;
-                double rz = d.getBounds().sizeZ() / 2.0 + 4.0;
-                for (Entity e : w.getNearbyEntities(center, rx, ry, rz)) {
-                    if (dungeonId.equals(e.getPersistentDataContainer().get(ghostPdc, PersistentDataType.STRING))) {
-                        e.remove();
-                    }
-                }
-            }
+        if (world != null && house != null) {
+            removeTaggedGhostsNearHouse(world, house);
         }
     }
 

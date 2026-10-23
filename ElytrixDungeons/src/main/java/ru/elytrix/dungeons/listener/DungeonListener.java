@@ -21,6 +21,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -187,6 +188,19 @@ public final class DungeonListener implements Listener {
                 event.setCancelled(true);
             }
         }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onLootContainerOpen(InventoryOpenEvent event) {
+        if (!(event.getPlayer() instanceof Player)) return;
+        BlockPosKey pos = null;
+        InventoryHolder holder = event.getInventory().getHolder();
+        if (holder instanceof BlockState state) {
+            pos = new BlockPosKey(state.getWorld().getName(), state.getX(), state.getY(), state.getZ());
+        } else if (event.getInventory().getLocation() != null) {
+            pos = BlockPosKey.of(event.getInventory().getLocation());
+        }
+        if (pos != null) plugin.getDungeonManager().markContainerOpened(pos);
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)

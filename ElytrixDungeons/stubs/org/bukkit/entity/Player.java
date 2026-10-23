@@ -62,6 +62,7 @@ public interface Player extends HumanEntity, OfflinePlayer, CommandSender {
     void setFoodLevel(int food);
     AttributeInstance getAttribute(Attribute attribute);
     void playSound(Location location, Sound sound, float volume, float pitch);
+    void stopSound(Sound sound);
     void setNoGravity(boolean gravity);
     float getPitch();
     Location getEyeLocation();

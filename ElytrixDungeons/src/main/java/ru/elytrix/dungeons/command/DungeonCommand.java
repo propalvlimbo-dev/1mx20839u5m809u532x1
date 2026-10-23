@@ -108,7 +108,7 @@ public final class DungeonCommand implements TabExecutor {
                 } else if (plugin.getDungeonManager().isPlacementInProgress()) {
                     scanStatus = "устанавливается данж, дождитесь завершения";
                 } else if (plugin.getDungeonManager().getAllDungeons().isEmpty()) {
-                    scanStatus = "ожидает /elytrixdungeon create <surface|underground>";
+                    scanStatus = "ожидает /elytrixdungeon create <surface|underground> <id-схемы>";
                 } else if (plugin.getDungeonManager().getAllDungeons().size() < 14) {
                     scanStatus = "создано вручную: " + plugin.getDungeonManager().getAllDungeons().size() + "/14";
                 } else {
@@ -120,10 +120,11 @@ public final class DungeonCommand implements TabExecutor {
             }
             case "create" -> {
                 if (args.length < 2) {
-                    sender.sendMessage(plugin.prefix() + "/elytrixdungeon create <surface|underground|surface_1..surface_7|underground_1..underground_7>");
+                    sender.sendMessage(plugin.prefix() + "/elytrixdungeon create <surface|underground> <id-схемы>");
                     return true;
                 }
-                sendCreateResult(sender, plugin.getDungeonManager().createDungeonFromCommand(args[1]));
+                String templateId = args.length >= 3 ? args[2] : null;
+                sendCreateResult(sender, plugin.getDungeonManager().createDungeonFromCommand(args[1], templateId));
             }
             case "findspots", "rebuildall" -> {
                 plugin.getDungeonManager().rebuildAllFromSchematics();
@@ -252,28 +253,42 @@ public final class DungeonCommand implements TabExecutor {
 
     private void sendCreateResult(CommandSender sender, DungeonManager.CreateResult result) {
         DungeonCategory category = result.category();
-        String typeName = category == null ? "данжей" : category.getTitle();
+        String typeName = category == null ? "данжа" : category.getTitle();
+        String available = availableSchematics(category);
         switch (result.status()) {
             case CREATED -> {
-                DungeonInstance d = result.dungeon();
-                BlockPosKey origin = d.getOrigin();
-                sender.sendMessage(plugin.prefix() + "Начата установка данжа §f" + d.getId() + " §7(" + d.getCategory().getTitle()
-                        + ", схема " + d.getTemplateId() + ").");
+                DungeonInstance dungeon = result.dungeon();
+                BlockPosKey origin = dungeon.getOrigin();
+                sender.sendMessage(plugin.prefix() + "Устанавливается данж §f" + dungeon.getId() + " §7("
+                        + dungeon.getCategory().getTitle() + ", схема " + dungeon.getTemplateId() + ").");
                 sender.sendMessage(TextUtil.color(" &#F8BEFB&l┃ &fКоординаты: &#F8BEFB" + origin.x() + ", " + origin.y() + ", " + origin.z()
                         + " &8┃ &fСоздано этого типа: &#F8BEFB" + result.count() + "/" + DungeonManager.MAX_DUNGEONS_PER_CATEGORY));
             }
-            case MAX_REACHED -> sender.sendMessage(plugin.prefix() + "§cДля типа «" + typeName + "» максимум — "
-                    + DungeonManager.MAX_DUNGEONS_PER_CATEGORY + " данжей. Сейчас: " + result.count() + "/"
-                    + DungeonManager.MAX_DUNGEONS_PER_CATEGORY + ".");
+            case MAX_REACHED -> sender.sendMessage(plugin.prefix() + "§cДля типа «" + typeName + "» уже создано максимально допустимое количество данжей: "
+                    + result.count() + "/" + DungeonManager.MAX_DUNGEONS_PER_CATEGORY + ".");
             case INVALID_ID -> sender.sendMessage(plugin.prefix()
-                    + "§cНеверный ID. Используйте: /elytrixdungeon create <surface|underground|surface_1..surface_7|underground_1..underground_7>.");
+                    + "§cУкажите тип surface или underground (либо конкретный ID данжа), затем ID схемы: "
+                    + "/elytrixdungeon create <surface|underground> <id-схемы>.");
             case ID_ALREADY_EXISTS -> sender.sendMessage(plugin.prefix() + "§cДанж с таким ID уже существует.");
-            case MISSING_SCHEMATIC -> sender.sendMessage(plugin.prefix() + "§cДля типа «" + typeName + "» не найдено ни одной .schem схемы.");
+            case MISSING_SCHEMATIC -> sender.sendMessage(plugin.prefix() + "§cДля типа «" + typeName + "» пока нет загруженных схем. "
+                    + "Поместите .schem в plugins/ElytrixDungeons/schematics/" + category.name().toLowerCase(Locale.ROOT) + "/.");
+            case TEMPLATE_REQUIRED -> sender.sendMessage(plugin.prefix() + "§eУкажите ID загруженной схемы. Доступные схемы для «" + typeName + "»: §f" + available);
+            case INVALID_TEMPLATE -> sender.sendMessage(plugin.prefix() + "§cСхема не найдена. Доступные схемы для «" + typeName + "»: §f" + available);
+            case TEMPLATE_CATEGORY_MISMATCH -> sender.sendMessage(plugin.prefix() + "§cЭта схема относится к другому типу данжа. Доступные схемы для «" + typeName + "»: §f" + available);
             case WORLD_NOT_FOUND -> sender.sendMessage(plugin.prefix() + "§cМир для создания данжей не найден. Проверьте world-settings.world в config.yml.");
-            case NO_SAFE_SPOT -> sender.sendMessage(plugin.prefix() + "§cНе найдено безопасное место для данжа. Проверьте размер схемы и границы поиска в config.yml.");
-            case SNAPSHOT_FAILED -> sender.sendMessage(plugin.prefix() + "§cНе удалось сохранить исходный рельеф. Данж не создан; проверьте свободное место и права записи плагина.");
-            case SCAN_IN_PROGRESS -> sender.sendMessage(plugin.prefix() + "§cИдёт поиск или установка предыдущего данжа. Дождитесь завершения и повторите команду.");
+            case NO_SAFE_SPOT -> sender.sendMessage(plugin.prefix() + "§cНе удалось найти безопасное место. Проверьте размер схемы и границы поиска в config.yml.");
+            case SNAPSHOT_FAILED -> sender.sendMessage(plugin.prefix() + "§cНе удалось сохранить исходный ландшафт. Данж не создан; проверьте права записи и свободное место.");
+            case SCAN_IN_PROGRESS -> sender.sendMessage(plugin.prefix() + "§cСейчас идёт поиск места или установка другого данжа. Дождитесь завершения.");
         }
+    }
+
+    private String availableSchematics(DungeonCategory category) {
+        if (category == null) return "нет загруженных схем";
+        List<String> ids = new ArrayList<>();
+        for (DungeonTemplate template : plugin.getDungeonManager().getTemplates(category)) {
+            ids.add(template.getId());
+        }
+        return ids.isEmpty() ? "нет загруженных схем" : String.join(", ", ids);
     }
 
     private void teleportToDungeon(Player p, String id) {
@@ -369,9 +384,6 @@ public final class DungeonCommand implements TabExecutor {
                         if (plugin.getDungeonManager().getDungeon(id) == null) ids.add(id);
                     }
                 }
-                for (String templateId : plugin.getDungeonManager().getTemplates().keySet()) {
-                    if (!ids.contains(templateId)) ids.add(templateId);
-                }
                 return StringUtil.copyPartialMatches(args[1], ids, new ArrayList<>());
             }
             if (sub.equals("tp") || sub.equals("remove") || sub.equals("regen") || sub.equals("relocate")) {
@@ -389,9 +401,37 @@ public final class DungeonCommand implements TabExecutor {
                 return StringUtil.copyPartialMatches(args[1], names, new ArrayList<>());
             }
         }
+        if (args.length == 3 && args[0].equalsIgnoreCase("create")) {
+            DungeonCategory category = categoryForCreateTarget(args[1]);
+            if (category == null) return List.of();
+            List<String> schematicIds = new ArrayList<>();
+            for (DungeonTemplate template : plugin.getDungeonManager().getTemplates(category)) {
+                schematicIds.add(template.getId());
+            }
+            return StringUtil.copyPartialMatches(args[2], schematicIds, new ArrayList<>());
+        }
         if (args.length == 3 && args[0].equalsIgnoreCase("save")) {
             return StringUtil.copyPartialMatches(args[2], List.of("SURFACE", "UNDERGROUND"), new ArrayList<>());
         }
         return List.of();
+    }
+
+    private static DungeonCategory categoryForCreateTarget(String target) {
+        if (target == null) return null;
+        String input = target.toLowerCase(Locale.ROOT);
+        if (input.equals("surface")) return DungeonCategory.SURFACE;
+        if (input.equals("underground")) return DungeonCategory.UNDERGROUND;
+        int separator = input.indexOf('_');
+        if (separator <= 0) return null;
+        String suffix = input.substring(separator + 1);
+        if (suffix.isEmpty()) return null;
+        for (int i = 0; i < suffix.length(); i++) {
+            if (!Character.isDigit(suffix.charAt(i))) return null;
+        }
+        return switch (input.substring(0, separator)) {
+            case "surface" -> DungeonCategory.SURFACE;
+            case "underground" -> DungeonCategory.UNDERGROUND;
+            default -> null;
+        };
     }
 }

@@ -79,7 +79,7 @@ public final class DungeonMenuService {
                 : plugin.getDungeonManager().isPlacementInProgress()
                         ? "&#F8BEFBУстанавливается данж, дождитесь завершения"
                         : dungeonCount == 0
-                                ? "&#F8BEFBАвтоспавн отключён: создавайте по одному командой /elytrixdungeon create surface|underground"
+                                ? "&#F8BEFBАвтоспавн отключён: создавайте по одному командой /elytrixdungeon create surface|underground <id-схемы>"
                                 : "&#96FF91Создано: " + dungeonCount + "/14 (координаты сохранены в dungeons.yml)";
 
         inv.setItem(4, icon(Material.BEACON, "&7« &#F8BEFBСтатус Данжей &7»", List.of(
