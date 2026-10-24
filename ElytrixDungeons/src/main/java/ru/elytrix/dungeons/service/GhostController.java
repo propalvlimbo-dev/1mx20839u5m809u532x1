@@ -15,6 +15,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -44,21 +45,15 @@ import ru.elytrix.dungeons.util.TextUtil;
  */
 public final class GhostController {
 
-    private static final int GHOSTS_PER_WAVE = 6;
-    private static final long WAVE_DURATION_MS = 30L * 60L * 1000L;
-
     private final ElytrixDungeonsPlugin plugin;
     private final NamespacedKey ghostPdc;
-    private final NamespacedKey ghostWavePdc;
     private final Map<String, Set<UUID>> houseGhosts = new HashMap<>();
     private final Map<UUID, String> ghostToHouse = new HashMap<>();
-    private final Map<String, Long> waveStartedAtMs = new HashMap<>();
-    private final Map<String, Integer> killedInWave = new HashMap<>();
+    private final Map<String, Long> nextRespawnMs = new HashMap<>();
 
     public GhostController(ElytrixDungeonsPlugin plugin) {
         this.plugin = plugin;
         this.ghostPdc = new NamespacedKey(plugin, "house_ghost");
-        this.ghostWavePdc = new NamespacedKey(plugin, "house_ghost_wave");
     }
 
     public boolean isGhost(Entity entity) {
@@ -75,12 +70,19 @@ public final class GhostController {
         if (house.getCategory() != DungeonCategory.SURFACE) return;
         clearHouseGhosts(house.getId());
         World world = house.getOrigin().world();
-        if (world == null) return;
-        startFreshWave(house, world, System.currentTimeMillis(), false);
+        BlockPosKey anchor = house.getHologramAnchor();
+        if (world == null || anchor == null || !world.isChunkLoaded(anchor.x() >> 4, anchor.z() >> 4)) return;
+
+        int initial = Math.max(1, plugin.getConfig().getInt("surface-dungeon.ghosts.initial-count", 6));
+        spawnUpTo(world, house, initial);
     }
 
     public void tickHousesOncePerSecond(Iterable<DungeonInstance> allDungeons) {
         long now = System.currentTimeMillis();
+        int maxAlive = Math.max(1, plugin.getConfig().getInt("surface-dungeon.ghosts.max-alive", 6));
+        long intervalMs = Math.max(15L,
+                plugin.getConfig().getLong("surface-dungeon.ghosts.respawn-every-seconds", 60L)) * 1000L;
+
         for (DungeonInstance house : allDungeons) {
             if (house.getCategory() != DungeonCategory.SURFACE || house.getStatus() == DungeonStatus.REGENERATING) {
                 continue;
@@ -97,16 +99,14 @@ public final class GhostController {
             while (it.hasNext()) {
                 UUID uid = it.next();
                 Entity entity = world.getEntity(uid);
-                // A ghost in an unloaded chunk is still part of this wave; keep its UUID until it loads.
+                // A ghost in an unloaded chunk is still part of the current population.
                 if (entity == null) continue;
                 if (!(entity instanceof LivingEntity ghost) || ghost.isDead() || !ghost.isValid()) {
                     it.remove();
                     ghostToHouse.remove(uid);
                     continue;
                 }
-                if (ghost.isInsideVehicle()) {
-                    ghost.eject();
-                }
+                if (ghost.isInsideVehicle()) ghost.eject();
                 if (!bounds.contains(ghost.getLocation())) {
                     Location back = randomInteriorPoint(house);
                     if (back != null) {
@@ -117,34 +117,14 @@ public final class GhostController {
                 }
             }
 
-            Long waveStartedAt = waveStartedAtMs.get(house.getId());
-            if (waveStartedAt == null) {
-                startFreshWave(house, world, now, true);
-            } else if (now - waveStartedAt >= WAVE_DURATION_MS) {
-                // If the wave was not fully defeated, replace all remaining ghosts after 30 minutes.
-                startFreshWave(house, world, now, true);
-            }
-        }
-    }
-
-    private void startFreshWave(DungeonInstance house, World world, long now, boolean removePreviousWave) {
-        String id = house.getId();
-        if (removePreviousWave) {
-            Set<UUID> previous = houseGhosts.get(id);
-            if (previous != null) {
-                for (UUID uid : previous) {
-                    ghostToHouse.remove(uid);
-                    Entity entity = world.getEntity(uid);
-                    if (entity != null && entity.isValid()) entity.remove();
+            if (set.size() < maxAlive) {
+                long due = nextRespawnMs.computeIfAbsent(house.getId(), key -> now + intervalMs);
+                if (now >= due) {
+                    nextRespawnMs.put(house.getId(), now + intervalMs);
+                    spawnUpTo(world, house, Math.min(maxAlive, set.size() + 2));
                 }
             }
-            removeTaggedGhostsNearHouse(world, house);
         }
-
-        houseGhosts.put(id, new HashSet<>());
-        waveStartedAtMs.put(id, now);
-        killedInWave.put(id, 0);
-        spawnUpTo(world, house, GHOSTS_PER_WAVE);
     }
 
     private void removeTaggedGhostsNearHouse(World world, DungeonInstance house) {
@@ -166,7 +146,7 @@ public final class GhostController {
         Set<UUID> set = houseGhosts.computeIfAbsent(house.getId(), k -> new HashSet<>());
         double hp = Math.max(4.0, plugin.getConfig().getDouble("surface-dungeon.ghosts.health", 16.0));
         while (set.size() < targetTotal) {
-            Location loc = randomInteriorPoint(house);
+            Location loc = chooseSpreadSpawnPoint(w, house, set);
             if (loc == null) break;
             Entity raw = w.spawnEntity(loc.clone().add(0, 0.6, 0), EntityType.ALLAY);
             if (!(raw instanceof LivingEntity le)) {
@@ -174,8 +154,6 @@ public final class GhostController {
                 break;
             }
             le.getPersistentDataContainer().set(ghostPdc, PersistentDataType.STRING, house.getId());
-            le.getPersistentDataContainer().set(ghostWavePdc, PersistentDataType.LONG,
-                    waveStartedAtMs.getOrDefault(house.getId(), System.currentTimeMillis()));
             le.setRemoveWhenFarAway(false);
             le.setCanPickupItems(false);
             le.setCustomName(TextUtil.color("&#F8BEFBПризрак"));
@@ -203,19 +181,7 @@ public final class GhostController {
         }
         if (dungeonId != null) {
             Set<UUID> set = houseGhosts.get(dungeonId);
-            boolean belongedToCurrentWave = set != null && set.remove(dead.getUniqueId());
-            if (belongedToCurrentWave) {
-                int killed = killedInWave.getOrDefault(dungeonId, 0) + 1;
-                killedInWave.put(dungeonId, killed);
-                if (killed >= GHOSTS_PER_WAVE) {
-                    DungeonInstance house = plugin.getDungeonManager().getDungeon(dungeonId);
-                    World world = house == null ? null : house.getOrigin().world();
-                    if (house != null && world != null && house.getStatus() != DungeonStatus.REGENERATING) {
-                        // The sixth kill starts a complete new wave immediately.
-                        startFreshWave(house, world, System.currentTimeMillis(), false);
-                    }
-                }
-            }
+            if (set != null) set.remove(dead.getUniqueId());
         }
 
         event.getDrops().clear();
@@ -286,10 +252,7 @@ public final class GhostController {
         for (Entity e : chunk.getEntities()) {
             String tag = e.getPersistentDataContainer().get(ghostPdc, PersistentDataType.STRING);
             if (tag != null) {
-                Long entityWave = e.getPersistentDataContainer().get(ghostWavePdc, PersistentDataType.LONG);
-                Long currentWave = waveStartedAtMs.get(tag);
-                if (plugin.getDungeonManager().getDungeon(tag) == null
-                        || entityWave != null && currentWave != null && !entityWave.equals(currentWave)) {
+                if (plugin.getDungeonManager().getDungeon(tag) == null) {
                     e.remove();
                 } else {
                     houseGhosts.computeIfAbsent(tag, k -> new HashSet<>()).add(e.getUniqueId());
@@ -301,8 +264,7 @@ public final class GhostController {
 
     public void clearHouseGhosts(String dungeonId) {
         Set<UUID> set = houseGhosts.remove(dungeonId);
-        waveStartedAtMs.remove(dungeonId);
-        killedInWave.remove(dungeonId);
+        nextRespawnMs.remove(dungeonId);
         DungeonInstance house = plugin.getDungeonManager().getDungeon(dungeonId);
         World world = house == null ? null : house.getOrigin().world();
         if (set != null) {
@@ -329,11 +291,94 @@ public final class GhostController {
         }
     }
 
-    private static Location randomInteriorPoint(DungeonInstance house) {
-        List<BlockPosKey> pts = house.getMobSpawns();
-        if (pts.isEmpty()) {
-            return house.teleportLocation();
+    private static Location chooseSpreadSpawnPoint(World world, DungeonInstance house, Set<UUID> aliveGhosts) {
+        List<BlockPosKey> candidates = safeSpawnPoints(world, house);
+        if (candidates.isEmpty()) return randomInteriorPoint(house);
+
+        List<Location> occupied = new ArrayList<>();
+        for (UUID uid : aliveGhosts) {
+            Entity entity = world.getEntity(uid);
+            if (entity instanceof LivingEntity ghost && ghost.isValid() && !ghost.isDead()) {
+                occupied.add(ghost.getLocation());
+            }
         }
-        return pts.get(ThreadLocalRandom.current().nextInt(pts.size())).floorLocation();
+        if (occupied.isEmpty()) {
+            return candidates.get(ThreadLocalRandom.current().nextInt(candidates.size())).floorLocation();
+        }
+
+        double bestDistance = -1.0;
+        List<BlockPosKey> best = new ArrayList<>();
+        for (BlockPosKey candidate : candidates) {
+            Location location = candidate.floorLocation();
+            double nearest = Double.POSITIVE_INFINITY;
+            for (Location other : occupied) {
+                nearest = Math.min(nearest, location.distanceSquared(other));
+            }
+            if (nearest > bestDistance) {
+                bestDistance = nearest;
+                best.clear();
+                best.add(candidate);
+            } else if (nearest == bestDistance) {
+                best.add(candidate);
+            }
+        }
+        return best.get(ThreadLocalRandom.current().nextInt(best.size())).floorLocation();
+    }
+
+    private static List<BlockPosKey> safeSpawnPoints(World world, DungeonInstance house) {
+        Set<BlockPosKey> allSafe = new HashSet<>();
+        Set<BlockPosKey> awayFromEntrance = new HashSet<>();
+        BlockPosKey entrance = house.getEntrancePos();
+        CuboidRegion bounds = house.getBounds();
+
+        for (BlockPosKey marker : house.getMobSpawns()) {
+            // Expand a marker to nearby walkable floor cells. This avoids stacking every Allay
+            // on a single marker when a schematic contains only one generated spawn coordinate.
+            for (int dy = -1; dy <= 1; dy++) {
+                for (int dz = -2; dz <= 2; dz++) {
+                    for (int dx = -2; dx <= 2; dx++) {
+                        BlockPosKey candidate = marker.add(dx, dy, dz);
+                        if (!bounds.containsBlock(candidate.worldName(), candidate.x(), candidate.y(), candidate.z())
+                                || !isSafeSpawnPoint(world, candidate)) {
+                            continue;
+                        }
+                        allSafe.add(candidate);
+                        if (entrance == null || horizontalDistanceSquared(candidate, entrance) >= 9) {
+                            awayFromEntrance.add(candidate);
+                        }
+                    }
+                }
+            }
+        }
+
+        Set<BlockPosKey> selected = awayFromEntrance.isEmpty() ? allSafe : awayFromEntrance;
+        return new ArrayList<>(selected);
+    }
+
+    private static boolean isSafeSpawnPoint(World world, BlockPosKey point) {
+        if (point.y() <= world.getMinHeight() || point.y() + 1 >= world.getMaxHeight()
+                || !world.isChunkLoaded(point.x() >> 4, point.z() >> 4)) {
+            return false;
+        }
+        Block floor = world.getBlockAt(point.x(), point.y() - 1, point.z());
+        Block feet = world.getBlockAt(point.x(), point.y(), point.z());
+        Block head = world.getBlockAt(point.x(), point.y() + 1, point.z());
+        return floor.isSolid() && feet.isPassable() && head.isPassable();
+    }
+
+    private static int horizontalDistanceSquared(BlockPosKey a, BlockPosKey b) {
+        int dx = a.x() - b.x(), dz = a.z() - b.z();
+        return dx * dx + dz * dz;
+    }
+
+    private static Location randomInteriorPoint(DungeonInstance house) {
+        World world = house.getOrigin().world();
+        if (world == null) return null;
+        List<BlockPosKey> points = safeSpawnPoints(world, house);
+        if (!points.isEmpty()) {
+            return points.get(ThreadLocalRandom.current().nextInt(points.size())).floorLocation();
+        }
+        Location entrance = house.teleportLocation();
+        return entrance != null && isSafeSpawnPoint(world, BlockPosKey.of(entrance)) ? entrance : null;
     }
 }

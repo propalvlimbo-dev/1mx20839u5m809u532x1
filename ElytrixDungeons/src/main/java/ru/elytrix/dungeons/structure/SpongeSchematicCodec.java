@@ -161,6 +161,8 @@ public final class SpongeSchematicCodec {
                     } else if (base.equals("barrel")) {
                         tpl.getBarrelOffsets().add(new int[]{x, y, z});
                     } else if (base.endsWith("shulker_box")) {
+                        // Any ordinary colored shulker in the .schem is a spawn/loot marker.
+                        // Keep its exact coordinates; runtime replaces/fills it with the configured loot shulker.
                         tpl.getShulkerOffsets().add(new int[]{x, y, z});
                     }
                 }
@@ -237,31 +239,40 @@ public final class SpongeSchematicCodec {
                 && distSq2D(spot[0], spot[2], midX, midZ) > Math.max(4, Math.min(sx, sz) / 3)
                         * Math.max(4, Math.min(sx, sz) / 3));
         List<int[]> holoCandidates = hologramSpots.isEmpty() ? interior : hologramSpots;
-        holoCandidates.sort(Comparator.comparingInt(a -> Math.abs(a[1] - floorY) * 10000
-                + distSq2D(a[0], a[2], midX, midZ)));
 
         if (category == DungeonCategory.SURFACE) {
             // Container positions are intentional markers in the uploaded .schem: never invent chests.
             if (!interior.isEmpty()) {
-                int[] centerRoom = !holoCandidates.isEmpty() ? holoCandidates.get(0) : interior.get(0);
-                tpl.setHologramOffset(centerRoom[0], centerRoom[1], centerRoom[2]);
+                int[] centerRoom = selectBestHologramSpot(tpl, holoCandidates, midX, midZ);
+                if (centerRoom == null) centerRoom = selectBestHologramSpot(tpl, interior, midX, midZ);
+                if (centerRoom == null) centerRoom = findOpenHologramSpot(tpl, midX, midZ);
+                if (centerRoom != null) tpl.setHologramOffset(centerRoom[0], centerRoom[1], centerRoom[2]);
                 int[] entry = interior.get(Math.min(interior.size() - 1, Math.max(0, interior.size() / 4)));
                 tpl.setEntranceOffset(entry[0], entry[1], entry[2]);
-
-                int step = Math.max(1, interior.size() / 8);
-                for (int i = 0; i < interior.size() && tpl.getMobSpawnOffsets().size() < 8; i += step) {
-                    tpl.getMobSpawnOffsets().add(interior.get(i));
-                }
+                addDistributedMobSpawnOffsets(tpl, interior, 8, entry[0], entry[2]);
+            } else {
+                int[] openSpot = findOpenHologramSpot(tpl, midX, midZ);
+                if (openSpot != null) tpl.setHologramOffset(openSpot[0], openSpot[1], openSpot[2]);
             }
         } else {
-            // UNDERGROUND: ensure at least one locked boss shulker on an interior floor.
+            // An ordinary shulker block in the uploaded .schem marks the exact loot location.
+            // If none was supplied, place one on an interior floor as before.
             if (tpl.getShulkerOffsets().isEmpty()) {
                 int[] center = !interior.isEmpty() ? interior.get(0) : new int[]{midX, Math.max(1, sy / 3), midZ};
                 tpl.setBlock(center[0], center[1], center[2], "minecraft:purple_shulker_box[facing=up]");
                 tpl.getShulkerOffsets().add(center);
             }
             int[] mainShulker = tpl.getShulkerOffsets().get(0);
-            tpl.setHologramOffset(mainShulker[0], mainShulker[1], mainShulker[2]);
+            int[] hologramSpot = selectBestHologramSpot(tpl, holoCandidates, mainShulker[0], mainShulker[2]);
+            if (hologramSpot == null) {
+                hologramSpot = selectBestHologramSpot(tpl, interior, midX, midZ);
+            }
+            if (hologramSpot == null) {
+                hologramSpot = findOpenHologramSpot(tpl, midX, midZ);
+            }
+            if (hologramSpot != null) {
+                tpl.setHologramOffset(hologramSpot[0], hologramSpot[1], hologramSpot[2]);
+            }
 
             List<int[]> around = new ArrayList<>();
             for (int[] c : interior) {
@@ -272,16 +283,114 @@ public final class SpongeSchematicCodec {
             }
             List<int[]> source = !around.isEmpty() ? around : interior;
             if (!source.isEmpty()) {
-                tpl.setEntranceOffset(source.get(0)[0], source.get(0)[1], source.get(0)[2]);
-                int step = Math.max(1, source.size() / 8);
-                for (int i = 0; i < source.size() && tpl.getMobSpawnOffsets().size() < 8; i += step) {
-                    tpl.getMobSpawnOffsets().add(source.get(i));
-                }
+                int[] entry = source.get(0);
+                tpl.setEntranceOffset(entry[0], entry[1], entry[2]);
+                addDistributedMobSpawnOffsets(tpl, source, 8, entry[0], entry[2]);
             } else {
-                tpl.setEntranceOffset(Math.max(1, mainShulker[0] - 2), mainShulker[1], mainShulker[2]);
-                tpl.getMobSpawnOffsets().add(new int[]{Math.max(1, mainShulker[0] - 2), mainShulker[1], mainShulker[2]});
+                int[] fallback = new int[]{Math.max(1, mainShulker[0] - 2), mainShulker[1], mainShulker[2]};
+                tpl.setEntranceOffset(fallback[0], fallback[1], fallback[2]);
+                tpl.getMobSpawnOffsets().add(fallback);
             }
         }
+    }
+
+    private static int[] selectBestHologramSpot(
+            DungeonTemplate tpl, List<int[]> candidates, int referenceX, int referenceZ
+    ) {
+        int[] best = null;
+        int bestClearance = Integer.MIN_VALUE;
+        int bestDistance = Integer.MAX_VALUE;
+        for (int[] candidate : candidates) {
+            if (!isPassable(tpl.getBlock(candidate[0], candidate[1], candidate[2]))
+                    || !isPassable(tpl.getBlock(candidate[0], candidate[1] + 1, candidate[2]))
+                    || !isPassable(tpl.getBlock(candidate[0], candidate[1] + 2, candidate[2]))) {
+                continue;
+            }
+            int clearance = hologramClearanceScore(tpl, candidate);
+            int distance = distSq2D(candidate[0], candidate[2], referenceX, referenceZ);
+            if (clearance > bestClearance || clearance == bestClearance && distance < bestDistance) {
+                best = candidate;
+                bestClearance = clearance;
+                bestDistance = distance;
+            }
+        }
+        return best;
+    }
+
+    private static int[] findOpenHologramSpot(DungeonTemplate tpl, int referenceX, int referenceZ) {
+        List<int[]> candidates = new ArrayList<>();
+        for (int y = 1; y < tpl.getSizeY() - 2; y++) {
+            for (int z = 1; z < tpl.getSizeZ() - 1; z++) {
+                for (int x = 1; x < tpl.getSizeX() - 1; x++) {
+                    if (isPassable(tpl.getBlock(x, y, z))
+                            && isPassable(tpl.getBlock(x, y + 1, z))
+                            && isPassable(tpl.getBlock(x, y + 2, z))) {
+                        candidates.add(new int[]{x, y, z});
+                    }
+                }
+            }
+        }
+        return selectBestHologramSpot(tpl, candidates, referenceX, referenceZ);
+    }
+
+    private static int hologramClearanceScore(DungeonTemplate tpl, int[] spot) {
+        int score = 0;
+        for (int y = spot[1]; y < Math.min(tpl.getSizeY(), spot[1] + 5); y++) {
+            for (int dz = -2; dz <= 2; dz++) {
+                for (int dx = -2; dx <= 2; dx++) {
+                    int x = spot[0] + dx, z = spot[2] + dz;
+                    if (x >= 0 && x < tpl.getSizeX() && z >= 0 && z < tpl.getSizeZ()
+                            && isPassable(tpl.getBlock(x, y, z))) {
+                        score++;
+                    }
+                }
+            }
+        }
+        return score;
+    }
+
+    private static void addDistributedMobSpawnOffsets(
+            DungeonTemplate tpl, List<int[]> candidates, int maxSpawns, int entranceX, int entranceZ
+    ) {
+        if (candidates.isEmpty()) return;
+
+        List<int[]> separatedFromEntrance = new ArrayList<>();
+        for (int[] candidate : candidates) {
+            if (distSq2D(candidate[0], candidate[2], entranceX, entranceZ) >= 9) {
+                separatedFromEntrance.add(candidate);
+            }
+        }
+        List<int[]> remaining = new ArrayList<>(separatedFromEntrance.isEmpty() ? candidates : separatedFromEntrance);
+        List<int[]> selected = new ArrayList<>();
+        int centerX = tpl.getSizeX() / 2, centerZ = tpl.getSizeZ() / 2;
+
+        while (!remaining.isEmpty() && selected.size() < maxSpawns) {
+            int bestIndex = 0;
+            int bestDistance = Integer.MIN_VALUE;
+            for (int i = 0; i < remaining.size(); i++) {
+                int[] candidate = remaining.get(i);
+                int distance;
+                if (selected.isEmpty()) {
+                    distance = distSq2D(candidate[0], candidate[2], entranceX, entranceZ);
+                } else {
+                    distance = Integer.MAX_VALUE;
+                    for (int[] existing : selected) {
+                        int dx = candidate[0] - existing[0];
+                        int dy = candidate[1] - existing[1];
+                        int dz = candidate[2] - existing[2];
+                        distance = Math.min(distance, dx * dx + dy * dy * 2 + dz * dz);
+                    }
+                }
+                if (distance > bestDistance || distance == bestDistance
+                        && distSq2D(candidate[0], candidate[2], centerX, centerZ)
+                        < distSq2D(remaining.get(bestIndex)[0], remaining.get(bestIndex)[2], centerX, centerZ)) {
+                    bestDistance = distance;
+                    bestIndex = i;
+                }
+            }
+            selected.add(remaining.remove(bestIndex));
+        }
+        tpl.getMobSpawnOffsets().addAll(selected);
     }
 
     private static boolean[] findExteriorPassableCells(DungeonTemplate tpl) {

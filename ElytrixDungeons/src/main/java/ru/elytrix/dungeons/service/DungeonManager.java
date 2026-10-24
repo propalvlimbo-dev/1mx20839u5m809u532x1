@@ -1295,9 +1295,16 @@ public final class DungeonManager {
         if (anchor == null) return;
         World w = anchor.world();
         if (w == null || !w.isChunkLoaded(anchor.x() >> 4, anchor.z() >> 4)) return;
+        if (!w.getBlockAt(anchor.x(), anchor.y(), anchor.z()).isPassable()
+                || !w.getBlockAt(anchor.x(), anchor.y() + 1, anchor.z()).isPassable()
+                || !w.getBlockAt(anchor.x(), anchor.y() + 2, anchor.z()).isPassable()) {
+            removeHologram(d);
+            return;
+        }
 
-        // Surface anchors are a clear first-floor air cell; keep the three-line display below the ceiling.
-        double yOff = d.getCategory() == DungeonCategory.UNDERGROUND ? 2.35 : 1.55;
+        // Both categories use a clear room-floor anchor, not a shulker block. Keep the display
+        // within the open room instead of pushing underground labels into the ceiling.
+        double yOff = 1.55;
         Location holoLoc = new Location(w, anchor.x() + 0.5, anchor.y() + yOff, anchor.z() + 0.5);
         TextDisplay td = findHologram(w, d, holoLoc);
         if (td == null) {
