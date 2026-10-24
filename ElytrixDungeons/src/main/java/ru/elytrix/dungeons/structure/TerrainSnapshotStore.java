@@ -117,9 +117,16 @@ public final class TerrainSnapshotStore {
      * from original natural worldgen, allowing zero-lag batched restoration on live servers!
      */
     public List<BlockRestoreDiff> collectRestoreDiffs(String dungeonId) throws IOException {
+        return collectRestoreDiffs(dungeonId, false);
+    }
+
+    private List<BlockRestoreDiff> collectRestoreDiffs(String dungeonId, boolean strict) throws IOException {
         List<BlockRestoreDiff> diffs = new ArrayList<>();
         File inFile = snapshotFile(dungeonId);
-        if (!inFile.isFile()) return diffs;
+        if (!inFile.isFile()) {
+            if (strict) throw new IOException("Снимок рельефа не найден");
+            return diffs;
+        }
 
         try (DataInputStream in = new DataInputStream(new BufferedInputStream(new GZIPInputStream(new FileInputStream(inFile))))) {
             String worldName = in.readUTF();
@@ -128,23 +135,38 @@ public final class TerrainSnapshotStore {
 
             int minX = in.readInt(), minY = in.readInt(), minZ = in.readInt();
             int sx = in.readInt(), sy = in.readInt(), sz = in.readInt();
+            long totalLong = (long) sx * sy * sz;
+            if (strict && (sx <= 0 || sy <= 0 || sz <= 0 || totalLong > Integer.MAX_VALUE)) {
+                throw new IOException("Некорректные размеры снимка рельефа");
+            }
+            int total = (int) totalLong;
             ensureChunksLoaded(world, new CuboidRegion(worldName, minX, minY, minZ, minX + sx - 1, minY + sy - 1, minZ + sz - 1));
 
             int pCount = in.readInt();
+            if (strict && (pCount <= 0 || pCount > total)) {
+                throw new IOException("Некорректная палитра снимка рельефа");
+            }
             BlockData[] datas = new BlockData[pCount];
             for (int i = 0; i < pCount; i++) {
                 String state = in.readUTF();
                 try {
                     datas[i] = Bukkit.createBlockData(state);
                 } catch (IllegalArgumentException ex) {
+                    if (strict) throw new IOException("Некорректный блок в снимке рельефа: " + state, ex);
                     datas[i] = Bukkit.createBlockData(Material.AIR);
                 }
             }
             int runCount = in.readInt();
-            int cursor = 0, total = sx * sy * sz;
+            if (strict && (runCount <= 0 || runCount > total)) {
+                throw new IOException("Некорректные данные снимка рельефа");
+            }
+            int cursor = 0;
             for (int r = 0; r < runCount; r++) {
                 int pid = in.readInt();
                 int len = in.readInt();
+                if (strict && (pid < 0 || pid >= datas.length || len <= 0 || (long) cursor + len > total)) {
+                    throw new IOException("Повреждены последовательности блоков снимка рельефа");
+                }
                 BlockData bd = pid >= 0 && pid < datas.length ? datas[pid] : Bukkit.createBlockData(Material.AIR);
                 for (int k = 0; k < len && cursor < total; k++, cursor++) {
                     int y = cursor / (sx * sz);
@@ -157,6 +179,9 @@ public final class TerrainSnapshotStore {
                     }
                 }
             }
+            if (strict && cursor != total) {
+                throw new IOException("Снимок рельефа содержит не все блоки");
+            }
         }
         return diffs;
     }
@@ -166,23 +191,51 @@ public final class TerrainSnapshotStore {
      * dungeon AND any surrounding grief craters disappear cleanly without holding shutdown.
      */
     public void restoreWorldSnapshotInstant(String dungeonId) throws IOException {
+        restoreWorldSnapshotInstant(dungeonId, null, false);
+    }
+
+    /**
+     * Strict restore used before deleting a dungeon. Unlike best-effort shutdown/regen restores,
+     * this fails if the snapshot is missing or belongs to a different world.
+     */
+    public boolean restoreWorldSnapshotInstant(String dungeonId, String expectedWorldName) throws IOException {
+        return restoreWorldSnapshotInstant(dungeonId, expectedWorldName, true);
+    }
+
+    private boolean restoreWorldSnapshotInstant(
+            String dungeonId, String expectedWorldName, boolean requireSnapshot
+    ) throws IOException {
         File inFile = snapshotFile(dungeonId);
-        if (!inFile.isFile()) return;
-
-        List<BlockRestoreDiff> diffs = collectRestoreDiffs(dungeonId);
-        if (diffs.isEmpty()) return;
-
-        try (DataInputStream in = new DataInputStream(new BufferedInputStream(new GZIPInputStream(new FileInputStream(inFile))))) {
-            World world = Bukkit.getWorld(in.readUTF());
-            if (world == null) return;
-            for (BlockRestoreDiff diff : diffs) {
-                Block b = world.getBlockAt(diff.x(), diff.y(), diff.z());
-                if (isContainerType(b.getType()) && b.getState() instanceof InventoryHolder holder) {
-                    holder.getInventory().clear();
-                }
-                b.setBlockData(diff.data(), false);
-            }
+        if (!inFile.isFile()) {
+            if (requireSnapshot) throw new IOException("Снимок рельефа не найден");
+            return false;
         }
+
+        String snapshotWorldName;
+        try (DataInputStream in = new DataInputStream(new BufferedInputStream(
+                new GZIPInputStream(new FileInputStream(inFile))))) {
+            snapshotWorldName = in.readUTF();
+        }
+        if (expectedWorldName != null && !expectedWorldName.equals(snapshotWorldName)) {
+            throw new IOException("Снимок относится к миру «" + snapshotWorldName
+                    + "», а данж находится в мире «" + expectedWorldName + "»");
+        }
+
+        World world = Bukkit.getWorld(snapshotWorldName);
+        if (world == null) {
+            if (requireSnapshot) throw new IOException("Мир снимка «" + snapshotWorldName + "» не загружен");
+            return false;
+        }
+
+        List<BlockRestoreDiff> diffs = collectRestoreDiffs(dungeonId, requireSnapshot);
+        for (BlockRestoreDiff diff : diffs) {
+            Block b = world.getBlockAt(diff.x(), diff.y(), diff.z());
+            if (isContainerType(b.getType()) && b.getState() instanceof InventoryHolder holder) {
+                holder.getInventory().clear();
+            }
+            b.setBlockData(diff.data(), false);
+        }
+        return true;
     }
 
     public static void ensureChunksLoaded(World world, CuboidRegion box) {

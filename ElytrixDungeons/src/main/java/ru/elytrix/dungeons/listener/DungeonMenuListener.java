@@ -68,6 +68,7 @@ public final class DungeonMenuListener implements Listener {
                 }
             }
             case ADMIN_BOARD -> handleAdminBoard(player, raw, clicked, event.getClick());
+            case DELETE_CONFIRM -> handleDeleteConfirmation(player, holder, raw);
             case LOOT_POOL_SELECT -> {
                 if (raw == 40) {
                     plugin.getMenuService().openAdminBoard(player);
@@ -176,6 +177,14 @@ public final class DungeonMenuListener implements Listener {
             admin.closeInventory();
             plugin.getDungeonManager().regenerateDungeon(d, true);
             admin.sendMessage(plugin.prefix() + "Данж §f" + d.getId() + " §7перенесён на новые идеальные координаты!");
+        } else if (click == ClickType.SHIFT_LEFT) {
+            if (!admin.hasPermission("elytrixdungeons.admin")) return;
+            if (plugin.getDungeonManager().isPlacementInProgress() || plugin.getDungeonManager().isScanning()) {
+                admin.sendMessage(plugin.prefix() + "§cДождитесь завершения поиска, установки или обновления данжа.");
+                plugin.getMenuService().openAdminBoard(admin);
+                return;
+            }
+            plugin.getMenuService().openDeleteConfirmation(admin, d);
         } else if (click.isRightClick()) {
             plugin.getDungeonManager().regenerateDungeon(d, false);
             admin.playSound(admin.getLocation(), Sound.BLOCK_ANVIL_USE, 0.7f, 1.25f);
@@ -188,6 +197,39 @@ public final class DungeonMenuListener implements Listener {
                 admin.playSound(tp, Sound.ENTITY_ENDERMAN_TELEPORT, 0.8f, 1.15f);
             }
         }
+    }
+
+    private void handleDeleteConfirmation(Player admin, DungeonGuiHolder holder, int raw) {
+        if (!admin.hasPermission("elytrixdungeons.admin")) {
+            admin.closeInventory();
+            return;
+        }
+        if (raw == 15) {
+            plugin.getMenuService().openAdminBoard(admin);
+            return;
+        }
+        if (raw != 11) return;
+
+        String dungeonId = holder.getDungeonId();
+        if (dungeonId == null) {
+            plugin.getMenuService().openAdminBoard(admin);
+            return;
+        }
+        if (plugin.getDungeonManager().isPlacementInProgress() || plugin.getDungeonManager().isScanning()) {
+            admin.sendMessage(plugin.prefix() + "§cДождитесь завершения поиска, установки или обновления данжа и повторите удаление.");
+            plugin.getMenuService().openAdminBoard(admin);
+            return;
+        }
+
+        if (plugin.getDungeonManager().removeDungeon(dungeonId, true)) {
+            admin.sendMessage(plugin.prefix() + "Данж §f" + dungeonId
+                    + " §7удалён, исходный рельеф восстановлен.");
+            admin.playSound(admin.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.7f, 1.2f);
+        } else {
+            admin.sendMessage(plugin.prefix() + "§cНе удалось удалить данж. Проверьте, что он не удалён, не идёт поиск/обновление и для него сохранён снимок местности.");
+            admin.playSound(admin.getLocation(), Sound.BLOCK_ANVIL_USE, 0.6f, 0.8f);
+        }
+        plugin.getMenuService().openAdminBoard(admin);
     }
 
     private void handleLootEditor(Player admin, LootPoolType poolType, int raw, ItemStack clicked, ClickType click) {

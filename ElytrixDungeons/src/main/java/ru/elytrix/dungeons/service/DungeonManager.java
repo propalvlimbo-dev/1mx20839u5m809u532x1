@@ -2,6 +2,9 @@ package ru.elytrix.dungeons.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -341,7 +344,7 @@ public final class DungeonManager {
         return (list == null || list.isEmpty()) ? null : list.get(0);
     }
 
-    public void saveDungeons() {
+    public boolean saveDungeons() {
         YamlConfiguration yml = new YamlConfiguration();
         for (DungeonInstance d : dungeons.values()) {
             String p = "dungeons." + d.getId();
@@ -373,10 +376,21 @@ public final class DungeonManager {
             }
             yml.set(p + ".surface-shulkers", surfaceShulkers);
         }
+        File tempFile = new File(plugin.getDataFolder(), "dungeons.yml.tmp");
         try {
-            yml.save(dungeonsFile);
+            yml.save(tempFile);
+            try {
+                Files.move(tempFile.toPath(), dungeonsFile.toPath(),
+                        StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+            } catch (AtomicMoveNotSupportedException ex) {
+                Files.move(tempFile.toPath(), dungeonsFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            }
+            return true;
         } catch (IOException ex) {
             plugin.getLogger().severe("Не удалось сохранить dungeons.yml: " + ex.getMessage());
+            return false;
+        } finally {
+            if (tempFile.exists()) tempFile.delete();
         }
     }
 
@@ -394,8 +408,13 @@ public final class DungeonManager {
      * and scans fresh ideal spots across ungenerated chunks: 7 SURFACE (4 + 3) & 7 UNDERGROUND (4 + 3)!
      */
     public void rebuildAllFromSchematics() {
+        if (isPlacementInProgress()) {
+            enqueueJob(this::rebuildAllFromSchematics);
+            return;
+        }
         hiddenFromWorld = false;
         jobQueue.clear();
+        pendingScanTotal = pendingScanDone;
         for (String id : new ArrayList<>(dungeons.keySet())) {
             removeDungeon(id, true);
         }
@@ -687,6 +706,7 @@ public final class DungeonManager {
     }
 
     public void regenerateDungeon(DungeonInstance inst, boolean forceRelocate) {
+        if (inst == null || dungeons.get(inst.getId()) != inst) return;
         DungeonTemplate tpl = resolveTemplateOrCategoryFallback(inst.getTemplateId(), inst.getCategory());
         World w = inst.getOrigin().world();
         if (tpl == null || w == null || inst.getStatus() == DungeonStatus.REGENERATING) {
@@ -730,24 +750,54 @@ public final class DungeonManager {
     }
 
     public boolean removeDungeon(String id, boolean restoreTerrain) {
+        if (id == null || isScanning() || isPlacementInProgress()) return false;
         DungeonInstance inst = dungeons.get(id);
-        if (inst == null) return false;
-        plugin.getTrialController().abortFight(id, false);
-        plugin.getGhostController().clearHouseGhosts(id);
-        dungeons.remove(id);
-        protectedContainerIndex.entrySet().removeIf(e -> e.getValue().equals(id));
-        removeHologram(inst);
-        removeContainerHolograms(inst);
-        World w = inst.getOrigin().world();
-        plugin.getWorldGuardHook().removeDungeonRegion(w, id);
+        if (inst == null || inst.getStatus() == DungeonStatus.REGENERATING) return false;
+
+        World world = inst.getOrigin().world();
         if (restoreTerrain) {
+            if (world == null) {
+                plugin.getLogger().severe("Не удалось удалить данж " + id + ": мир данжа не загружен.");
+                return false;
+            }
             try {
-                snapshotStore.restoreWorldSnapshotInstant(id);
-            } catch (IOException ignored) {
+                if (!snapshotStore.restoreWorldSnapshotInstant(id, inst.getOrigin().worldName())) {
+                    plugin.getLogger().severe("Не удалось удалить данж " + id + ": снимок рельефа недоступен.");
+                    return false;
+                }
+            } catch (IOException | RuntimeException ex) {
+                plugin.getLogger().severe("Не удалось восстановить рельеф для " + id + "; данж оставлен: " + ex.getMessage());
+                return false;
             }
         }
+
+        if (restoreTerrain) evacuatePlayersFromDungeon(inst, world);
+        plugin.getTrialController().abortFight(id, false);
+        plugin.getGhostController().clearHouseGhosts(id);
+        stopHouseMusicForDungeon(id);
+        removeHologram(inst);
+        removeContainerHolograms(inst);
+        plugin.getWorldGuardHook().removeDungeonRegion(world, id);
+        dungeons.remove(id);
+        protectedContainerIndex.entrySet().removeIf(e -> e.getValue().equals(id));
+
+        if (!saveDungeons()) {
+            dungeons.put(id, inst);
+            reindexProtectedContainers(inst);
+            int pad = plugin.getConfig().getInt("protection.claim-padding-blocks", 40);
+            plugin.getWorldGuardHook().syncDungeonRegion(inst, pad,
+                    plugin.getConfig().getBoolean("protection.allow-pvp", true),
+                    plugin.getConfig().getBoolean("protection.allow-block-modify-in-zone", true));
+            if (restoreTerrain) {
+                enqueueJob(() -> restoreSavedDungeonOnStartup(inst));
+            } else {
+                updateContainerHolograms(inst);
+                updateDungeonHologram(inst);
+            }
+            return false;
+        }
+
         snapshotStore.deleteSnapshot(id);
-        saveDungeons();
         return true;
     }
 
@@ -1152,6 +1202,26 @@ public final class DungeonManager {
         houseMusicPlayers.clear();
         houseMusicPlayers.putAll(insideNow);
         houseMusicStartedAtMs.keySet().removeIf(playerId -> !insideNow.containsKey(playerId));
+    }
+
+    private void evacuatePlayersFromDungeon(DungeonInstance dungeon, World world) {
+        Location safeLocation = world.getSpawnLocation();
+        for (Player player : world.getPlayers()) {
+            if (!dungeon.getBounds().contains(player.getLocation())) continue;
+            player.setFallDistance(0f);
+            player.teleport(safeLocation);
+            player.sendMessage(plugin.prefix() + "Данж удалён, вы перемещены на безопасное место.");
+        }
+    }
+
+    private void stopHouseMusicForDungeon(String dungeonId) {
+        for (Map.Entry<UUID, String> entry : new ArrayList<>(houseMusicPlayers.entrySet())) {
+            if (!dungeonId.equals(entry.getValue())) continue;
+            Player player = Bukkit.getPlayer(entry.getKey());
+            if (player != null) player.stopSound(Sound.MUSIC_DISC_5);
+            houseMusicPlayers.remove(entry.getKey());
+            houseMusicStartedAtMs.remove(entry.getKey());
+        }
     }
 
     private void stopHouseMusic() {

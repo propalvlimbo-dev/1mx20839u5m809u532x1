@@ -237,8 +237,14 @@ public final class DungeonCommand implements TabExecutor {
                 }
             }
             case "remove" -> {
-                if (args.length >= 2 && plugin.getDungeonManager().removeDungeon(args[1], true)) {
+                if (args.length < 2) {
+                    sender.sendMessage(plugin.prefix() + "/elytrixdungeon remove <id-данжа>");
+                    return true;
+                }
+                if (plugin.getDungeonManager().removeDungeon(args[1], true)) {
                     sender.sendMessage(plugin.prefix() + "Данж удалён, природный рельеф возвращён.");
+                } else {
+                    sender.sendMessage(plugin.prefix() + "§cНе удалось удалить данж: он не найден, идёт поиск/установка/обновление или не удалось восстановить снимок рельефа.");
                 }
             }
             case "reload" -> {

@@ -131,6 +131,31 @@ public final class DungeonMenuService {
         player.openInventory(inv);
     }
 
+    public void openDeleteConfirmation(Player admin, DungeonInstance dungeon) {
+        DungeonGuiHolder holder = new DungeonGuiHolder(
+                DungeonGuiHolder.Screen.DELETE_CONFIRM, null, dungeon.getId());
+        Inventory inv = Bukkit.createInventory(holder, 27, TextUtil.color("&#FF5555&lУдалить данж?"));
+        holder.setInventory(inv);
+        fillBorder(inv);
+
+        BlockPosKey origin = dungeon.getOrigin();
+        inv.setItem(13, icon(dungeon.getCategory().getIcon(),
+                "&7« " + dungeon.getCategory().getColorHex() + dungeon.getDisplayName() + " &8#" + dungeon.getId() + " &7»",
+                List.of(
+                        "&#F8BEFB&l┃ &fКоординаты: &#F8BEFB" + origin.x() + ", " + origin.y() + ", " + origin.z(),
+                        "&#F8BEFB&l┃ &cДанж будет удалён без возможности отката.",
+                        "&#F8BEFB&l┃ &fСнимок местности будет восстановлен, запись и лут данжа удалены."
+                )));
+        inv.setItem(11, icon(Material.RED_CONCRETE, "&7« &cПодтвердить удаление &7»", List.of(
+                "&#F8BEFB&l┃ &fУдалить схематику и вернуть исходный рельеф",
+                "&7● &cПодтверждение необратимо"
+        )));
+        inv.setItem(15, icon(Material.LIME_DYE, "&7« &#96FF91Отмена &7»", List.of(
+                "&7● &fВернуться в панель администратора"
+        )));
+        admin.openInventory(inv);
+    }
+
     private void placeSevenRow(Inventory inv, DungeonCategory cat, int startSlot, boolean adminControls, boolean allowTp) {
         int col = 0;
         for (DungeonInstance d : plugin.getDungeonManager().getAllDungeons()) {
@@ -153,6 +178,7 @@ public final class DungeonMenuService {
                 lore.add("&7● &fЛКМ — телепортироваться внутрь");
                 lore.add("&7● &fПКМ — восстановить данж и блоки вокруг");
                 lore.add("&7● &fShift+ПКМ — перенести на новое место");
+                lore.add("&7● &cShift+ЛКМ — удалить данж и восстановить рельеф");
             } else if (allowTp) {
                 lore.add("&#F8BEFB&l┃");
                 lore.add("&7● &fНажмите для телепортации");
