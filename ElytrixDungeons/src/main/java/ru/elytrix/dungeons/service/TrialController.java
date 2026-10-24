@@ -287,7 +287,6 @@ public final class TrialController {
 
         notifyNearby(d, 45.0, plugin.msg("underground-completed"));
         plugin.getDungeonManager().saveDungeons();
-        plugin.getDungeonManager().updateDungeonHologram(d);
     }
 
     public void abortFight(String dungeonId, boolean markReady) {
@@ -297,7 +296,6 @@ public final class TrialController {
         fight.bossBar.removeAll();
         if (markReady) {
             fight.dungeon.setStatus(DungeonStatus.READY);
-            plugin.getDungeonManager().updateDungeonHologram(fight.dungeon);
         }
     }
 
@@ -368,7 +366,6 @@ public final class TrialController {
                 }
             }
         }
-        plugin.getDungeonManager().updateDungeonHologram(d);
     }
 
     private static void setAttr(LivingEntity le, Attribute attr, double val) {

@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import org.bukkit.Location;
+import org.bukkit.World;
 
 public final class DungeonInstance {
 
@@ -23,6 +24,7 @@ public final class DungeonInstance {
 
     private DungeonStatus status = DungeonStatus.READY;
     private long nextResetEpochMs;
+    private long ghostRespawnAtMs;
     private UUID hologramUuid;
 
     private BlockPosKey hologramAnchor;
@@ -99,9 +101,42 @@ public final class DungeonInstance {
         return structureBounds.expand(padding, 16);
     }
 
+    /**
+     * Returns a centered, walkable ground-floor arrival point. The schematic analyzer sets the
+     * preferred point in the connected entrance/corridor network; this runtime check handles a
+     * block changed by a player without ever falling back to a hologram anchor.
+     */
     public Location teleportLocation() {
-        return entrancePos != null ? entrancePos.floorLocation()
-                : (hologramAnchor != null ? hologramAnchor.floorLocation() : origin.floorLocation());
+        BlockPosKey preferred = entrancePos != null ? entrancePos : origin;
+        World world = preferred.world();
+        if (world == null || !world.isChunkLoaded(preferred.x() >> 4, preferred.z() >> 4)) {
+            return preferred.floorLocation();
+        }
+        if (isSafeArrival(world, preferred)) return preferred.floorLocation();
+
+        for (int radius = 1; radius <= 8; radius++) {
+            for (int dy = -2; dy <= 2; dy++) {
+                for (int dz = -radius; dz <= radius; dz++) {
+                    for (int dx = -radius; dx <= radius; dx++) {
+                        if (Math.max(Math.abs(dx), Math.abs(dz)) != radius) continue;
+                        BlockPosKey candidate = preferred.add(dx, dy, dz);
+                        if (getBounds().containsBlock(candidate.worldName(), candidate.x(), candidate.y(), candidate.z())
+                                && world.isChunkLoaded(candidate.x() >> 4, candidate.z() >> 4)
+                                && isSafeArrival(world, candidate)) {
+                            return candidate.floorLocation();
+                        }
+                    }
+                }
+            }
+        }
+        return preferred.floorLocation();
+    }
+
+    private static boolean isSafeArrival(World world, BlockPosKey point) {
+        if (point.y() <= world.getMinHeight() || point.y() + 1 >= world.getMaxHeight()) return false;
+        return world.getBlockAt(point.x(), point.y() - 1, point.z()).isSolid()
+                && world.getBlockAt(point.x(), point.y(), point.z()).isPassable()
+                && world.getBlockAt(point.x(), point.y() + 1, point.z()).isPassable();
     }
 
     public long secondsUntilReset() {
@@ -129,6 +164,9 @@ public final class DungeonInstance {
 
     public long getNextResetEpochMs() { return nextResetEpochMs; }
     public void setNextResetEpochMs(long ms) { this.nextResetEpochMs = ms; }
+
+    public long getGhostRespawnAtMs() { return ghostRespawnAtMs; }
+    public void setGhostRespawnAtMs(long ms) { this.ghostRespawnAtMs = Math.max(0L, ms); }
 
     public UUID getHologramUuid() { return hologramUuid; }
     public void setHologramUuid(UUID hologramUuid) { this.hologramUuid = hologramUuid; }

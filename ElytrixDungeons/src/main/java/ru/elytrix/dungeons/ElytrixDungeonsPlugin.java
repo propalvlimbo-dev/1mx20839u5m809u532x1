@@ -87,30 +87,61 @@ public final class ElytrixDungeonsPlugin extends JavaPlugin {
         migrateLegacyConfig();
         reloadMessages();
         lootRegistry.load();
+        dungeonManager.removeLegacyDungeonDisplays();
         dungeonManager.loadSchematics();
         dungeonManager.syncAllWorldGuardRegions();
     }
 
     private void migrateLegacyConfig() {
         int version = getConfig().isSet("config-version") ? getConfig().getInt("config-version", 0) : 0;
-        if (version >= 2) {
-            return;
+        boolean changed = false;
+
+        if (version < 2) {
+            // Upgrade the old built-in defaults without changing newer user tuning.
+            if (Math.abs(getConfig().getDouble("surface-dungeon.ghosts.key-drop-chance", 5.0) - 5.0) < 0.001) {
+                getConfig().set("surface-dungeon.ghosts.key-drop-chance", 35.0);
+            }
+            if (getConfig().getDouble("surface-dungeon.ambience.volume", 0.55) < 1.5) {
+                getConfig().set("surface-dungeon.ambience.volume", 2.0);
+            }
+            getConfig().set("surface-dungeon.shulker-stacks", Math.max(14,
+                    getConfig().getInt("surface-dungeon.shulker-stacks", 14)));
+            getConfig().set("surface-dungeon.shulker-refresh-seconds", 21600);
+            getConfig().set("surface-dungeon.landscaping.enabled", true);
+            getConfig().set("surface-dungeon.landscaping.radius", 6);
+            version = 2;
+            changed = true;
         }
 
-        // Upgrade the old built-in 5% default without changing newer user tuning.
-        if (Math.abs(getConfig().getDouble("surface-dungeon.ghosts.key-drop-chance", 5.0) - 5.0) < 0.001) {
-            getConfig().set("surface-dungeon.ghosts.key-drop-chance", 35.0);
+        if (version < 3) {
+            if (!getConfig().isSet("surface-dungeon.ghosts.initial-count")) {
+                getConfig().set("surface-dungeon.ghosts.initial-count", 6);
+            }
+            if (!getConfig().isSet("surface-dungeon.ghosts.respawn-cooldown-seconds")) {
+                getConfig().set("surface-dungeon.ghosts.respawn-cooldown-seconds", 7200);
+            }
+            getConfig().set("surface-dungeon.ghosts.max-alive", null);
+            getConfig().set("surface-dungeon.ghosts.respawn-every-seconds", null);
+            getConfig().set("hologram.enabled", false);
+            getConfig().set("hologram.chest-hint.enabled", false);
+            if (!getConfig().isSet("auctionbar.enabled")) getConfig().set("auctionbar.enabled", true);
+            if (!getConfig().isSet("auctionbar.cycle-seconds")) getConfig().set("auctionbar.cycle-seconds", 15);
+            String auctionBrand = "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &8» ";
+            if (!getConfig().isSet("auctionbar.reset-line")) {
+                getConfig().set("auctionbar.reset-line", auctionBrand + "&7{dungeon} &8┃ &fДанж восстановится через &#96FF91{timer}");
+            }
+            if (!getConfig().isSet("auctionbar.ghosts-line")) {
+                getConfig().set("auctionbar.ghosts-line", auctionBrand
+                        + "&7{dungeon} &8┃ &f{ghost-label}: &#F8BEFB{ghosts}&7/{ghost-total} &8┃ &f{ghost-state}");
+            }
+            if (!getConfig().isSet("auctionbar.loot-line")) {
+                getConfig().set("auctionbar.loot-line", auctionBrand
+                        + "&7{dungeon} &8┃ &fЛут обновится через &#96FF91{timer}");
+            }
+            getConfig().set("config-version", 3);
+            changed = true;
         }
-        if (getConfig().getDouble("surface-dungeon.ambience.volume", 0.55) < 1.5) {
-            getConfig().set("surface-dungeon.ambience.volume", 2.0);
-        }
-        getConfig().set("surface-dungeon.shulker-stacks", Math.max(14,
-                getConfig().getInt("surface-dungeon.shulker-stacks", 14)));
-        getConfig().set("surface-dungeon.shulker-refresh-seconds", 21600);
-        getConfig().set("surface-dungeon.landscaping.enabled", true);
-        getConfig().set("surface-dungeon.landscaping.radius", 6);
-        getConfig().set("config-version", 2);
-        saveConfig();
+        if (changed) saveConfig();
     }
 
     private void saveResourceIfMissing(String name) {

@@ -160,9 +160,9 @@ public final class DungeonMenuService {
         int col = 0;
         for (DungeonInstance d : plugin.getDungeonManager().getAllDungeons()) {
             if (d.getCategory() != cat || col >= 7) continue;
-            BlockPosKey anchor = d.getHologramAnchor();
+            BlockPosKey anchor = d.getEntrancePos() != null ? d.getEntrancePos() : d.getOrigin();
             String stateInfo = cat == DungeonCategory.SURFACE
-                    ? "Призраков внутри: &#F8BEFB" + plugin.getGhostController().countAliveGhosts(d.getId())
+                    ? "Призраков в коридорах: &#F8BEFB" + plugin.getGhostController().countAliveGhosts(d.getId())
                     : "Шалкер: &#F8BEFB" + d.getStatus().getTitle();
 
             List<String> lore = new ArrayList<>();

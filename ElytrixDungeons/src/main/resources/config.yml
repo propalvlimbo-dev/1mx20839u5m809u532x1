@@ -1,5 +1,5 @@
 # ElytrixDungeons — до 7 наземных домов и 7 подземных данжей.
-config-version: 2
+config-version: 3
 # Схемы плагин не создаёт: загрузите собственные файлы .schem в нужную папку.
 #   plugins/ElytrixDungeons/schematics/surface/<id-схемы>.schem
 #   plugins/ElytrixDungeons/schematics/underground/<id-схемы>.schem
@@ -63,10 +63,9 @@ surface-dungeon:
     # Плавный природный склон вокруг основания дома (в пределах снимка местности).
     radius: 6
   ghosts:
-    # При создании дома появляется до 6 призраков; убитые пополняются группами по 2 раз в минуту.
+    # Стая из шести появляется сразу; после гибели всех шести следующая ждёт 2 часа.
     initial-count: 6
-    max-alive: 6
-    respawn-every-seconds: 60
+    respawn-cooldown-seconds: 7200
     health: 16.0
     # 100% шанс выпадения Призрачного осколка.
     shard-drop-chance: 100.0
@@ -97,27 +96,16 @@ underground-dungeon:
   leader-damage: 18.5
   fight-timeout-seconds: 210
 
+# Dungeon holograms have been retired. Kept only for backwards-compatible configs.
 hologram:
-  enabled: true
-  view-range: 0.75
-  line-width: 270
+  enabled: false
   chest-hint:
-    enabled: true
-    text: "&#F8BEFB&lОТКРЫТЬ"
-    y-offset: 1.15
-  surface-lines:
-    - "&#F8BEFBНаземный данж &8[&#96FF91Дом призраков&8]"
-    - "&fПризраков внутри: &#F8BEFB{ghosts} &8┃ &fСундуки с добычей"
-    - "&7Восстановление данжа через: &#F8BEFB{timer}"
-  underground-ready-lines:
-    - "&#F8BEFBПодземный данж &8[&#89A0FFЗапечатан&8]"
-    - "&fПКМ по шалкеру — вызвать стражей"
-    - "&7Восстановление данжа через: &#F8BEFB{timer}"
-  underground-fight-lines:
-    - "&#F8BEFBПодземный данж &8[&cИдёт бой&8]"
-    - "&fОсталось противников: &#F8BEFB{mobs} &8(&7{clock}&8)"
-    - "&7Восстановление данжа через: &#F8BEFB{timer}"
-  underground-cooldown-lines:
-    - "&#F8BEFBПодземный данж &8[&7Перезарядка&8]"
-    - "&fШалкер открыт &8┃ &7Данж скоро обновится"
-    - "&7Восстановление данжа через: &#F8BEFB{timer}"
+    enabled: false
+
+# Elytrix AuctionBar-style dungeon status. Pages rotate every 15 seconds.
+auctionbar:
+  enabled: true
+  cycle-seconds: 15
+  reset-line: "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &8» &7{dungeon} &8┃ &fДанж восстановится через &#96FF91{timer}"
+  ghosts-line: "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &8» &7{dungeon} &8┃ &f{ghost-label}: &#F8BEFB{ghosts}&7/{ghost-total} &8┃ &f{ghost-state}"
+  loot-line: "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &8» &7{dungeon} &8┃ &fЛут обновится через &#96FF91{timer}"

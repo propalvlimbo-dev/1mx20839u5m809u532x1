@@ -314,7 +314,7 @@ public final class DungeonCommand implements TabExecutor {
     private void sendClickableDungeonList(CommandSender sender) {
         sender.sendMessage(plugin.prefix() + "Активные данжи (§f" + plugin.getDungeonManager().getAllDungeons().size() + "/14§7):");
         for (DungeonInstance d : plugin.getDungeonManager().getAllDungeons()) {
-            BlockPosKey a = d.getHologramAnchor();
+            BlockPosKey a = d.getEntrancePos() != null ? d.getEntrancePos() : d.getOrigin();
             String line = TextUtil.color(" &#F8BEFB● &f" + d.getId()
                     + " &8[" + d.getCategory().getColorHex() + d.getTemplateId() + "&8] &7— &f"
                     + a.x() + ", " + a.y() + ", " + a.z() + " ");

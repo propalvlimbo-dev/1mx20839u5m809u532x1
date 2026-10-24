@@ -82,6 +82,25 @@ public final class DungeonLootRegistry {
                 ));
             }
         }
+        ensureMissingPoolsHaveDefaults();
+    }
+
+    private void ensureMissingPoolsHaveDefaults() {
+        boolean hasEmptyPool = pools.values().stream().anyMatch(List::isEmpty);
+        if (!hasEmptyPool) return;
+
+        EnumMap<LootPoolType, List<DungeonLootEntry>> configured = new EnumMap<>(LootPoolType.class);
+        for (LootPoolType type : LootPoolType.values()) {
+            configured.put(type, new ArrayList<>(pools.get(type)));
+            pools.get(type).clear();
+        }
+        seedDefaults();
+        for (LootPoolType type : LootPoolType.values()) {
+            if (configured.get(type).isEmpty()) continue;
+            pools.get(type).clear();
+            pools.get(type).addAll(configured.get(type));
+        }
+        save();
     }
 
     public void save() {
@@ -132,7 +151,11 @@ public final class DungeonLootRegistry {
     public List<ItemStack> rollStacks(LootPoolType type, int targetStacks) {
         List<DungeonLootEntry> entries = getPool(type);
         List<ItemStack> output = new ArrayList<>();
-        if (entries.isEmpty()) return output;
+        if (entries.isEmpty()) {
+            output.add(new ItemStack(Material.GOLDEN_APPLE));
+            return output;
+        }
+        targetStacks = Math.max(1, targetStacks);
         ThreadLocalRandom random = ThreadLocalRandom.current();
 
         for (DungeonLootEntry entry : entries) {
@@ -147,6 +170,10 @@ public final class DungeonLootRegistry {
             if (random.nextDouble(100.0) <= candidate.getChancePercent()) {
                 output.add(materialize(candidate, random));
             }
+        }
+        // A custom pool with zero chances must still never leave a loot container completely empty.
+        if (output.isEmpty()) {
+            output.add(materialize(entries.get(random.nextInt(entries.size())), random));
         }
         return output;
     }

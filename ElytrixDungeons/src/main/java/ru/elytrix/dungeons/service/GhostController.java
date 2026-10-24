@@ -39,8 +39,9 @@ import ru.elytrix.dungeons.util.TextUtil;
 
 /**
  * Manages Surface House Ghosts (EntityType.ALLAY):
- *  - Spawns ghosts inside rooms of every Surface House & keeps them leashed inside house walls
- *  - Prevents vanilla Allay duplication / item-handing / passive regen exploits
+ *  - Spawns a separated wave at walkable, connected ground-floor corridor points
+ *  - Keeps ghosts inside the house and prevents vanilla Allay duplication / item-handing exploits
+ *  - After the whole wave is defeated, waits for the configured cooldown before spawning another
  *  - On kill: 100% drops Призрачный осколок (amethyst_shard) + 35% weighted Vault Key
  */
 public final class GhostController {
@@ -49,7 +50,6 @@ public final class GhostController {
     private final NamespacedKey ghostPdc;
     private final Map<String, Set<UUID>> houseGhosts = new HashMap<>();
     private final Map<UUID, String> ghostToHouse = new HashMap<>();
-    private final Map<String, Long> nextRespawnMs = new HashMap<>();
 
     public GhostController(ElytrixDungeonsPlugin plugin) {
         this.plugin = plugin;
@@ -68,30 +68,32 @@ public final class GhostController {
 
     public void populateInitialGhosts(DungeonInstance house) {
         if (house.getCategory() != DungeonCategory.SURFACE) return;
-        clearHouseGhosts(house.getId());
         World world = house.getOrigin().world();
-        BlockPosKey anchor = house.getHologramAnchor();
-        if (world == null || anchor == null || !world.isChunkLoaded(anchor.x() >> 4, anchor.z() >> 4)) return;
+        BlockPosKey anchor = house.getEntrancePos() != null ? house.getEntrancePos() : house.getOrigin();
+        if (world == null || !world.isChunkLoaded(anchor.x() >> 4, anchor.z() >> 4)) return;
+
+        Set<UUID> set = houseGhosts.computeIfAbsent(house.getId(), key -> new HashSet<>());
+        trackExistingGhosts(world, house, set, null);
+        if (house.getGhostRespawnAtMs() > System.currentTimeMillis() || !set.isEmpty()) return;
 
         int initial = Math.max(1, plugin.getConfig().getInt("surface-dungeon.ghosts.initial-count", 6));
-        spawnUpTo(world, house, initial);
+        if (spawnUpTo(world, house, initial) > 0) {
+            house.setGhostRespawnAtMs(0L);
+            plugin.getDungeonManager().saveDungeons();
+        }
     }
 
     public void tickHousesOncePerSecond(Iterable<DungeonInstance> allDungeons) {
         long now = System.currentTimeMillis();
-        int maxAlive = Math.max(1, plugin.getConfig().getInt("surface-dungeon.ghosts.max-alive", 6));
-        long intervalMs = Math.max(15L,
-                plugin.getConfig().getLong("surface-dungeon.ghosts.respawn-every-seconds", 60L)) * 1000L;
+        int initialCount = Math.max(1, plugin.getConfig().getInt("surface-dungeon.ghosts.initial-count", 6));
 
         for (DungeonInstance house : allDungeons) {
             if (house.getCategory() != DungeonCategory.SURFACE || house.getStatus() == DungeonStatus.REGENERATING) {
                 continue;
             }
             World world = house.getOrigin().world();
-            BlockPosKey anchor = house.getHologramAnchor();
-            if (world == null || anchor == null || !world.isChunkLoaded(anchor.x() >> 4, anchor.z() >> 4)) {
-                continue;
-            }
+            BlockPosKey anchor = house.getEntrancePos() != null ? house.getEntrancePos() : house.getOrigin();
+            if (world == null || !world.isChunkLoaded(anchor.x() >> 4, anchor.z() >> 4)) continue;
 
             Set<UUID> set = houseGhosts.computeIfAbsent(house.getId(), key -> new HashSet<>());
             CuboidRegion bounds = house.getBounds();
@@ -99,7 +101,7 @@ public final class GhostController {
             while (it.hasNext()) {
                 UUID uid = it.next();
                 Entity entity = world.getEntity(uid);
-                // A ghost in an unloaded chunk is still part of the current population.
+                // A ghost in an unloaded chunk is still part of this wave; keep it counted.
                 if (entity == null) continue;
                 if (!(entity instanceof LivingEntity ghost) || ghost.isDead() || !ghost.isValid()) {
                     it.remove();
@@ -117,23 +119,29 @@ public final class GhostController {
                 }
             }
 
-            if (set.size() < maxAlive) {
-                long due = nextRespawnMs.computeIfAbsent(house.getId(), key -> now + intervalMs);
-                if (now >= due) {
-                    nextRespawnMs.put(house.getId(), now + intervalMs);
-                    spawnUpTo(world, house, Math.min(maxAlive, set.size() + 2));
+            long respawnAt = house.getGhostRespawnAtMs();
+            if (set.isEmpty() && (respawnAt == 0L || now >= respawnAt)) {
+                int spawned = spawnUpTo(world, house, initialCount);
+                if (spawned > 0) {
+                    if (respawnAt > 0L) house.setGhostRespawnAtMs(0L);
+                    plugin.getDungeonManager().saveDungeons();
+                } else if (respawnAt == 0L) {
+                    // If this is a fresh house whose chunks were unavailable during finalize,
+                    // retry initial population on the next loaded tick.
+                    continue;
                 }
             }
         }
     }
 
     private void removeTaggedGhostsNearHouse(World world, DungeonInstance house) {
-        BlockPosKey anchor = house.getHologramAnchor();
-        Location center = anchor == null ? null : anchor.centerLocation();
-        if (center == null || !world.isChunkLoaded(center.getBlockX() >> 4, center.getBlockZ() >> 4)) return;
-        double rx = house.getBounds().sizeX() / 2.0 + 4.0;
-        double ry = house.getBounds().sizeY() / 2.0 + 4.0;
-        double rz = house.getBounds().sizeZ() / 2.0 + 4.0;
+        CuboidRegion bounds = house.getBounds();
+        Location center = new Location(world, (bounds.minX() + bounds.maxX() + 1) / 2.0,
+                (bounds.minY() + bounds.maxY() + 1) / 2.0, (bounds.minZ() + bounds.maxZ() + 1) / 2.0);
+        if (!world.isChunkLoaded(center.getBlockX() >> 4, center.getBlockZ() >> 4)) return;
+        double rx = bounds.sizeX() / 2.0 + 4.0;
+        double ry = bounds.sizeY() / 2.0 + 4.0;
+        double rz = bounds.sizeZ() / 2.0 + 4.0;
         for (Entity entity : world.getNearbyEntities(center, rx, ry, rz)) {
             if (house.getId().equals(entity.getPersistentDataContainer().get(ghostPdc, PersistentDataType.STRING))) {
                 ghostToHouse.remove(entity.getUniqueId());
@@ -142,9 +150,29 @@ public final class GhostController {
         }
     }
 
-    private void spawnUpTo(World w, DungeonInstance house, int targetTotal) {
+    private void trackExistingGhosts(World world, DungeonInstance house, Set<UUID> tracked, UUID excluded) {
+        CuboidRegion bounds = house.getBounds();
+        for (int chunkX = bounds.minX() >> 4; chunkX <= bounds.maxX() >> 4; chunkX++) {
+            for (int chunkZ = bounds.minZ() >> 4; chunkZ <= bounds.maxZ() >> 4; chunkZ++) {
+                if (!world.isChunkLoaded(chunkX, chunkZ)) continue;
+                for (Entity entity : world.getChunkAt(chunkX, chunkZ).getEntities()) {
+                    if (excluded != null && excluded.equals(entity.getUniqueId())) continue;
+                    if (!(entity instanceof LivingEntity living) || living.isDead() || !living.isValid()) continue;
+                    if (!house.getId().equals(entity.getPersistentDataContainer().get(ghostPdc, PersistentDataType.STRING))) {
+                        continue;
+                    }
+                    living.setCustomNameVisible(false);
+                    tracked.add(entity.getUniqueId());
+                    ghostToHouse.put(entity.getUniqueId(), house.getId());
+                }
+            }
+        }
+    }
+
+    private int spawnUpTo(World w, DungeonInstance house, int targetTotal) {
         Set<UUID> set = houseGhosts.computeIfAbsent(house.getId(), k -> new HashSet<>());
         double hp = Math.max(4.0, plugin.getConfig().getDouble("surface-dungeon.ghosts.health", 16.0));
+        int spawned = 0;
         while (set.size() < targetTotal) {
             Location loc = chooseSpreadSpawnPoint(w, house, set);
             if (loc == null) break;
@@ -157,7 +185,8 @@ public final class GhostController {
             le.setRemoveWhenFarAway(false);
             le.setCanPickupItems(false);
             le.setCustomName(TextUtil.color("&#F8BEFBПризрак"));
-            le.setCustomNameVisible(true);
+            // Hide nameplates: otherwise ghosts inside rooms look like floating holograms above loot boxes.
+            le.setCustomNameVisible(false);
 
             AttributeInstance maxHp = ((Attributable) le).getAttribute(Attribute.MAX_HEALTH);
             if (maxHp != null) maxHp.setBaseValue(hp);
@@ -170,7 +199,9 @@ public final class GhostController {
 
             set.add(le.getUniqueId());
             ghostToHouse.put(le.getUniqueId(), house.getId());
+            spawned++;
         }
+        return spawned;
     }
 
     public void handleGhostDeath(EntityDeathEvent event) {
@@ -180,8 +211,21 @@ public final class GhostController {
             dungeonId = dead.getPersistentDataContainer().get(ghostPdc, PersistentDataType.STRING);
         }
         if (dungeonId != null) {
-            Set<UUID> set = houseGhosts.get(dungeonId);
-            if (set != null) set.remove(dead.getUniqueId());
+            DungeonInstance house = plugin.getDungeonManager().getDungeon(dungeonId);
+            if (house != null && house.getCategory() == DungeonCategory.SURFACE) {
+                Set<UUID> set = houseGhosts.computeIfAbsent(dungeonId, key -> new HashSet<>());
+                set.remove(dead.getUniqueId());
+                World world = house.getOrigin().world();
+                if (world != null && set.isEmpty()) {
+                    trackExistingGhosts(world, house, set, dead.getUniqueId());
+                }
+                if (set.isEmpty() && house.getGhostRespawnAtMs() <= System.currentTimeMillis()) {
+                    long cooldownSeconds = Math.max(60L,
+                            plugin.getConfig().getLong("surface-dungeon.ghosts.respawn-cooldown-seconds", 7200L));
+                    house.setGhostRespawnAtMs(System.currentTimeMillis() + cooldownSeconds * 1000L);
+                    plugin.getDungeonManager().saveDungeons();
+                }
+            }
         }
 
         event.getDrops().clear();
@@ -215,10 +259,6 @@ public final class GhostController {
             }
         }
 
-        if (dungeonId != null) {
-            DungeonInstance house = plugin.getDungeonManager().getDungeon(dungeonId);
-            if (house != null) plugin.getDungeonManager().updateDungeonHologram(house);
-        }
     }
 
     public String rollWeightedKeyId(ThreadLocalRandom rng) {
@@ -255,6 +295,7 @@ public final class GhostController {
                 if (plugin.getDungeonManager().getDungeon(tag) == null) {
                     e.remove();
                 } else {
+                    if (e instanceof LivingEntity ghost) ghost.setCustomNameVisible(false);
                     houseGhosts.computeIfAbsent(tag, k -> new HashSet<>()).add(e.getUniqueId());
                     ghostToHouse.put(e.getUniqueId(), tag);
                 }
@@ -264,7 +305,7 @@ public final class GhostController {
 
     public void clearHouseGhosts(String dungeonId) {
         Set<UUID> set = houseGhosts.remove(dungeonId);
-        nextRespawnMs.remove(dungeonId);
+        // The persisted two-hour deadline belongs to the dungeon and survives resets/reloads.
         DungeonInstance house = plugin.getDungeonManager().getDungeon(dungeonId);
         World world = house == null ? null : house.getOrigin().world();
         if (set != null) {
@@ -331,23 +372,16 @@ public final class GhostController {
         BlockPosKey entrance = house.getEntrancePos();
         CuboidRegion bounds = house.getBounds();
 
-        for (BlockPosKey marker : house.getMobSpawns()) {
-            // Expand a marker to nearby walkable floor cells. This avoids stacking every Allay
-            // on a single marker when a schematic contains only one generated spawn coordinate.
-            for (int dy = -1; dy <= 1; dy++) {
-                for (int dz = -2; dz <= 2; dz++) {
-                    for (int dx = -2; dx <= 2; dx++) {
-                        BlockPosKey candidate = marker.add(dx, dy, dz);
-                        if (!bounds.containsBlock(candidate.worldName(), candidate.x(), candidate.y(), candidate.z())
-                                || !isSafeSpawnPoint(world, candidate)) {
-                            continue;
-                        }
-                        allSafe.add(candidate);
-                        if (entrance == null || horizontalDistanceSquared(candidate, entrance) >= 9) {
-                            awayFromEntrance.add(candidate);
-                        }
-                    }
-                }
+        for (BlockPosKey candidate : house.getMobSpawns()) {
+            // Use only analyzed corridor markers. Expanding a marker through a wall can put an
+            // Allay into a sealed room even when the original marker was reachable.
+            if (!bounds.containsBlock(candidate.worldName(), candidate.x(), candidate.y(), candidate.z())
+                    || !isSafeSpawnPoint(world, candidate)) {
+                continue;
+            }
+            allSafe.add(candidate);
+            if (entrance == null || horizontalDistanceSquared(candidate, entrance) >= 9) {
+                awayFromEntrance.add(candidate);
             }
         }
 

@@ -175,6 +175,8 @@ public final class SpongeSchematicCodec {
         List<int[]> enclosedFloorSpots = new ArrayList<>();
         List<int[]> roofedSpots = new ArrayList<>();
         List<int[]> anyFloorSpots = new ArrayList<>();
+        List<int[]> connectedFloorSpots = new ArrayList<>();
+        List<int[]> corridorSpots = new ArrayList<>();
         List<int[]> hologramSpots = new ArrayList<>();
         for (int y = 1; y < sy - 1; y++) {
             for (int z = 1; z < sz - 1; z++) {
@@ -189,11 +191,17 @@ public final class SpongeSchematicCodec {
                     anyFloorSpots.add(cell);
                     int index = indexOf(x, y, z, sx, sz);
                     boolean enclosed = !exterior[index] && !exterior[index + layer];
+                    boolean connectedToEntrance = exterior[index] && exterior[index + layer];
+                    boolean roofed = hasCeilingAbove(tpl, x, y + 2, z);
                     if (enclosed) {
                         enclosedFloorSpots.add(cell);
                     }
-                    if (hasCeilingAbove(tpl, x, y + 2, z)) {
+                    if (roofed) {
                         roofedSpots.add(cell);
+                    }
+                    if (connectedToEntrance) {
+                        connectedFloorSpots.add(cell);
+                        if (roofed) corridorSpots.add(cell);
                     }
                     if (isPassable(tpl.getBlock(x, y + 2, z)) && enclosed) {
                         hologramSpots.add(cell);
@@ -247,12 +255,23 @@ public final class SpongeSchematicCodec {
                 if (centerRoom == null) centerRoom = selectBestHologramSpot(tpl, interior, midX, midZ);
                 if (centerRoom == null) centerRoom = findOpenHologramSpot(tpl, midX, midZ);
                 if (centerRoom != null) tpl.setHologramOffset(centerRoom[0], centerRoom[1], centerRoom[2]);
-                int[] entry = interior.get(Math.min(interior.size() - 1, Math.max(0, interior.size() / 4)));
-                tpl.setEntranceOffset(entry[0], entry[1], entry[2]);
-                addDistributedMobSpawnOffsets(tpl, interior, 8, entry[0], entry[2]);
             } else {
                 int[] openSpot = findOpenHologramSpot(tpl, midX, midZ);
                 if (openSpot != null) tpl.setHologramOffset(openSpot[0], openSpot[1], openSpot[2]);
+            }
+
+            // Spawn ghosts and send teleports to the connected, roofed, lowest-level corridors.
+            // Sealed bedrooms are intentionally excluded even if they look like valid floor cells.
+            List<int[]> corridorNetwork = preferCentralSpots(corridorSpots, sx, sz, midX, midZ);
+            if (corridorNetwork.isEmpty()) {
+                corridorNetwork = preferCentralSpots(connectedFloorSpots, sx, sz, midX, midZ);
+            }
+            if (corridorNetwork.isEmpty()) corridorNetwork = interior;
+            List<int[]> groundFloorNetwork = lowestFloorBand(corridorNetwork, 1);
+            int[] entry = selectEntranceSpot(groundFloorNetwork, sx, sz, midX, midZ);
+            if (entry != null) {
+                tpl.setEntranceOffset(entry[0], entry[1], entry[2]);
+                addDistributedMobSpawnOffsets(tpl, groundFloorNetwork, 64, entry[0], entry[2]);
             }
         } else {
             // An ordinary shulker block in the uploaded .schem marks the exact loot location.
@@ -275,15 +294,23 @@ public final class SpongeSchematicCodec {
             }
 
             List<int[]> around = new ArrayList<>();
+            List<int[]> corridorAround = new ArrayList<>();
             for (int[] c : interior) {
                 int d2 = distSq2D(c[0], c[2], mainShulker[0], mainShulker[2]);
-                if (d2 >= 4 && d2 <= 81) {
-                    around.add(c);
-                }
+                if (d2 >= 4 && d2 <= 81) around.add(c);
             }
-            List<int[]> source = !around.isEmpty() ? around : interior;
-            if (!source.isEmpty()) {
-                int[] entry = source.get(0);
+            for (int[] c : corridorSpots) {
+                int d2 = distSq2D(c[0], c[2], mainShulker[0], mainShulker[2]);
+                if (d2 <= 144) corridorAround.add(c);
+            }
+            List<int[]> source = !corridorAround.isEmpty() ? corridorAround
+                    : (!around.isEmpty() ? around : interior);
+
+            List<int[]> entranceNetwork = !corridorSpots.isEmpty() ? corridorSpots : connectedFloorSpots;
+            if (entranceNetwork.isEmpty()) entranceNetwork = source;
+            int[] entry = selectEntranceSpot(lowestFloorBand(entranceNetwork, 1), sx, sz, midX, midZ);
+            if (entry == null && !source.isEmpty()) entry = selectEntranceSpot(source, sx, sz, midX, midZ);
+            if (entry != null) {
                 tpl.setEntranceOffset(entry[0], entry[1], entry[2]);
                 addDistributedMobSpawnOffsets(tpl, source, 8, entry[0], entry[2]);
             } else {
@@ -292,6 +319,55 @@ public final class SpongeSchematicCodec {
                 tpl.getMobSpawnOffsets().add(fallback);
             }
         }
+    }
+
+    private static List<int[]> preferCentralSpots(
+            List<int[]> candidates, int sizeX, int sizeZ, int centerX, int centerZ
+    ) {
+        if (candidates.isEmpty()) return new ArrayList<>();
+        int radius = Math.max(4, Math.min(sizeX, sizeZ) / 3);
+        int radiusSquared = radius * radius;
+        List<int[]> central = new ArrayList<>();
+        for (int[] candidate : candidates) {
+            if (distSq2D(candidate[0], candidate[2], centerX, centerZ) <= radiusSquared) {
+                central.add(candidate);
+            }
+        }
+        return central.isEmpty() ? new ArrayList<>(candidates) : central;
+    }
+
+    private static List<int[]> lowestFloorBand(List<int[]> candidates, int yAllowance) {
+        if (candidates.isEmpty()) return new ArrayList<>();
+        int lowestY = Integer.MAX_VALUE;
+        for (int[] candidate : candidates) lowestY = Math.min(lowestY, candidate[1]);
+        List<int[]> lowest = new ArrayList<>();
+        for (int[] candidate : candidates) {
+            if (candidate[1] <= lowestY + Math.max(0, yAllowance)) lowest.add(candidate);
+        }
+        return lowest;
+    }
+
+    private static int[] selectEntranceSpot(
+            List<int[]> candidates, int sizeX, int sizeZ, int centerX, int centerZ
+    ) {
+        if (candidates.isEmpty()) return null;
+        int lowestY = Integer.MAX_VALUE;
+        for (int[] candidate : candidates) lowestY = Math.min(lowestY, candidate[1]);
+
+        int[] best = null;
+        long bestScore = Long.MAX_VALUE;
+        for (int[] candidate : candidates) {
+            if (candidate[1] > lowestY + 1) continue;
+            int edgeDepth = Math.min(Math.min(candidate[0], sizeX - 1 - candidate[0]),
+                    Math.min(candidate[2], sizeZ - 1 - candidate[2]));
+            long centerDistance = distSq2D(candidate[0], candidate[2], centerX, centerZ);
+            long score = (long) edgeDepth * 1_000_000L + centerDistance;
+            if (score < bestScore) {
+                best = candidate;
+                bestScore = score;
+            }
+        }
+        return best;
     }
 
     private static int[] selectBestHologramSpot(

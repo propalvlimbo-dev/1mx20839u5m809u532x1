@@ -26,6 +26,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import ru.rooyzee.elytrixitem.Main;
+import ru.rooyzee.elytrixitem.util.ColorUtil;
 
 /** Handles the two-minute target display and persistent two-hour cooldown. */
 public final class TruthCompassListener implements Listener {
@@ -46,7 +47,7 @@ public final class TruthCompassListener implements Listener {
         startActionBarTask();
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onCompassUse(PlayerInteractEvent event) {
         if (event.getHand() != EquipmentSlot.HAND
                 || event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) {
@@ -54,6 +55,9 @@ public final class TruthCompassListener implements Listener {
         }
 
         ItemStack item = event.getItem();
+        if (item == null || item.getType().isAir()) {
+            item = event.getPlayer().getInventory().getItemInMainHand();
+        }
         if (item == null || item.getType() != Material.COMPASS || !item.hasItemMeta()) {
             return;
         }
@@ -117,7 +121,9 @@ public final class TruthCompassListener implements Listener {
     }
 
     private static void sendActionBar(Player player, String text) {
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(text));
+        String brand = "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &8» &f";
+        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                TextComponent.fromLegacyText(ColorUtil.color(brand + text)));
     }
 
     /**
@@ -150,9 +156,6 @@ public final class TruthCompassListener implements Listener {
                     continue;
                 }
                 Object position = invokeNoArgs(dungeon, "getEntrancePos");
-                if (position == null) {
-                    position = invokeNoArgs(dungeon, "getHologramAnchor");
-                }
                 if (position == null) {
                     position = invokeNoArgs(dungeon, "getOrigin");
                 }

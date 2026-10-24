@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
-import org.bukkit.Color;
 import org.bukkit.HeightMap;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -34,9 +33,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.inventory.InventoryHolder;
@@ -93,6 +90,7 @@ public final class DungeonManager {
     private final File schematicsRoot;
     private final TerrainSnapshotStore snapshotStore;
     private final SpotFinder spotFinder;
+    private final DungeonAuctionBar auctionBar;
     private final NamespacedKey hologramPdc;
     private final NamespacedKey containerHintPdc;
 
@@ -118,6 +116,7 @@ public final class DungeonManager {
         this.schematicsRoot = new File(plugin.getDataFolder(), "schematics");
         this.snapshotStore = new TerrainSnapshotStore(plugin.getDataFolder());
         this.spotFinder = new SpotFinder(plugin);
+        this.auctionBar = new DungeonAuctionBar(plugin);
         this.hologramPdc = new NamespacedKey(plugin, "dungeon_hologram");
         this.containerHintPdc = new NamespacedKey(plugin, "container_hint");
     }
@@ -131,6 +130,7 @@ public final class DungeonManager {
     public void startup() {
         loadSchematics();
         boolean hadSaved = loadDungeonsFromDisk();
+        removeLegacyDungeonDisplays();
         startHeartbeat();
 
         if (hadSaved) {
@@ -281,6 +281,7 @@ public final class DungeonManager {
                     d.getInt("surface-y", origin.y()),
                     d.getLong("next-reset-ms", System.currentTimeMillis() + resetIntervalMs())
             );
+            inst.setGhostRespawnAtMs(d.getLong("ghost-respawn-ms", 0L));
             try {
                 DungeonStatus st = DungeonStatus.valueOf(d.getString("status", "READY"));
                 inst.setStatus(st == DungeonStatus.CLEARED ? DungeonStatus.CLEARED : DungeonStatus.READY);
@@ -333,7 +334,6 @@ public final class DungeonManager {
         pasteWithRestoreDiffsBatched(w, inst, tpl, () -> {
             inst.setStatus(savedStatus);
             inst.getShulkerUnlocked().putAll(savedShulkers);
-            updateDungeonHologram(inst);
         }, true);
     }
 
@@ -355,6 +355,7 @@ public final class DungeonManager {
             yml.set(p + ".surface-y", d.getSurfaceY());
             yml.set(p + ".status", d.getStatus().name());
             yml.set(p + ".next-reset-ms", d.getNextResetEpochMs());
+            yml.set(p + ".ghost-respawn-ms", d.getGhostRespawnAtMs());
             writeRegion(yml, p + ".bounds", d.getBounds());
             writeRegion(yml, p + ".snapshot-bounds", d.getSnapshotBounds());
 
@@ -788,12 +789,7 @@ public final class DungeonManager {
             plugin.getWorldGuardHook().syncDungeonRegion(inst, pad,
                     plugin.getConfig().getBoolean("protection.allow-pvp", true),
                     plugin.getConfig().getBoolean("protection.allow-block-modify-in-zone", true));
-            if (restoreTerrain) {
-                enqueueJob(() -> restoreSavedDungeonOnStartup(inst));
-            } else {
-                updateContainerHolograms(inst);
-                updateDungeonHologram(inst);
-            }
+            if (restoreTerrain) enqueueJob(() -> restoreSavedDungeonOnStartup(inst));
             return false;
         }
 
@@ -1054,7 +1050,6 @@ public final class DungeonManager {
             }
         }
 
-        updateContainerHolograms(inst);
         Location safe = inst.teleportLocation();
         if (safe != null) {
             for (Player p : world.getPlayers()) {
@@ -1067,7 +1062,6 @@ public final class DungeonManager {
                 }
             }
         }
-        updateDungeonHologram(inst);
         saveDungeons();
     }
 
@@ -1256,11 +1250,8 @@ public final class DungeonManager {
                             && d.getStatus() != DungeonStatus.REGENERATING && activePasteCount == 0) {
                         refreshSurfaceShulkerLootIfDue(d, now);
                     }
-                    BlockPosKey anchor = d.getHologramAnchor();
-                    if (w != null && anchor != null && w.isChunkLoaded(anchor.x() >> 4, anchor.z() >> 4)) {
-                        updateDungeonHologram(d);
-                    }
                 }
+                auctionBar.tick(dungeons.values(), now);
             }
         }.runTaskTimer(plugin, 20L, 20L);
     }
@@ -1285,113 +1276,10 @@ public final class DungeonManager {
         }
     }
 
-    public void updateDungeonHologram(DungeonInstance d) {
-        if (!plugin.getConfig().getBoolean("hologram.enabled", true) || hiddenFromWorld) {
-            removeHologram(d);
-            removeContainerHolograms(d);
-            return;
-        }
-        BlockPosKey anchor = d.getHologramAnchor();
-        if (anchor == null) return;
-        World w = anchor.world();
-        if (w == null || !w.isChunkLoaded(anchor.x() >> 4, anchor.z() >> 4)) return;
-        if (!w.getBlockAt(anchor.x(), anchor.y(), anchor.z()).isPassable()
-                || !w.getBlockAt(anchor.x(), anchor.y() + 1, anchor.z()).isPassable()
-                || !w.getBlockAt(anchor.x(), anchor.y() + 2, anchor.z()).isPassable()) {
-            removeHologram(d);
-            return;
-        }
-
-        // Both categories use a clear room-floor anchor, not a shulker block. Keep the display
-        // within the open room instead of pushing underground labels into the ceiling.
-        double yOff = 1.55;
-        Location holoLoc = new Location(w, anchor.x() + 0.5, anchor.y() + yOff, anchor.z() + 0.5);
-        TextDisplay td = findHologram(w, d, holoLoc);
-        if (td == null) {
-            Entity spawned = w.spawnEntity(holoLoc, EntityType.TEXT_DISPLAY);
-            if (!(spawned instanceof TextDisplay created)) {
-                spawned.remove();
-                return;
-            }
-            td = created;
-            d.setHologramUuid(td.getUniqueId());
-        } else if (td.getLocation().distanceSquared(holoLoc) > 0.04) {
-            td.teleport(holoLoc);
-        }
-
-        td.setPersistent(false);
-        td.getPersistentDataContainer().set(hologramPdc, PersistentDataType.STRING, d.getId());
-        td.setBillboard(Display.Billboard.CENTER);
-        td.setAlignment(TextDisplay.TextAlignment.CENTER);
-        td.setDefaultBackground(false);
-        td.setBackgroundColor(Color.fromARGB(0, 0, 0, 0));
-        td.setShadowed(true);
-        td.setSeeThrough(false);
-        td.setLineWidth(plugin.getConfig().getInt("hologram.line-width", 270));
-        td.setViewRange((float) plugin.getConfig().getDouble("hologram.view-range", 0.75));
-        td.setText(buildHologramText(d));
-        updateContainerHolograms(d);
-    }
-
-    private void updateContainerHolograms(DungeonInstance dungeon) {
-        if (!plugin.getConfig().getBoolean("hologram.enabled", true)
-                || !plugin.getConfig().getBoolean("hologram.chest-hint.enabled", true)
-                || hiddenFromWorld) return;
-        for (BlockPosKey pos : dungeon.getChestPositions()) {
-            if (!dungeon.isContainerOpened(pos)) ensureContainerHologram(dungeon, pos);
-        }
-        for (BlockPosKey pos : dungeon.getBarrelPositions()) {
-            if (!dungeon.isContainerOpened(pos)) ensureContainerHologram(dungeon, pos);
-        }
-    }
-
-    private void ensureContainerHologram(DungeonInstance dungeon, BlockPosKey pos) {
-        if (!plugin.getConfig().getBoolean("hologram.enabled", true)
-                || !plugin.getConfig().getBoolean("hologram.chest-hint.enabled", true)
-                || hiddenFromWorld || dungeon.isContainerOpened(pos)) {
-            removeContainerHologram(pos);
-            return;
-        }
-        World world = pos.world();
-        if (world == null || !world.isChunkLoaded(pos.x() >> 4, pos.z() >> 4)) return;
-        Block block = world.getBlockAt(pos.x(), pos.y(), pos.z());
-        if (!(block.getState() instanceof InventoryHolder)) return;
-
-        double yOffset = plugin.getConfig().getDouble("hologram.chest-hint.y-offset", 1.15);
-        Location location = new Location(world, pos.x() + 0.5, pos.y() + yOffset, pos.z() + 0.5);
-        TextDisplay display = findContainerHologram(world, pos, location);
-        if (display == null) {
-            Entity spawned = world.spawnEntity(location, EntityType.TEXT_DISPLAY);
-            if (!(spawned instanceof TextDisplay created)) {
-                spawned.remove();
-                return;
-            }
-            display = created;
-        } else if (display.getLocation().distanceSquared(location) > 0.04) {
-            display.teleport(location);
-        }
-
-        display.setPersistent(false);
-        display.getPersistentDataContainer().set(containerHintPdc, PersistentDataType.STRING, pos.serialize());
-        display.setBillboard(Display.Billboard.CENTER);
-        display.setAlignment(TextDisplay.TextAlignment.CENTER);
-        display.setDefaultBackground(false);
-        display.setBackgroundColor(Color.fromARGB(0, 0, 0, 0));
-        display.setShadowed(true);
-        display.setSeeThrough(false);
-        display.setLineWidth(160);
-        display.setViewRange((float) plugin.getConfig().getDouble("hologram.view-range", 0.75));
-        display.setText(TextUtil.color(plugin.getConfig().getString("hologram.chest-hint.text", "&#F8BEFB&lОТКРЫТЬ")));
-    }
-
-    private TextDisplay findContainerHologram(World world, BlockPosKey pos, Location near) {
-        for (Entity entity : world.getNearbyEntities(near, 2.0, 2.0, 2.0)) {
-            if (entity instanceof TextDisplay display) {
-                String tag = display.getPersistentDataContainer().get(containerHintPdc, PersistentDataType.STRING);
-                if (pos.serialize().equals(tag)) return display;
-            }
-        }
-        return null;
+    /** Compatibility entry point: dungeon TextDisplay holograms are retired. */
+    public void updateDungeonHologram(DungeonInstance dungeon) {
+        removeHologram(dungeon);
+        removeContainerHolograms(dungeon);
     }
 
     private void removeContainerHologram(BlockPosKey pos) {
@@ -1399,7 +1287,7 @@ public final class DungeonManager {
         if (world == null || !world.isChunkLoaded(pos.x() >> 4, pos.z() >> 4)) return;
         Location near = new Location(world, pos.x() + 0.5, pos.y() + 1.5, pos.z() + 0.5);
         for (Entity entity : world.getNearbyEntities(near, 2.0, 2.0, 2.0)) {
-            if (entity instanceof TextDisplay display
+            if (entity instanceof org.bukkit.entity.TextDisplay display
                     && pos.serialize().equals(display.getPersistentDataContainer().get(containerHintPdc, PersistentDataType.STRING))) {
                 display.remove();
             }
@@ -1407,6 +1295,7 @@ public final class DungeonManager {
     }
 
     private void removeContainerHolograms(DungeonInstance dungeon) {
+        cleanupDungeonDisplays(dungeon);
         for (BlockPosKey pos : dungeon.getChestPositions()) removeContainerHologram(pos);
         for (BlockPosKey pos : dungeon.getBarrelPositions()) removeContainerHologram(pos);
     }
@@ -1415,94 +1304,60 @@ public final class DungeonManager {
         return dungeon.getChestPositions().contains(pos) || dungeon.getBarrelPositions().contains(pos);
     }
 
-    private String buildHologramText(DungeonInstance d) {
-        String timer = TextUtil.formatDuration(d.secondsUntilReset());
-        List<String> lines;
-        int ghosts = 0, mobs = 0;
-        String clock = "00:00";
-
-        if (d.getCategory() == DungeonCategory.SURFACE) {
-            lines = plugin.getConfig().getStringList("hologram.surface-lines");
-            ghosts = plugin.getGhostController().countAliveGhosts(d.getId());
-        } else {
-            TrialController.ActiveFight f = plugin.getTrialController().getFight(d.getId());
-            if (f != null) {
-                lines = plugin.getConfig().getStringList("hologram.underground-fight-lines");
-                mobs = f.aliveMobs.size();
-                clock = TextUtil.formatShortClock((f.deadlineMs - System.currentTimeMillis()) / 1000L);
-            } else if (d.getStatus() == DungeonStatus.CLEARED) {
-                lines = plugin.getConfig().getStringList("hologram.underground-cooldown-lines");
-            } else {
-                lines = plugin.getConfig().getStringList("hologram.underground-ready-lines");
-            }
-        }
-
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < lines.size(); i++) {
-            if (i > 0) sb.append('\n');
-            String line = lines.get(i).replace("Обновление через:", "Восстановление данжа через:");
-            sb.append(TextUtil.color(line
-                    .replace("{ghosts}", String.valueOf(ghosts))
-                    .replace("{mobs}", String.valueOf(mobs))
-                    .replace("{clock}", clock)
-                    .replace("{timer}", timer)));
-        }
-        return sb.toString();
+    public void removeHologram(DungeonInstance dungeon) {
+        cleanupDungeonDisplays(dungeon);
     }
 
-    private TextDisplay findHologram(World w, DungeonInstance d, Location near) {
-        if (d.getHologramUuid() != null) {
-            Entity e = w.getEntity(d.getHologramUuid());
-            if (e instanceof TextDisplay td && td.isValid()) return td;
+    public void removeLegacyDungeonDisplays() {
+        for (World world : Bukkit.getWorlds()) {
+            for (Chunk chunk : world.getLoadedChunks()) {
+                for (Entity entity : chunk.getEntities()) {
+                    if (entity instanceof TextDisplay display
+                            && (display.getPersistentDataContainer().has(hologramPdc, PersistentDataType.STRING)
+                            || display.getPersistentDataContainer().has(containerHintPdc, PersistentDataType.STRING))) {
+                        display.remove();
+                    }
+                }
+                plugin.getGhostController().handleChunkLoad(chunk);
+            }
         }
-        for (Entity e : w.getNearbyEntities(near, 3.0, 4.0, 3.0)) {
-            if (e instanceof TextDisplay td) {
-                String tag = td.getPersistentDataContainer().get(hologramPdc, PersistentDataType.STRING);
-                if (d.getId().equals(tag)) {
-                    d.setHologramUuid(td.getUniqueId());
-                    return td;
+        for (DungeonInstance dungeon : dungeons.values()) dungeon.setHologramUuid(null);
+    }
+
+    private void cleanupDungeonDisplays(DungeonInstance dungeon) {
+        World world = dungeon.getOrigin().world();
+        if (world == null) return;
+        CuboidRegion bounds = dungeon.getBounds();
+        int minChunkX = bounds.minX() >> 4, maxChunkX = bounds.maxX() >> 4;
+        int minChunkZ = bounds.minZ() >> 4, maxChunkZ = bounds.maxZ() >> 4;
+        for (int chunkX = minChunkX; chunkX <= maxChunkX; chunkX++) {
+            for (int chunkZ = minChunkZ; chunkZ <= maxChunkZ; chunkZ++) {
+                if (!world.isChunkLoaded(chunkX, chunkZ)) continue;
+                Chunk chunk = world.getChunkAt(chunkX, chunkZ);
+                for (Entity entity : chunk.getEntities()) {
+                    if (entity instanceof org.bukkit.entity.TextDisplay display
+                            && (display.getPersistentDataContainer().has(hologramPdc, PersistentDataType.STRING)
+                            || display.getPersistentDataContainer().has(containerHintPdc, PersistentDataType.STRING))) {
+                        display.remove();
+                    }
                 }
             }
         }
-        return null;
-    }
-
-    public void removeHologram(DungeonInstance d) {
-        World w = d.getOrigin().world();
-        if (w != null && d.getHologramUuid() != null) {
-            Entity e = w.getEntity(d.getHologramUuid());
-            if (e != null) e.remove();
-            d.setHologramUuid(null);
-        }
+        dungeon.setHologramUuid(null);
     }
 
     public void handleChunkLoad(Chunk chunk) {
         for (Entity entity : chunk.getEntities()) {
-            if (!(entity instanceof TextDisplay display)) continue;
-            String dungeonId = display.getPersistentDataContainer().get(hologramPdc, PersistentDataType.STRING);
-            if (dungeonId != null && (!dungeons.containsKey(dungeonId) || hiddenFromWorld)) {
+            if (entity instanceof TextDisplay display
+                    && (display.getPersistentDataContainer().has(hologramPdc, PersistentDataType.STRING)
+                    || display.getPersistentDataContainer().has(containerHintPdc, PersistentDataType.STRING))) {
                 display.remove();
-                continue;
-            }
-            String serializedPos = display.getPersistentDataContainer().get(containerHintPdc, PersistentDataType.STRING);
-            if (serializedPos != null) {
-                BlockPosKey pos = BlockPosKey.deserialize(serializedPos);
-                DungeonInstance owner = pos == null ? null : getByProtectedContainer(pos);
-                if (owner == null || hiddenFromWorld || owner.isContainerOpened(pos) || !isLootContainerPosition(owner, pos)) {
-                    display.remove();
-                }
             }
         }
         plugin.getGhostController().handleChunkLoad(chunk);
         if (hiddenFromWorld) return;
         for (DungeonInstance dungeon : dungeons.values()) {
-            BlockPosKey anchor = dungeon.getHologramAnchor();
-            if (anchor != null && anchor.worldName().equals(chunk.getWorld().getName())
-                    && (anchor.x() >> 4) == chunk.getX() && (anchor.z() >> 4) == chunk.getZ()) {
-                updateDungeonHologram(dungeon);
-            }
             applyPendingSurfaceShulkersInChunk(dungeon, chunk);
-            ensureContainerHologramsInChunk(dungeon, chunk);
         }
     }
 
@@ -1521,21 +1376,6 @@ public final class DungeonManager {
             changed |= applySurfaceShulkerState(dungeon, chunk.getWorld(), pos, rarity, stacks);
         }
         if (changed) saveDungeons();
-    }
-
-    private void ensureContainerHologramsInChunk(DungeonInstance dungeon, Chunk chunk) {
-        for (BlockPosKey pos : dungeon.getChestPositions()) {
-            if (pos.worldName().equals(chunk.getWorld().getName()) && (pos.x() >> 4) == chunk.getX()
-                    && (pos.z() >> 4) == chunk.getZ() && !dungeon.isContainerOpened(pos)) {
-                ensureContainerHologram(dungeon, pos);
-            }
-        }
-        for (BlockPosKey pos : dungeon.getBarrelPositions()) {
-            if (pos.worldName().equals(chunk.getWorld().getName()) && (pos.x() >> 4) == chunk.getX()
-                    && (pos.z() >> 4) == chunk.getZ() && !dungeon.isContainerOpened(pos)) {
-                ensureContainerHologram(dungeon, pos);
-            }
-        }
     }
 
     public DungeonInstance getByProtectedContainer(BlockPosKey pos) {
