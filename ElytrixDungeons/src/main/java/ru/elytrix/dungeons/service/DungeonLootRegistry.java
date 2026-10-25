@@ -2,6 +2,9 @@ package ru.elytrix.dungeons.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -45,12 +48,13 @@ public final class DungeonLootRegistry {
             return;
         }
 
-        YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
-        if (yml.getInt("loot-version", 0) < LOOT_VERSION) {
-            // The earlier generated defaults referenced shop and kit ids that are not guaranteed
-            // to exist. Upgrade that generated table once to reliable vanilla item stacks.
-            seedDefaults();
-            save();
+        YamlConfiguration yml = new YamlConfiguration();
+        try {
+            yml.load(file);
+        } catch (Exception exception) {
+            // Do not replace a damaged user loot file with generated defaults.
+            plugin.getLogger().severe("Не удалось прочитать loot.yml; исходный файл оставлен без изменений: "
+                    + exception.getMessage());
             return;
         }
 
@@ -65,49 +69,53 @@ public final class DungeonLootRegistry {
                 try {
                     kind = SourceKind.valueOf(entry.getString("kind", "ITEM_STACK"));
                 } catch (IllegalArgumentException exception) {
+                    plugin.getLogger().warning("Неизвестный тип лута " + key + " в " + type.name()
+                            + "; сохранённый ItemStack будет использован как есть.");
                     kind = SourceKind.ITEM_STACK;
                 }
                 String externalId = entry.getString("external-id", "");
                 ItemStack stack = entry.getItemStack("item");
-                if (stack == null || stack.getType().isAir()) stack = new ItemStack(Material.DIAMOND);
+                if (stack == null || stack.getType().isAir()) {
+                    plugin.getLogger().warning("Пропущен некорректный ItemStack в loot.yml: "
+                            + type.name() + "." + key + ".item");
+                    continue;
+                }
+                double chance = entry.getDouble("chance", 40.0);
+                if (!Double.isFinite(chance)) chance = 40.0;
                 list.add(new DungeonLootEntry(
                         key,
                         kind,
                         externalId,
                         stack,
-                        entry.getDouble("chance", 40.0),
+                        chance,
                         entry.getInt("min", 1),
                         entry.getInt("max", 1),
                         entry.getBoolean("guaranteed", false)
                 ));
             }
         }
-        ensureMissingPoolsHaveDefaults();
+
+        // Upgrade metadata only. Never reseed an existing pool just because it is empty or old.
+        if (yml.getInt("loot-version", 0) < LOOT_VERSION) save();
     }
 
-    private void ensureMissingPoolsHaveDefaults() {
-        boolean hasEmptyPool = pools.values().stream().anyMatch(List::isEmpty);
-        if (!hasEmptyPool) return;
-
-        EnumMap<LootPoolType, List<DungeonLootEntry>> configured = new EnumMap<>(LootPoolType.class);
-        for (LootPoolType type : LootPoolType.values()) {
-            configured.put(type, new ArrayList<>(pools.get(type)));
-            pools.get(type).clear();
-        }
-        seedDefaults();
-        for (LootPoolType type : LootPoolType.values()) {
-            if (configured.get(type).isEmpty()) continue;
-            pools.get(type).clear();
-            pools.get(type).addAll(configured.get(type));
-        }
-        save();
-    }
-
-    public void save() {
+    public boolean save() {
         YamlConfiguration yml = new YamlConfiguration();
+        if (file.exists()) {
+            try {
+                yml.load(file);
+            } catch (Exception exception) {
+                plugin.getLogger().severe("Refusing to overwrite unreadable loot.yml: " + exception.getMessage());
+                return false;
+            }
+        }
+
         yml.set("loot-version", LOOT_VERSION);
         for (LootPoolType type : LootPoolType.values()) {
             String base = "pools." + type.name();
+            yml.set(base, null);
+            // This marker keeps an intentionally empty pool distinct from a missing legacy section.
+            yml.set(base + ".configured", true);
             int i = 0;
             for (DungeonLootEntry entry : pools.get(type)) {
                 String path = base + ".item_" + (i++);
@@ -120,10 +128,28 @@ public final class DungeonLootRegistry {
                 yml.set(path + ".guaranteed", entry.isGuaranteed());
             }
         }
+
+        File tempFile = new File(file.getParentFile(), file.getName() + ".tmp");
         try {
-            yml.save(file);
-        } catch (IOException exception) {
+            File parent = file.getParentFile();
+            if (parent != null && !parent.exists() && !parent.mkdirs()) {
+                throw new IOException("Could not create " + parent.getAbsolutePath());
+            }
+            yml.save(tempFile);
+            try {
+                Files.move(tempFile.toPath(), file.toPath(),
+                        StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+            } catch (AtomicMoveNotSupportedException exception) {
+                Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            }
+            return true;
+        } catch (IOException | RuntimeException exception) {
             plugin.getLogger().severe("Не удалось сохранить loot.yml: " + exception.getMessage());
+            return false;
+        } finally {
+            if (tempFile.exists() && !tempFile.delete()) {
+                plugin.getLogger().warning("Could not remove temporary loot file: " + tempFile.getName());
+            }
         }
     }
 
@@ -151,10 +177,7 @@ public final class DungeonLootRegistry {
     public List<ItemStack> rollStacks(LootPoolType type, int targetStacks) {
         List<DungeonLootEntry> entries = getPool(type);
         List<ItemStack> output = new ArrayList<>();
-        if (entries.isEmpty()) {
-            output.add(new ItemStack(Material.GOLDEN_APPLE));
-            return output;
-        }
+        if (entries.isEmpty()) return output;
         targetStacks = Math.max(1, targetStacks);
         ThreadLocalRandom random = ThreadLocalRandom.current();
 

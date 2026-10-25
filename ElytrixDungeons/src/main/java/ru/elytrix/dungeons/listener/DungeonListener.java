@@ -39,6 +39,7 @@ import ru.elytrix.dungeons.model.DungeonCategory;
 import ru.elytrix.dungeons.model.DungeonInstance;
 import ru.elytrix.dungeons.model.DungeonStatus;
 import ru.elytrix.dungeons.model.SurfaceShulkerRarity;
+import ru.elytrix.dungeons.service.TrialController;
 
 public final class DungeonListener implements Listener {
 
@@ -100,7 +101,7 @@ public final class DungeonListener implements Listener {
                 }
                 SurfaceShulkerRarity lootTier = lootTierForKey(keyId);
                 if (lootTier == null) {
-                    player.sendMessage(plugin.prefix() + "Этот шалкер открывается только ключом Хранилища ElytrixVault.");
+                    player.sendMessage(plugin.prefix() + "Этот шалкер открывается только ключом хранилища");
                     return;
                 }
                 if (plugin.getDungeonManager().openSurfaceShulkerWithKey(player, dungeon, pos, lootTier)) {
@@ -150,16 +151,28 @@ public final class DungeonListener implements Listener {
         return keyId == null || keyId.isBlank() ? null : keyId.trim();
     }
 
-    private static SurfaceShulkerRarity lootTierForKey(String keyId) {
+    private SurfaceShulkerRarity lootTierForKey(String keyId) {
         if (keyId == null) return null;
-        return switch (keyId.toLowerCase(Locale.ROOT)) {
+        SurfaceShulkerRarity builtIn = switch (keyId.toLowerCase(Locale.ROOT)) {
             case "rusty" -> SurfaceShulkerRarity.COMMON;
             case "knowledge" -> SurfaceShulkerRarity.UNCOMMON;
             case "royal" -> SurfaceShulkerRarity.RARE;
             case "void" -> SurfaceShulkerRarity.EPIC;
             case "unique" -> SurfaceShulkerRarity.MYTHIC;
-            // Custom keys created by ElytrixVault are accepted as Vault keys too.
-            default -> SurfaceShulkerRarity.COMMON;
+            default -> null;
+        };
+        if (builtIn != null) return builtIn;
+
+        // Custom ElytrixVault keys use their configured 1-5 level to choose the loot table.
+        Integer level = plugin.getItemsHook().getVaultKeyLevel(keyId);
+        if (level == null) return null;
+        return switch (level) {
+            case 1 -> SurfaceShulkerRarity.COMMON;
+            case 2 -> SurfaceShulkerRarity.UNCOMMON;
+            case 3 -> SurfaceShulkerRarity.RARE;
+            case 4 -> SurfaceShulkerRarity.EPIC;
+            case 5 -> SurfaceShulkerRarity.MYTHIC;
+            default -> null;
         };
     }
 
@@ -201,7 +214,7 @@ public final class DungeonListener implements Listener {
         plugin.getDungeonManager().suppressAuctionBar(player);
         if (dungeon.isSurfaceShulkerLocked(pos)) {
             event.setCancelled(true);
-            player.sendActionBar("Запечатанный шалкер открывается ключом Хранилища");
+            player.sendActionBar("Этот шалкер открывается только ключом хранилища");
             return;
         }
         if (dungeon.isSurfaceShulkerKeyUnlocked(pos)) {
@@ -238,7 +251,7 @@ public final class DungeonListener implements Listener {
             event.setCancelled(true);
             plugin.getDungeonManager().suppressAuctionBar(player);
             if (dungeon.isSurfaceShulkerLocked(pos)) {
-                player.sendActionBar("Запечатанный шалкер открывается ключом Хранилища");
+                player.sendActionBar("Этот шалкер открывается только ключом хранилища");
                 return;
             }
             if (dungeon.isSurfaceShulkerKeyUnlocked(pos)) {
@@ -387,8 +400,9 @@ public final class DungeonListener implements Listener {
             return;
         }
         if (plugin.getTrialController().isTrialMob(event.getEntity())) {
-            event.getDrops().clear();
-            event.setDroppedExp(18);
+            TrialController.MobRewardTier rewardTier = plugin.getTrialController()
+                    .getMobRewardTier(event.getEntity());
+            plugin.getGhostController().handleTrialMobDeath(event, rewardTier);
             plugin.getTrialController().handleMobDeath(event.getEntity().getUniqueId());
         }
     }

@@ -1,0 +1,21 @@
+name: ElytrixCemetery
+version: 1.0.0
+main: ru.rooyzee.elytrixcemetery.Main
+api-version: 1.16
+author: rooyzee
+depend: [WorldEdit, WorldGuard, DecentHolograms]
+softdepend: [PlaceholderAPI, FastAsyncWorldEdit]
+commands:
+  elytrixcemetery:
+    description: Основная команда Кладбища
+    aliases: [ec, cemetery, cem, paradise, ep, elytrixparadise]
+    usage: /cemetery help
+  cemetery:
+    description: Основная команда Кладбища
+    aliases: [ec, cem]
+    usage: /cemetery help
+permissions:
+  elytrixcemetery.admin:
+    default: op
+  elytrixcemetery.tp:
+    default: true

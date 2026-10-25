@@ -9,6 +9,7 @@ softdepend:
   - FastAsyncWorldEdit
   - ElytrixVault
   - ElytrixItem
+  - ElytrixCemetery
   - Vault
 
 commands:

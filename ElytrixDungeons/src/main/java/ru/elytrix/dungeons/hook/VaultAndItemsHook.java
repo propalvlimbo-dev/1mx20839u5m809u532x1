@@ -38,50 +38,32 @@ public final class VaultAndItemsHook {
             "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTFiNGIyMDE4OWQ5MDJiYzZjM2ZhYmUyM2Q5ZjU3ODY5N2Y1NDRjZjQxNTMxNzc4NzM3NDExODM5M2RhNCJ9fX0=";
 
     private final NamespacedKey vaultKeyPdc = new NamespacedKey("elytrixvault", "key_id");
-    private final NamespacedKey dungeonItemPdc = new NamespacedKey("elytrixdungeons", "item_id");
-
-    /**
-     * Canonical Ghost Shard (Призрачный осколок — Material.AMETHYST_SHARD) dropped 100% by Ghosts
-     * inside Surface Houses and ready to be exchanged at the upcoming Trader!
-     */
-    public ItemStack createGhostShard(int amount) {
-        ItemStack stack = new ItemStack(Material.AMETHYST_SHARD, Math.max(1, amount));
-        ItemMeta meta = stack.getItemMeta();
-        if (meta != null) {
-            meta.setDisplayName(TextUtil.color("&7« &#F8BEFBПризрачный осколок &7»"));
-            meta.setLore(TextUtil.colorList(List.of(
-                    "&#F8BEFB&l┃",
-                    "&#F8BEFB&l┃ &fДобывается с Призраков в Наземных домах",
-                    "&#F8BEFB&l┃ &fОбменивается на ценные награды у Торговца",
-                    "&#F8BEFB&l┃"
-            )));
-            meta.addEnchant(Enchantment.UNBREAKING, 1, true);
-            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES);
-            meta.getPersistentDataContainer().set(dungeonItemPdc, PersistentDataType.STRING, "ghost_shard");
-            stack.setItemMeta(meta);
-        }
-        return stack;
-    }
-
-    public boolean isGhostShard(ItemStack stack) {
-        if (stack == null || stack.getType() != Material.AMETHYST_SHARD || !stack.hasItemMeta()) {
-            return false;
-        }
-        ItemMeta meta = stack.getItemMeta();
-        return meta != null && "ghost_shard".equals(
-                meta.getPersistentDataContainer().get(dungeonItemPdc, PersistentDataType.STRING));
-    }
 
     public ItemStack createVaultKey(String keyId, int amount) {
-        try {
-            Plugin v = Bukkit.getPluginManager().getPlugin("ElytrixVault");
-            if (v != null && v.isEnabled()) {
-                Object km = v.getClass().getMethod("getKeyManager").invoke(v);
-                Method mk = km.getClass().getMethod("createKeyItem", String.class, int.class);
-                Object res = mk.invoke(km, keyId, amount);
-                if (res instanceof ItemStack st) return st;
+        Plugin vault = Bukkit.getPluginManager().getPlugin("ElytrixVault");
+        if (vault != null && vault.isEnabled()) {
+            for (String getter : new String[]{"getKeyRegistry", "getKeyManager"}) {
+                try {
+                    Object registry = vault.getClass().getMethod(getter).invoke(vault);
+                    try {
+                        Method directFactory = registry.getClass().getMethod("createKeyItem", String.class, int.class);
+                        Object directResult = directFactory.invoke(registry, keyId, amount);
+                        if (directResult instanceof ItemStack stack) return stack;
+                    } catch (NoSuchMethodException ignored) {
+                    }
+
+                    Object keyType = registry.getClass().getMethod("getKey", String.class).invoke(registry, keyId);
+                    if (keyType == null) continue;
+                    Object rawPdc = registry.getClass().getMethod("getKeyPdc").invoke(registry);
+                    if (rawPdc instanceof NamespacedKey keyPdc) {
+                        Method itemFactory = keyType.getClass()
+                                .getMethod("createKeyItem", NamespacedKey.class, int.class);
+                        Object result = itemFactory.invoke(keyType, keyPdc, amount);
+                        if (result instanceof ItemStack stack) return stack;
+                    }
+                } catch (Throwable ignored) {
+                }
             }
-        } catch (Throwable ignored) {
         }
         boolean ominous = keyId.equalsIgnoreCase("void") || keyId.equalsIgnoreCase("unique");
         ItemStack stack = new ItemStack(ominous ? Material.OMINOUS_TRIAL_KEY : Material.TRIAL_KEY, amount);
@@ -106,6 +88,26 @@ public final class VaultAndItemsHook {
         ItemMeta meta = stack.getItemMeta();
         return meta == null ? null
                 : meta.getPersistentDataContainer().get(vaultKeyPdc, PersistentDataType.STRING);
+    }
+
+    /** Returns the configured level for a custom ElytrixVault key, or null if it is unknown. */
+    public Integer getVaultKeyLevel(String keyId) {
+        if (keyId == null || keyId.isBlank()) return null;
+        Plugin vault = Bukkit.getPluginManager().getPlugin("ElytrixVault");
+        if (vault == null || !vault.isEnabled()) return null;
+        for (String getter : new String[]{"getKeyRegistry", "getKeyManager"}) {
+            try {
+                Object registry = vault.getClass().getMethod(getter).invoke(vault);
+                Object keyType = registry.getClass().getMethod("getKey", String.class).invoke(registry, keyId);
+                if (keyType == null) continue;
+                Object rawLevel = keyType.getClass().getMethod("getLevel").invoke(keyType);
+                if (rawLevel instanceof Number number) {
+                    return Math.max(1, Math.min(5, number.intValue()));
+                }
+            } catch (Throwable ignored) {
+            }
+        }
+        return null;
     }
 
     public static String vaultKeyDisplayName(String keyId) {

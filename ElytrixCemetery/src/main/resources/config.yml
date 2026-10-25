@@ -1,0 +1,45 @@
+# ===================================================================
+#                      ELYTRIX CEMETERY (КЛАДБИЩЕ)
+# ===================================================================
+
+center:
+  world: "world"
+  x: 0
+  y: 70
+  z: 0
+
+# Радиус границы кладбища
+boundary-radius: 50
+
+# Интервал автоматического закапывания раскопанных могил и обновления лута (секунды)
+# 1800 секунд = 30 минут
+refill-interval-seconds: 1800
+
+# Шанс появления Осквернённого Стража (мощный Wither Skeleton) при раскопке могилы (%)
+wither-skeleton-chance: 25.0
+# Шанс ключа Хранилища за победу над Осквернённым Стражем (%)
+guardian-key-drop-chance: 50.0
+
+# Настройки призраков (Allay)
+ghosts:
+  count: 8
+  health: 16.0
+  respawn-cooldown-seconds: 60
+  # Шанс дополнительного предмета из таблицы GHOSTS (%)
+  bonus-loot-chance: 35.0
+
+# Ключи ElytrixVault выпадают только с Осквернённого Стража на Кладбище.
+guardian-key-weights:
+  rusty: 52
+  knowledge: 25
+  royal: 13
+  void: 7
+  unique: 3
+
+# Голограммы
+# Общая голограмма события удалена; оставлены только прозрачные голограммы могил.
+main-hologram-enabled: false
+grave-holograms-enabled: true
+main-hologram-offset-y: 4.5
+# Как часто перепроверять и восстанавливать голограммы загруженных могил.
+hologram-refresh-interval-seconds: 5

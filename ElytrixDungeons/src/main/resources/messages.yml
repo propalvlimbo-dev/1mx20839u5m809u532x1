@@ -5,12 +5,12 @@ claim-blocked: "&cНельзя создавать приват рядом с д�
 protected-block: "&cКонтейнеры данжа защищены от разрушения."
 protected-zone: "&cВ этой зоне нельзя ломать и ставить блоки."
 
-ghost-key-dropped: "&#96FF91Редкая находка! &fПризрак оставил вам: &#F8BEFB{key}&f."
-
-underground-started: "&#89A0FFСтражи подземелья пробудились! &fПобедите всех, затем нажмите ПКМ по шалкеру за наградой."
+underground-started: "&#89A0FF{player} начал испытание! &fВолна 1/3: 2 сильных скелета и 5 обычных визер-скелетов."
+underground-wave-cleared: "&#96FF91Волна пройдена. &fВолна {wave}/3 начнётся через &#F8BEFB{seconds} сек."
+underground-wave-started: "&#89A0FFВолна {wave}/3: &f{description}."
+underground-spawn-failed: "&cНе удалось найти достаточно свободных безопасных точек. Бой отменён, шалкер снова запечатан."
 underground-already-active: "&cБой уже идёт. Осталось противников: &#F8BEFB{mobs}&c."
 underground-completed: "&#96FF91Победа! &fШалкер наполнен наградой. Нажмите ПКМ по нему, чтобы забрать."
 underground-timeout: "&cВремя вышло! Шалкер снова запечатан — ПКМ, чтобы начать испытание заново."
-
 dungeon-regenerated: "Данж и окружающий ландшафт восстановлены."
 broadcast-all-reset: "Все &#F8BEFB14 данжей &fи окружающий ландшафт восстановлены."

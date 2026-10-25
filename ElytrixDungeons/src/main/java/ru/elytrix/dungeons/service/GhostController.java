@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,24 +13,19 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Allay;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import ru.elytrix.dungeons.ElytrixDungeonsPlugin;
-import ru.elytrix.dungeons.hook.VaultAndItemsHook;
 import ru.elytrix.dungeons.model.BlockPosKey;
 import ru.elytrix.dungeons.model.CuboidRegion;
 import ru.elytrix.dungeons.model.DungeonCategory;
@@ -43,8 +37,8 @@ import ru.elytrix.dungeons.util.TextUtil;
  * Manages Surface House Ghosts (EntityType.ALLAY):
  *  - Spawns a separated wave on the first two floors, then lets Allays roam naturally
  *  - Lets ghosts roam naturally inside the house and prevents vanilla Allay duplication / item-handing exploits
- *  - After the whole wave is defeated, waits for the configured cooldown before spawning another
- *  - On kill: 100% drops Призрачный осколок (amethyst_shard) + 35% weighted Vault Key
+ *  - Tracks and respawns each surface-dungeon population independently from Cemetery ghosts
+ *  - Prevents vanilla Allay duplication / item-handing exploits; grants no shard or key rewards
  */
 public final class GhostController {
 
@@ -68,6 +62,10 @@ public final class GhostController {
     public int countAliveGhosts(String dungeonId) {
         Set<UUID> set = houseGhosts.get(dungeonId);
         return set == null ? 0 : set.size();
+    }
+
+    private static String ghostDisplayName() {
+        return TextUtil.color("&#F8BEFB&lПризрак");
     }
 
     public void populateInitialGhosts(DungeonInstance house) {
@@ -166,7 +164,7 @@ public final class GhostController {
                     if (!house.getId().equals(entity.getPersistentDataContainer().get(ghostPdc, PersistentDataType.STRING))) {
                         continue;
                     }
-                    living.setCustomName(TextUtil.color("Призрак"));
+                    living.setCustomName(ghostDisplayName());
                     living.setCustomNameVisible(true);
                     tracked.add(entity.getUniqueId());
                     ghostToHouse.put(entity.getUniqueId(), house.getId());
@@ -190,7 +188,7 @@ public final class GhostController {
             le.getPersistentDataContainer().set(ghostPdc, PersistentDataType.STRING, house.getId());
             le.setRemoveWhenFarAway(false);
             le.setCanPickupItems(false);
-            le.setCustomName(TextUtil.color("Призрак"));
+            le.setCustomName(ghostDisplayName());
             le.setCustomNameVisible(true);
 
             AttributeInstance maxHp = ((Attributable) le).getAttribute(Attribute.MAX_HEALTH);
@@ -234,63 +232,22 @@ public final class GhostController {
         }
 
         event.getDrops().clear();
-        event.setDroppedExp(12);
-
-        ThreadLocalRandom rng = ThreadLocalRandom.current();
-
-        // 1. 100% chance: Призрачный осколок (amethyst_shard for upcoming Trader)
-        double shardChance = plugin.getConfig().getDouble("surface-dungeon.ghosts.shard-drop-chance", 100.0);
-        if (rng.nextDouble(100.0) < shardChance) {
-            int minAmt = Math.max(1, plugin.getConfig().getInt("surface-dungeon.ghosts.shard-min-amount", 1));
-            int maxAmt = Math.max(minAmt, plugin.getConfig().getInt("surface-dungeon.ghosts.shard-max-amount", 1));
-            int amt = minAmt == maxAmt ? minAmt : rng.nextInt(minAmt, maxAmt + 1);
-            event.getDrops().add(plugin.getItemsHook().createGhostShard(amt));
-        }
-
-        // 2. 35% chance: Vault Key of any rarity (weighted — common drops most frequently!)
-        double keyChance = plugin.getConfig().getDouble("surface-dungeon.ghosts.key-drop-chance", 35.0);
-        if (rng.nextDouble(100.0) < keyChance) {
-            String keyId = rollWeightedKeyId(rng);
-            ItemStack keyItem = plugin.getItemsHook().createVaultKey(keyId, 1);
-            event.getDrops().add(keyItem);
-
-            Location deathLoc = dead.getLocation();
-            dead.getWorld().playSound(deathLoc, Sound.BLOCK_VAULT_ACTIVATE, 1.0f, 1.15f);
-            dead.getWorld().spawnParticle(Particle.TOTEM_OF_UNDYING, deathLoc.clone().add(0, 0.5, 0), 22, 0.3, 0.3, 0.3, 0.1);
-            Player killer = dead.getKiller();
-            if (killer != null) {
-                killer.sendMessage(TextUtil.color(plugin.msg("ghost-key-dropped")
-                        .replace("{key}", VaultAndItemsHook.vaultKeyDisplayName(keyId))));
-            }
-        }
-
+        event.setDroppedExp(0);
     }
 
-    public String rollWeightedKeyId(ThreadLocalRandom rng) {
-        Map<String, Integer> weights = new LinkedHashMap<>();
-        ConfigurationSection sec = plugin.getConfig().getConfigurationSection("surface-dungeon.ghosts.key-weights");
-        if (sec != null) {
-            for (String k : sec.getKeys(false)) {
-                int w = sec.getInt(k, 0);
-                if (w > 0) weights.put(k, w);
-            }
-        }
-        if (weights.isEmpty()) {
-            weights.put("rusty", 52);
-            weights.put("knowledge", 25);
-            weights.put("royal", 13);
-            weights.put("void", 7);
-            weights.put("unique", 3);
-        }
-        int total = 0;
-        for (int w : weights.values()) total += w;
-        int roll = rng.nextInt(Math.max(1, total));
-        int acc = 0;
-        for (Map.Entry<String, Integer> e : weights.entrySet()) {
-            acc += e.getValue();
-            if (roll < acc) return e.getKey();
-        }
-        return "rusty";
+    /** Trial regular mobs give no shards, elites give one, and the underground boss gives four to seven. */
+    public void handleTrialMobDeath(EntityDeathEvent event, TrialController.MobRewardTier rewardTier) {
+        event.getDrops().clear();
+        event.setDroppedExp(18);
+
+        if (rewardTier != TrialController.MobRewardTier.STRONG
+                && rewardTier != TrialController.MobRewardTier.BOSS) return;
+
+        int amount = rewardTier == TrialController.MobRewardTier.BOSS
+                ? ThreadLocalRandom.current().nextInt(4, 8)
+                : 1;
+        org.bukkit.inventory.ItemStack shard = plugin.getCemeteryShardHook().createGhostShard(amount);
+        if (shard != null) event.getDrops().add(shard);
     }
 
     public void handleChunkLoad(Chunk chunk) {
@@ -302,7 +259,7 @@ public final class GhostController {
                 continue;
             }
             if (entity instanceof LivingEntity ghost) {
-                ghost.setCustomName(TextUtil.color("Призрак"));
+                ghost.setCustomName(ghostDisplayName());
                 ghost.setCustomNameVisible(true);
                 houseGhosts.computeIfAbsent(tag, key -> new HashSet<>()).add(entity.getUniqueId());
                 ghostToHouse.put(entity.getUniqueId(), tag);

@@ -192,7 +192,12 @@ public final class DungeonCommand implements TabExecutor {
                     sender.sendMessage(plugin.prefix() + "/edungeon giveshard <игрок> [кол-во]");
                     return true;
                 }
-                target.getInventory().addItem(plugin.getItemsHook().createGhostShard(amount));
+                ItemStack shard = plugin.getCemeteryShardHook().createGhostShard(amount);
+                if (shard == null) {
+                    sender.sendMessage(plugin.prefix() + "§cДля создания Призрачного осколка должен быть включён ElytrixCemetery.");
+                    return true;
+                }
+                target.getInventory().addItem(shard);
                 sender.sendMessage(plugin.prefix() + "Выдано §f" + amount + "× Призрачный осколок §7игроку §f" + target.getName());
             }
             case "wand" -> {

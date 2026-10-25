@@ -76,22 +76,27 @@ public final class DungeonAuctionBar {
     }
 
     private String ghostsLine(DungeonInstance dungeon) {
+        if (dungeon.getCategory() == DungeonCategory.SURFACE) {
+            int alive = plugin.getGhostController().countAliveGhosts(dungeon.getId());
+            int total = Math.max(1, plugin.getConfig().getInt("surface-dungeon.ghosts.initial-count", 6));
+            String fallback = "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &8» "
+                    + "&7{dungeon} &8┃ &fПризраков в данже: &#F8BEFB{ghosts}&7/{ghost-total}";
+            return render("auctionbar.surface-event-line", fallback, dungeon)
+                    .replace("{ghosts}", String.valueOf(alive))
+                    .replace("{ghost-total}", String.valueOf(total));
+        }
+
         int alive;
         int total;
         String groupLabel;
-        if (dungeon.getCategory() == DungeonCategory.SURFACE) {
-            alive = plugin.getGhostController().countAliveGhosts(dungeon.getId());
-            total = Math.max(1, plugin.getConfig().getInt("surface-dungeon.ghosts.initial-count", 6));
-            groupLabel = "Призраков осталось";
-        } else {
-            TrialController.ActiveFight fight = plugin.getTrialController().getFight(dungeon.getId());
-            alive = fight == null ? 0 : fight.aliveMobs.size();
-            total = fight == null
-                    ? Math.max(1, plugin.getConfig().getInt("underground-dungeon.mob-count", 5)
-                            + (plugin.getConfig().getBoolean("underground-dungeon.spawn-leader", true) ? 1 : 0))
-                    : Math.max(1, fight.initialMobCount);
-            groupLabel = "Стражей осталось";
-        }
+        TrialController.ActiveFight fight = plugin.getTrialController().getFight(dungeon.getId());
+        alive = fight == null ? 0 : fight.aliveMobs.size();
+        total = fight == null
+                ? TrialController.TOTAL_MOB_COUNT
+                : Math.max(1, fight.currentWaveInitialMobCount);
+        groupLabel = fight == null
+                ? "Стражей осталось"
+                : "Волна " + (fight.waveIndex + 1) + "/" + TrialController.WAVE_COUNT + " — стражей";
 
         String fallback = "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &8» "
                 + "&7{dungeon} &8┃ &f{ghost-label}: &#F8BEFB{ghosts}&7/{ghost-total}";

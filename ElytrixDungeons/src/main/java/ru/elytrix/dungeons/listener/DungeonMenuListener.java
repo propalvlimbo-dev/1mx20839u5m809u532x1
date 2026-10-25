@@ -40,6 +40,11 @@ public final class DungeonMenuListener implements Listener {
         if (!(top.getHolder() instanceof DungeonGuiHolder holder)) return;
         event.setCancelled(true);
         if (!(event.getWhoClicked() instanceof Player player)) return;
+        if (holder.getScreen() != DungeonGuiHolder.Screen.PLAYER_OVERVIEW
+                && !player.hasPermission("elytrixdungeons.admin")) {
+            player.closeInventory();
+            return;
+        }
 
         int raw = event.getRawSlot();
         ItemStack clicked = event.getCurrentItem();
@@ -126,7 +131,12 @@ public final class DungeonMenuListener implements Listener {
             return;
         }
         if (raw == 47) {
-            admin.getInventory().addItem(plugin.getItemsHook().createGhostShard(16));
+            ItemStack shard = plugin.getCemeteryShardHook().createGhostShard(16);
+            if (shard == null) {
+                admin.sendMessage(plugin.prefix() + "§cДля создания Призрачного осколка должен быть включён ElytrixCemetery.");
+                return;
+            }
+            admin.getInventory().addItem(shard);
             admin.playSound(admin.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.9f, 1.3f);
             admin.sendMessage(plugin.prefix() + "Выдано §f16× Призрачный осколок§7.");
             return;
@@ -258,7 +268,9 @@ public final class DungeonMenuListener implements Listener {
                         Math.max(1, amt),
                         false
                 ));
-                plugin.getLootRegistry().save();
+                if (!plugin.getLootRegistry().save()) {
+                    admin.sendMessage(plugin.prefix() + "§cНе удалось сохранить лут; старый файл оставлен без изменений. Проверьте консоль.");
+                }
                 admin.playSound(admin.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.9f, 1.3f);
                 plugin.getMenuService().openLootPoolEditor(admin, poolType);
             }
@@ -278,7 +290,9 @@ public final class DungeonMenuListener implements Listener {
         } else if (click.isRightClick()) {
             entry.setChancePercent(entry.getChancePercent() - 5.0);
         }
-        plugin.getLootRegistry().save();
+        if (!plugin.getLootRegistry().save()) {
+            admin.sendMessage(plugin.prefix() + "§cНе удалось сохранить лут; старый файл оставлен без изменений. Проверьте консоль.");
+        }
         admin.playSound(admin.getLocation(), Sound.UI_BUTTON_CLICK, 0.7f, 1.2f);
         plugin.getMenuService().openLootPoolEditor(admin, poolType);
     }

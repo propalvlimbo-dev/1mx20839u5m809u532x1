@@ -1,5 +1,5 @@
 # ElytrixDungeons — до 7 наземных домов и 7 подземных данжей.
-config-version: 6
+config-version: 10
 # Схемы плагин не создаёт: загрузите собственные файлы .schem в нужную папку.
 #   plugins/ElytrixDungeons/schematics/surface/<id-схемы>.schem
 #   plugins/ElytrixDungeons/schematics/underground/<id-схемы>.schem
@@ -63,22 +63,10 @@ surface-dungeon:
     # Плавный природный склон вокруг основания дома (в пределах снимка местности).
     radius: 6
   ghosts:
-    # Стая из шести появляется сразу; после гибели всех шести следующая ждёт 2 часа.
+    # Отдельная популяция для каждого надземного данжа; не связана с призраками Кладбища.
     initial-count: 6
     respawn-cooldown-seconds: 7200
     health: 16.0
-    # 100% шанс выпадения Призрачного осколка.
-    shard-drop-chance: 100.0
-    shard-min-amount: 1
-    shard-max-amount: 1
-    # 35% шанс выпадения ключа Хранилища.
-    key-drop-chance: 35.0
-    key-weights:
-      rusty: 52
-      knowledge: 25
-      royal: 13
-      void: 7
-      unique: 3
   ambience:
     enabled: true
     # Жуткая MUSIC_DISC_5 — персональная музыка для каждого игрока внутри дома, с автоповтором.
@@ -90,13 +78,19 @@ underground-dungeon:
   claim-padding-blocks: 8
   shulker-stacks: 7
   side-container-stacks: 4
-  mob-count: 5
-  spawn-leader: true
+  # Пауза между зачисткой волны и появлением следующей.
+  wave-delay-seconds: 3
+  # Параметры 5 обычных визер-скелетов первой волны.
+  wither-skeleton-health: 36.0
+  wither-skeleton-damage: 8.0
+  # Параметры сильных скелетов и лучников.
   guard-health: 64.0
   guard-damage: 14.5
+  # Параметры финального босса.
   leader-health: 150.0
   leader-damage: 18.5
-  fight-timeout-seconds: 210
+  # Ключи Хранилища выпадают только на Кладбище.
+  fight-timeout-seconds: 690
 
 # Общая голограмма данжа и подписи сундуков выключены. Над призраками отображается только их имя.
 hologram:
@@ -114,4 +108,12 @@ auctionbar:
   cycle-seconds: 15
   reset-line: "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &8» &7{dungeon} &8┃ &fПолный сброс через &#96FF91{timer}"
   ghosts-line: "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &8» &7{dungeon} &8┃ &f{ghost-label}: &#F8BEFB{ghosts}&7/{ghost-total}"
+  surface-event-line: "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &8» &7{dungeon} &8┃ &fПризраков в данже: &#F8BEFB{ghosts}&7/{ghost-total}"
   loot-line: "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &8» &7{dungeon} &8┃ &fЛут шалкеров обновится через &#96FF91{timer}"
+
+# Подавление шумных серверных записей. Эти настройки применяются при запуске плагина;
+# значения исходных настроек Paper/Spigot восстанавливаются при выключении ElytrixDungeons.
+console-logs:
+  suppress-named-entity-deaths: true
+  suppress-player-command-logs: true
+  suppress-admin-command-feedback: true

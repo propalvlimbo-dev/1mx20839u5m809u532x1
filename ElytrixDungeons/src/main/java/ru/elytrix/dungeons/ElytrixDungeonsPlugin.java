@@ -1,6 +1,10 @@
 package ru.elytrix.dungeons;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.PluginCommand;
@@ -9,11 +13,13 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import ru.elytrix.dungeons.command.DungeonCommand;
 import ru.elytrix.dungeons.gui.DungeonMenuService;
+import ru.elytrix.dungeons.hook.CemeteryShardHook;
 import ru.elytrix.dungeons.hook.VaultAndItemsHook;
 import ru.elytrix.dungeons.hook.WorldEditHook;
 import ru.elytrix.dungeons.hook.WorldGuardHook;
 import ru.elytrix.dungeons.listener.DungeonListener;
 import ru.elytrix.dungeons.listener.DungeonMenuListener;
+import ru.elytrix.dungeons.service.ConsoleLogController;
 import ru.elytrix.dungeons.service.DungeonLootRegistry;
 import ru.elytrix.dungeons.service.DungeonManager;
 import ru.elytrix.dungeons.service.GhostController;
@@ -26,11 +32,13 @@ public final class ElytrixDungeonsPlugin extends JavaPlugin {
     private WorldGuardHook worldGuardHook;
     private WorldEditHook worldEditHook;
     private VaultAndItemsHook itemsHook;
+    private CemeteryShardHook cemeteryShardHook;
     private DungeonLootRegistry lootRegistry;
     private GhostController ghostController;
     private TrialController trialController;
     private DungeonManager dungeonManager;
     private DungeonMenuService menuService;
+    private ConsoleLogController consoleLogController;
     private DungeonCommand commandHandler;
 
     private NamespacedKey guiTargetPdc;
@@ -43,12 +51,16 @@ public final class ElytrixDungeonsPlugin extends JavaPlugin {
         saveResourceIfMissing("messages.yml");
         reloadMessages();
 
+        this.consoleLogController = new ConsoleLogController(this);
+        this.consoleLogController.apply();
+
         this.guiTargetPdc = new NamespacedKey(this, "gui_target");
         this.wandPdc = new NamespacedKey(this, "builder_wand");
 
         this.worldGuardHook = new WorldGuardHook();
         this.worldEditHook = new WorldEditHook();
         this.itemsHook = new VaultAndItemsHook();
+        this.cemeteryShardHook = new CemeteryShardHook(this);
         this.lootRegistry = new DungeonLootRegistry(this);
         this.lootRegistry.load();
 
@@ -80,12 +92,17 @@ public final class ElytrixDungeonsPlugin extends JavaPlugin {
         if (dungeonManager != null) {
             dungeonManager.shutdown();
         }
+        if (consoleLogController != null) {
+            consoleLogController.restore();
+        }
     }
 
     public void reloadAll() {
+        if (consoleLogController != null) consoleLogController.restore();
         reloadConfig();
         migrateLegacyConfig();
         reloadMessages();
+        if (consoleLogController != null) consoleLogController.apply();
         lootRegistry.load();
         dungeonManager.removeLegacyDungeonDisplays();
         dungeonManager.loadSchematics();
@@ -178,6 +195,76 @@ public final class ElytrixDungeonsPlugin extends JavaPlugin {
             getConfig().set("config-version", 6);
             changed = true;
         }
+        if (version < 7) {
+            if (!getConfig().isSet("underground-dungeon.wave-delay-seconds")) {
+                getConfig().set("underground-dungeon.wave-delay-seconds", 3);
+            }
+            if (!getConfig().isSet("underground-dungeon.wither-skeleton-health")) {
+                getConfig().set("underground-dungeon.wither-skeleton-health", 36.0);
+            }
+            if (!getConfig().isSet("underground-dungeon.wither-skeleton-damage")) {
+                getConfig().set("underground-dungeon.wither-skeleton-damage", 8.0);
+            }
+            if (!getConfig().isSet("underground-dungeon.guard-key-drop-chance")) {
+                getConfig().set("underground-dungeon.guard-key-drop-chance", 50.0);
+            }
+            // Counts are now fixed by the three-wave encounter rather than legacy group settings.
+            getConfig().set("underground-dungeon.mob-count", null);
+            getConfig().set("underground-dungeon.spawn-leader", null);
+            getConfig().set("config-version", 7);
+            changed = true;
+        }
+        if (version < 8) {
+            if (!getConfig().isSet("auctionbar.surface-event-line")) {
+                getConfig().set("auctionbar.surface-event-line",
+                        "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &8» &7{dungeon} &8┃ &fПризраков в данже: &#F8BEFB{ghosts}&7/{ghost-total}");
+            }
+            getConfig().set("config-version", 8);
+            changed = true;
+        }
+        if (version < 9) {
+            long previousFightTimeout = getConfig().getLong("underground-dungeon.fight-timeout-seconds", 210L);
+            if (!getConfig().isSet("underground-dungeon.fight-timeout-seconds") || previousFightTimeout == 210L) {
+                getConfig().set("underground-dungeon.fight-timeout-seconds", 690L);
+            }
+            getConfig().set("underground-dungeon.guard-key-drop-chance", null);
+            getConfig().set("surface-dungeon.ghosts.shard-drop-chance", null);
+            getConfig().set("surface-dungeon.ghosts.shard-min-amount", null);
+            getConfig().set("surface-dungeon.ghosts.shard-max-amount", null);
+            getConfig().set("surface-dungeon.ghosts.key-drop-chance", null);
+            getConfig().set("surface-dungeon.ghosts.key-weights", null);
+            if (!getConfig().isSet("console-logs.suppress-named-entity-deaths")) {
+                getConfig().set("console-logs.suppress-named-entity-deaths", true);
+            }
+            if (!getConfig().isSet("console-logs.suppress-player-command-logs")) {
+                getConfig().set("console-logs.suppress-player-command-logs", true);
+            }
+            if (!getConfig().isSet("console-logs.suppress-admin-command-feedback")) {
+                getConfig().set("console-logs.suppress-admin-command-feedback", true);
+            }
+            getConfig().set("config-version", 9);
+            changed = true;
+        }
+        if (version < 10) {
+            if (!getConfig().isSet("surface-dungeon.ghosts.initial-count")) {
+                getConfig().set("surface-dungeon.ghosts.initial-count", 6);
+            }
+            if (!getConfig().isSet("surface-dungeon.ghosts.respawn-cooldown-seconds")) {
+                getConfig().set("surface-dungeon.ghosts.respawn-cooldown-seconds", 7200);
+            }
+            if (!getConfig().isSet("surface-dungeon.ghosts.health")) {
+                getConfig().set("surface-dungeon.ghosts.health", 16.0);
+            }
+            String surfaceLine = getConfig().getString("auctionbar.surface-event-line", "");
+            if (!getConfig().isSet("auctionbar.surface-event-line")
+                    || surfaceLine == null || surfaceLine.contains("Кладбище")) {
+                String auctionBrand = "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &8» ";
+                getConfig().set("auctionbar.surface-event-line", auctionBrand
+                        + "&7{dungeon} &8┃ &fПризраков в данже: &#F8BEFB{ghosts}&7/{ghost-total}");
+            }
+            getConfig().set("config-version", 10);
+            changed = true;
+        }
         if (changed) saveConfig();
     }
 
@@ -189,7 +276,26 @@ public final class ElytrixDungeonsPlugin extends JavaPlugin {
     }
 
     private void reloadMessages() {
-        this.messages = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "messages.yml"));
+        File file = new File(getDataFolder(), "messages.yml");
+        this.messages = YamlConfiguration.loadConfiguration(file);
+        try (InputStream resource = getResource("messages.yml")) {
+            if (resource == null) return;
+            YamlConfiguration defaults = YamlConfiguration.loadConfiguration(
+                    new InputStreamReader(resource, StandardCharsets.UTF_8));
+            boolean missing = false;
+            for (String key : defaults.getKeys(false)) {
+                if (!messages.isSet(key)) {
+                    messages.addDefault(key, defaults.get(key));
+                    missing = true;
+                }
+            }
+            if (missing) {
+                messages.options().copyDefaults(true);
+                messages.save(file);
+            }
+        } catch (IOException exception) {
+            getLogger().warning("Could not merge default messages.yml entries: " + exception.getMessage());
+        }
     }
 
     public String prefix() {
@@ -203,6 +309,7 @@ public final class ElytrixDungeonsPlugin extends JavaPlugin {
     public WorldGuardHook getWorldGuardHook() { return worldGuardHook; }
     public WorldEditHook getWorldEditHook() { return worldEditHook; }
     public VaultAndItemsHook getItemsHook() { return itemsHook; }
+    public CemeteryShardHook getCemeteryShardHook() { return cemeteryShardHook; }
     public DungeonLootRegistry getLootRegistry() { return lootRegistry; }
     public GhostController getGhostController() { return ghostController; }
     public TrialController getTrialController() { return trialController; }

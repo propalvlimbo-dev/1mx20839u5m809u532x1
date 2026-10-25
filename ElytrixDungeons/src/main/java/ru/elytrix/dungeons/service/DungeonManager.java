@@ -1309,8 +1309,10 @@ public final class DungeonManager {
         }
 
         Block block = world.getBlockAt(pos.x(), pos.y(), pos.z());
-        if (block.getType() != rarity.getBlockMaterial()) {
-            block.setType(rarity.getBlockMaterial(), false);
+        boolean revealRarity = !dungeon.isSurfaceShulkerKeyUnlocked(pos);
+        Material displayMaterial = revealRarity ? rarity.getBlockMaterial() : Material.SHULKER_BOX;
+        if (block.getType() != displayMaterial) {
+            block.setType(displayMaterial, false);
         }
         BlockState state = block.getState();
         if (!(state instanceof Container container)) {
@@ -1320,8 +1322,10 @@ public final class DungeonManager {
         plugin.getLootRegistry().fillContainerRandomSlots(
                 container.getSnapshotInventory(), rarity.getLootPool(), stacks);
         if (state instanceof Nameable nameable) {
-            nameable.setCustomName(TextUtil.color("&7« " + rarity.getColorHex()
-                    + rarity.getDisplayName() + " шалкер &7»"));
+            String displayName = revealRarity
+                    ? "&7« " + rarity.getColorHex() + rarity.getDisplayName() + " шалкер &7»"
+                    : "&7« Открытый шалкер &7»";
+            nameable.setCustomName(TextUtil.color(displayName));
         }
         if (!state.update(true, false)) {
             dungeon.getPendingSurfaceShulkerRefresh().add(pos);
@@ -1620,20 +1624,26 @@ public final class DungeonManager {
             if (dungeon.isSurfaceShulkerLocked(pos)) {
                 return TextUtil.color("&7Запечатанный шалкер\n&7Откройте ключом Хранилища");
             }
+            if (dungeon.isSurfaceShulkerKeyUnlocked(pos)) {
+                return TextUtil.color("&7Открытый шалкер\n&7Нажмите, чтобы открыть");
+            }
             SurfaceShulkerRarity rarity = SurfaceShulkerRarity.fromName(
                     dungeon.getSurfaceShulkerRarities().get(pos));
             if (rarity == null) rarity = SurfaceShulkerRarity.COMMON;
-            if (dungeon.isSurfaceShulkerKeyUnlocked(pos)) {
-                return TextUtil.color(rarity.getColorHex() + "&l" + rarity.getDisplayName() + " шалкер\n"
-                        + "&7Нажмите, чтобы открыть");
-            }
             int progress = dungeon.getSurfaceShulkerBreakProgress().getOrDefault(pos, 0);
             return TextUtil.color(rarity.getColorHex() + "&l" + rarity.getDisplayName() + " шалкер\n"
                     + "&7Полные ломания: " + progress + "/" + rarity.getRequiredBreakCycles());
         }
 
-        if (plugin.getTrialController().getFight(dungeon.getId()) != null) {
-            return TextUtil.color("&#FF5555&lИспытание идёт\n&7Победите стражей, чтобы получить лут");
+        TrialController.ActiveFight fight = plugin.getTrialController().getFight(dungeon.getId());
+        if (fight != null) {
+            if (fight.nextWaveAtMs > 0L) {
+                long seconds = Math.max(0L, (fight.nextWaveAtMs - System.currentTimeMillis() + 999L) / 1000L);
+                return TextUtil.color("&#FF5555&lВолна " + (fight.waveIndex + 1) + "/"
+                        + TrialController.WAVE_COUNT + " пройдена\n&7Следующая через " + seconds + "с");
+            }
+            return TextUtil.color("&#FF5555&lВолна " + (fight.waveIndex + 1) + "/"
+                    + TrialController.WAVE_COUNT + "\n&7Осталось мобов: " + fight.aliveMobs.size());
         }
         boolean unlocked = Boolean.TRUE.equals(dungeon.getShulkerUnlocked().get(pos));
         return TextUtil.color(unlocked

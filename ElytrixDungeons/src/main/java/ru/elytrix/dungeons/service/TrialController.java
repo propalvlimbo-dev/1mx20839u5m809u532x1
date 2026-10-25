@@ -1,9 +1,11 @@
 package ru.elytrix.dungeons.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,6 +42,7 @@ import ru.elytrix.dungeons.ElytrixDungeonsPlugin;
 import ru.elytrix.dungeons.hook.VaultAndItemsHook;
 import ru.elytrix.dungeons.hook.VaultAndItemsHook.MapEnchant;
 import ru.elytrix.dungeons.model.BlockPosKey;
+import ru.elytrix.dungeons.model.CuboidRegion;
 import ru.elytrix.dungeons.model.DungeonInstance;
 import ru.elytrix.dungeons.model.DungeonStatus;
 import ru.elytrix.dungeons.model.LootPoolType;
@@ -47,12 +50,23 @@ import ru.elytrix.dungeons.util.TextUtil;
 
 public final class TrialController {
 
+    public enum MobRewardTier { NONE, STANDARD, STRONG, BOSS }
+
+    public static final int WAVE_COUNT = 3;
+    public static final int TOTAL_MOB_COUNT = 13;
+    private static final int SPAWN_SEARCH_RADIUS = 4;
+    private static final double[] SPAWN_SEPARATION_THRESHOLDS = {2.25, 1.0};
+
     public static final class ActiveFight {
         public final DungeonInstance dungeon;
         public final BossBar bossBar;
+        /** Total combatants across all three waves; used by status displays while idle. */
         public final int initialMobCount;
         public final long deadlineMs;
         public final Set<UUID> aliveMobs = new HashSet<>();
+        public int waveIndex;
+        public int currentWaveInitialMobCount = 1;
+        public long nextWaveAtMs;
 
         ActiveFight(DungeonInstance dungeon, BossBar bossBar, int initialMobCount, long timeoutSec) {
             this.dungeon = dungeon;
@@ -62,14 +76,26 @@ public final class TrialController {
         }
     }
 
+    private record FighterSpec(
+            EntityType type,
+            String name,
+            double health,
+            double attackDamage,
+            boolean archer,
+            boolean elite,
+            boolean boss
+    ) {}
+
     private final ElytrixDungeonsPlugin plugin;
     private final NamespacedKey trialMobPdc;
+    private final NamespacedKey trialMobTierPdc;
     private final Map<String, ActiveFight> fightsByDungeon = new HashMap<>();
     private final Map<UUID, String> mobToDungeon = new HashMap<>();
 
     public TrialController(ElytrixDungeonsPlugin plugin) {
         this.plugin = plugin;
         this.trialMobPdc = new NamespacedKey(plugin, "dungeon_mob");
+        this.trialMobTierPdc = new NamespacedKey(plugin, "dungeon_mob_reward_tier");
     }
 
     public ActiveFight getFight(String dungeonId) {
@@ -81,6 +107,14 @@ public final class TrialController {
                 || entity.getPersistentDataContainer().has(trialMobPdc, PersistentDataType.STRING));
     }
 
+    public MobRewardTier getMobRewardTier(Entity entity) {
+        if (!isTrialMob(entity)) return MobRewardTier.NONE;
+        String tier = entity.getPersistentDataContainer().get(trialMobTierPdc, PersistentDataType.STRING);
+        if ("boss".equals(tier)) return MobRewardTier.BOSS;
+        if ("strong".equals(tier)) return MobRewardTier.STRONG;
+        return MobRewardTier.STANDARD;
+    }
+
     public void startUndergroundFight(Player starter, DungeonInstance dungeon) {
         ActiveFight running = fightsByDungeon.get(dungeon.getId());
         if (running != null) {
@@ -88,138 +122,274 @@ public final class TrialController {
                     .replace("{mobs}", String.valueOf(running.aliveMobs.size())));
             return;
         }
-        World w = dungeon.getOrigin().world();
-        if (w == null) {
-            return;
-        }
+        World world = dungeon.getOrigin().world();
+        if (world == null) return;
 
-        int guards = Math.max(2, plugin.getConfig().getInt("underground-dungeon.mob-count", 5));
-        boolean withLeader = plugin.getConfig().getBoolean("underground-dungeon.spawn-leader", true);
-        int totalExpected = guards + (withLeader ? 1 : 0);
-        long timeoutSec = Math.max(90L, plugin.getConfig().getLong("underground-dungeon.fight-timeout-seconds", 210L));
-
+        long timeoutSec = Math.max(90L,
+                plugin.getConfig().getLong("underground-dungeon.fight-timeout-seconds", 690L));
         BossBar bar = Bukkit.createBossBar(
-                TextUtil.color("&#89A0FFПодземный данж &8┃ &fОсталось стражей: &#F8BEFB" + totalExpected),
+                TextUtil.color("&#89A0FFПодземный данж &8┃ &fВолна 1/3 &8┃ &fОсталось: &#F8BEFB7"),
                 BarColor.BLUE,
                 BarStyle.SEGMENTED_10
         );
         bar.setProgress(1.0);
 
-        ActiveFight fight = new ActiveFight(dungeon, bar, totalExpected, timeoutSec);
+        ActiveFight fight = new ActiveFight(dungeon, bar, TOTAL_MOB_COUNT, timeoutSec);
         fightsByDungeon.put(dungeon.getId(), fight);
         dungeon.setStatus(DungeonStatus.ACTIVE_TRIAL);
 
-        spawnUndergroundSquad(w, dungeon, fight, guards, withLeader);
+        if (!spawnWave(world, dungeon, fight, 0)) {
+            abortFight(dungeon.getId(), true);
+            starter.sendMessage(plugin.msg("underground-spawn-failed"));
+            plugin.getDungeonManager().updateShulkerHolograms(dungeon);
+            return;
+        }
+
         plugin.getDungeonManager().updateShulkerHolograms(dungeon);
-
         Location center = dungeon.getHologramAnchor().centerLocation();
-        w.playSound(center, Sound.BLOCK_TRIAL_SPAWNER_OMINOUS_ACTIVATE, 1.0f, 0.95f);
-        w.playSound(center, Sound.ENTITY_WARDEN_NEARBY_CLOSER, 0.9f, 1.0f);
-        w.spawnParticle(Particle.SCULK_SOUL, center.clone().add(0, 0.8, 0), 30, 0.6, 0.4, 0.6, 0.03);
+        world.playSound(center, Sound.BLOCK_TRIAL_SPAWNER_OMINOUS_ACTIVATE, 1.0f, 0.95f);
+        world.playSound(center, Sound.ENTITY_WARDEN_NEARBY_CLOSER, 0.9f, 1.0f);
+        world.spawnParticle(Particle.SCULK_SOUL, center.clone().add(0, 0.8, 0), 30, 0.6, 0.4, 0.6, 0.03);
 
-        notifyNearby(dungeon, 40.0, plugin.msg("underground-started").replace("{player}", starter.getName()));
+        notifyNearby(dungeon, 40.0,
+                plugin.msg("underground-started").replace("{player}", starter.getName()));
         refreshFightVisuals(fight);
     }
 
-    private void spawnUndergroundSquad(World w, DungeonInstance d, ActiveFight fight, int guards, boolean withLeader) {
-        List<BlockPosKey> pts = d.getMobSpawns().isEmpty()
-                ? List.of(d.getEntrancePos() != null ? d.getEntrancePos() : d.getHologramAnchor())
-                : d.getMobSpawns();
-        ThreadLocalRandom rng = ThreadLocalRandom.current();
+    private List<FighterSpec> createWaveLineup(int waveIndex) {
+        double standardHealth = Math.max(1.0,
+                plugin.getConfig().getDouble("underground-dungeon.wither-skeleton-health", 36.0));
+        double standardDamage = Math.max(1.0,
+                plugin.getConfig().getDouble("underground-dungeon.wither-skeleton-damage", 8.0));
+        double eliteHealth = Math.max(1.0,
+                plugin.getConfig().getDouble("underground-dungeon.guard-health", 64.0));
+        double eliteDamage = Math.max(1.0,
+                plugin.getConfig().getDouble("underground-dungeon.guard-damage", 14.5));
+        double bossHealth = Math.max(1.0,
+                plugin.getConfig().getDouble("underground-dungeon.leader-health", 150.0));
+        double bossDamage = Math.max(1.0,
+                plugin.getConfig().getDouble("underground-dungeon.leader-damage", 18.5));
 
-        double guardHp = plugin.getConfig().getDouble("underground-dungeon.guard-health", 64.0);
-        double guardDmg = plugin.getConfig().getDouble("underground-dungeon.guard-damage", 14.5);
-        double leaderHp = plugin.getConfig().getDouble("underground-dungeon.leader-health", 150.0);
-        double leaderDmg = plugin.getConfig().getDouble("underground-dungeon.leader-damage", 18.5);
-
-        for (int i = 0; i < guards; i++) {
-            BlockPosKey sp = pts.get(i % pts.size());
-            boolean archer = (i % 3 == 2);
-            EntityType type = archer
-                    ? (rng.nextBoolean() ? EntityType.BOGGED : EntityType.STRAY)
-                    : (i % 2 == 0 ? EntityType.WITHER_SKELETON : EntityType.VINDICATOR);
-            spawnSingleFighter(w, d, fight, sp.floorLocation(), type, false, guardHp, guardDmg, archer);
-        }
-        if (withLeader) {
-            BlockPosKey sp = pts.get(0);
-            spawnSingleFighter(w, d, fight, sp.floorLocation(), EntityType.WITHER_SKELETON, true, leaderHp, leaderDmg, false);
-        }
-    }
-
-    private void spawnSingleFighter(
-            World w,
-            DungeonInstance d,
-            ActiveFight fight,
-            Location loc,
-            EntityType type,
-            boolean leader,
-            double hp,
-            double attackDamage,
-            boolean archer
-    ) {
-        Entity raw = w.spawnEntity(loc, type);
-        if (!(raw instanceof LivingEntity le)) {
-            raw.remove();
-            return;
-        }
-        le.getPersistentDataContainer().set(trialMobPdc, PersistentDataType.STRING, d.getId());
-        le.setPersistent(false);
-        le.setRemoveWhenFarAway(false);
-        le.setCanPickupItems(false);
-        le.setCustomNameVisible(true);
-
-        setAttr(le, Attribute.MAX_HEALTH, hp);
-        le.setHealth(hp);
-        setAttr(le, Attribute.ATTACK_DAMAGE, attackDamage);
-        setAttr(le, Attribute.ARMOR, leader ? 18.0 : 12.0);
-        setAttr(le, Attribute.ARMOR_TOUGHNESS, leader ? 8.0 : 4.0);
-        setAttr(le, Attribute.FOLLOW_RANGE, 32.0);
-        setAttr(le, Attribute.KNOCKBACK_RESISTANCE, leader ? 0.65 : 0.30);
-
-        if (leader) {
-            setAttr(le, Attribute.SCALE, 1.24);
-            le.setCustomName(TextUtil.color("&#F8BEFBКаратель Подземелья &8[&cБосс&8]"));
-            le.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 20 * 300, 0, false, false));
-            le.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20 * 300, 0, false, false));
-        } else {
-            le.setCustomName(TextUtil.color(archer ? "&#89A0FFПодземный Стрелок" : "&#89A0FFСтраж Шалкера"));
-            if (!archer) {
-                le.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 20 * 300, 0, false, false));
-            }
-        }
-        le.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 20 * 300, 0, false, false));
-
-        EntityEquipment eq = le.getEquipment();
-        if (eq != null) {
-            if (leader) {
-                eq.setHelmet(new ItemStack(Material.NETHERITE_HELMET), true);
-                eq.setChestplate(new ItemStack(Material.NETHERITE_CHESTPLATE), true);
-                eq.setLeggings(new ItemStack(Material.NETHERITE_LEGGINGS), true);
-                eq.setBoots(new ItemStack(Material.NETHERITE_BOOTS), true);
-                eq.setItemInMainHand(new ItemStack(Material.NETHERITE_AXE), true);
-            } else {
-                eq.setHelmet(new ItemStack(Material.DIAMOND_HELMET), true);
-                eq.setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE), true);
-                if (archer) {
-                    eq.setItemInMainHand(VaultAndItemsHook.enchantedGear(Material.BOW, null,
-                            new MapEnchant(Enchantment.POWER, 3), new MapEnchant(Enchantment.PUNCH, 1)), true);
-                } else {
-                    eq.setItemInMainHand(new ItemStack(Material.DIAMOND_SWORD), true);
+        List<FighterSpec> lineup = new ArrayList<>();
+        switch (waveIndex) {
+            case 0 -> {
+                for (int i = 0; i < 2; i++) {
+                    lineup.add(new FighterSpec(EntityType.WITHER_SKELETON, "&#89A0FFСильный скелет",
+                            eliteHealth, eliteDamage, false, true, false));
+                }
+                for (int i = 0; i < 5; i++) {
+                    lineup.add(new FighterSpec(EntityType.WITHER_SKELETON, "&7Визер-скелет",
+                            standardHealth, standardDamage, false, false, false));
                 }
             }
-            eq.setHelmetDropChance(0f);
-            eq.setChestplateDropChance(0f);
-            eq.setLeggingsDropChance(0f);
-            eq.setBootsDropChance(0f);
-            eq.setItemInMainHandDropChance(0f);
+            case 1 -> {
+                for (int i = 0; i < 3; i++) lineup.add(strongArcher(eliteHealth, eliteDamage));
+            }
+            case 2 -> {
+                lineup.add(new FighterSpec(EntityType.WITHER_SKELETON,
+                        "&#F8BEFBКаратель Подземелья &8[&cБосс&8]",
+                        bossHealth, bossDamage, false, true, true));
+                for (int i = 0; i < 2; i++) lineup.add(strongArcher(eliteHealth, eliteDamage));
+            }
+            default -> { }
+        }
+        return lineup;
+    }
+
+    private static FighterSpec strongArcher(double health, double damage) {
+        EntityType type = ThreadLocalRandom.current().nextBoolean() ? EntityType.BOGGED : EntityType.STRAY;
+        return new FighterSpec(type, "&#89A0FFСильный лучник", health, damage, true, true, false);
+    }
+
+    private boolean spawnWave(World world, DungeonInstance dungeon, ActiveFight fight, int waveIndex) {
+        List<FighterSpec> lineup = createWaveLineup(waveIndex);
+        if (lineup.isEmpty()) return false;
+
+        List<BlockPosKey> spawnPositions = chooseSpawnPositions(world, dungeon, lineup.size());
+        if (spawnPositions.size() != lineup.size()) return false;
+
+        fight.waveIndex = waveIndex;
+        fight.nextWaveAtMs = 0L;
+        for (int i = 0; i < lineup.size(); i++) {
+            if (!spawnSingleFighter(world, dungeon, fight, spawnPositions.get(i).floorLocation(), lineup.get(i))) {
+                cleanupEntities(fight);
+                return false;
+            }
+        }
+        fight.currentWaveInitialMobCount = fight.aliveMobs.size();
+        return fight.currentWaveInitialMobCount == lineup.size();
+    }
+
+    private List<BlockPosKey> chooseSpawnPositions(World world, DungeonInstance dungeon, int count) {
+        List<BlockPosKey> candidates = collectSafeSpawnCandidates(world, dungeon);
+        Collections.shuffle(candidates, ThreadLocalRandom.current());
+
+        for (double minHorizontalDistanceSquared : SPAWN_SEPARATION_THRESHOLDS) {
+            List<BlockPosKey> selected = new ArrayList<>(count);
+            for (BlockPosKey candidate : candidates) {
+                if (!isSeparatedFromSelected(candidate, selected, minHorizontalDistanceSquared)) continue;
+                selected.add(candidate);
+                if (selected.size() == count) return selected;
+            }
+        }
+        return List.of();
+    }
+
+    private List<BlockPosKey> collectSafeSpawnCandidates(World world, DungeonInstance dungeon) {
+        LinkedHashSet<BlockPosKey> safe = new LinkedHashSet<>();
+        List<BlockPosKey> anchors = new ArrayList<>(dungeon.getMobSpawns());
+        if (anchors.isEmpty()) {
+            BlockPosKey fallback = dungeon.getEntrancePos() != null
+                    ? dungeon.getEntrancePos()
+                    : dungeon.getHologramAnchor();
+            if (fallback != null) anchors.add(fallback);
+        }
+        if (anchors.isEmpty()) anchors.add(dungeon.getOrigin());
+
+        CuboidRegion bounds = dungeon.getBounds();
+        Location center = new Location(world,
+                (bounds.minX() + bounds.maxX() + 1) / 2.0,
+                (bounds.minY() + bounds.maxY() + 1) / 2.0,
+                (bounds.minZ() + bounds.maxZ() + 1) / 2.0);
+        double radiusX = Math.max(2.0, bounds.sizeX() / 2.0 + 2.0);
+        double radiusY = Math.max(3.0, bounds.sizeY() / 2.0 + 2.0);
+        double radiusZ = Math.max(2.0, bounds.sizeZ() / 2.0 + 2.0);
+        List<Location> occupiedByLivingEntities = new ArrayList<>();
+        for (Entity entity : world.getNearbyEntities(center, radiusX, radiusY, radiusZ)) {
+            if (entity instanceof LivingEntity living && living.isValid() && !living.isDead()) {
+                occupiedByLivingEntities.add(living.getLocation());
+            }
         }
 
-        Player target = findNearestPlayer(w, loc, 26.0);
-        if (target != null && le instanceof Mob mob) {
-            mob.setTarget(target);
+        for (BlockPosKey anchor : anchors) {
+            if (!world.getName().equals(anchor.worldName())) continue;
+            for (int radius = 0; radius <= SPAWN_SEARCH_RADIUS; radius++) {
+                for (int dz = -radius; dz <= radius; dz++) {
+                    for (int dx = -radius; dx <= radius; dx++) {
+                        if (radius > 0 && Math.max(Math.abs(dx), Math.abs(dz)) != radius) continue;
+                        for (int dy = -1; dy <= 1; dy++) {
+                            BlockPosKey candidate = anchor.add(dx, dy, dz);
+                            if (bounds.containsBlock(world.getName(), candidate.x(), candidate.y(), candidate.z())
+                                    && isSafeSpawnPoint(world, candidate, occupiedByLivingEntities)) {
+                                safe.add(candidate);
+                            }
+                        }
+                    }
+                }
+            }
         }
-        fight.aliveMobs.add(le.getUniqueId());
-        mobToDungeon.put(le.getUniqueId(), d.getId());
+        return new ArrayList<>(safe);
+    }
+
+    private static boolean isSafeSpawnPoint(World world, BlockPosKey point, List<Location> occupied) {
+        if (point.y() <= world.getMinHeight() || point.y() + 2 >= world.getMaxHeight()
+                || !world.isChunkLoaded(point.x() >> 4, point.z() >> 4)) {
+            return false;
+        }
+
+        Block floor = world.getBlockAt(point.x(), point.y() - 1, point.z());
+        if (!floor.isSolid() || floor.isLiquid()) return false;
+        for (int height = 0; height <= 2; height++) {
+            Block bodySpace = world.getBlockAt(point.x(), point.y() + height, point.z());
+            if (!bodySpace.isPassable() || bodySpace.isLiquid()) return false;
+        }
+
+        double x = point.x() + 0.5;
+        double y = point.y();
+        double z = point.z() + 0.5;
+        for (Location entityLocation : occupied) {
+            if (Math.abs(entityLocation.getX() - x) < 0.85
+                    && Math.abs(entityLocation.getZ() - z) < 0.85
+                    && Math.abs(entityLocation.getY() - y) < 3.0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean isSeparatedFromSelected(
+            BlockPosKey candidate, List<BlockPosKey> selected, double minHorizontalDistanceSquared
+    ) {
+        for (BlockPosKey other : selected) {
+            int dy = Math.abs(candidate.y() - other.y());
+            int dx = candidate.x() - other.x();
+            int dz = candidate.z() - other.z();
+            if (dy < 3 && dx * dx + dz * dz < minHorizontalDistanceSquared) return false;
+        }
+        return true;
+    }
+
+    private boolean spawnSingleFighter(
+            World world,
+            DungeonInstance dungeon,
+            ActiveFight fight,
+            Location location,
+            FighterSpec spec
+    ) {
+        Entity raw = world.spawnEntity(location, spec.type());
+        if (!(raw instanceof LivingEntity living)) {
+            if (raw != null) raw.remove();
+            return false;
+        }
+        living.getPersistentDataContainer().set(trialMobPdc, PersistentDataType.STRING, dungeon.getId());
+        living.getPersistentDataContainer().set(trialMobTierPdc, PersistentDataType.STRING,
+                spec.boss() ? "boss" : spec.elite() ? "strong" : "standard");
+        living.setPersistent(false);
+        living.setRemoveWhenFarAway(false);
+        living.setCanPickupItems(false);
+        living.setCustomNameVisible(true);
+
+        setAttr(living, Attribute.MAX_HEALTH, spec.health());
+        living.setHealth(spec.health());
+        setAttr(living, Attribute.ATTACK_DAMAGE, spec.attackDamage());
+        setAttr(living, Attribute.ARMOR, spec.boss() ? 18.0 : spec.elite() ? 12.0 : 4.0);
+        setAttr(living, Attribute.ARMOR_TOUGHNESS, spec.boss() ? 8.0 : spec.elite() ? 4.0 : 0.0);
+        setAttr(living, Attribute.FOLLOW_RANGE, 32.0);
+        setAttr(living, Attribute.KNOCKBACK_RESISTANCE, spec.boss() ? 0.65 : spec.elite() ? 0.30 : 0.10);
+        living.setCustomName(TextUtil.color(spec.name()));
+
+        if (spec.boss()) {
+            setAttr(living, Attribute.SCALE, 1.24);
+            living.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 20 * 300, 0, false, false));
+            living.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20 * 300, 0, false, false));
+        } else if (spec.elite() && !spec.archer()) {
+            living.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 20 * 300, 0, false, false));
+        }
+        living.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 20 * 300, 0, false, false));
+
+        EntityEquipment equipment = living.getEquipment();
+        if (equipment != null) {
+            if (spec.boss()) {
+                equipment.setHelmet(new ItemStack(Material.NETHERITE_HELMET), true);
+                equipment.setChestplate(new ItemStack(Material.NETHERITE_CHESTPLATE), true);
+                equipment.setLeggings(new ItemStack(Material.NETHERITE_LEGGINGS), true);
+                equipment.setBoots(new ItemStack(Material.NETHERITE_BOOTS), true);
+                equipment.setItemInMainHand(new ItemStack(Material.NETHERITE_AXE), true);
+            } else if (spec.elite()) {
+                equipment.setHelmet(new ItemStack(Material.DIAMOND_HELMET), true);
+                equipment.setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE), true);
+                equipment.setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS), true);
+                equipment.setBoots(new ItemStack(Material.DIAMOND_BOOTS), true);
+                if (spec.archer()) {
+                    equipment.setItemInMainHand(VaultAndItemsHook.enchantedGear(Material.BOW, null,
+                            new MapEnchant(Enchantment.POWER, 4), new MapEnchant(Enchantment.PUNCH, 1)), true);
+                } else {
+                    equipment.setItemInMainHand(VaultAndItemsHook.enchantedGear(Material.DIAMOND_SWORD, null,
+                            new MapEnchant(Enchantment.SHARPNESS, 3), new MapEnchant(Enchantment.UNBREAKING, 3)), true);
+                }
+            }
+            equipment.setHelmetDropChance(0f);
+            equipment.setChestplateDropChance(0f);
+            equipment.setLeggingsDropChance(0f);
+            equipment.setBootsDropChance(0f);
+            equipment.setItemInMainHandDropChance(0f);
+        }
+
+        Player target = findNearestPlayer(world, location, 26.0);
+        if (target != null && living instanceof Mob mob) mob.setTarget(target);
+        fight.aliveMobs.add(living.getUniqueId());
+        mobToDungeon.put(living.getUniqueId(), dungeon.getId());
+        return true;
     }
 
     public void handleMobDeath(UUID mobId) {
@@ -229,66 +399,117 @@ public final class TrialController {
         if (fight == null) return;
         fight.aliveMobs.remove(mobId);
 
-        World w = fight.dungeon.getOrigin().world();
+        World world = fight.dungeon.getOrigin().world();
         if (fight.aliveMobs.isEmpty()) {
-            if (w != null) {
-                unlockUndergroundShulkersAndCooldown(w, fight);
-            }
+            if (world != null) handleClearedWave(world, fight);
         } else {
             refreshFightVisuals(fight);
+            plugin.getDungeonManager().updateShulkerHolograms(fight.dungeon);
         }
+    }
+
+    private void handleClearedWave(World world, ActiveFight fight) {
+        DungeonInstance dungeon = fight.dungeon;
+        if (fight.waveIndex >= WAVE_COUNT - 1) {
+            unlockUndergroundShulkersAndCooldown(world, fight);
+            return;
+        }
+
+        if (fight.nextWaveAtMs == 0L) {
+            long delaySeconds = Math.max(1L,
+                    plugin.getConfig().getLong("underground-dungeon.wave-delay-seconds", 3L));
+            fight.nextWaveAtMs = System.currentTimeMillis() + delaySeconds * 1000L;
+            notifyNearby(dungeon, 40.0, plugin.msg("underground-wave-cleared")
+                    .replace("{wave}", String.valueOf(fight.waveIndex + 2))
+                    .replace("{seconds}", String.valueOf(delaySeconds)));
+        }
+        refreshFightVisuals(fight);
+        plugin.getDungeonManager().updateShulkerHolograms(dungeon);
+    }
+
+    private static String waveDescription(int waveIndex) {
+        return switch (waveIndex) {
+            case 1 -> "3 сильных лучника";
+            case 2 -> "босс и 2 сильных лучника";
+            default -> "2 сильных скелета и 5 обычных визер-скелетов";
+        };
+    }
+
+    private void announceWave(DungeonInstance dungeon, int waveIndex) {
+        notifyNearby(dungeon, 40.0, plugin.msg("underground-wave-started")
+                .replace("{wave}", String.valueOf(waveIndex + 1))
+                .replace("{description}", waveDescription(waveIndex)));
     }
 
     public void tickOncePerSecond() {
         long now = System.currentTimeMillis();
         for (ActiveFight fight : new ArrayList<>(fightsByDungeon.values())) {
-            DungeonInstance d = fight.dungeon;
-            World w = d.getOrigin().world();
-            if (w == null) {
-                abortFight(d.getId(), false);
+            DungeonInstance dungeon = fight.dungeon;
+            World world = dungeon.getOrigin().world();
+            if (world == null) {
+                abortFight(dungeon.getId(), false);
                 continue;
             }
             if (now >= fight.deadlineMs) {
-                notifyNearby(d, 40.0, plugin.msg("underground-timeout"));
-                abortFight(d.getId(), true);
-                plugin.getDungeonManager().updateShulkerHolograms(d);
+                notifyNearby(dungeon, 40.0, plugin.msg("underground-timeout"));
+                abortFight(dungeon.getId(), true);
+                plugin.getDungeonManager().updateShulkerHolograms(dungeon);
                 continue;
             }
-            pruneAndLeashMobs(w, fight);
+
+            pruneAndLeashMobs(world, fight);
             if (fight.aliveMobs.isEmpty()) {
-                unlockUndergroundShulkersAndCooldown(w, fight);
-                continue;
+                if (fight.nextWaveAtMs == 0L) {
+                    handleClearedWave(world, fight);
+                    continue;
+                }
+                if (now < fight.nextWaveAtMs) {
+                    refreshFightVisuals(fight);
+                    continue;
+                }
+
+                int nextWave = fight.waveIndex + 1;
+                if (!spawnWave(world, dungeon, fight, nextWave)) {
+                    notifyNearby(dungeon, 40.0, plugin.msg("underground-spawn-failed"));
+                    abortFight(dungeon.getId(), true);
+                    plugin.getDungeonManager().updateShulkerHolograms(dungeon);
+                    continue;
+                }
+                announceWave(dungeon, nextWave);
+                plugin.getDungeonManager().updateShulkerHolograms(dungeon);
             }
             refreshFightVisuals(fight);
         }
     }
 
-    private void unlockUndergroundShulkersAndCooldown(World w, ActiveFight fight) {
-        DungeonInstance d = fight.dungeon;
-        fightsByDungeon.remove(d.getId());
+    private void unlockUndergroundShulkersAndCooldown(World world, ActiveFight fight) {
+        DungeonInstance dungeon = fight.dungeon;
+        fightsByDungeon.remove(dungeon.getId());
         cleanupEntities(fight);
         fight.bossBar.removeAll();
-        d.setStatus(DungeonStatus.CLEARED);
+        dungeon.setStatus(DungeonStatus.CLEARED);
 
         int stacks = Math.max(3, plugin.getConfig().getInt("underground-dungeon.shulker-stacks", 7));
-        for (BlockPosKey shulkerPos : new ArrayList<>(d.getShulkerUnlocked().keySet())) {
-            d.getShulkerUnlocked().put(shulkerPos, Boolean.TRUE);
-            Block b = w.getBlockAt(shulkerPos.x(), shulkerPos.y(), shulkerPos.z());
-            if (!(b.getState() instanceof InventoryHolder)) {
-                b.setBlockData(Bukkit.createBlockData(Material.PURPLE_SHULKER_BOX), false);
+        for (BlockPosKey shulkerPos : new ArrayList<>(dungeon.getShulkerUnlocked().keySet())) {
+            dungeon.getShulkerUnlocked().put(shulkerPos, Boolean.TRUE);
+            Block block = world.getBlockAt(shulkerPos.x(), shulkerPos.y(), shulkerPos.z());
+            if (!(block.getState() instanceof InventoryHolder)) {
+                block.setBlockData(Bukkit.createBlockData(Material.PURPLE_SHULKER_BOX), false);
             }
-            if (b.getState() instanceof InventoryHolder holder) {
-                plugin.getLootRegistry().fillContainerRandomSlots(holder.getInventory(), LootPoolType.UNDERGROUND_SHULKER, stacks);
+            if (block.getState() instanceof InventoryHolder holder) {
+                plugin.getLootRegistry().fillContainerRandomSlots(
+                        holder.getInventory(), LootPoolType.UNDERGROUND_SHULKER, stacks);
             }
-            Location c = shulkerPos.centerLocation();
-            w.strikeLightningEffect(c);
-            w.playSound(c, Sound.UI_TOAST_CHALLENGE_COMPLETE, 1.0f, 1.0f);
-            w.playSound(c, Sound.BLOCK_SHULKER_BOX_OPEN, 1.0f, 1.0f);
-            w.spawnParticle(Particle.TOTEM_OF_UNDYING, c.clone().add(0, 0.9, 0), 40, 0.5, 0.5, 0.5, 0.14);
+            Location location = shulkerPos.centerLocation();
+            world.strikeLightningEffect(location);
+            world.playSound(location, Sound.UI_TOAST_CHALLENGE_COMPLETE, 1.0f, 1.0f);
+            world.playSound(location, Sound.BLOCK_SHULKER_BOX_OPEN, 1.0f, 1.0f);
+            world.spawnParticle(Particle.TOTEM_OF_UNDYING, location.clone().add(0, 0.9, 0), 40,
+                    0.5, 0.5, 0.5, 0.14);
         }
 
-        plugin.getDungeonManager().updateShulkerHolograms(d);
-        notifyNearby(d, 45.0, plugin.msg("underground-completed"));
+        plugin.getDungeonManager().updateShulkerHolograms(dungeon);
+        notifyNearby(dungeon, 45.0, plugin.msg("underground-completed"));
         plugin.getDungeonManager().saveDungeons();
     }
 
@@ -297,109 +518,122 @@ public final class TrialController {
         if (fight == null) return;
         cleanupEntities(fight);
         fight.bossBar.removeAll();
-        if (markReady) {
-            fight.dungeon.setStatus(DungeonStatus.READY);
-        }
+        if (markReady) fight.dungeon.setStatus(DungeonStatus.READY);
     }
 
     public void shutdownAll() {
-        for (String id : new ArrayList<>(fightsByDungeon.keySet())) {
-            abortFight(id, true);
-        }
+        for (String id : new ArrayList<>(fightsByDungeon.keySet())) abortFight(id, true);
     }
 
     private void cleanupEntities(ActiveFight fight) {
-        World w = fight.dungeon.getOrigin().world();
-        for (UUID uid : new HashSet<>(fight.aliveMobs)) {
-            mobToDungeon.remove(uid);
-            if (w != null) {
-                Entity e = w.getEntity(uid);
-                if (e != null && e.isValid()) e.remove();
+        World world = fight.dungeon.getOrigin().world();
+        for (UUID uuid : new HashSet<>(fight.aliveMobs)) {
+            mobToDungeon.remove(uuid);
+            if (world != null) {
+                Entity entity = world.getEntity(uuid);
+                if (entity != null && entity.isValid()) entity.remove();
             }
         }
         fight.aliveMobs.clear();
     }
 
-    private void pruneAndLeashMobs(World w, ActiveFight fight) {
+    private void pruneAndLeashMobs(World world, ActiveFight fight) {
         Location center = fight.dungeon.getHologramAnchor().centerLocation();
         double maxDistSq = Math.pow(Math.max(14, fight.dungeon.getBounds().sizeX() / 2.0 + 3.0), 2);
-        Iterator<UUID> it = fight.aliveMobs.iterator();
-        while (it.hasNext()) {
-            UUID uid = it.next();
-            Entity e = w.getEntity(uid);
-            if (!(e instanceof LivingEntity le) || le.isDead() || !le.isValid()) {
-                it.remove();
-                mobToDungeon.remove(uid);
+        Iterator<UUID> iterator = fight.aliveMobs.iterator();
+        while (iterator.hasNext()) {
+            UUID uuid = iterator.next();
+            Entity entity = world.getEntity(uuid);
+            if (!(entity instanceof LivingEntity living) || living.isDead() || !living.isValid()) {
+                iterator.remove();
+                mobToDungeon.remove(uuid);
                 continue;
             }
-            Location ml = le.getLocation();
-            boolean outside = ml.distanceSquared(center) > maxDistSq || ml.getY() < fight.dungeon.getOrigin().y() - 1;
-            boolean suffocating = ml.getBlock().getType().isOccluding() && ml.clone().add(0, 1, 0).getBlock().getType().isOccluding();
+            Location mobLocation = living.getLocation();
+            boolean outside = mobLocation.distanceSquared(center) > maxDistSq
+                    || mobLocation.getY() < fight.dungeon.getOrigin().y() - 1;
+            boolean suffocating = mobLocation.getBlock().getType().isOccluding()
+                    && mobLocation.clone().add(0, 1, 0).getBlock().getType().isOccluding();
             if (outside || suffocating) {
-                Location safe = fight.dungeon.teleportLocation();
-                if (safe != null) {
-                    le.setFallDistance(0f);
-                    le.teleport(safe);
-                    w.spawnParticle(Particle.PORTAL, safe.clone().add(0, 1.0, 0), 12, 0.3, 0.4, 0.3, 0.05);
+                List<BlockPosKey> safePositions = chooseSpawnPositions(world, fight.dungeon, 1);
+                if (!safePositions.isEmpty()) {
+                    Location safe = safePositions.get(0).floorLocation();
+                    living.setFallDistance(0f);
+                    living.teleport(safe);
+                    world.spawnParticle(Particle.PORTAL, safe.clone().add(0, 1.0, 0), 12,
+                            0.3, 0.4, 0.3, 0.05);
                 }
             }
-            if (le instanceof Mob mob && (mob.getTarget() == null || mob.getTarget().isDead())) {
-                Player nearest = findNearestPlayer(w, ml, 26.0);
+            if (living instanceof Mob mob && (mob.getTarget() == null || mob.getTarget().isDead())) {
+                Player nearest = findNearestPlayer(world, mobLocation, 26.0);
                 if (nearest != null) mob.setTarget(nearest);
             }
         }
     }
 
     private void refreshFightVisuals(ActiveFight fight) {
-        DungeonInstance d = fight.dungeon;
-        long secLeft = Math.max(0L, (fight.deadlineMs - System.currentTimeMillis()) / 1000L);
-        double prog = Math.max(0.03, Math.min(1.0, (double) fight.aliveMobs.size() / fight.initialMobCount));
-        fight.bossBar.setProgress(prog);
-        fight.bossBar.setTitle(TextUtil.color("&#89A0FFПодземный данж &8┃ &fОсталось мобов: &#F8BEFB"
-                + fight.aliveMobs.size() + " &8(&7" + TextUtil.formatShortClock(secLeft) + "&8)"));
+        DungeonInstance dungeon = fight.dungeon;
+        long secondsLeft = Math.max(0L, (fight.deadlineMs - System.currentTimeMillis()) / 1000L);
+        int currentWaveTotal = Math.max(1, fight.currentWaveInitialMobCount);
+        double progress = Math.max(0.03,
+                Math.min(1.0, (double) fight.aliveMobs.size() / currentWaveTotal));
+        fight.bossBar.setProgress(progress);
 
-        World w = d.getOrigin().world();
-        if (w != null) {
-            Location c = d.getHologramAnchor().centerLocation();
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                if (p.getWorld().equals(w) && p.getLocation().distanceSquared(c) <= 36.0 * 36.0) {
-                    if (!fight.bossBar.getPlayers().contains(p)) fight.bossBar.addPlayer(p);
+        String waveStatus;
+        if (fight.nextWaveAtMs > 0L) {
+            long waitSeconds = Math.max(0L,
+                    (fight.nextWaveAtMs - System.currentTimeMillis() + 999L) / 1000L);
+            waveStatus = "&fВолна " + (fight.waveIndex + 1) + "/" + WAVE_COUNT
+                    + " завершена &8┃ &fСледующая через &#F8BEFB" + waitSeconds + "с";
+        } else {
+            waveStatus = "&fВолна " + (fight.waveIndex + 1) + "/" + WAVE_COUNT
+                    + " &8┃ &fОсталось: &#F8BEFB" + fight.aliveMobs.size();
+        }
+        fight.bossBar.setTitle(TextUtil.color("&#89A0FFПодземный данж &8┃ " + waveStatus
+                + " &8(&7" + TextUtil.formatShortClock(secondsLeft) + "&8)"));
+
+        World world = dungeon.getOrigin().world();
+        if (world != null) {
+            Location center = dungeon.getHologramAnchor().centerLocation();
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (player.getWorld().equals(world)
+                        && player.getLocation().distanceSquared(center) <= 36.0 * 36.0) {
+                    if (!fight.bossBar.getPlayers().contains(player)) fight.bossBar.addPlayer(player);
                 } else {
-                    fight.bossBar.removePlayer(p);
+                    fight.bossBar.removePlayer(player);
                 }
             }
         }
     }
 
-    private static void setAttr(LivingEntity le, Attribute attr, double val) {
-        if (attr == null) return;
-        AttributeInstance inst = ((Attributable) le).getAttribute(attr);
-        if (inst != null) inst.setBaseValue(val);
+    private static void setAttr(LivingEntity living, Attribute attribute, double value) {
+        if (attribute == null) return;
+        AttributeInstance instance = ((Attributable) living).getAttribute(attribute);
+        if (instance != null) instance.setBaseValue(value);
     }
 
-    private static Player findNearestPlayer(World w, Location from, double radius) {
+    private static Player findNearestPlayer(World world, Location from, double radius) {
         Player best = null;
-        double bestSq = radius * radius;
-        for (Player p : w.getPlayers()) {
-            if (p.isDead() || p.getGameMode() == GameMode.SPECTATOR || p.getGameMode() == GameMode.CREATIVE) continue;
-            double d = p.getLocation().distanceSquared(from);
-            if (d < bestSq) {
-                bestSq = d;
-                best = p;
+        double bestSquared = radius * radius;
+        for (Player player : world.getPlayers()) {
+            if (player.isDead() || player.getGameMode() == GameMode.SPECTATOR
+                    || player.getGameMode() == GameMode.CREATIVE) continue;
+            double distanceSquared = player.getLocation().distanceSquared(from);
+            if (distanceSquared < bestSquared) {
+                bestSquared = distanceSquared;
+                best = player;
             }
         }
         return best;
     }
 
-    private static void notifyNearby(DungeonInstance d, double radius, String message) {
-        World w = d.getOrigin().world();
-        if (w == null) return;
-        Location c = d.getHologramAnchor().centerLocation();
-        double rSq = radius * radius;
-        for (Player p : w.getPlayers()) {
-            if (p.getLocation().distanceSquared(c) <= rSq) {
-                p.sendMessage(message);
-            }
+    private static void notifyNearby(DungeonInstance dungeon, double radius, String message) {
+        World world = dungeon.getOrigin().world();
+        if (world == null) return;
+        Location center = dungeon.getHologramAnchor().centerLocation();
+        double radiusSquared = radius * radius;
+        for (Player player : world.getPlayers()) {
+            if (player.getLocation().distanceSquared(center) <= radiusSquared) player.sendMessage(message);
         }
     }
 }

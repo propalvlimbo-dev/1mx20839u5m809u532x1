@@ -163,9 +163,14 @@ public final class DungeonMenuService {
         for (DungeonInstance d : plugin.getDungeonManager().getAllDungeons()) {
             if (d.getCategory() != cat || col >= 7) continue;
             BlockPosKey anchor = d.getEntrancePos() != null ? d.getEntrancePos() : d.getOrigin();
-            String stateInfo = cat == DungeonCategory.SURFACE
-                    ? "Призраков в коридорах: &#F8BEFB" + plugin.getGhostController().countAliveGhosts(d.getId())
-                    : "Шалкер: &#F8BEFB" + d.getStatus().getTitle();
+            String stateInfo;
+            if (cat == DungeonCategory.SURFACE) {
+                int ghosts = plugin.getGhostController().countAliveGhosts(d.getId());
+                int totalGhosts = Math.max(1, plugin.getConfig().getInt("surface-dungeon.ghosts.initial-count", 6));
+                stateInfo = "Призраки: &#F8BEFB" + ghosts + "&7/" + totalGhosts;
+            } else {
+                stateInfo = "Шалкер: &#F8BEFB" + d.getStatus().getTitle();
+            }
 
             List<String> lore = new ArrayList<>();
             if (adminControls) {
