@@ -1,2 +1,2 @@
 b4192852baefdbd104cbb9de377e37b50f622049bcc0be61f9456bbfe2763f5a  ElytrixDungeons-1.0.0.jar
-c0c2cdac1075d77e6ba8b392c6c6b1fa3fdb9721c55ad9ce823dd96113a7ba0c  ElytrixCemetery.jar
+851a8d4e61a9aaf6ae8985987769b81b9c06414ac8710dc79f78dfa212296331  ElytrixCemetery.jar
