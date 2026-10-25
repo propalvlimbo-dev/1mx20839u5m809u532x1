@@ -290,8 +290,8 @@ public class Grave {
         invoke(textDisplayApi, entity, "setShadowed", new Class<?>[]{boolean.class}, true);
         invoke(textDisplayApi, entity, "setSeeThrough", new Class<?>[]{boolean.class}, false);
         invoke(textDisplayApi, entity, "setLineWidth", new Class<?>[]{int.class}, 240);
-        // Slightly shorter than the previous four-block range (~3.5 blocks).
-        invoke(displayApi, entity, "setViewRange", new Class<?>[]{float.class}, 0.055f);
+        // setViewRange is a multiplier: 0.09375 gives about six blocks on the default 64-block tracking range.
+        invoke(displayApi, entity, "setViewRange", new Class<?>[]{float.class}, 0.09375f);
         invoke(textDisplayApi, entity, "setText", new Class<?>[]{String.class}, text);
     }
 
