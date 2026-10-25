@@ -32,6 +32,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.Container;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -41,6 +42,8 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -61,8 +64,8 @@ import ru.elytrix.dungeons.util.TextUtil;
 public final class DungeonManager {
 
     public static final int MAX_DUNGEONS_PER_CATEGORY = 7;
-    // Restart just before the 3:15 music track ends to hide tick scheduling/network jitter.
-    private static final long MUSIC_DISC_OTHERSIDE_DURATION_MS = 194_000L;
+    // MUSIC_DISC_5 lasts about 2:58; restart just before its end to hide tick/network jitter.
+    private static final long MUSIC_DISC_5_DURATION_MS = 177_000L;
 
     public enum CreateStatus {
         CREATED,
@@ -322,8 +325,24 @@ public final class DungeonManager {
                     for (String key : d.getStringList("surface-locked-shulkers")) {
                         BlockPosKey pos = BlockPosKey.deserialize(key);
                         if (pos != null && inst.getShulkerPositions().contains(pos)) {
-                            inst.getSurfaceShulkerLocked().add(pos);
+                            inst.setSurfaceShulkerLocked(pos, true);
                         }
+                    }
+                }
+                for (String key : d.getStringList("surface-key-unlocked-shulkers")) {
+                    BlockPosKey pos = BlockPosKey.deserialize(key);
+                    if (pos != null && inst.getShulkerPositions().contains(pos)) {
+                        inst.setSurfaceShulkerKeyUnlocked(pos, true);
+                    }
+                }
+                for (String state : d.getStringList("surface-shulker-break-progress")) {
+                    String[] parts = state.split("\\|", 2);
+                    if (parts.length != 2) continue;
+                    BlockPosKey pos = BlockPosKey.deserialize(parts[0]);
+                    if (pos == null || !inst.getShulkerPositions().contains(pos)) continue;
+                    try {
+                        inst.setSurfaceShulkerBreakProgress(pos, Integer.parseInt(parts[1]));
+                    } catch (NumberFormatException ignored) {
                     }
                 }
             }
@@ -398,6 +417,24 @@ public final class DungeonManager {
                 }
             }
             yml.set(p + ".surface-locked-shulkers", lockedSurfaceShulkers);
+            List<String> keyUnlockedSurfaceShulkers = new ArrayList<>();
+            if (d.getCategory() == DungeonCategory.SURFACE) {
+                for (BlockPosKey pos : d.getSurfaceShulkerKeyUnlocked()) {
+                    keyUnlockedSurfaceShulkers.add(pos.serialize());
+                }
+            }
+            yml.set(p + ".surface-key-unlocked-shulkers", keyUnlockedSurfaceShulkers);
+            List<String> surfaceShulkerBreakProgress = new ArrayList<>();
+            if (d.getCategory() == DungeonCategory.SURFACE) {
+                for (Map.Entry<BlockPosKey, Integer> entry : d.getSurfaceShulkerBreakProgress().entrySet()) {
+                    if (entry.getValue() != null && entry.getValue() > 0
+                            && !d.isSurfaceShulkerLocked(entry.getKey())
+                            && !d.isSurfaceShulkerKeyUnlocked(entry.getKey())) {
+                        surfaceShulkerBreakProgress.add(entry.getKey().serialize() + "|" + entry.getValue());
+                    }
+                }
+            }
+            yml.set(p + ".surface-shulker-break-progress", surfaceShulkerBreakProgress);
         }
         File tempFile = new File(plugin.getDataFolder(), "dungeons.yml.tmp");
         try {
@@ -1096,14 +1133,30 @@ public final class DungeonManager {
         int stacks = Math.max(1, plugin.getConfig().getInt("surface-dungeon.shulker-stacks", 14));
 
         for (BlockPosKey pos : dungeon.getShulkerPositions()) {
+            if (dungeon.isSurfaceShulkerLocked(pos)) {
+                dungeon.getSurfaceShulkerRarities().remove(pos);
+                dungeon.getSurfaceShulkerRefreshAtMs().remove(pos);
+                dungeon.clearSurfaceShulkerBreakProgress(pos);
+                applyLockedSurfaceShulkerState(dungeon, world, pos);
+                continue;
+            }
+
             SurfaceShulkerRarity rarity = SurfaceShulkerRarity.fromName(
                     dungeon.getSurfaceShulkerRarities().get(pos));
             Long refreshAt = dungeon.getSurfaceShulkerRefreshAtMs().get(pos);
-            if (!preserveSurfaceShulkerState || rarity == null || refreshAt == null || refreshAt <= now) {
+            if (dungeon.isSurfaceShulkerKeyUnlocked(pos)) {
+                // A key chooses this box's loot tier; refresh the same table instead of rerolling it.
+                if (rarity == null) rarity = SurfaceShulkerRarity.COMMON;
+                if (!preserveSurfaceShulkerState || refreshAt == null || refreshAt <= now) {
+                    dungeon.getSurfaceShulkerRefreshAtMs().put(pos, now + refreshInterval);
+                }
+            } else if (!preserveSurfaceShulkerState || rarity == null || refreshAt == null || refreshAt <= now) {
                 rarity = SurfaceShulkerRarity.roll();
                 dungeon.getSurfaceShulkerRarities().put(pos, rarity.name());
                 dungeon.getSurfaceShulkerRefreshAtMs().put(pos, now + refreshInterval);
+                dungeon.clearSurfaceShulkerBreakProgress(pos);
             }
+            dungeon.getSurfaceShulkerRarities().put(pos, rarity.name());
             applySurfaceShulkerState(dungeon, world, pos, rarity, stacks);
         }
     }
@@ -1119,15 +1172,40 @@ public final class DungeonManager {
         int stacks = Math.max(1, plugin.getConfig().getInt("surface-dungeon.shulker-stacks", 14));
         long refreshInterval = surfaceShulkerRefreshIntervalMs();
         for (BlockPosKey pos : dungeon.getShulkerPositions()) {
+            if (dungeon.isSurfaceShulkerLocked(pos)) continue;
+
             SurfaceShulkerRarity rarity = SurfaceShulkerRarity.fromName(
                     dungeon.getSurfaceShulkerRarities().get(pos));
             Long refreshAt = dungeon.getSurfaceShulkerRefreshAtMs().get(pos);
-            if (rarity == null || refreshAt == null || refreshAt <= now) {
+            boolean due = rarity == null || refreshAt == null || refreshAt <= now;
+            if (dungeon.isSurfaceShulkerKeyUnlocked(pos)) {
+                if (rarity == null) rarity = SurfaceShulkerRarity.COMMON;
+                if (due) {
+                    dungeon.getSurfaceShulkerRarities().put(pos, rarity.name());
+                    dungeon.getSurfaceShulkerRefreshAtMs().put(pos, now + refreshInterval);
+                    if (world.isChunkLoaded(pos.x() >> 4, pos.z() >> 4)) {
+                        changed |= applySurfaceShulkerState(dungeon, world, pos, rarity, stacks);
+                        updateShulkerHologram(dungeon, pos);
+                    } else {
+                        dungeon.getPendingSurfaceShulkerRefresh().add(pos);
+                    }
+                    changed = true;
+                } else if (dungeon.getPendingSurfaceShulkerRefresh().contains(pos)
+                        && world.isChunkLoaded(pos.x() >> 4, pos.z() >> 4)) {
+                    changed |= applySurfaceShulkerState(dungeon, world, pos, rarity, stacks);
+                    updateShulkerHologram(dungeon, pos);
+                }
+                continue;
+            }
+
+            if (due) {
                 rarity = SurfaceShulkerRarity.roll();
                 dungeon.getSurfaceShulkerRarities().put(pos, rarity.name());
                 dungeon.getSurfaceShulkerRefreshAtMs().put(pos, now + refreshInterval);
+                dungeon.clearSurfaceShulkerBreakProgress(pos);
                 if (world.isChunkLoaded(pos.x() >> 4, pos.z() >> 4)) {
                     applySurfaceShulkerState(dungeon, world, pos, rarity, stacks);
+                    updateShulkerHologram(dungeon, pos);
                 } else {
                     dungeon.getPendingSurfaceShulkerRefresh().add(pos);
                 }
@@ -1135,11 +1213,10 @@ public final class DungeonManager {
             } else if (dungeon.getPendingSurfaceShulkerRefresh().contains(pos)
                     && world.isChunkLoaded(pos.x() >> 4, pos.z() >> 4)) {
                 changed |= applySurfaceShulkerState(dungeon, world, pos, rarity, stacks);
+                updateShulkerHologram(dungeon, pos);
             }
         }
-        if (changed) {
-            saveDungeons();
-        }
+        if (changed) saveDungeons();
     }
 
     public void ensureSurfaceShulkerHasLoot(DungeonInstance dungeon, BlockPosKey pos) {
@@ -1156,7 +1233,10 @@ public final class DungeonManager {
 
         SurfaceShulkerRarity rarity = SurfaceShulkerRarity.fromName(
                 dungeon.getSurfaceShulkerRarities().get(pos));
-        if (rarity == null) rarity = SurfaceShulkerRarity.roll();
+        if (rarity == null) {
+            rarity = dungeon.isSurfaceShulkerKeyUnlocked(pos)
+                    ? SurfaceShulkerRarity.COMMON : SurfaceShulkerRarity.roll();
+        }
         dungeon.getSurfaceShulkerRarities().put(pos, rarity.name());
         if (!dungeon.getSurfaceShulkerRefreshAtMs().containsKey(pos)) {
             dungeon.getSurfaceShulkerRefreshAtMs().put(pos, System.currentTimeMillis() + surfaceShulkerRefreshIntervalMs());
@@ -1177,10 +1257,11 @@ public final class DungeonManager {
         World world = pos.world();
         if (world == null || !world.isChunkLoaded(pos.x() >> 4, pos.z() >> 4)) return false;
         Block block = world.getBlockAt(pos.x(), pos.y(), pos.z());
-        if (!(block.getState() instanceof InventoryHolder)) return false;
+        if (!block.getType().name().endsWith("_SHULKER_BOX")
+                || !(block.getState() instanceof InventoryHolder)) return false;
 
         long now = System.currentTimeMillis();
-        dungeon.setSurfaceShulkerLocked(pos, false);
+        dungeon.setSurfaceShulkerKeyUnlocked(pos, true);
         dungeon.getSurfaceShulkerRarities().put(pos, lootTier.name());
         dungeon.getSurfaceShulkerRefreshAtMs().put(pos, now + surfaceShulkerRefreshIntervalMs());
         if (!applySurfaceShulkerState(dungeon, world, pos, lootTier,
@@ -1191,9 +1272,18 @@ public final class DungeonManager {
 
         updateShulkerHologram(dungeon, pos);
         saveDungeons();
-        player.playSound(pos.centerLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, 1.0f, 0.85f);
         BlockState opened = world.getBlockAt(pos.x(), pos.y(), pos.z()).getState();
-        if (opened instanceof InventoryHolder holder) player.openInventory(holder.getInventory());
+        if (!(opened instanceof InventoryHolder holder)
+                || player.openInventory(holder.getInventory()) == null) {
+            // InventoryOpenEvent may be cancelled by another plugin. Restore the sealed, empty state
+            // and let the listener keep the key because the player never got the loot window.
+            dungeon.setSurfaceShulkerLocked(pos, true);
+            applyLockedSurfaceShulkerState(dungeon, world, pos);
+            updateShulkerHologram(dungeon, pos);
+            saveDungeons();
+            return false;
+        }
+        player.playSound(pos.centerLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, 1.0f, 0.85f);
         return true;
     }
 
@@ -1210,15 +1300,82 @@ public final class DungeonManager {
             block.setType(rarity.getBlockMaterial(), false);
         }
         BlockState state = block.getState();
-        if (state instanceof InventoryHolder holder) {
-            plugin.getLootRegistry().fillContainerRandomSlots(holder.getInventory(), rarity.getLootPool(), stacks);
+        if (!(state instanceof Container container)) {
+            dungeon.getPendingSurfaceShulkerRefresh().add(pos);
+            return false;
         }
+        plugin.getLootRegistry().fillContainerRandomSlots(
+                container.getSnapshotInventory(), rarity.getLootPool(), stacks);
         if (state instanceof Nameable nameable) {
             nameable.setCustomName(TextUtil.color("&7« " + rarity.getColorHex()
                     + rarity.getDisplayName() + " шалкер &7»"));
         }
-        state.update(true, false);
+        if (!state.update(true, false)) {
+            dungeon.getPendingSurfaceShulkerRefresh().add(pos);
+            return false;
+        }
         dungeon.getPendingSurfaceShulkerRefresh().remove(pos);
+        return true;
+    }
+
+    private boolean applyLockedSurfaceShulkerState(
+            DungeonInstance dungeon, World world, BlockPosKey pos
+    ) {
+        if (!world.isChunkLoaded(pos.x() >> 4, pos.z() >> 4)) {
+            dungeon.getPendingSurfaceShulkerRefresh().add(pos);
+            return false;
+        }
+        Block block = world.getBlockAt(pos.x(), pos.y(), pos.z());
+        if (block.getType() != Material.SHULKER_BOX) {
+            block.setType(Material.SHULKER_BOX, false);
+        }
+        BlockState state = block.getState();
+        if (!(state instanceof Container container)) {
+            dungeon.getPendingSurfaceShulkerRefresh().add(pos);
+            return false;
+        }
+        container.getSnapshotInventory().clear();
+        if (state instanceof Nameable nameable) {
+            nameable.setCustomName(TextUtil.color("&7Запечатанный шалкер"));
+        }
+        if (!state.update(true, false)) {
+            dungeon.getPendingSurfaceShulkerRefresh().add(pos);
+            return false;
+        }
+        dungeon.getPendingSurfaceShulkerRefresh().remove(pos);
+        return true;
+    }
+
+    public boolean breakSurfaceShulkerForLoot(Player player, DungeonInstance dungeon, BlockPosKey pos) {
+        if (player == null || dungeon == null || dungeon.getCategory() != DungeonCategory.SURFACE
+                || !dungeon.getShulkerPositions().contains(pos) || dungeon.isSurfaceShulkerLocked(pos)
+                || dungeon.isSurfaceShulkerKeyUnlocked(pos)) return false;
+        World world = pos.world();
+        if (world == null || !world.isChunkLoaded(pos.x() >> 4, pos.z() >> 4)) return false;
+        Block block = world.getBlockAt(pos.x(), pos.y(), pos.z());
+        if (!block.getType().name().endsWith("_SHULKER_BOX")) return false;
+        SurfaceShulkerRarity rarity = SurfaceShulkerRarity.fromName(
+                dungeon.getSurfaceShulkerRarities().get(pos));
+        if (rarity == null) rarity = SurfaceShulkerRarity.COMMON;
+
+        List<ItemStack> drops = new ArrayList<>();
+        if (block.getState() instanceof Container container) {
+            for (ItemStack item : container.getInventory().getContents()) {
+                if (item != null && !item.getType().isAir()) drops.add(item.clone());
+            }
+        }
+        if (drops.isEmpty()) {
+            drops.addAll(plugin.getLootRegistry().rollStacks(rarity.getLootPool(),
+                    Math.max(1, plugin.getConfig().getInt("surface-dungeon.shulker-stacks", 14))));
+        }
+
+        Location dropLocation = block.getLocation().add(0.5, 0.5, 0.5);
+        block.setType(Material.AIR, false);
+        dungeon.clearSurfaceShulkerBreakProgress(pos);
+        updateShulkerHologram(dungeon, pos);
+        for (ItemStack item : drops) world.dropItemNaturally(dropLocation, item);
+        player.playSound(dropLocation, Sound.BLOCK_SHULKER_BOX_CLOSE, 0.8f, 0.8f);
+        saveDungeons();
         return true;
     }
 
@@ -1237,7 +1394,7 @@ public final class DungeonManager {
         float volume = (float) Math.max(2.0, Math.min(4.0,
                 plugin.getConfig().getDouble("surface-dungeon.ambience.volume", 2.5)));
         float pitch = (float) Math.max(0.5, plugin.getConfig().getDouble("surface-dungeon.ambience.pitch", 0.85));
-        long trackLoopMs = Math.max(1L, Math.round(MUSIC_DISC_OTHERSIDE_DURATION_MS / pitch));
+        long trackLoopMs = Math.max(1L, Math.round(MUSIC_DISC_5_DURATION_MS / pitch));
         long now = System.currentTimeMillis();
         Map<UUID, String> insideNow = new HashMap<>();
 
@@ -1252,15 +1409,14 @@ public final class DungeonManager {
                 String previousHouse = houseMusicPlayers.get(playerId);
                 Long startedAt = houseMusicStartedAtMs.get(playerId);
                 if (!house.getId().equals(previousHouse)) {
-                    if (previousHouse != null) player.stopSound(Sound.MUSIC_DISC_OTHERSIDE, SoundCategory.RECORDS);
-                    player.playSound(player.getLocation(), Sound.MUSIC_DISC_OTHERSIDE,
+                    if (previousHouse != null) player.stopSound(Sound.MUSIC_DISC_5, SoundCategory.RECORDS);
+                    player.playSound(player.getLocation(), Sound.MUSIC_DISC_5,
                             SoundCategory.RECORDS, volume, pitch);
                     houseMusicStartedAtMs.put(playerId, now);
                 } else if (startedAt == null || now - startedAt >= trackLoopMs) {
-                    // MUSIC_DISC_OTHERSIDE is a finite melodic vanilla track. Restart it at its end so the house
-                    // has a continuous ambience rather than a one-shot effect.
-                    player.stopSound(Sound.MUSIC_DISC_OTHERSIDE, SoundCategory.RECORDS);
-                    player.playSound(player.getLocation(), Sound.MUSIC_DISC_OTHERSIDE,
+                    // MUSIC_DISC_5 is a finite eerie vanilla track; restart it at its end for continuous ambience.
+                    player.stopSound(Sound.MUSIC_DISC_5, SoundCategory.RECORDS);
+                    player.playSound(player.getLocation(), Sound.MUSIC_DISC_5,
                             SoundCategory.RECORDS, volume, pitch);
                     houseMusicStartedAtMs.put(playerId, now);
                 }
@@ -1270,7 +1426,7 @@ public final class DungeonManager {
         for (UUID playerId : new ArrayList<>(houseMusicPlayers.keySet())) {
             if (!insideNow.containsKey(playerId)) {
                 Player player = Bukkit.getPlayer(playerId);
-                if (player != null) player.stopSound(Sound.MUSIC_DISC_OTHERSIDE, SoundCategory.RECORDS);
+                if (player != null) player.stopSound(Sound.MUSIC_DISC_5, SoundCategory.RECORDS);
                 houseMusicStartedAtMs.remove(playerId);
             }
         }
@@ -1293,7 +1449,7 @@ public final class DungeonManager {
         for (Map.Entry<UUID, String> entry : new ArrayList<>(houseMusicPlayers.entrySet())) {
             if (!dungeonId.equals(entry.getValue())) continue;
             Player player = Bukkit.getPlayer(entry.getKey());
-            if (player != null) player.stopSound(Sound.MUSIC_DISC_OTHERSIDE, SoundCategory.RECORDS);
+            if (player != null) player.stopSound(Sound.MUSIC_DISC_5, SoundCategory.RECORDS);
             houseMusicPlayers.remove(entry.getKey());
             houseMusicStartedAtMs.remove(entry.getKey());
         }
@@ -1302,7 +1458,7 @@ public final class DungeonManager {
     private void stopHouseMusic() {
         for (UUID playerId : houseMusicPlayers.keySet()) {
             Player player = Bukkit.getPlayer(playerId);
-            if (player != null) player.stopSound(Sound.MUSIC_DISC_OTHERSIDE, SoundCategory.RECORDS);
+            if (player != null) player.stopSound(Sound.MUSIC_DISC_5, SoundCategory.RECORDS);
         }
         houseMusicPlayers.clear();
         houseMusicStartedAtMs.clear();
@@ -1401,7 +1557,7 @@ public final class DungeonManager {
         }
     }
 
-    private void updateShulkerHologram(DungeonInstance dungeon, BlockPosKey pos) {
+    public void updateShulkerHologram(DungeonInstance dungeon, BlockPosKey pos) {
         World world = pos.world();
         if (world == null || !world.isChunkLoaded(pos.x() >> 4, pos.z() >> 4)) return;
         Location location = new Location(world, pos.x() + 0.5, pos.y() + 1.18, pos.z() + 0.5);
@@ -1435,7 +1591,7 @@ public final class DungeonManager {
         display.setDefaultBackground(false);
         display.setBackgroundColor(Color.fromARGB(0, 0, 0, 0));
         display.setShadowed(true);
-        display.setSeeThrough(true);
+        display.setSeeThrough(false);
         display.setLineWidth(240);
         display.setViewRange(0.8f);
         display.setText(shulkerHologramText(dungeon, pos));
@@ -1444,13 +1600,18 @@ public final class DungeonManager {
     private String shulkerHologramText(DungeonInstance dungeon, BlockPosKey pos) {
         if (dungeon.getCategory() == DungeonCategory.SURFACE) {
             if (dungeon.isSurfaceShulkerLocked(pos)) {
-                return TextUtil.color("&#C58BFF&l✦ ЗАПЕЧАТАННЫЙ ШАЛКЕР ✦\n&7Откройте любым ключом");
+                return TextUtil.color("&7Запечатанный шалкер\n&7Откройте любым ключом");
             }
             SurfaceShulkerRarity rarity = SurfaceShulkerRarity.fromName(
                     dungeon.getSurfaceShulkerRarities().get(pos));
             if (rarity == null) rarity = SurfaceShulkerRarity.COMMON;
+            if (dungeon.isSurfaceShulkerKeyUnlocked(pos)) {
+                return TextUtil.color(rarity.getColorHex() + "&l" + rarity.getDisplayName() + " шалкер\n"
+                        + "&7Нажмите, чтобы открыть");
+            }
+            int progress = dungeon.getSurfaceShulkerBreakProgress().getOrDefault(pos, 0);
             return TextUtil.color(rarity.getColorHex() + "&l" + rarity.getDisplayName() + " шалкер\n"
-                    + "&7Нажмите, чтобы открыть");
+                    + "&7Киркой: " + progress + "/" + rarity.getRequiredBreakHits());
         }
 
         boolean unlocked = Boolean.TRUE.equals(dungeon.getShulkerUnlocked().get(pos));
@@ -1553,9 +1714,14 @@ public final class DungeonManager {
                     || !dungeon.getPendingSurfaceShulkerRefresh().contains(pos)) {
                 continue;
             }
-            SurfaceShulkerRarity rarity = SurfaceShulkerRarity.fromName(
-                    dungeon.getSurfaceShulkerRarities().get(pos));
-            changed |= applySurfaceShulkerState(dungeon, chunk.getWorld(), pos, rarity, stacks);
+            if (dungeon.isSurfaceShulkerLocked(pos)) {
+                changed |= applyLockedSurfaceShulkerState(dungeon, chunk.getWorld(), pos);
+            } else {
+                SurfaceShulkerRarity rarity = SurfaceShulkerRarity.fromName(
+                        dungeon.getSurfaceShulkerRarities().get(pos));
+                changed |= applySurfaceShulkerState(dungeon, chunk.getWorld(), pos, rarity, stacks);
+            }
+            updateShulkerHologram(dungeon, pos);
         }
         if (changed) saveDungeons();
     }

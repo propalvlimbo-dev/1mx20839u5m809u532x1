@@ -13,6 +13,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
@@ -107,7 +108,15 @@ public final class DungeonListener implements Listener {
                 }
                 return;
             }
-            plugin.getDungeonManager().ensureSurfaceShulkerHasLoot(dungeon, pos);
+            if (dungeon.isSurfaceShulkerKeyUnlocked(pos)) return;
+            event.setCancelled(true);
+            if (event.getHand() == EquipmentSlot.HAND) {
+                SurfaceShulkerRarity rarity = SurfaceShulkerRarity.fromName(
+                        dungeon.getSurfaceShulkerRarities().get(pos));
+                if (rarity == null) rarity = SurfaceShulkerRarity.COMMON;
+                int progress = dungeon.getSurfaceShulkerBreakProgress().getOrDefault(pos, 0);
+                player.sendActionBar("Добывайте шалкер киркой: " + progress + "/" + rarity.getRequiredBreakHits());
+            }
             return;
         }
 
@@ -174,6 +183,52 @@ public final class DungeonListener implements Listener {
     public void onGhostRegen(EntityRegainHealthEvent event) {
         if (plugin.getGhostController().isGhost(event.getEntity())) {
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onSurfaceShulkerDamage(BlockDamageEvent event) {
+        Block block = event.getBlock();
+        BlockPosKey pos = BlockPosKey.of(block);
+        DungeonInstance dungeon = plugin.getDungeonManager().getByProtectedContainer(pos);
+        if (dungeon == null || dungeon.getCategory() != DungeonCategory.SURFACE
+                || !dungeon.getShulkerPositions().contains(pos)
+                || !block.getType().name().endsWith("_SHULKER_BOX")) return;
+
+        // Stop vanilla mining completely: each start-dig click advances the custom rarity counter.
+        event.setCancelled(true);
+        Player player = event.getPlayer();
+        if (dungeon.isSurfaceShulkerLocked(pos)) {
+            player.sendActionBar("Запечатанный шалкер открывается ключом");
+            return;
+        }
+        if (dungeon.isSurfaceShulkerKeyUnlocked(pos)) {
+            player.sendActionBar("Этот шалкер открывается правым кликом");
+            return;
+        }
+
+        ItemStack tool = player.getInventory().getItemInMainHand();
+        if (tool == null || !tool.getType().name().endsWith("_PICKAXE")) {
+            player.sendActionBar("Для шалкера нужна кирка");
+            return;
+        }
+
+        SurfaceShulkerRarity rarity = SurfaceShulkerRarity.fromName(
+                dungeon.getSurfaceShulkerRarities().get(pos));
+        if (rarity == null) rarity = SurfaceShulkerRarity.COMMON;
+        int required = rarity.getRequiredBreakHits();
+        int progress = dungeon.incrementSurfaceShulkerBreakProgress(pos);
+        if (progress >= required) {
+            if (plugin.getDungeonManager().breakSurfaceShulkerForLoot(player, dungeon, pos)) {
+                player.sendActionBar("Шалкер разрушен — добыча выпала");
+            } else {
+                dungeon.setSurfaceShulkerBreakProgress(pos, required);
+                plugin.getDungeonManager().saveDungeons();
+            }
+        } else {
+            plugin.getDungeonManager().updateShulkerHologram(dungeon, pos);
+            player.sendActionBar("Удары киркой: " + progress + "/" + required);
+            if (progress % 5 == 0) plugin.getDungeonManager().saveDungeons();
         }
     }
 

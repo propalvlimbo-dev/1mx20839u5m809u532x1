@@ -35,6 +35,8 @@ public final class DungeonInstance {
     private final Set<BlockPosKey> openedContainers = new HashSet<>();
     private final Map<BlockPosKey, Boolean> shulkerUnlocked = new LinkedHashMap<>();
     private final Set<BlockPosKey> surfaceShulkerLocked = new HashSet<>();
+    private final Set<BlockPosKey> surfaceShulkerKeyUnlocked = new HashSet<>();
+    private final Map<BlockPosKey, Integer> surfaceShulkerBreakProgress = new LinkedHashMap<>();
     private final List<BlockPosKey> shulkerPositions = new ArrayList<>();
     private final Map<BlockPosKey, String> surfaceShulkerRarities = new LinkedHashMap<>();
     private final Map<BlockPosKey, Long> surfaceShulkerRefreshAtMs = new LinkedHashMap<>();
@@ -82,6 +84,8 @@ public final class DungeonInstance {
 
         this.shulkerUnlocked.clear();
         this.surfaceShulkerLocked.clear();
+        this.surfaceShulkerKeyUnlocked.clear();
+        this.surfaceShulkerBreakProgress.clear();
         this.shulkerPositions.clear();
         this.surfaceShulkerRarities.clear();
         this.surfaceShulkerRefreshAtMs.clear();
@@ -195,9 +199,41 @@ public final class DungeonInstance {
     public boolean isSurfaceShulkerLocked(BlockPosKey pos) { return surfaceShulkerLocked.contains(pos); }
     public void setSurfaceShulkerLocked(BlockPosKey pos, boolean locked) {
         if (pos == null || !shulkerPositions.contains(pos)) return;
-        if (locked) surfaceShulkerLocked.add(pos);
-        else surfaceShulkerLocked.remove(pos);
+        if (locked) {
+            surfaceShulkerLocked.add(pos);
+            surfaceShulkerKeyUnlocked.remove(pos);
+            surfaceShulkerBreakProgress.remove(pos);
+            surfaceShulkerRarities.remove(pos);
+            surfaceShulkerRefreshAtMs.remove(pos);
+        } else {
+            surfaceShulkerLocked.remove(pos);
+        }
     }
+    public Set<BlockPosKey> getSurfaceShulkerKeyUnlocked() { return surfaceShulkerKeyUnlocked; }
+    public boolean isSurfaceShulkerKeyUnlocked(BlockPosKey pos) { return surfaceShulkerKeyUnlocked.contains(pos); }
+    public void setSurfaceShulkerKeyUnlocked(BlockPosKey pos, boolean unlocked) {
+        if (pos == null || !shulkerPositions.contains(pos)) return;
+        if (unlocked) {
+            surfaceShulkerLocked.remove(pos);
+            surfaceShulkerKeyUnlocked.add(pos);
+            surfaceShulkerBreakProgress.remove(pos);
+        } else {
+            surfaceShulkerKeyUnlocked.remove(pos);
+        }
+    }
+    public Map<BlockPosKey, Integer> getSurfaceShulkerBreakProgress() { return surfaceShulkerBreakProgress; }
+    public int incrementSurfaceShulkerBreakProgress(BlockPosKey pos) {
+        if (pos == null || !shulkerPositions.contains(pos) || surfaceShulkerLocked.contains(pos)
+                || surfaceShulkerKeyUnlocked.contains(pos)) return 0;
+        return surfaceShulkerBreakProgress.merge(pos, 1, Integer::sum);
+    }
+    public void setSurfaceShulkerBreakProgress(BlockPosKey pos, int hits) {
+        if (pos == null || !shulkerPositions.contains(pos) || surfaceShulkerLocked.contains(pos)
+                || surfaceShulkerKeyUnlocked.contains(pos)) return;
+        if (hits <= 0) surfaceShulkerBreakProgress.remove(pos);
+        else surfaceShulkerBreakProgress.put(pos, hits);
+    }
+    public void clearSurfaceShulkerBreakProgress(BlockPosKey pos) { surfaceShulkerBreakProgress.remove(pos); }
     public List<BlockPosKey> getShulkerPositions() { return shulkerPositions; }
     public Map<BlockPosKey, String> getSurfaceShulkerRarities() { return surfaceShulkerRarities; }
     public Map<BlockPosKey, Long> getSurfaceShulkerRefreshAtMs() { return surfaceShulkerRefreshAtMs; }

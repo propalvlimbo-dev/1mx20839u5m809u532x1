@@ -164,6 +164,13 @@ public final class ElytrixDungeonsPlugin extends JavaPlugin {
             getConfig().set("config-version", 4);
             changed = true;
         }
+
+        if (version < 5) {
+            // Ghosts now use their entity name only; no separate floating text hologram is created.
+            getConfig().set("hologram.ghost.enabled", false);
+            getConfig().set("config-version", 5);
+            changed = true;
+        }
         if (changed) saveConfig();
     }
 

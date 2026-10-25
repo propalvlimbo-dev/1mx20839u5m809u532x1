@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import org.bukkit.Chunk;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
@@ -23,7 +22,6 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Allay;
-import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -43,21 +41,18 @@ import ru.elytrix.dungeons.util.TextUtil;
 
 /**
  * Manages Surface House Ghosts (EntityType.ALLAY):
- *  - Spawns a separated wave at walkable corridor points on the first two floors
- *  - Keeps ghosts inside the house and prevents vanilla Allay duplication / item-handing exploits
+ *  - Spawns a separated wave on the first two floors, then lets Allays roam naturally
+ *  - Lets ghosts roam naturally inside the house and prevents vanilla Allay duplication / item-handing exploits
  *  - After the whole wave is defeated, waits for the configured cooldown before spawning another
  *  - On kill: 100% drops Призрачный осколок (amethyst_shard) + 35% weighted Vault Key
  */
 public final class GhostController {
-
-    private static final double MAX_CORRIDOR_ROAM_DISTANCE_SQUARED = 25.0;
 
     private final ElytrixDungeonsPlugin plugin;
     private final NamespacedKey ghostPdc;
     private final NamespacedKey ghostHologramPdc;
     private final Map<String, Set<UUID>> houseGhosts = new HashMap<>();
     private final Map<UUID, String> ghostToHouse = new HashMap<>();
-    private final Map<UUID, UUID> ghostHolograms = new HashMap<>();
 
     public GhostController(ElytrixDungeonsPlugin plugin) {
         this.plugin = plugin;
@@ -106,6 +101,7 @@ public final class GhostController {
 
             Set<UUID> set = houseGhosts.computeIfAbsent(house.getId(), key -> new HashSet<>());
             CuboidRegion bounds = house.getBounds();
+            CuboidRegion recoveryBounds = bounds.expand(3, 3);
             Iterator<UUID> it = set.iterator();
             while (it.hasNext()) {
                 UUID uid = it.next();
@@ -115,11 +111,10 @@ public final class GhostController {
                 if (!(entity instanceof LivingEntity ghost) || ghost.isDead() || !ghost.isValid()) {
                     it.remove();
                     ghostToHouse.remove(uid);
-                    removeGhostHologram(world, uid);
                     continue;
                 }
                 if (ghost.isInsideVehicle()) ghost.eject();
-                if (!bounds.contains(ghost.getLocation())) {
+                if (!recoveryBounds.contains(ghost.getLocation())) {
                     Location back = randomInteriorPoint(house);
                     if (back != null) {
                         ghost.setFallDistance(0f);
@@ -127,20 +122,6 @@ public final class GhostController {
                         world.spawnParticle(Particle.SOUL, back.clone().add(0, 0.5, 0), 6, 0.2, 0.2, 0.2, 0.02);
                     }
                 }
-                Location ghostLocation = ghost.getLocation();
-                BlockPosKey floor = nearestSafeSpawnPoint(world, house, ghostLocation);
-                if (floor != null) {
-                    double dx = ghostLocation.getX() - (floor.x() + 0.5);
-                    double dz = ghostLocation.getZ() - (floor.z() + 0.5);
-                    boolean outsideCorridors = dx * dx + dz * dz > MAX_CORRIDOR_ROAM_DISTANCE_SQUARED;
-                    boolean outsideFloorBand = ghostLocation.getY() > floor.y() + 1.75
-                            || ghostLocation.getY() < floor.y() - 0.5;
-                    if (outsideCorridors || outsideFloorBand) {
-                        ghost.setFallDistance(0f);
-                        ghost.teleport(floor.floorLocation());
-                    }
-                }
-                updateGhostHologram(ghost);
             }
 
             long respawnAt = house.getGhostRespawnAtMs();
@@ -169,7 +150,6 @@ public final class GhostController {
         for (Entity entity : world.getNearbyEntities(center, rx, ry, rz)) {
             if (house.getId().equals(entity.getPersistentDataContainer().get(ghostPdc, PersistentDataType.STRING))) {
                 ghostToHouse.remove(entity.getUniqueId());
-                removeGhostHologram(world, entity.getUniqueId());
                 entity.remove();
             }
         }
@@ -186,79 +166,10 @@ public final class GhostController {
                     if (!house.getId().equals(entity.getPersistentDataContainer().get(ghostPdc, PersistentDataType.STRING))) {
                         continue;
                     }
-                    living.setCustomNameVisible(false);
+                    living.setCustomName(TextUtil.color("Призрак"));
+                    living.setCustomNameVisible(true);
                     tracked.add(entity.getUniqueId());
                     ghostToHouse.put(entity.getUniqueId(), house.getId());
-                    updateGhostHologram(living);
-                }
-            }
-        }
-    }
-
-    private void updateGhostHologram(LivingEntity ghost) {
-        World world = ghost.getWorld();
-        Location location = ghost.getLocation().clone().add(0, 0.84, 0);
-        if (!plugin.getConfig().getBoolean("hologram.ghost.enabled", true)) {
-            removeGhostHologram(world, ghost.getUniqueId());
-            return;
-        }
-        if (!world.isChunkLoaded(location.getBlockX() >> 4, location.getBlockZ() >> 4)) return;
-
-        TextDisplay display = null;
-        UUID displayId = ghostHolograms.get(ghost.getUniqueId());
-        if (displayId != null && world.getEntity(displayId) instanceof TextDisplay existing && existing.isValid()) {
-            display = existing;
-        }
-        if (display == null) {
-            String ghostId = ghost.getUniqueId().toString();
-            for (Entity nearby : world.getNearbyEntities(location, 1.5, 2.0, 1.5)) {
-                if (!(nearby instanceof TextDisplay candidate)
-                        || !ghostId.equals(candidate.getPersistentDataContainer()
-                                .get(ghostHologramPdc, PersistentDataType.STRING))) continue;
-                if (display == null) display = candidate;
-                else candidate.remove();
-            }
-        }
-        if (display == null) {
-            Entity spawned = world.spawnEntity(location, EntityType.TEXT_DISPLAY);
-            if (!(spawned instanceof TextDisplay created)) {
-                spawned.remove();
-                return;
-            }
-            display = created;
-        } else if (display.getLocation().distanceSquared(location) > 0.01) {
-            display.teleport(location);
-        }
-
-        display.setPersistent(false);
-        display.getPersistentDataContainer().set(ghostHologramPdc, PersistentDataType.STRING,
-                ghost.getUniqueId().toString());
-        display.setBillboard(Display.Billboard.CENTER);
-        display.setAlignment(TextDisplay.TextAlignment.CENTER);
-        display.setDefaultBackground(false);
-        display.setBackgroundColor(Color.fromARGB(0, 0, 0, 0));
-        display.setShadowed(true);
-        display.setSeeThrough(true);
-        display.setLineWidth(120);
-        display.setViewRange(0.75f);
-        display.setText(TextUtil.color("&#F8BEFB&l✦ Призрак ✦"));
-        ghostHolograms.put(ghost.getUniqueId(), display.getUniqueId());
-    }
-
-    private void removeGhostHologram(World world, UUID ghostId) {
-        UUID displayId = ghostHolograms.remove(ghostId);
-        if (world == null) return;
-        if (displayId != null) {
-            Entity mapped = world.getEntity(displayId);
-            if (mapped != null && mapped.isValid()) mapped.remove();
-        }
-        String target = ghostId.toString();
-        for (Chunk chunk : world.getLoadedChunks()) {
-            for (Entity entity : chunk.getEntities()) {
-                if (entity instanceof TextDisplay display
-                        && target.equals(display.getPersistentDataContainer()
-                                .get(ghostHologramPdc, PersistentDataType.STRING))) {
-                    display.remove();
                 }
             }
         }
@@ -279,9 +190,8 @@ public final class GhostController {
             le.getPersistentDataContainer().set(ghostPdc, PersistentDataType.STRING, house.getId());
             le.setRemoveWhenFarAway(false);
             le.setCanPickupItems(false);
-            le.setCustomName(TextUtil.color("&#F8BEFBПризрак"));
-            // Hide nameplates: otherwise ghosts inside rooms look like floating holograms above loot boxes.
-            le.setCustomNameVisible(false);
+            le.setCustomName(TextUtil.color("Призрак"));
+            le.setCustomNameVisible(true);
 
             AttributeInstance maxHp = ((Attributable) le).getAttribute(Attribute.MAX_HEALTH);
             if (maxHp != null) maxHp.setBaseValue(hp);
@@ -294,7 +204,6 @@ public final class GhostController {
 
             set.add(le.getUniqueId());
             ghostToHouse.put(le.getUniqueId(), house.getId());
-            updateGhostHologram(le);
             spawned++;
         }
         return spawned;
@@ -306,7 +215,6 @@ public final class GhostController {
         if (dungeonId == null) {
             dungeonId = dead.getPersistentDataContainer().get(ghostPdc, PersistentDataType.STRING);
         }
-        removeGhostHologram(dead.getWorld(), dead.getUniqueId());
         if (dungeonId != null) {
             DungeonInstance house = plugin.getDungeonManager().getDungeon(dungeonId);
             if (house != null && house.getCategory() == DungeonCategory.SURFACE) {
@@ -390,33 +298,21 @@ public final class GhostController {
             String tag = entity.getPersistentDataContainer().get(ghostPdc, PersistentDataType.STRING);
             if (tag == null) continue;
             if (plugin.getDungeonManager().getDungeon(tag) == null) {
-                removeGhostHologram(chunk.getWorld(), entity.getUniqueId());
                 entity.remove();
                 continue;
             }
             if (entity instanceof LivingEntity ghost) {
-                ghost.setCustomNameVisible(false);
+                ghost.setCustomName(TextUtil.color("Призрак"));
+                ghost.setCustomNameVisible(true);
                 houseGhosts.computeIfAbsent(tag, key -> new HashSet<>()).add(entity.getUniqueId());
                 ghostToHouse.put(entity.getUniqueId(), tag);
-                updateGhostHologram(ghost);
             }
         }
 
+        // Remove ghost TextDisplays from previous versions; ghosts now use only their entity name.
         for (Entity entity : chunk.getEntities()) {
-            if (!(entity instanceof TextDisplay display)) continue;
-            String ghostId = display.getPersistentDataContainer()
-                    .get(ghostHologramPdc, PersistentDataType.STRING);
-            if (ghostId == null) continue;
-            try {
-                UUID id = UUID.fromString(ghostId);
-                Entity target = chunk.getWorld().getEntity(id);
-                if (target instanceof LivingEntity ghost && isGhost(ghost)) {
-                    ghostHolograms.put(id, display.getUniqueId());
-                    updateGhostHologram(ghost);
-                } else {
-                    display.remove();
-                }
-            } catch (IllegalArgumentException invalidId) {
+            if (entity instanceof TextDisplay display
+                    && display.getPersistentDataContainer().has(ghostHologramPdc, PersistentDataType.STRING)) {
                 display.remove();
             }
         }
@@ -430,7 +326,6 @@ public final class GhostController {
         if (set != null) {
             for (UUID uid : set) {
                 ghostToHouse.remove(uid);
-                removeGhostHologram(world, uid);
                 if (world != null) {
                     Entity entity = world.getEntity(uid);
                     if (entity != null && entity.isValid()) entity.remove();
@@ -507,20 +402,6 @@ public final class GhostController {
             if (point.y() >= targetFloorY && point.y() <= targetFloorY + 1) band.add(point);
         }
         return band;
-    }
-
-    private static BlockPosKey nearestSafeSpawnPoint(World world, DungeonInstance house, Location reference) {
-        List<BlockPosKey> candidates = safeSpawnPoints(world, house);
-        BlockPosKey nearest = null;
-        double nearestDistance = Double.POSITIVE_INFINITY;
-        for (BlockPosKey candidate : candidates) {
-            double distance = candidate.floorLocation().distanceSquared(reference);
-            if (distance < nearestDistance) {
-                nearestDistance = distance;
-                nearest = candidate;
-            }
-        }
-        return nearest;
     }
 
     private static List<BlockPosKey> safeSpawnPoints(World world, DungeonInstance house) {

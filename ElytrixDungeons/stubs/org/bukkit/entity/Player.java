@@ -53,7 +53,7 @@ public interface Player extends HumanEntity, OfflinePlayer, CommandSender {
     Location getLocation();
     World getWorld();
     boolean teleport(Location location);
-    void sendActionBar(net.kyori.adventure.text.Component message);
+    void sendActionBar(String message);
     boolean addPotionEffect(org.bukkit.potion.PotionEffect effect);
     java.util.Collection<org.bukkit.potion.PotionEffect> getActivePotionEffects();
     double getHealth();

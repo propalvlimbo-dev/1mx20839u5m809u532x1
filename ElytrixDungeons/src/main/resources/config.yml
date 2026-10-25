@@ -1,5 +1,5 @@
 # ElytrixDungeons — до 7 наземных домов и 7 подземных данжей.
-config-version: 4
+config-version: 5
 # Схемы плагин не создаёт: загрузите собственные файлы .schem в нужную папку.
 #   plugins/ElytrixDungeons/schematics/surface/<id-схемы>.schem
 #   plugins/ElytrixDungeons/schematics/underground/<id-схемы>.schem
@@ -81,7 +81,7 @@ surface-dungeon:
       unique: 3
   ambience:
     enabled: true
-    # Мелодичная MUSIC_DISC_OTHERSIDE — персональная музыка для каждого игрока внутри дома, с автоповтором.
+    # Жуткая MUSIC_DISC_5 — персональная музыка для каждого игрока внутри дома, с автоповтором.
     volume: 2.0
     pitch: 0.85
 
@@ -96,13 +96,13 @@ underground-dungeon:
   leader-damage: 18.5
   fight-timeout-seconds: 210
 
-# Legacy full-dungeon/chest labels stay disabled; the focused ghost and shulker labels are active.
+# Общая голограмма данжа и подписи сундуков выключены. Над призраками отображается только их имя.
 hologram:
   enabled: false
   chest-hint:
     enabled: false
   ghost:
-    enabled: true
+    enabled: false
   shulker:
     enabled: true
 

@@ -104,6 +104,7 @@ public final class DungeonAuctionBar {
         if (dungeon.getCategory() == DungeonCategory.SURFACE) {
             long next = Long.MAX_VALUE;
             for (BlockPosKey pos : dungeon.getShulkerPositions()) {
+                if (dungeon.isSurfaceShulkerLocked(pos)) continue;
                 Long refreshAt = dungeon.getSurfaceShulkerRefreshAtMs().get(pos);
                 if (refreshAt != null && refreshAt > 0L) next = Math.min(next, refreshAt);
             }
