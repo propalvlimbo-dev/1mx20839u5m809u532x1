@@ -1,7 +1,10 @@
 package ru.elytrix.dungeons.service;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -17,9 +20,16 @@ import ru.elytrix.dungeons.util.TextUtil;
 public final class DungeonAuctionBar {
 
     private final ElytrixDungeonsPlugin plugin;
+    private final Map<UUID, Long> suppressedUntilMs = new HashMap<>();
 
     public DungeonAuctionBar(ElytrixDungeonsPlugin plugin) {
         this.plugin = plugin;
+    }
+
+    public void suppressFor(Player player, long durationMs) {
+        if (player == null) return;
+        long duration = Math.max(250L, durationMs);
+        suppressedUntilMs.put(player.getUniqueId(), System.currentTimeMillis() + duration);
     }
 
     public void tick(Collection<DungeonInstance> dungeons, long now) {
@@ -29,6 +39,11 @@ public final class DungeonAuctionBar {
         int page = (int) ((now / cycleMs) % 3L);
         List<Player> players = List.copyOf(Bukkit.getOnlinePlayers());
         for (Player player : players) {
+            Long suppressedUntil = suppressedUntilMs.get(player.getUniqueId());
+            if (suppressedUntil != null) {
+                if (suppressedUntil > now) continue;
+                suppressedUntilMs.remove(player.getUniqueId());
+            }
             DungeonInstance active = findContaining(dungeons, player);
             if (active == null) continue;
             String line = switch (page) {
@@ -39,6 +54,8 @@ public final class DungeonAuctionBar {
             player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
                     TextComponent.fromLegacyText(TextUtil.color(line)));
         }
+        suppressedUntilMs.entrySet().removeIf(entry -> entry.getValue() <= now
+                || Bukkit.getPlayer(entry.getKey()) == null);
     }
 
     private static DungeonInstance findContaining(Collection<DungeonInstance> dungeons, Player player) {

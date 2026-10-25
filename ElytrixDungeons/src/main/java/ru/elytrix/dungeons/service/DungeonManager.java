@@ -176,6 +176,9 @@ public final class DungeonManager {
         plugin.getGhostController().shutdownAll(dungeons.values());
         for (DungeonInstance d : dungeons.values()) removeContainerHolograms(d);
         saveDungeons();
+        for (DungeonInstance d : dungeons.values()) {
+            plugin.getWorldGuardHook().removeDungeonRegion(d.getOrigin().world(), d.getId());
+        }
 
         if (plugin.getConfig().getBoolean("auto-spawn.hide-dungeons-on-disable", true) && !hiddenFromWorld) {
             for (DungeonInstance d : dungeons.values()) {
@@ -215,6 +218,7 @@ public final class DungeonManager {
     }
 
     public boolean isHiddenFromWorld() { return hiddenFromWorld; }
+    public void suppressAuctionBar(Player player) { auctionBar.suppressFor(player, 2_000L); }
     public int getPendingScanDone() { return pendingScanDone; }
     public int getPendingScanTotal() { return pendingScanTotal; }
     public boolean isScanning() { return pendingScanTotal > 0 && pendingScanDone < pendingScanTotal; }
@@ -1257,8 +1261,7 @@ public final class DungeonManager {
         World world = pos.world();
         if (world == null || !world.isChunkLoaded(pos.x() >> 4, pos.z() >> 4)) return false;
         Block block = world.getBlockAt(pos.x(), pos.y(), pos.z());
-        if (!block.getType().name().endsWith("_SHULKER_BOX")
-                || !(block.getState() instanceof InventoryHolder)) return false;
+        if (!isShulkerBox(block) || !(block.getState() instanceof InventoryHolder)) return false;
 
         long now = System.currentTimeMillis();
         dungeon.setSurfaceShulkerKeyUnlocked(pos, true);
@@ -1266,7 +1269,7 @@ public final class DungeonManager {
         dungeon.getSurfaceShulkerRefreshAtMs().put(pos, now + surfaceShulkerRefreshIntervalMs());
         if (!applySurfaceShulkerState(dungeon, world, pos, lootTier,
                 Math.max(1, plugin.getConfig().getInt("surface-dungeon.shulker-stacks", 14)))) {
-            dungeon.setSurfaceShulkerLocked(pos, true);
+            rollbackSurfaceShulkerKeyOpen(dungeon, world, pos);
             return false;
         }
 
@@ -1277,14 +1280,18 @@ public final class DungeonManager {
                 || player.openInventory(holder.getInventory()) == null) {
             // InventoryOpenEvent may be cancelled by another plugin. Restore the sealed, empty state
             // and let the listener keep the key because the player never got the loot window.
-            dungeon.setSurfaceShulkerLocked(pos, true);
-            applyLockedSurfaceShulkerState(dungeon, world, pos);
-            updateShulkerHologram(dungeon, pos);
-            saveDungeons();
+            rollbackSurfaceShulkerKeyOpen(dungeon, world, pos);
             return false;
         }
         player.playSound(pos.centerLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, 1.0f, 0.85f);
         return true;
+    }
+
+    private void rollbackSurfaceShulkerKeyOpen(DungeonInstance dungeon, World world, BlockPosKey pos) {
+        dungeon.setSurfaceShulkerLocked(pos, true);
+        applyLockedSurfaceShulkerState(dungeon, world, pos);
+        updateShulkerHologram(dungeon, pos);
+        saveDungeons();
     }
 
     private boolean applySurfaceShulkerState(
@@ -1353,7 +1360,7 @@ public final class DungeonManager {
         World world = pos.world();
         if (world == null || !world.isChunkLoaded(pos.x() >> 4, pos.z() >> 4)) return false;
         Block block = world.getBlockAt(pos.x(), pos.y(), pos.z());
-        if (!block.getType().name().endsWith("_SHULKER_BOX")) return false;
+        if (!isShulkerBox(block)) return false;
         SurfaceShulkerRarity rarity = SurfaceShulkerRarity.fromName(
                 dungeon.getSurfaceShulkerRarities().get(pos));
         if (rarity == null) rarity = SurfaceShulkerRarity.COMMON;
@@ -1557,6 +1564,12 @@ public final class DungeonManager {
         }
     }
 
+    private static boolean isShulkerBox(Block block) {
+        if (block == null) return false;
+        Material material = block.getType();
+        return material == Material.SHULKER_BOX || material.name().endsWith("_SHULKER_BOX");
+    }
+
     public void updateShulkerHologram(DungeonInstance dungeon, BlockPosKey pos) {
         World world = pos.world();
         if (world == null || !world.isChunkLoaded(pos.x() >> 4, pos.z() >> 4)) return;
@@ -1566,8 +1579,7 @@ public final class DungeonManager {
             return;
         }
         Block block = world.getBlockAt(pos.x(), pos.y(), pos.z());
-        if (!block.getType().name().endsWith("_SHULKER_BOX")
-                || !(block.getState() instanceof InventoryHolder)) {
+        if (!isShulkerBox(block) || !(block.getState() instanceof InventoryHolder)) {
             removeShulkerHologram(world, pos, location);
             return;
         }

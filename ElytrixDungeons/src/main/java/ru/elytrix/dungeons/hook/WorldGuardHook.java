@@ -75,7 +75,8 @@ public final class WorldGuardHook {
     }
 
     public void removeDungeonRegion(World bukkitWorld, String dungeonId) {
-        if (!available || bukkitWorld == null) return;
+        // Attempt cleanup even if a previous optional WorldGuard operation marked the hook unavailable.
+        if (bukkitWorld == null) return;
         try {
             Object regionManager = getRegionManager(bukkitWorld);
             if (regionManager != null) {

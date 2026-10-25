@@ -105,11 +105,14 @@ public final class DungeonListener implements Listener {
                 }
                 if (plugin.getDungeonManager().openSurfaceShulkerWithKey(player, dungeon, pos, lootTier)) {
                     consumeOneKey(player, key, keySlot);
+                } else {
+                    player.sendMessage(plugin.prefix() + "Не удалось открыть шалкер; ключ не потрачен.");
                 }
                 return;
             }
             if (dungeon.isSurfaceShulkerKeyUnlocked(pos)) return;
             event.setCancelled(true);
+            plugin.getDungeonManager().suppressAuctionBar(player);
             if (event.getHand() == EquipmentSlot.HAND) {
                 SurfaceShulkerRarity rarity = SurfaceShulkerRarity.fromName(
                         dungeon.getSurfaceShulkerRarities().get(pos));
@@ -192,44 +195,38 @@ public final class DungeonListener implements Listener {
         BlockPosKey pos = BlockPosKey.of(block);
         DungeonInstance dungeon = plugin.getDungeonManager().getByProtectedContainer(pos);
         if (dungeon == null || dungeon.getCategory() != DungeonCategory.SURFACE
-                || !dungeon.getShulkerPositions().contains(pos)
-                || !block.getType().name().endsWith("_SHULKER_BOX")) return;
+                || !dungeon.getShulkerPositions().contains(pos) || !isShulkerBox(block)) return;
 
-        // Stop vanilla mining completely: each start-dig click advances the custom rarity counter.
-        event.setCancelled(true);
         Player player = event.getPlayer();
+        plugin.getDungeonManager().suppressAuctionBar(player);
         if (dungeon.isSurfaceShulkerLocked(pos)) {
+            event.setCancelled(true);
             player.sendActionBar("Запечатанный шалкер открывается ключом");
             return;
         }
         if (dungeon.isSurfaceShulkerKeyUnlocked(pos)) {
+            event.setCancelled(true);
             player.sendActionBar("Этот шалкер открывается правым кликом");
             return;
         }
-
-        ItemStack tool = player.getInventory().getItemInMainHand();
-        if (tool == null || !tool.getType().name().endsWith("_PICKAXE")) {
+        if (!isPickaxe(player.getInventory().getItemInMainHand())) {
+            event.setCancelled(true);
             player.sendActionBar("Для шалкера нужна кирка");
             return;
         }
 
-        SurfaceShulkerRarity rarity = SurfaceShulkerRarity.fromName(
-                dungeon.getSurfaceShulkerRarities().get(pos));
-        if (rarity == null) rarity = SurfaceShulkerRarity.COMMON;
-        int required = rarity.getRequiredBreakHits();
-        int progress = dungeon.incrementSurfaceShulkerBreakProgress(pos);
-        if (progress >= required) {
-            if (plugin.getDungeonManager().breakSurfaceShulkerForLoot(player, dungeon, pos)) {
-                player.sendActionBar("Шалкер разрушен — добыча выпала");
-            } else {
-                dungeon.setSurfaceShulkerBreakProgress(pos, required);
-                plugin.getDungeonManager().saveDungeons();
-            }
-        } else {
-            plugin.getDungeonManager().updateShulkerHologram(dungeon, pos);
-            player.sendActionBar("Удары киркой: " + progress + "/" + required);
-            if (progress % 5 == 0) plugin.getDungeonManager().saveDungeons();
-        }
+        // Turn each pickaxe swing into a genuine break attempt. The break event below
+        // cancels it until the rarity's hit threshold is reached.
+        event.setInstaBreak(true);
+    }
+
+    private static boolean isShulkerBox(Block block) {
+        return block != null && (block.getType() == Material.SHULKER_BOX
+                || block.getType().name().endsWith("_SHULKER_BOX"));
+    }
+
+    private static boolean isPickaxe(ItemStack item) {
+        return item != null && item.getType().name().endsWith("_PICKAXE");
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -237,9 +234,47 @@ public final class DungeonListener implements Listener {
         Block block = event.getBlock();
         Player player = event.getPlayer();
         BlockPosKey pos = BlockPosKey.of(block);
+        DungeonInstance dungeon = plugin.getDungeonManager().getByProtectedContainer(pos);
 
-        // Always protect dungeon chests, barrels & locked shulkers from being broken
-        if (plugin.getDungeonManager().getByProtectedContainer(pos) != null) {
+        if (dungeon != null && dungeon.getCategory() == DungeonCategory.SURFACE
+                && dungeon.getShulkerPositions().contains(pos) && isShulkerBox(block)) {
+            event.setCancelled(true);
+            plugin.getDungeonManager().suppressAuctionBar(player);
+            if (dungeon.isSurfaceShulkerLocked(pos)) {
+                player.sendActionBar("Запечатанный шалкер открывается ключом");
+                return;
+            }
+            if (dungeon.isSurfaceShulkerKeyUnlocked(pos)) {
+                player.sendActionBar("Этот шалкер открывается правым кликом");
+                return;
+            }
+            if (!isPickaxe(player.getInventory().getItemInMainHand())) {
+                player.sendActionBar("Для шалкера нужна кирка");
+                return;
+            }
+
+            SurfaceShulkerRarity rarity = SurfaceShulkerRarity.fromName(
+                    dungeon.getSurfaceShulkerRarities().get(pos));
+            if (rarity == null) rarity = SurfaceShulkerRarity.COMMON;
+            int required = rarity.getRequiredBreakHits();
+            int progress = dungeon.incrementSurfaceShulkerBreakProgress(pos);
+            if (progress >= required) {
+                if (plugin.getDungeonManager().breakSurfaceShulkerForLoot(player, dungeon, pos)) {
+                    player.sendActionBar("Шалкер сломан — добыча выпала");
+                } else {
+                    dungeon.setSurfaceShulkerBreakProgress(pos, required);
+                    plugin.getDungeonManager().saveDungeons();
+                }
+            } else {
+                plugin.getDungeonManager().updateShulkerHologram(dungeon, pos);
+                player.sendActionBar("Удары киркой: " + progress + "/" + required);
+                if (progress % 5 == 0) plugin.getDungeonManager().saveDungeons();
+            }
+            return;
+        }
+
+        // Keep all non-surface dungeon containers protected from ordinary mining.
+        if (dungeon != null) {
             event.setCancelled(true);
             player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.45f, 1.6f);
             player.sendMessage(plugin.msg("protected-block"));
