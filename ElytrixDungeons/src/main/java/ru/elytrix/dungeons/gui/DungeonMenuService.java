@@ -95,6 +95,8 @@ public final class DungeonMenuService {
 
         boolean allowBreak = plugin.getConfig().getBoolean("protection.allow-block-modify-in-zone", true);
         boolean hidden = plugin.getDungeonManager().isHiddenFromWorld();
+        int surfaceClaimPadding = plugin.getConfig().getInt("protection.claim-padding-blocks", 40);
+        int undergroundClaimPadding = plugin.getConfig().getInt("underground-dungeon.claim-padding-blocks", 8);
 
         inv.setItem(45, icon(Material.CHEST, "&7« &#F8BEFBНастройка лута (GUI) &7»", List.of(
                 "&#F8BEFB&l┃ &fСундуки, 6 редкостей шалкеров Дома и лут Подземелья",
@@ -114,7 +116,7 @@ public final class DungeonMenuService {
                 "&#F8BEFB&l┃ &fСейчас: " + (allowBreak
                         ? "&#96FF91Ломать можно &7(авто-восстановление +12 бл. вокруг)"
                         : "&#FF5555Защита включена &7(раскапывать нельзя)"),
-                "&#F8BEFB&l┃ &fЗапрет привата рядом: &#F8BEFB" + plugin.getConfig().getInt("protection.claim-padding-blocks", 40) + " блоков",
+                "&#F8BEFB&l┃ &fПриват — наземный: &#F8BEFB" + surfaceClaimPadding + " бл. &7/ подземный: &#F8BEFB" + undergroundClaimPadding + " бл.",
                 "&7● &fЛКМ — переключить режим"
         )));
         inv.setItem(52, icon(hidden ? Material.GRAY_DYE : Material.LIME_DYE,

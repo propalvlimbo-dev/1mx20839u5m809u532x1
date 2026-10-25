@@ -110,6 +110,7 @@ public final class TrialController {
         dungeon.setStatus(DungeonStatus.ACTIVE_TRIAL);
 
         spawnUndergroundSquad(w, dungeon, fight, guards, withLeader);
+        plugin.getDungeonManager().updateShulkerHolograms(dungeon);
 
         Location center = dungeon.getHologramAnchor().centerLocation();
         w.playSound(center, Sound.BLOCK_TRIAL_SPAWNER_OMINOUS_ACTIVATE, 1.0f, 0.95f);
@@ -250,6 +251,7 @@ public final class TrialController {
             if (now >= fight.deadlineMs) {
                 notifyNearby(d, 40.0, plugin.msg("underground-timeout"));
                 abortFight(d.getId(), true);
+                plugin.getDungeonManager().updateShulkerHolograms(d);
                 continue;
             }
             pruneAndLeashMobs(w, fight);

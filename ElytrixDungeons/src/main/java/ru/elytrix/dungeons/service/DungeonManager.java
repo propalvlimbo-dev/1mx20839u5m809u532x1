@@ -218,7 +218,7 @@ public final class DungeonManager {
     }
 
     public boolean isHiddenFromWorld() { return hiddenFromWorld; }
-    public void suppressAuctionBar(Player player) { auctionBar.suppressFor(player, 2_000L); }
+    public void suppressAuctionBar(Player player) { auctionBar.suppressFor(player, 5_000L); }
     public int getPendingScanDone() { return pendingScanDone; }
     public int getPendingScanTotal() { return pendingScanTotal; }
     public boolean isScanning() { return pendingScanTotal > 0 && pendingScanDone < pendingScanTotal; }
@@ -253,8 +253,8 @@ public final class DungeonManager {
         YamlConfiguration yml = YamlConfiguration.loadConfiguration(dungeonsFile);
         ConfigurationSection sec = yml.getConfigurationSection("dungeons");
         if (sec == null || sec.getKeys(false).isEmpty()) return false;
+        boolean progressUsesCompletedMiningCycles = yml.getInt("surface-shulker-break-progress-version", 0) >= 1;
 
-        int pad = plugin.getConfig().getInt("protection.claim-padding-blocks", 40);
         boolean allowPvp = plugin.getConfig().getBoolean("protection.allow-pvp", true);
         boolean allowBreak = plugin.getConfig().getBoolean("protection.allow-block-modify-in-zone", true);
 
@@ -339,18 +339,20 @@ public final class DungeonManager {
                         inst.setSurfaceShulkerKeyUnlocked(pos, true);
                     }
                 }
-                for (String state : d.getStringList("surface-shulker-break-progress")) {
-                    String[] parts = state.split("\\|", 2);
-                    if (parts.length != 2) continue;
-                    BlockPosKey pos = BlockPosKey.deserialize(parts[0]);
-                    if (pos == null || !inst.getShulkerPositions().contains(pos)) continue;
-                    try {
-                        inst.setSurfaceShulkerBreakProgress(pos, Integer.parseInt(parts[1]));
-                    } catch (NumberFormatException ignored) {
+                if (progressUsesCompletedMiningCycles) {
+                    for (String state : d.getStringList("surface-shulker-break-progress")) {
+                        String[] parts = state.split("\\|", 2);
+                        if (parts.length != 2) continue;
+                        BlockPosKey pos = BlockPosKey.deserialize(parts[0]);
+                        if (pos == null || !inst.getShulkerPositions().contains(pos)) continue;
+                        try {
+                            inst.setSurfaceShulkerBreakProgress(pos, Integer.parseInt(parts[1]));
+                        } catch (NumberFormatException ignored) {
+                        }
                     }
                 }
             }
-            registerDungeonRuntime(inst, pad, allowPvp, allowBreak);
+            registerDungeonRuntime(inst, allowPvp, allowBreak);
         }
         return !dungeons.isEmpty();
     }
@@ -384,6 +386,7 @@ public final class DungeonManager {
 
     public boolean saveDungeons() {
         YamlConfiguration yml = new YamlConfiguration();
+        yml.set("surface-shulker-break-progress-version", 1);
         for (DungeonInstance d : dungeons.values()) {
             String p = "dungeons." + d.getId();
             yml.set(p + ".display-name", d.getDisplayName());
@@ -689,11 +692,11 @@ public final class DungeonManager {
         CuboidRegion snapBox = new CuboidRegion(w.getName(), ox - bufXZ, Math.max(w.getMinHeight(), oy - bufY), oz - bufXZ,
                 structBox.maxX() + bufXZ, Math.min(w.getMaxHeight() - 1, snapTop), structBox.maxZ() + bufXZ);
 
-        int claimPadding = plugin.getConfig().getInt("protection.claim-padding-blocks", 40);
+        int claimPadding = claimPaddingFor(tpl.getCategory());
         for (DungeonInstance existing : dungeons.values()) {
             if (!existing.getOrigin().worldName().equals(w.getName())) continue;
             if (existing.getSnapshotBounds().intersects3D(snapBox)
-                    || existing.claimGuardRegion(claimPadding).intersects3D(snapBox)) {
+                    || existing.claimGuardRegion(claimPaddingFor(existing.getCategory())).intersects3D(snapBox)) {
                 return null;
             }
         }
@@ -737,10 +740,9 @@ public final class DungeonManager {
         );
         inst.applyTemplateMarkers(tpl);
 
-        int pad = plugin.getConfig().getInt("protection.claim-padding-blocks", 40);
         boolean allowPvp = plugin.getConfig().getBoolean("protection.allow-pvp", true);
         boolean allowBreak = plugin.getConfig().getBoolean("protection.allow-block-modify-in-zone", true);
-        registerDungeonRuntime(inst, pad, allowPvp, allowBreak);
+        registerDungeonRuntime(inst, allowPvp, allowBreak);
 
         pasteWithRestoreDiffsBatched(w, inst, tpl, null, false);
         saveDungeons();
@@ -748,18 +750,24 @@ public final class DungeonManager {
     }
 
     public void syncAllWorldGuardRegions() {
-        int pad = plugin.getConfig().getInt("protection.claim-padding-blocks", 40);
         boolean allowPvp = plugin.getConfig().getBoolean("protection.allow-pvp", true);
         boolean allowBreak = plugin.getConfig().getBoolean("protection.allow-block-modify-in-zone", true);
         for (DungeonInstance d : dungeons.values()) {
-            plugin.getWorldGuardHook().syncDungeonRegion(d, pad, allowPvp, allowBreak);
+            plugin.getWorldGuardHook().syncDungeonRegion(d, claimPaddingFor(d.getCategory()), allowPvp, allowBreak);
         }
     }
 
-    private void registerDungeonRuntime(DungeonInstance inst, int pad, boolean allowPvp, boolean allowBreak) {
+    private int claimPaddingFor(DungeonCategory category) {
+        if (category == DungeonCategory.UNDERGROUND) {
+            return Math.max(0, plugin.getConfig().getInt("underground-dungeon.claim-padding-blocks", 8));
+        }
+        return Math.max(0, plugin.getConfig().getInt("protection.claim-padding-blocks", 40));
+    }
+
+    private void registerDungeonRuntime(DungeonInstance inst, boolean allowPvp, boolean allowBreak) {
         dungeons.put(inst.getId(), inst);
         reindexProtectedContainers(inst);
-        plugin.getWorldGuardHook().syncDungeonRegion(inst, pad, allowPvp, allowBreak);
+        plugin.getWorldGuardHook().syncDungeonRegion(inst, claimPaddingFor(inst.getCategory()), allowPvp, allowBreak);
     }
 
     public void reindexProtectedContainers(DungeonInstance inst) {
@@ -800,8 +808,7 @@ public final class DungeonManager {
                 inst.setSnapshotBounds(newPlan.snapshotBounds());
                 inst.setSurfaceY(newPlan.surfaceY());
             }
-            int pad = plugin.getConfig().getInt("protection.claim-padding-blocks", 40);
-            plugin.getWorldGuardHook().syncDungeonRegion(inst, pad,
+            plugin.getWorldGuardHook().syncDungeonRegion(inst, claimPaddingFor(inst.getCategory()),
                     plugin.getConfig().getBoolean("protection.allow-pvp", true),
                     plugin.getConfig().getBoolean("protection.allow-block-modify-in-zone", true));
         }
@@ -848,8 +855,7 @@ public final class DungeonManager {
         if (!saveDungeons()) {
             dungeons.put(id, inst);
             reindexProtectedContainers(inst);
-            int pad = plugin.getConfig().getInt("protection.claim-padding-blocks", 40);
-            plugin.getWorldGuardHook().syncDungeonRegion(inst, pad,
+            plugin.getWorldGuardHook().syncDungeonRegion(inst, claimPaddingFor(inst.getCategory()),
                     plugin.getConfig().getBoolean("protection.allow-pvp", true),
                     plugin.getConfig().getBoolean("protection.allow-block-modify-in-zone", true));
             if (restoreTerrain) enqueueJob(() -> restoreSavedDungeonOnStartup(inst));
@@ -1612,7 +1618,7 @@ public final class DungeonManager {
     private String shulkerHologramText(DungeonInstance dungeon, BlockPosKey pos) {
         if (dungeon.getCategory() == DungeonCategory.SURFACE) {
             if (dungeon.isSurfaceShulkerLocked(pos)) {
-                return TextUtil.color("&7Запечатанный шалкер\n&7Откройте любым ключом");
+                return TextUtil.color("&7Запечатанный шалкер\n&7Откройте ключом Хранилища");
             }
             SurfaceShulkerRarity rarity = SurfaceShulkerRarity.fromName(
                     dungeon.getSurfaceShulkerRarities().get(pos));
@@ -1623,13 +1629,16 @@ public final class DungeonManager {
             }
             int progress = dungeon.getSurfaceShulkerBreakProgress().getOrDefault(pos, 0);
             return TextUtil.color(rarity.getColorHex() + "&l" + rarity.getDisplayName() + " шалкер\n"
-                    + "&7Киркой: " + progress + "/" + rarity.getRequiredBreakHits());
+                    + "&7Полные ломания: " + progress + "/" + rarity.getRequiredBreakCycles());
         }
 
+        if (plugin.getTrialController().getFight(dungeon.getId()) != null) {
+            return TextUtil.color("&#FF5555&lИспытание идёт\n&7Победите стражей, чтобы получить лут");
+        }
         boolean unlocked = Boolean.TRUE.equals(dungeon.getShulkerUnlocked().get(pos));
         return TextUtil.color(unlocked
-                ? "&#96FF91&lШалкер открыт\n&7Награда получена"
-                : "&#F8BEFB&lШалкер запечатан\n&7ПКМ — вызвать стражей");
+                ? "&#96FF91&lСтражи побеждены\n&7ПКМ — забрать награду"
+                : "&#F8BEFB&lШалкер-испытание\n&7ПКМ — вызвать стражей");
     }
 
     private TextDisplay findShulkerHologram(World world, BlockPosKey pos, Location location) {
@@ -1759,17 +1768,15 @@ public final class DungeonManager {
     }
 
     public DungeonInstance findContainingClaimZone(Location loc) {
-        int pad = plugin.getConfig().getInt("protection.claim-padding-blocks", 40);
         for (DungeonInstance d : dungeons.values()) {
-            if (d.claimGuardRegion(pad).contains(loc)) return d;
+            if (d.claimGuardRegion(claimPaddingFor(d.getCategory())).contains(loc)) return d;
         }
         return null;
     }
 
     public DungeonInstance findIntersectingClaimZone(CuboidRegion selection) {
-        int pad = plugin.getConfig().getInt("protection.claim-padding-blocks", 40);
         for (DungeonInstance d : dungeons.values()) {
-            if (d.claimGuardRegion(pad).intersects3D(selection)) return d;
+            if (d.claimGuardRegion(claimPaddingFor(d.getCategory())).intersects3D(selection)) return d;
         }
         return null;
     }

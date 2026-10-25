@@ -171,6 +171,13 @@ public final class ElytrixDungeonsPlugin extends JavaPlugin {
             getConfig().set("config-version", 5);
             changed = true;
         }
+        if (version < 6) {
+            if (!getConfig().isSet("underground-dungeon.claim-padding-blocks")) {
+                getConfig().set("underground-dungeon.claim-padding-blocks", 8);
+            }
+            getConfig().set("config-version", 6);
+            changed = true;
+        }
         if (changed) saveConfig();
     }
 

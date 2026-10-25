@@ -23,7 +23,7 @@ public enum SurfaceShulkerRarity {
     private final Material blockMaterial;
     private final LootPoolType lootPool;
     private final int weight;
-    private final int requiredBreakHits;
+    private final int requiredBreakCycles;
 
     SurfaceShulkerRarity(
             String displayName,
@@ -31,14 +31,14 @@ public enum SurfaceShulkerRarity {
             Material blockMaterial,
             LootPoolType lootPool,
             int weight,
-            int requiredBreakHits
+            int requiredBreakCycles
     ) {
         this.displayName = displayName;
         this.colorHex = colorHex;
         this.blockMaterial = blockMaterial;
         this.lootPool = lootPool;
         this.weight = weight;
-        this.requiredBreakHits = requiredBreakHits;
+        this.requiredBreakCycles = requiredBreakCycles;
     }
 
     public String getDisplayName() { return displayName; }
@@ -46,7 +46,7 @@ public enum SurfaceShulkerRarity {
     public Material getBlockMaterial() { return blockMaterial; }
     public LootPoolType getLootPool() { return lootPool; }
     public int getWeight() { return weight; }
-    public int getRequiredBreakHits() { return requiredBreakHits; }
+    public int getRequiredBreakCycles() { return requiredBreakCycles; }
 
     public static SurfaceShulkerRarity roll() {
         int totalWeight = 0;

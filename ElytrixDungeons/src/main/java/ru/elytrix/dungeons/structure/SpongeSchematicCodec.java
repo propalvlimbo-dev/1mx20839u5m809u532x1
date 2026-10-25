@@ -161,8 +161,8 @@ public final class SpongeSchematicCodec {
                     } else if (base.equals("barrel")) {
                         tpl.getBarrelOffsets().add(new int[]{x, y, z});
                     } else if (base.endsWith("shulker_box")) {
-                        // Any ordinary colored shulker in the .schem is a spawn/loot marker.
-                        // Keep its exact coordinates; runtime replaces/fills it with the configured loot shulker.
+                        // In an underground schematic, place one shulker as the trial trigger and reward container.
+                        // Surface shulkers are independent loot markers; preserve every exact schematic position.
                         tpl.getShulkerOffsets().add(new int[]{x, y, z});
                     }
                 }

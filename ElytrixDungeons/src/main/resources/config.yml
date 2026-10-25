@@ -1,5 +1,5 @@
 # ElytrixDungeons — до 7 наземных домов и 7 подземных данжей.
-config-version: 5
+config-version: 6
 # Схемы плагин не создаёт: загрузите собственные файлы .schem в нужную папку.
 #   plugins/ElytrixDungeons/schematics/surface/<id-схемы>.schem
 #   plugins/ElytrixDungeons/schematics/underground/<id-схемы>.schem
@@ -33,7 +33,7 @@ auto-spawn:
   hide-dungeons-on-disable: true
 
 protection:
-  # Запрет приватов (/rg claim и аналогичные команды) вокруг зоны данжа.
+  # Радиус запрета приватов (/rg claim и аналоги) вокруг наземных данжей.
   claim-padding-blocks: 40
   # Размер буфера природного рельефа, сохраняемого и восстанавливаемого вокруг схемы.
   surround-restore-padding-xz: 12
@@ -86,6 +86,8 @@ surface-dungeon:
     pitch: 0.85
 
 underground-dungeon:
+  # Компактный радиус WorldGuard и запрета приватов вокруг подземного данжа.
+  claim-padding-blocks: 8
   shulker-stacks: 7
   side-container-stacks: 4
   mob-count: 5

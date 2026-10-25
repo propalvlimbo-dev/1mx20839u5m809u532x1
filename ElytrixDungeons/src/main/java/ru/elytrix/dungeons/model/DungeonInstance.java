@@ -113,7 +113,8 @@ public final class DungeonInstance {
     }
 
     public CuboidRegion claimGuardRegion(int padding) {
-        return structureBounds.expand(padding, 16);
+        int verticalPadding = category == DungeonCategory.UNDERGROUND ? padding : 16;
+        return structureBounds.expand(padding, verticalPadding);
     }
 
     /**
@@ -227,11 +228,11 @@ public final class DungeonInstance {
                 || surfaceShulkerKeyUnlocked.contains(pos)) return 0;
         return surfaceShulkerBreakProgress.merge(pos, 1, Integer::sum);
     }
-    public void setSurfaceShulkerBreakProgress(BlockPosKey pos, int hits) {
+    public void setSurfaceShulkerBreakProgress(BlockPosKey pos, int cycles) {
         if (pos == null || !shulkerPositions.contains(pos) || surfaceShulkerLocked.contains(pos)
                 || surfaceShulkerKeyUnlocked.contains(pos)) return;
-        if (hits <= 0) surfaceShulkerBreakProgress.remove(pos);
-        else surfaceShulkerBreakProgress.put(pos, hits);
+        if (cycles <= 0) surfaceShulkerBreakProgress.remove(pos);
+        else surfaceShulkerBreakProgress.put(pos, cycles);
     }
     public void clearSurfaceShulkerBreakProgress(BlockPosKey pos) { surfaceShulkerBreakProgress.remove(pos); }
     public List<BlockPosKey> getShulkerPositions() { return shulkerPositions; }

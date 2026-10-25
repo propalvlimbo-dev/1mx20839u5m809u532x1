@@ -50,7 +50,9 @@ public final class SpotFinder {
         int halfSize = Math.max(250, plugin.getConfig().getInt("world-settings.half-size", 1420));
         int spawnExcl = Math.max(40, plugin.getConfig().getInt("world-settings.spawn-exclusion-radius", 200));
         int baseMinDist = Math.max(80, plugin.getConfig().getInt("world-settings.min-distance-between-dungeons", 340));
-        int claimPad = Math.max(8, plugin.getConfig().getInt("protection.claim-padding-blocks", 40));
+        int claimPad = tpl.getCategory() == DungeonCategory.UNDERGROUND
+                ? Math.max(0, plugin.getConfig().getInt("underground-dungeon.claim-padding-blocks", 8))
+                : Math.max(8, plugin.getConfig().getInt("protection.claim-padding-blocks", 40));
         int candidatesTarget = Math.max(8, plugin.getConfig().getInt("auto-spawn.candidates-per-dungeon", 24));
 
         Location worldSpawn = world.getSpawnLocation();

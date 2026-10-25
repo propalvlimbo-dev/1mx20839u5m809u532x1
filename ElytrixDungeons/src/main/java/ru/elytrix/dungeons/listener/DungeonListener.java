@@ -100,7 +100,7 @@ public final class DungeonListener implements Listener {
                 }
                 SurfaceShulkerRarity lootTier = lootTierForKey(keyId);
                 if (lootTier == null) {
-                    player.sendMessage(plugin.prefix() + "Этот шалкер запечатан. Нужен любой ключ Хранилища.");
+                    player.sendMessage(plugin.prefix() + "Этот шалкер открывается только ключом Хранилища ElytrixVault.");
                     return;
                 }
                 if (plugin.getDungeonManager().openSurfaceShulkerWithKey(player, dungeon, pos, lootTier)) {
@@ -118,19 +118,21 @@ public final class DungeonListener implements Listener {
                         dungeon.getSurfaceShulkerRarities().get(pos));
                 if (rarity == null) rarity = SurfaceShulkerRarity.COMMON;
                 int progress = dungeon.getSurfaceShulkerBreakProgress().getOrDefault(pos, 0);
-                player.sendActionBar("Добывайте шалкер киркой: " + progress + "/" + rarity.getRequiredBreakHits());
+                player.sendActionBar("Полностью ломайте киркой: " + progress + "/" + rarity.getRequiredBreakCycles());
             }
             return;
         }
 
         if (dungeon.getCategory() != DungeonCategory.UNDERGROUND) return;
         Boolean shulkerUnlocked = dungeon.getShulkerUnlocked().get(pos);
-        if (shulkerUnlocked == null || Boolean.TRUE.equals(shulkerUnlocked)) return;
+        if (shulkerUnlocked == null) return;
 
+        // This schematic shulker is the trial trigger and the reward container.
+        // Always cancel vanilla handling; after the fight, open this same inventory explicitly.
         event.setCancelled(true);
         if (event.getHand() != EquipmentSlot.HAND) return;
 
-        if (dungeon.getStatus() == DungeonStatus.CLEARED) {
+        if (Boolean.TRUE.equals(shulkerUnlocked) || dungeon.getStatus() == DungeonStatus.CLEARED) {
             dungeon.getShulkerUnlocked().put(pos, Boolean.TRUE);
             plugin.getDungeonManager().updateShulkerHolograms(dungeon);
             if (clicked.getState() instanceof InventoryHolder holder) {
@@ -142,11 +144,10 @@ public final class DungeonListener implements Listener {
     }
 
     private String keyIdForItem(ItemStack item) {
+        // Only ElytrixVault items carry the Vault-owned `elytrixvault:key_id` marker.
+        // Vanilla Trial Keys are not Vault keys and must not unlock these shulkers.
         String keyId = plugin.getItemsHook().getVaultKeyId(item);
-        if (keyId != null || item == null) return keyId;
-        if (item.getType() == Material.TRIAL_KEY) return "__trial_key";
-        if (item.getType() == Material.OMINOUS_TRIAL_KEY) return "__ominous_key";
-        return null;
+        return keyId == null || keyId.isBlank() ? null : keyId.trim();
     }
 
     private static SurfaceShulkerRarity lootTierForKey(String keyId) {
@@ -157,8 +158,7 @@ public final class DungeonListener implements Listener {
             case "royal" -> SurfaceShulkerRarity.RARE;
             case "void" -> SurfaceShulkerRarity.EPIC;
             case "unique" -> SurfaceShulkerRarity.MYTHIC;
-            case "__trial_key" -> SurfaceShulkerRarity.EPIC;
-            case "__ominous_key" -> SurfaceShulkerRarity.LEGENDARY;
+            // Custom keys created by ElytrixVault are accepted as Vault keys too.
             default -> SurfaceShulkerRarity.COMMON;
         };
     }
@@ -201,7 +201,7 @@ public final class DungeonListener implements Listener {
         plugin.getDungeonManager().suppressAuctionBar(player);
         if (dungeon.isSurfaceShulkerLocked(pos)) {
             event.setCancelled(true);
-            player.sendActionBar("Запечатанный шалкер открывается ключом");
+            player.sendActionBar("Запечатанный шалкер открывается ключом Хранилища");
             return;
         }
         if (dungeon.isSurfaceShulkerKeyUnlocked(pos)) {
@@ -212,12 +212,9 @@ public final class DungeonListener implements Listener {
         if (!isPickaxe(player.getInventory().getItemInMainHand())) {
             event.setCancelled(true);
             player.sendActionBar("Для шалкера нужна кирка");
-            return;
         }
-
-        // Turn each pickaxe swing into a genuine break attempt. The break event below
-        // cancels it until the rarity's hit threshold is reached.
-        event.setInstaBreak(true);
+        // Do not advance the custom counter here: this event is only the start of mining.
+        // Vanilla completes the mining cycle and then fires BlockBreakEvent.
     }
 
     private static boolean isShulkerBox(Block block) {
@@ -241,7 +238,7 @@ public final class DungeonListener implements Listener {
             event.setCancelled(true);
             plugin.getDungeonManager().suppressAuctionBar(player);
             if (dungeon.isSurfaceShulkerLocked(pos)) {
-                player.sendActionBar("Запечатанный шалкер открывается ключом");
+                player.sendActionBar("Запечатанный шалкер открывается ключом Хранилища");
                 return;
             }
             if (dungeon.isSurfaceShulkerKeyUnlocked(pos)) {
@@ -256,7 +253,7 @@ public final class DungeonListener implements Listener {
             SurfaceShulkerRarity rarity = SurfaceShulkerRarity.fromName(
                     dungeon.getSurfaceShulkerRarities().get(pos));
             if (rarity == null) rarity = SurfaceShulkerRarity.COMMON;
-            int required = rarity.getRequiredBreakHits();
+            int required = rarity.getRequiredBreakCycles();
             int progress = dungeon.incrementSurfaceShulkerBreakProgress(pos);
             if (progress >= required) {
                 if (plugin.getDungeonManager().breakSurfaceShulkerForLoot(player, dungeon, pos)) {
@@ -267,7 +264,7 @@ public final class DungeonListener implements Listener {
                 }
             } else {
                 plugin.getDungeonManager().updateShulkerHologram(dungeon, pos);
-                player.sendActionBar("Удары киркой: " + progress + "/" + required);
+                player.sendActionBar("Полные ломания киркой: " + progress + "/" + required);
                 if (progress % 5 == 0) plugin.getDungeonManager().saveDungeons();
             }
             return;

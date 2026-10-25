@@ -68,6 +68,8 @@ public final class WorldGuardHook {
             setStateFlagIfPresent(flagsClass, setFlag, region, "MOB_SPAWNING", allowState);
             setStateFlagIfPresent(flagsClass, setFlag, region, "PVP", allowPvp ? allowState : denyState);
 
+            String regionId = regionIdFor(dungeon.getId());
+            regionManager.getClass().getMethod("removeRegion", String.class).invoke(regionManager, regionId);
             regionManager.getClass().getMethod("addRegion", prClass).invoke(regionManager, region);
         } catch (Throwable ignored) {
             this.available = false;
