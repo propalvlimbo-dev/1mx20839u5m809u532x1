@@ -101,6 +101,13 @@ public final class VaultAndItemsHook {
         return stack;
     }
 
+    public String getVaultKeyId(ItemStack stack) {
+        if (stack == null || stack.getType().isAir() || !stack.hasItemMeta()) return null;
+        ItemMeta meta = stack.getItemMeta();
+        return meta == null ? null
+                : meta.getPersistentDataContainer().get(vaultKeyPdc, PersistentDataType.STRING);
+    }
+
     public static String vaultKeyDisplayName(String keyId) {
         return switch (keyId.toLowerCase(Locale.ROOT)) {
             case "rusty" -> "&#C88A65Ржавый ключ";

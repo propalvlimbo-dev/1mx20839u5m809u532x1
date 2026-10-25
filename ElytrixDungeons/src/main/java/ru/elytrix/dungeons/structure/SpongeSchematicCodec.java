@@ -260,8 +260,8 @@ public final class SpongeSchematicCodec {
                 if (openSpot != null) tpl.setHologramOffset(openSpot[0], openSpot[1], openSpot[2]);
             }
 
-            // Spawn ghosts and send teleports to the connected, roofed, lowest-level corridors.
-            // Sealed bedrooms are intentionally excluded even if they look like valid floor cells.
+            // Teleports use the first-floor corridor; ghosts can spawn across the first two
+            // connected, roofed floor bands. Sealed bedrooms are intentionally excluded.
             List<int[]> corridorNetwork = preferCentralSpots(corridorSpots, sx, sz, midX, midZ);
             if (corridorNetwork.isEmpty()) {
                 corridorNetwork = preferCentralSpots(connectedFloorSpots, sx, sz, midX, midZ);
@@ -271,7 +271,8 @@ public final class SpongeSchematicCodec {
             int[] entry = selectEntranceSpot(groundFloorNetwork, sx, sz, midX, midZ);
             if (entry != null) {
                 tpl.setEntranceOffset(entry[0], entry[1], entry[2]);
-                addDistributedMobSpawnOffsets(tpl, groundFloorNetwork, 64, entry[0], entry[2]);
+                addDistributedMobSpawnOffsets(tpl, firstTwoFloorBands(corridorNetwork), 64,
+                        entry[0], entry[2]);
             }
         } else {
             // An ordinary shulker block in the uploaded .schem marks the exact loot location.
@@ -345,6 +346,25 @@ public final class SpongeSchematicCodec {
             if (candidate[1] <= lowestY + Math.max(0, yAllowance)) lowest.add(candidate);
         }
         return lowest;
+    }
+
+    private static List<int[]> firstTwoFloorBands(List<int[]> candidates) {
+        if (candidates.isEmpty()) return new ArrayList<>();
+        int firstFloorY = Integer.MAX_VALUE;
+        for (int[] candidate : candidates) firstFloorY = Math.min(firstFloorY, candidate[1]);
+        List<int[]> floors = new ArrayList<>();
+        for (int[] candidate : candidates) {
+            if (candidate[1] <= firstFloorY + 1) floors.add(candidate);
+        }
+        int secondFloorY = Integer.MAX_VALUE;
+        for (int[] candidate : candidates) {
+            if (candidate[1] >= firstFloorY + 3) secondFloorY = Math.min(secondFloorY, candidate[1]);
+        }
+        if (secondFloorY == Integer.MAX_VALUE) return floors;
+        for (int[] candidate : candidates) {
+            if (candidate[1] >= secondFloorY && candidate[1] <= secondFloorY + 1) floors.add(candidate);
+        }
+        return floors;
     }
 
     private static int[] selectEntranceSpot(

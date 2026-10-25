@@ -285,6 +285,7 @@ public final class TrialController {
             w.spawnParticle(Particle.TOTEM_OF_UNDYING, c.clone().add(0, 0.9, 0), 40, 0.5, 0.5, 0.5, 0.14);
         }
 
+        plugin.getDungeonManager().updateShulkerHolograms(d);
         notifyNearby(d, 45.0, plugin.msg("underground-completed"));
         plugin.getDungeonManager().saveDungeons();
     }

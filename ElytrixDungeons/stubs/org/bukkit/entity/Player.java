@@ -62,7 +62,9 @@ public interface Player extends HumanEntity, OfflinePlayer, CommandSender {
     void setFoodLevel(int food);
     AttributeInstance getAttribute(Attribute attribute);
     void playSound(Location location, Sound sound, float volume, float pitch);
+    void playSound(Location location, Sound sound, org.bukkit.SoundCategory category, float volume, float pitch);
     void stopSound(Sound sound);
+    void stopSound(Sound sound, org.bukkit.SoundCategory category);
     void setNoGravity(boolean gravity);
     float getPitch();
     Location getEyeLocation();

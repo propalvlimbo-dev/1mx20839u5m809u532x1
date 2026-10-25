@@ -128,17 +128,40 @@ public final class ElytrixDungeonsPlugin extends JavaPlugin {
             if (!getConfig().isSet("auctionbar.cycle-seconds")) getConfig().set("auctionbar.cycle-seconds", 15);
             String auctionBrand = "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &8» ";
             if (!getConfig().isSet("auctionbar.reset-line")) {
-                getConfig().set("auctionbar.reset-line", auctionBrand + "&7{dungeon} &8┃ &fДанж восстановится через &#96FF91{timer}");
+                getConfig().set("auctionbar.reset-line", auctionBrand + "&7{dungeon} &8┃ &fПолный сброс через &#96FF91{timer}");
             }
             if (!getConfig().isSet("auctionbar.ghosts-line")) {
                 getConfig().set("auctionbar.ghosts-line", auctionBrand
-                        + "&7{dungeon} &8┃ &f{ghost-label}: &#F8BEFB{ghosts}&7/{ghost-total} &8┃ &f{ghost-state}");
+                        + "&7{dungeon} &8┃ &f{ghost-label}: &#F8BEFB{ghosts}&7/{ghost-total}");
             }
             if (!getConfig().isSet("auctionbar.loot-line")) {
                 getConfig().set("auctionbar.loot-line", auctionBrand
                         + "&7{dungeon} &8┃ &fЛут обновится через &#96FF91{timer}");
             }
             getConfig().set("config-version", 3);
+            changed = true;
+        }
+
+        if (version < 4) {
+            if (!getConfig().isSet("hologram.ghost.enabled")) getConfig().set("hologram.ghost.enabled", true);
+            if (!getConfig().isSet("hologram.shulker.enabled")) getConfig().set("hologram.shulker.enabled", true);
+            String auctionBrand = "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &8» ";
+            String ghostsLine = getConfig().getString("auctionbar.ghosts-line", "");
+            if (ghostsLine != null && ghostsLine.contains("{ghost-state}")) {
+                getConfig().set("auctionbar.ghosts-line", auctionBrand
+                        + "&7{dungeon} &8┃ &f{ghost-label}: &#F8BEFB{ghosts}&7/{ghost-total}");
+            }
+            String resetLine = getConfig().getString("auctionbar.reset-line", "");
+            if (resetLine != null && resetLine.contains("Данж восстановится через")) {
+                getConfig().set("auctionbar.reset-line", auctionBrand
+                        + "&7{dungeon} &8┃ &fПолный сброс через &#96FF91{timer}");
+            }
+            String lootLine = getConfig().getString("auctionbar.loot-line", "");
+            if (lootLine != null && lootLine.contains("Лут обновится")) {
+                getConfig().set("auctionbar.loot-line", auctionBrand
+                        + "&7{dungeon} &8┃ &fЛут шалкеров обновится через &#96FF91{timer}");
+            }
+            getConfig().set("config-version", 4);
             changed = true;
         }
         if (changed) saveConfig();

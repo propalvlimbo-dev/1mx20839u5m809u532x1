@@ -33,7 +33,7 @@ public final class DungeonAuctionBar {
             if (active == null) continue;
             String line = switch (page) {
                 case 0 -> resetLine(active, now);
-                case 1 -> ghostsLine(active, now);
+                case 1 -> ghostsLine(active);
                 default -> lootLine(active, now);
             };
             player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
@@ -53,28 +53,19 @@ public final class DungeonAuctionBar {
 
     private String resetLine(DungeonInstance dungeon, long now) {
         String fallback = "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &8» "
-                + "&7{dungeon} &8┃ &fДанж восстановится через &#96FF91{timer}";
+                + "&7{dungeon} &8┃ &fПолный сброс через &#96FF91{timer}";
         return render("auctionbar.reset-line", fallback, dungeon)
                 .replace("{timer}", TextUtil.formatDuration(dungeon.secondsUntilReset()));
     }
 
-    private String ghostsLine(DungeonInstance dungeon, long now) {
+    private String ghostsLine(DungeonInstance dungeon) {
         int alive;
         int total;
         String groupLabel;
-        String ghostState;
         if (dungeon.getCategory() == DungeonCategory.SURFACE) {
             alive = plugin.getGhostController().countAliveGhosts(dungeon.getId());
             total = Math.max(1, plugin.getConfig().getInt("surface-dungeon.ghosts.initial-count", 6));
-            groupLabel = "Призраков";
-            if (alive > 0) {
-                ghostState = "Призраки бродят по коридорам";
-            } else if (dungeon.getGhostRespawnAtMs() > now) {
-                ghostState = "Новая стая через "
-                        + TextUtil.formatDuration((dungeon.getGhostRespawnAtMs() - now + 999L) / 1000L);
-            } else {
-                ghostState = "Призраки готовятся к появлению";
-            }
+            groupLabel = "Призраков осталось";
         } else {
             TrialController.ActiveFight fight = plugin.getTrialController().getFight(dungeon.getId());
             alive = fight == null ? 0 : fight.aliveMobs.size();
@@ -82,29 +73,30 @@ public final class DungeonAuctionBar {
                     ? Math.max(1, plugin.getConfig().getInt("underground-dungeon.mob-count", 5)
                             + (plugin.getConfig().getBoolean("underground-dungeon.spawn-leader", true) ? 1 : 0))
                     : Math.max(1, fight.initialMobCount);
-            groupLabel = "Стражей";
-            ghostState = fight == null ? "Стражи ждут вызова" : "Стражи в бою";
+            groupLabel = "Стражей осталось";
         }
 
         String fallback = "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &8» "
-                + "&7{dungeon} &8┃ &f{ghost-label}: &#F8BEFB{ghosts}&7/{ghost-total} &8┃ &f{ghost-state}";
-        return render("auctionbar.ghosts-line", fallback, dungeon)
+                + "&7{dungeon} &8┃ &f{ghost-label}: &#F8BEFB{ghosts}&7/{ghost-total}";
+        String line = render("auctionbar.ghosts-line", fallback, dungeon)
+                .replace(" &8┃ &f{ghost-state}", "")
+                .replace("{ghost-state}", "")
                 .replace("{ghost-label}", groupLabel)
                 .replace("{ghosts}", String.valueOf(alive))
-                .replace("{ghost-total}", String.valueOf(total))
-                .replace("{ghost-state}", ghostState);
+                .replace("{ghost-total}", String.valueOf(total));
+        return line.replace("Призраков:", "Призраков осталось:");
     }
 
     private String lootLine(DungeonInstance dungeon, long now) {
         String fallback = "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &8» "
-                + "&7{dungeon} &8┃ &fЛут обновится через &#96FF91{timer}";
+                + "&7{dungeon} &8┃ &fЛут шалкеров обновится через &#96FF91{timer}";
         return render("auctionbar.loot-line", fallback, dungeon)
                 .replace("{timer}", TextUtil.formatDuration(secondsUntilLootRefresh(dungeon, now)));
     }
 
     private String render(String path, String fallback, DungeonInstance dungeon) {
         return plugin.getConfig().getString(path, fallback)
-                .replace("{dungeon}", dungeon.getId())
+                .replace("{dungeon}", "Данж")
                 .replace("{status}", dungeon.getStatus().getTitle());
     }
 

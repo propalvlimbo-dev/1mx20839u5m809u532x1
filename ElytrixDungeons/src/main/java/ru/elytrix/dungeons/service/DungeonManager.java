@@ -21,19 +21,23 @@ import java.util.Map;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.Color;
 import org.bukkit.HeightMap;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Nameable;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.inventory.InventoryHolder;
@@ -57,8 +61,8 @@ import ru.elytrix.dungeons.util.TextUtil;
 public final class DungeonManager {
 
     public static final int MAX_DUNGEONS_PER_CATEGORY = 7;
-    // Restart just before the 2:58 track ends to hide tick scheduling/network jitter.
-    private static final long MUSIC_DISC_5_DURATION_MS = 177_000L;
+    // Restart just before the 3:15 music track ends to hide tick scheduling/network jitter.
+    private static final long MUSIC_DISC_OTHERSIDE_DURATION_MS = 194_000L;
 
     public enum CreateStatus {
         CREATED,
@@ -93,6 +97,7 @@ public final class DungeonManager {
     private final DungeonAuctionBar auctionBar;
     private final NamespacedKey hologramPdc;
     private final NamespacedKey containerHintPdc;
+    private final NamespacedKey shulkerHologramPdc;
 
     private final Map<String, DungeonTemplate> templatesById = new LinkedHashMap<>();
     private final Map<DungeonCategory, List<DungeonTemplate>> templatesByCategory = new EnumMap<>(DungeonCategory.class);
@@ -119,6 +124,7 @@ public final class DungeonManager {
         this.auctionBar = new DungeonAuctionBar(plugin);
         this.hologramPdc = new NamespacedKey(plugin, "dungeon_hologram");
         this.containerHintPdc = new NamespacedKey(plugin, "container_hint");
+        this.shulkerHologramPdc = new NamespacedKey(plugin, "shulker_hologram");
     }
 
     public File categorySchemDir(DungeonCategory cat) {
@@ -165,12 +171,12 @@ public final class DungeonManager {
         stopHouseMusic();
         plugin.getTrialController().shutdownAll();
         plugin.getGhostController().shutdownAll(dungeons.values());
+        for (DungeonInstance d : dungeons.values()) removeContainerHolograms(d);
         saveDungeons();
 
         if (plugin.getConfig().getBoolean("auto-spawn.hide-dungeons-on-disable", true) && !hiddenFromWorld) {
             for (DungeonInstance d : dungeons.values()) {
                 removeHologram(d);
-                removeContainerHolograms(d);
                 try {
                     snapshotStore.restoreWorldSnapshotInstant(d.getId());
                 } catch (IOException ex) {
@@ -311,6 +317,15 @@ public final class DungeonManager {
                     } catch (NumberFormatException ignored) {
                     }
                 }
+                if (d.isSet("surface-locked-shulkers")) {
+                    inst.getSurfaceShulkerLocked().clear();
+                    for (String key : d.getStringList("surface-locked-shulkers")) {
+                        BlockPosKey pos = BlockPosKey.deserialize(key);
+                        if (pos != null && inst.getShulkerPositions().contains(pos)) {
+                            inst.getSurfaceShulkerLocked().add(pos);
+                        }
+                    }
+                }
             }
             registerDungeonRuntime(inst, pad, allowPvp, allowBreak);
         }
@@ -376,6 +391,13 @@ public final class DungeonManager {
                 }
             }
             yml.set(p + ".surface-shulkers", surfaceShulkers);
+            List<String> lockedSurfaceShulkers = new ArrayList<>();
+            if (d.getCategory() == DungeonCategory.SURFACE) {
+                for (BlockPosKey pos : d.getSurfaceShulkerLocked()) {
+                    lockedSurfaceShulkers.add(pos.serialize());
+                }
+            }
+            yml.set(p + ".surface-locked-shulkers", lockedSurfaceShulkers);
         }
         File tempFile = new File(plugin.getDataFolder(), "dungeons.yml.tmp");
         try {
@@ -1050,6 +1072,7 @@ public final class DungeonManager {
             }
         }
 
+        updateShulkerHolograms(inst);
         Location safe = inst.teleportLocation();
         if (safe != null) {
             for (Player p : world.getPlayers()) {
@@ -1119,6 +1142,61 @@ public final class DungeonManager {
         }
     }
 
+    public void ensureSurfaceShulkerHasLoot(DungeonInstance dungeon, BlockPosKey pos) {
+        if (dungeon == null || dungeon.getCategory() != DungeonCategory.SURFACE
+                || !dungeon.getShulkerPositions().contains(pos) || dungeon.isSurfaceShulkerLocked(pos)
+                || dungeon.isContainerOpened(pos)) return;
+        World world = pos.world();
+        if (world == null || !world.isChunkLoaded(pos.x() >> 4, pos.z() >> 4)) return;
+        Block block = world.getBlockAt(pos.x(), pos.y(), pos.z());
+        if (!(block.getState() instanceof InventoryHolder holder)) return;
+        for (org.bukkit.inventory.ItemStack item : holder.getInventory().getContents()) {
+            if (item != null && !item.getType().isAir()) return;
+        }
+
+        SurfaceShulkerRarity rarity = SurfaceShulkerRarity.fromName(
+                dungeon.getSurfaceShulkerRarities().get(pos));
+        if (rarity == null) rarity = SurfaceShulkerRarity.roll();
+        dungeon.getSurfaceShulkerRarities().put(pos, rarity.name());
+        if (!dungeon.getSurfaceShulkerRefreshAtMs().containsKey(pos)) {
+            dungeon.getSurfaceShulkerRefreshAtMs().put(pos, System.currentTimeMillis() + surfaceShulkerRefreshIntervalMs());
+        }
+        if (applySurfaceShulkerState(dungeon, world, pos, rarity,
+                Math.max(1, plugin.getConfig().getInt("surface-dungeon.shulker-stacks", 14)))) {
+            updateShulkerHologram(dungeon, pos);
+            saveDungeons();
+        }
+    }
+
+    public boolean openSurfaceShulkerWithKey(
+            Player player, DungeonInstance dungeon, BlockPosKey pos, SurfaceShulkerRarity lootTier
+    ) {
+        if (player == null || dungeon == null || lootTier == null
+                || dungeon.getCategory() != DungeonCategory.SURFACE
+                || !dungeon.isSurfaceShulkerLocked(pos)) return false;
+        World world = pos.world();
+        if (world == null || !world.isChunkLoaded(pos.x() >> 4, pos.z() >> 4)) return false;
+        Block block = world.getBlockAt(pos.x(), pos.y(), pos.z());
+        if (!(block.getState() instanceof InventoryHolder)) return false;
+
+        long now = System.currentTimeMillis();
+        dungeon.setSurfaceShulkerLocked(pos, false);
+        dungeon.getSurfaceShulkerRarities().put(pos, lootTier.name());
+        dungeon.getSurfaceShulkerRefreshAtMs().put(pos, now + surfaceShulkerRefreshIntervalMs());
+        if (!applySurfaceShulkerState(dungeon, world, pos, lootTier,
+                Math.max(1, plugin.getConfig().getInt("surface-dungeon.shulker-stacks", 14)))) {
+            dungeon.setSurfaceShulkerLocked(pos, true);
+            return false;
+        }
+
+        updateShulkerHologram(dungeon, pos);
+        saveDungeons();
+        player.playSound(pos.centerLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, 1.0f, 0.85f);
+        BlockState opened = world.getBlockAt(pos.x(), pos.y(), pos.z()).getState();
+        if (opened instanceof InventoryHolder holder) player.openInventory(holder.getInventory());
+        return true;
+    }
+
     private boolean applySurfaceShulkerState(
             DungeonInstance dungeon, World world, BlockPosKey pos, SurfaceShulkerRarity rarity, int stacks
     ) {
@@ -1138,8 +1216,8 @@ public final class DungeonManager {
         if (state instanceof Nameable nameable) {
             nameable.setCustomName(TextUtil.color("&7« " + rarity.getColorHex()
                     + rarity.getDisplayName() + " шалкер &7»"));
-            state.update(true, false);
         }
+        state.update(true, false);
         dungeon.getPendingSurfaceShulkerRefresh().remove(pos);
         return true;
     }
@@ -1154,11 +1232,12 @@ public final class DungeonManager {
             return;
         }
 
-        // Volume above 1 increases the positional sound radius; keep older 0.55 configs audible
-        // throughout the house while allowing an administrator to choose a stronger level.
-        float volume = (float) Math.max(1.5, Math.min(4.0,
-                plugin.getConfig().getDouble("surface-dungeon.ambience.volume", 2.0)));
+        // Send a real melodic record to each listener from their own position. This removes
+        // point-source attenuation, so players can hear the soundtrack throughout every room.
+        float volume = (float) Math.max(2.0, Math.min(4.0,
+                plugin.getConfig().getDouble("surface-dungeon.ambience.volume", 2.5)));
         float pitch = (float) Math.max(0.5, plugin.getConfig().getDouble("surface-dungeon.ambience.pitch", 0.85));
+        long trackLoopMs = Math.max(1L, Math.round(MUSIC_DISC_OTHERSIDE_DURATION_MS / pitch));
         long now = System.currentTimeMillis();
         Map<UUID, String> insideNow = new HashMap<>();
 
@@ -1173,14 +1252,16 @@ public final class DungeonManager {
                 String previousHouse = houseMusicPlayers.get(playerId);
                 Long startedAt = houseMusicStartedAtMs.get(playerId);
                 if (!house.getId().equals(previousHouse)) {
-                    if (previousHouse != null) player.stopSound(Sound.MUSIC_DISC_5);
-                    player.playSound(player.getLocation(), Sound.MUSIC_DISC_5, volume, pitch);
+                    if (previousHouse != null) player.stopSound(Sound.MUSIC_DISC_OTHERSIDE, SoundCategory.RECORDS);
+                    player.playSound(player.getLocation(), Sound.MUSIC_DISC_OTHERSIDE,
+                            SoundCategory.RECORDS, volume, pitch);
                     houseMusicStartedAtMs.put(playerId, now);
-                } else if (startedAt == null || now - startedAt >= MUSIC_DISC_5_DURATION_MS) {
-                    // MUSIC_DISC_5 is a finite vanilla track. Restart it at its end so the house
+                } else if (startedAt == null || now - startedAt >= trackLoopMs) {
+                    // MUSIC_DISC_OTHERSIDE is a finite melodic vanilla track. Restart it at its end so the house
                     // has a continuous ambience rather than a one-shot effect.
-                    player.stopSound(Sound.MUSIC_DISC_5);
-                    player.playSound(player.getLocation(), Sound.MUSIC_DISC_5, volume, pitch);
+                    player.stopSound(Sound.MUSIC_DISC_OTHERSIDE, SoundCategory.RECORDS);
+                    player.playSound(player.getLocation(), Sound.MUSIC_DISC_OTHERSIDE,
+                            SoundCategory.RECORDS, volume, pitch);
                     houseMusicStartedAtMs.put(playerId, now);
                 }
             }
@@ -1189,7 +1270,7 @@ public final class DungeonManager {
         for (UUID playerId : new ArrayList<>(houseMusicPlayers.keySet())) {
             if (!insideNow.containsKey(playerId)) {
                 Player player = Bukkit.getPlayer(playerId);
-                if (player != null) player.stopSound(Sound.MUSIC_DISC_5);
+                if (player != null) player.stopSound(Sound.MUSIC_DISC_OTHERSIDE, SoundCategory.RECORDS);
                 houseMusicStartedAtMs.remove(playerId);
             }
         }
@@ -1212,7 +1293,7 @@ public final class DungeonManager {
         for (Map.Entry<UUID, String> entry : new ArrayList<>(houseMusicPlayers.entrySet())) {
             if (!dungeonId.equals(entry.getValue())) continue;
             Player player = Bukkit.getPlayer(entry.getKey());
-            if (player != null) player.stopSound(Sound.MUSIC_DISC_5);
+            if (player != null) player.stopSound(Sound.MUSIC_DISC_OTHERSIDE, SoundCategory.RECORDS);
             houseMusicPlayers.remove(entry.getKey());
             houseMusicStartedAtMs.remove(entry.getKey());
         }
@@ -1221,7 +1302,7 @@ public final class DungeonManager {
     private void stopHouseMusic() {
         for (UUID playerId : houseMusicPlayers.keySet()) {
             Player player = Bukkit.getPlayer(playerId);
-            if (player != null) player.stopSound(Sound.MUSIC_DISC_5);
+            if (player != null) player.stopSound(Sound.MUSIC_DISC_OTHERSIDE, SoundCategory.RECORDS);
         }
         houseMusicPlayers.clear();
         houseMusicStartedAtMs.clear();
@@ -1301,7 +1382,105 @@ public final class DungeonManager {
     }
 
     private boolean isLootContainerPosition(DungeonInstance dungeon, BlockPosKey pos) {
-        return dungeon.getChestPositions().contains(pos) || dungeon.getBarrelPositions().contains(pos);
+        return dungeon.getChestPositions().contains(pos) || dungeon.getBarrelPositions().contains(pos)
+                || dungeon.getShulkerPositions().contains(pos);
+    }
+
+    public void updateShulkerHolograms(DungeonInstance dungeon) {
+        if (dungeon == null || hiddenFromWorld || dungeon.getStatus() == DungeonStatus.REGENERATING) return;
+        for (BlockPosKey pos : dungeon.getShulkerPositions()) updateShulkerHologram(dungeon, pos);
+    }
+
+    private void updateShulkerHologramsInChunk(DungeonInstance dungeon, Chunk chunk) {
+        if (dungeon == null || hiddenFromWorld || dungeon.getStatus() == DungeonStatus.REGENERATING) return;
+        for (BlockPosKey pos : dungeon.getShulkerPositions()) {
+            if (pos.worldName().equals(chunk.getWorld().getName())
+                    && (pos.x() >> 4) == chunk.getX() && (pos.z() >> 4) == chunk.getZ()) {
+                updateShulkerHologram(dungeon, pos);
+            }
+        }
+    }
+
+    private void updateShulkerHologram(DungeonInstance dungeon, BlockPosKey pos) {
+        World world = pos.world();
+        if (world == null || !world.isChunkLoaded(pos.x() >> 4, pos.z() >> 4)) return;
+        Location location = new Location(world, pos.x() + 0.5, pos.y() + 1.18, pos.z() + 0.5);
+        if (!plugin.getConfig().getBoolean("hologram.shulker.enabled", true)) {
+            removeShulkerHologram(world, pos, location);
+            return;
+        }
+        Block block = world.getBlockAt(pos.x(), pos.y(), pos.z());
+        if (!block.getType().name().endsWith("_SHULKER_BOX")
+                || !(block.getState() instanceof InventoryHolder)) {
+            removeShulkerHologram(world, pos, location);
+            return;
+        }
+
+        TextDisplay display = findShulkerHologram(world, pos, location);
+        if (display == null) {
+            Entity spawned = world.spawnEntity(location, EntityType.TEXT_DISPLAY);
+            if (!(spawned instanceof TextDisplay created)) {
+                spawned.remove();
+                return;
+            }
+            display = created;
+        } else if (display.getLocation().distanceSquared(location) > 0.01) {
+            display.teleport(location);
+        }
+
+        display.setPersistent(false);
+        display.getPersistentDataContainer().set(shulkerHologramPdc, PersistentDataType.STRING, pos.serialize());
+        display.setBillboard(Display.Billboard.CENTER);
+        display.setAlignment(TextDisplay.TextAlignment.CENTER);
+        display.setDefaultBackground(false);
+        display.setBackgroundColor(Color.fromARGB(0, 0, 0, 0));
+        display.setShadowed(true);
+        display.setSeeThrough(true);
+        display.setLineWidth(240);
+        display.setViewRange(0.8f);
+        display.setText(shulkerHologramText(dungeon, pos));
+    }
+
+    private String shulkerHologramText(DungeonInstance dungeon, BlockPosKey pos) {
+        if (dungeon.getCategory() == DungeonCategory.SURFACE) {
+            if (dungeon.isSurfaceShulkerLocked(pos)) {
+                return TextUtil.color("&#C58BFF&l✦ ЗАПЕЧАТАННЫЙ ШАЛКЕР ✦\n&7Откройте любым ключом");
+            }
+            SurfaceShulkerRarity rarity = SurfaceShulkerRarity.fromName(
+                    dungeon.getSurfaceShulkerRarities().get(pos));
+            if (rarity == null) rarity = SurfaceShulkerRarity.COMMON;
+            return TextUtil.color(rarity.getColorHex() + "&l" + rarity.getDisplayName() + " шалкер\n"
+                    + "&7Нажмите, чтобы открыть");
+        }
+
+        boolean unlocked = Boolean.TRUE.equals(dungeon.getShulkerUnlocked().get(pos));
+        return TextUtil.color(unlocked
+                ? "&#96FF91&lШалкер открыт\n&7Награда получена"
+                : "&#F8BEFB&lШалкер запечатан\n&7ПКМ — вызвать стражей");
+    }
+
+    private TextDisplay findShulkerHologram(World world, BlockPosKey pos, Location location) {
+        TextDisplay found = null;
+        String serialized = pos.serialize();
+        for (Entity entity : world.getNearbyEntities(location, 1.0, 2.0, 1.0)) {
+            if (!(entity instanceof TextDisplay display)
+                    || !serialized.equals(display.getPersistentDataContainer()
+                            .get(shulkerHologramPdc, PersistentDataType.STRING))) continue;
+            if (found == null) found = display;
+            else display.remove();
+        }
+        return found;
+    }
+
+    private void removeShulkerHologram(World world, BlockPosKey pos, Location location) {
+        String serialized = pos.serialize();
+        for (Entity entity : world.getNearbyEntities(location, 1.0, 2.0, 1.0)) {
+            if (entity instanceof TextDisplay display
+                    && serialized.equals(display.getPersistentDataContainer()
+                            .get(shulkerHologramPdc, PersistentDataType.STRING))) {
+                display.remove();
+            }
+        }
     }
 
     public void removeHologram(DungeonInstance dungeon) {
@@ -1314,7 +1493,8 @@ public final class DungeonManager {
                 for (Entity entity : chunk.getEntities()) {
                     if (entity instanceof TextDisplay display
                             && (display.getPersistentDataContainer().has(hologramPdc, PersistentDataType.STRING)
-                            || display.getPersistentDataContainer().has(containerHintPdc, PersistentDataType.STRING))) {
+                            || display.getPersistentDataContainer().has(containerHintPdc, PersistentDataType.STRING)
+                            || display.getPersistentDataContainer().has(shulkerHologramPdc, PersistentDataType.STRING))) {
                         display.remove();
                     }
                 }
@@ -1337,7 +1517,8 @@ public final class DungeonManager {
                 for (Entity entity : chunk.getEntities()) {
                     if (entity instanceof org.bukkit.entity.TextDisplay display
                             && (display.getPersistentDataContainer().has(hologramPdc, PersistentDataType.STRING)
-                            || display.getPersistentDataContainer().has(containerHintPdc, PersistentDataType.STRING))) {
+                            || display.getPersistentDataContainer().has(containerHintPdc, PersistentDataType.STRING)
+                            || display.getPersistentDataContainer().has(shulkerHologramPdc, PersistentDataType.STRING))) {
                         display.remove();
                     }
                 }
@@ -1358,6 +1539,7 @@ public final class DungeonManager {
         if (hiddenFromWorld) return;
         for (DungeonInstance dungeon : dungeons.values()) {
             applyPendingSurfaceShulkersInChunk(dungeon, chunk);
+            updateShulkerHologramsInChunk(dungeon, chunk);
         }
     }
 

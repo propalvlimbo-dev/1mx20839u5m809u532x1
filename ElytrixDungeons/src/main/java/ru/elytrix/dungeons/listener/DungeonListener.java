@@ -3,6 +3,7 @@ package ru.elytrix.dungeons.listener;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -36,6 +37,7 @@ import ru.elytrix.dungeons.model.CuboidRegion;
 import ru.elytrix.dungeons.model.DungeonCategory;
 import ru.elytrix.dungeons.model.DungeonInstance;
 import ru.elytrix.dungeons.model.DungeonStatus;
+import ru.elytrix.dungeons.model.SurfaceShulkerRarity;
 
 public final class DungeonListener implements Listener {
 
@@ -79,26 +81,85 @@ public final class DungeonListener implements Listener {
 
         BlockPosKey pos = BlockPosKey.of(clicked);
         DungeonInstance dungeon = plugin.getDungeonManager().getByProtectedContainer(pos);
-        if (dungeon == null || dungeon.getCategory() != DungeonCategory.UNDERGROUND) return;
+        if (dungeon == null) return;
 
-        Boolean shulkerUnlocked = dungeon.getShulkerUnlocked().get(pos);
-        if (shulkerUnlocked == null || Boolean.TRUE.equals(shulkerUnlocked)) {
+        if (dungeon.getCategory() == DungeonCategory.SURFACE
+                && dungeon.getShulkerPositions().contains(pos)) {
+            if (dungeon.isSurfaceShulkerLocked(pos)) {
+                event.setCancelled(true);
+                if (event.getHand() != EquipmentSlot.HAND) return;
+
+                ItemStack key = player.getInventory().getItemInMainHand();
+                EquipmentSlot keySlot = EquipmentSlot.HAND;
+                String keyId = keyIdForItem(key);
+                if (keyId == null) {
+                    key = player.getInventory().getItemInOffHand();
+                    keySlot = EquipmentSlot.OFF_HAND;
+                    keyId = keyIdForItem(key);
+                }
+                SurfaceShulkerRarity lootTier = lootTierForKey(keyId);
+                if (lootTier == null) {
+                    player.sendMessage(plugin.prefix() + "Этот шалкер запечатан. Нужен любой ключ Хранилища.");
+                    return;
+                }
+                if (plugin.getDungeonManager().openSurfaceShulkerWithKey(player, dungeon, pos, lootTier)) {
+                    consumeOneKey(player, key, keySlot);
+                }
+                return;
+            }
+            plugin.getDungeonManager().ensureSurfaceShulkerHasLoot(dungeon, pos);
             return;
         }
+
+        if (dungeon.getCategory() != DungeonCategory.UNDERGROUND) return;
+        Boolean shulkerUnlocked = dungeon.getShulkerUnlocked().get(pos);
+        if (shulkerUnlocked == null || Boolean.TRUE.equals(shulkerUnlocked)) return;
 
         event.setCancelled(true);
-        if (event.getHand() != EquipmentSlot.HAND) {
-            return;
-        }
+        if (event.getHand() != EquipmentSlot.HAND) return;
 
         if (dungeon.getStatus() == DungeonStatus.CLEARED) {
             dungeon.getShulkerUnlocked().put(pos, Boolean.TRUE);
+            plugin.getDungeonManager().updateShulkerHolograms(dungeon);
             if (clicked.getState() instanceof InventoryHolder holder) {
                 player.openInventory(holder.getInventory());
             }
             return;
         }
         plugin.getTrialController().startUndergroundFight(player, dungeon);
+    }
+
+    private String keyIdForItem(ItemStack item) {
+        String keyId = plugin.getItemsHook().getVaultKeyId(item);
+        if (keyId != null || item == null) return keyId;
+        if (item.getType() == Material.TRIAL_KEY) return "__trial_key";
+        if (item.getType() == Material.OMINOUS_TRIAL_KEY) return "__ominous_key";
+        return null;
+    }
+
+    private static SurfaceShulkerRarity lootTierForKey(String keyId) {
+        if (keyId == null) return null;
+        return switch (keyId.toLowerCase(Locale.ROOT)) {
+            case "rusty" -> SurfaceShulkerRarity.COMMON;
+            case "knowledge" -> SurfaceShulkerRarity.UNCOMMON;
+            case "royal" -> SurfaceShulkerRarity.RARE;
+            case "void" -> SurfaceShulkerRarity.EPIC;
+            case "unique" -> SurfaceShulkerRarity.MYTHIC;
+            case "__trial_key" -> SurfaceShulkerRarity.EPIC;
+            case "__ominous_key" -> SurfaceShulkerRarity.LEGENDARY;
+            default -> SurfaceShulkerRarity.COMMON;
+        };
+    }
+
+    private static void consumeOneKey(Player player, ItemStack key, EquipmentSlot slot) {
+        if (key == null || key.getAmount() <= 1) {
+            if (slot == EquipmentSlot.OFF_HAND) player.getInventory().setItemInOffHand(null);
+            else player.getInventory().setItemInMainHand(null);
+            return;
+        }
+        key.setAmount(key.getAmount() - 1);
+        if (slot == EquipmentSlot.OFF_HAND) player.getInventory().setItemInOffHand(key);
+        else player.getInventory().setItemInMainHand(key);
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)

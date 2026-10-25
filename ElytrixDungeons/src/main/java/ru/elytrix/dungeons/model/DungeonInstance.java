@@ -1,6 +1,7 @@
 package ru.elytrix.dungeons.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -33,6 +34,7 @@ public final class DungeonInstance {
     private final List<BlockPosKey> barrelPositions = new ArrayList<>();
     private final Set<BlockPosKey> openedContainers = new HashSet<>();
     private final Map<BlockPosKey, Boolean> shulkerUnlocked = new LinkedHashMap<>();
+    private final Set<BlockPosKey> surfaceShulkerLocked = new HashSet<>();
     private final List<BlockPosKey> shulkerPositions = new ArrayList<>();
     private final Map<BlockPosKey, String> surfaceShulkerRarities = new LinkedHashMap<>();
     private final Map<BlockPosKey, Long> surfaceShulkerRefreshAtMs = new LinkedHashMap<>();
@@ -79,6 +81,7 @@ public final class DungeonInstance {
         this.openedContainers.clear();
 
         this.shulkerUnlocked.clear();
+        this.surfaceShulkerLocked.clear();
         this.shulkerPositions.clear();
         this.surfaceShulkerRarities.clear();
         this.surfaceShulkerRefreshAtMs.clear();
@@ -88,6 +91,14 @@ public final class DungeonInstance {
             this.shulkerPositions.add(shulker);
             if (this.category == DungeonCategory.UNDERGROUND) {
                 this.shulkerUnlocked.put(shulker, Boolean.FALSE);
+            }
+        }
+        if (this.category == DungeonCategory.SURFACE && shulkerPositions.size() > 1) {
+            List<BlockPosKey> lockCandidates = new ArrayList<>(shulkerPositions);
+            Collections.shuffle(lockCandidates);
+            int lockedCount = lockCandidates.size() / 2;
+            for (int i = 0; i < lockedCount; i++) {
+                surfaceShulkerLocked.add(lockCandidates.get(i));
             }
         }
 
@@ -180,6 +191,13 @@ public final class DungeonInstance {
     public void markContainerOpened(BlockPosKey pos) { openedContainers.add(pos); }
     public void clearOpenedContainers() { openedContainers.clear(); }
     public Map<BlockPosKey, Boolean> getShulkerUnlocked() { return shulkerUnlocked; }
+    public Set<BlockPosKey> getSurfaceShulkerLocked() { return surfaceShulkerLocked; }
+    public boolean isSurfaceShulkerLocked(BlockPosKey pos) { return surfaceShulkerLocked.contains(pos); }
+    public void setSurfaceShulkerLocked(BlockPosKey pos, boolean locked) {
+        if (pos == null || !shulkerPositions.contains(pos)) return;
+        if (locked) surfaceShulkerLocked.add(pos);
+        else surfaceShulkerLocked.remove(pos);
+    }
     public List<BlockPosKey> getShulkerPositions() { return shulkerPositions; }
     public Map<BlockPosKey, String> getSurfaceShulkerRarities() { return surfaceShulkerRarities; }
     public Map<BlockPosKey, Long> getSurfaceShulkerRefreshAtMs() { return surfaceShulkerRefreshAtMs; }

@@ -1,5 +1,5 @@
 # ElytrixDungeons — до 7 наземных домов и 7 подземных данжей.
-config-version: 3
+config-version: 4
 # Схемы плагин не создаёт: загрузите собственные файлы .schem в нужную папку.
 #   plugins/ElytrixDungeons/schematics/surface/<id-схемы>.schem
 #   plugins/ElytrixDungeons/schematics/underground/<id-схемы>.schem
@@ -81,7 +81,7 @@ surface-dungeon:
       unique: 3
   ambience:
     enabled: true
-    # MUSIC_DISC_5 зацикливается, звучит с увеличенной дальностью и останавливается при выходе.
+    # Мелодичная MUSIC_DISC_OTHERSIDE — персональная музыка для каждого игрока внутри дома, с автоповтором.
     volume: 2.0
     pitch: 0.85
 
@@ -96,16 +96,20 @@ underground-dungeon:
   leader-damage: 18.5
   fight-timeout-seconds: 210
 
-# Dungeon holograms have been retired. Kept only for backwards-compatible configs.
+# Legacy full-dungeon/chest labels stay disabled; the focused ghost and shulker labels are active.
 hologram:
   enabled: false
   chest-hint:
     enabled: false
+  ghost:
+    enabled: true
+  shulker:
+    enabled: true
 
-# Elytrix AuctionBar-style dungeon status. Pages rotate every 15 seconds.
+# Elytrix AuctionBar-style status. Each line remains visible for 15 seconds.
 auctionbar:
   enabled: true
   cycle-seconds: 15
-  reset-line: "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &8» &7{dungeon} &8┃ &fДанж восстановится через &#96FF91{timer}"
-  ghosts-line: "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &8» &7{dungeon} &8┃ &f{ghost-label}: &#F8BEFB{ghosts}&7/{ghost-total} &8┃ &f{ghost-state}"
-  loot-line: "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &8» &7{dungeon} &8┃ &fЛут обновится через &#96FF91{timer}"
+  reset-line: "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &8» &7{dungeon} &8┃ &fПолный сброс через &#96FF91{timer}"
+  ghosts-line: "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &8» &7{dungeon} &8┃ &f{ghost-label}: &#F8BEFB{ghosts}&7/{ghost-total}"
+  loot-line: "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &8» &7{dungeon} &8┃ &fЛут шалкеров обновится через &#96FF91{timer}"
