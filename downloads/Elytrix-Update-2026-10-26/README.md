@@ -14,7 +14,10 @@
   SHA-256: RU `973d53ad066b527fae769e9024f8d2f342dd86c0b45bf027e3445f829c79d0b1`; EN `7fd1b010c1e3d2f18d49e39bcdacdb7b7507ad7f7543ed471b89eb8f6190ed82`.
 - `ElytrixDungeons-1.0.0.jar` — refreshed root download, byte-identical to the current source build (the older `Elytrix-full.zip` remains historical).
 - `ElytrixCasino-2.2.1.jar` (also named `ElytrixCasino.jar` at the root) — config upgrades now merge missing defaults and create backups instead of replacing custom settings.
-- `Elytrix-Menus.zip` — updated BMenu menus and config. The salary button runs `/salary` as the player; the seller button opens the existing `/seller`; free donate runs `/free`. `/help` links back to `/event`, and `/event` includes Cemetery and Dungeons; Paradise Place remains absent. Ghost Trader and empty `/moneyshop` info pages use the 54-slot style of the Experienced Trader page.
+- `Elytrix-Menus.zip` — compact BMenu overlay with the changed ElytriX menus and config.
+- `Elytrix-BMenu-Full-Fixed-2026-10-26.zip` — full 72-file BMenu configuration tree from the repository, including all menu folders and examples, plus `INSTALL.txt`. This is config/menu content, not the BMenu plugin JAR; merge server-specific settings instead of blindly replacing them. Includes the same fixes: `/salary`, `/seller`, `/free` run as the player; `/help` links to `/event` with Cemetery and Dungeons; `/moneyshop` stays empty; `/donate` stays decorative; Paradise Place stays absent.
+
+  SHA-256: `63482ed6fa90e1433053c6a758857b5b774899c2a35cd684ae41b026d482a2c4`.
 - `ElytrixSeller-configs.zip` — RU/EN seller defaults with farmer crops (including Nether Wart), a new farm autosell category, deepslate/raw/copper/amethyst ore types and loot from newer mobs/trial chambers. Merge into existing files; this is a config pack, separate from the two Seller JARs above.
 
 ## BMenu migration notes
