@@ -259,22 +259,6 @@ items:
     price: 40
     points: 1.8
     name: "&#F8BEFBМокрая губка"
-  COD:
-    price: 4
-    points: 0.08
-    name: "&#F8BEFBТреска"
-  SALMON:
-    price: 5
-    points: 0.1
-    name: "&#F8BEFBЛосось"
-  TROPICAL_FISH:
-    price: 8
-    points: 0.15
-    name: "&#F8BEFBТропическая рыба"
-  PUFFERFISH:
-    price: 7
-    points: 0.12
-    name: "&#F8BEFBИглобрюх"
 
   # ────────────────────────────────────
   # Шалкер
@@ -291,10 +275,6 @@ items:
     price: 6
     points: 0.15
     name: "&#F8BEFBКожа"
-  BEEF:
-    price: 8
-    points: 0.15
-    name: "&#F8BEFBГовядина"
   MILK_BUCKET:
     price: 15
     points: 0.3
@@ -303,18 +283,10 @@ items:
   # ────────────────────────────────────
   # Свинья / Хоглин
   # ────────────────────────────────────
-  PORKCHOP:
-    price: 8
-    points: 0.15
-    name: "&#F8BEFBСырая свинина"
 
   # ────────────────────────────────────
   # Овца
   # ────────────────────────────────────
-  MUTTON:
-    price: 6
-    points: 0.12
-    name: "&#F8BEFBБаранина"
   WHITE_WOOL:
     price: 3
     points: 0.06
@@ -327,10 +299,6 @@ items:
     price: 4
     points: 0.08
     name: "&#F8BEFBПеро"
-  CHICKEN:
-    price: 6
-    points: 0.1
-    name: "&#F8BEFBСырая курятина"
   EGG:
     price: 3
     points: 0.06
@@ -339,10 +307,6 @@ items:
   # ────────────────────────────────────
   # Кролик
   # ────────────────────────────────────
-  RABBIT:
-    price: 6
-    points: 0.1
-    name: "&#F8BEFBСырая крольчатина"
   RABBIT_HIDE:
     price: 4
     points: 0.08
@@ -399,10 +363,10 @@ items:
     price: 15
     points: 0.4
     name: "&#F8BEFBАрбалет"
-  OMINOUS_BANNER:
+  WHITE_BANNER:
     price: 35
     points: 1.5
-    name: "&#F8BEFBЗловещее знамя"
+    name: "&#F8BEFBБелый баннер"
   SADDLE:
     price: 40
     points: 2.0
@@ -979,3 +943,386 @@ items:
     price: 4
     points: 0.08
     name: "&#F8BEFBИскажённый стебель"
+  # ────────────────────────────────────
+  # Фермерские и растительные товары
+  # ────────────────────────────────────
+  WHEAT_SEEDS:
+    price: 1
+    points: 0.02
+    name: "&#F8BEFBСемена пшеницы"
+  BEETROOT_SEEDS:
+    price: 1
+    points: 0.02
+    name: "&#F8BEFBСемена свёклы"
+  PUMPKIN_SEEDS:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBСемена тыквы"
+  MELON_SEEDS:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBСемена арбуза"
+  POISONOUS_POTATO:
+    price: 1
+    points: 0.02
+    name: "&#F8BEFBЯдовитый картофель"
+  SUGAR_CANE:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBСахарный тростник"
+  CACTUS:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBКактус"
+  COCOA_BEANS:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBКакао-бобы"
+  SWEET_BERRIES:
+    price: 3
+    points: 0.06
+    name: "&#F8BEFBСладкие ягоды"
+  GLOW_BERRIES:
+    price: 4
+    points: 0.08
+    name: "&#F8BEFBСветящиеся ягоды"
+  BROWN_MUSHROOM:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBКоричневый гриб"
+  RED_MUSHROOM:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBКрасный гриб"
+  BROWN_MUSHROOM_BLOCK:
+    price: 5
+    points: 0.1
+    name: "&#F8BEFBБлок коричневого гриба"
+  RED_MUSHROOM_BLOCK:
+    price: 5
+    points: 0.1
+    name: "&#F8BEFBБлок красного гриба"
+  MUSHROOM_STEM:
+    price: 4
+    points: 0.08
+    name: "&#F8BEFBНожка гриба"
+  SEA_PICKLE:
+    price: 3
+    points: 0.06
+    name: "&#F8BEFBМорской огурец"
+  VINE:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBЛиана"
+  LILY_PAD:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBКувшинка"
+  CHORUS_FLOWER:
+    price: 8
+    points: 0.2
+    name: "&#F8BEFBЦветок хоруса"
+  CRIMSON_FUNGUS:
+    price: 3
+    points: 0.06
+    name: "&#F8BEFBБагровый гриб"
+  WARPED_FUNGUS:
+    price: 3
+    points: 0.06
+    name: "&#F8BEFBИскажённый гриб"
+  CRIMSON_ROOTS:
+    price: 1
+    points: 0.02
+    name: "&#F8BEFBБагровые корни"
+  WARPED_ROOTS:
+    price: 1
+    points: 0.02
+    name: "&#F8BEFBИскажённые корни"
+  NETHER_SPROUTS:
+    price: 1
+    points: 0.02
+    name: "&#F8BEFBНезерские ростки"
+  WEEPING_VINES:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBПлачущие лианы"
+  TWISTING_VINES:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBИзвивающиеся лианы"
+  TORCHFLOWER:
+    price: 12
+    points: 0.4
+    name: "&#F8BEFBФакельник"
+  PITCHER_PLANT:
+    price: 15
+    points: 0.5
+    name: "&#F8BEFBКувшинное растение"
+  OAK_SAPLING:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBСаженец дуба"
+  SPRUCE_SAPLING:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBСаженец ели"
+  BIRCH_SAPLING:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBСаженец берёзы"
+  JUNGLE_SAPLING:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBСаженец тропического дерева"
+  ACACIA_SAPLING:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBСаженец акации"
+  DARK_OAK_SAPLING:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBСаженец тёмного дуба"
+  MANGROVE_PROPAGULE:
+    price: 3
+    points: 0.06
+    name: "&#F8BEFBПропагула мангрового дерева"
+  CHERRY_SAPLING:
+    price: 3
+    points: 0.06
+    name: "&#F8BEFBСаженец вишни"
+  PALE_OAK_SAPLING:
+    price: 3
+    points: 0.06
+    name: "&#F8BEFBСаженец бледного дуба"
+  AZALEA:
+    price: 3
+    points: 0.06
+    name: "&#F8BEFBАзалия"
+  FLOWERING_AZALEA:
+    price: 4
+    points: 0.08
+    name: "&#F8BEFBЦветущая азалия"
+  AZALEA_LEAVES:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBЛиства азалии"
+  FLOWERING_AZALEA_LEAVES:
+    price: 3
+    points: 0.06
+    name: "&#F8BEFBЛиства цветущей азалии"
+  MOSS_BLOCK:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBБлок мха"
+  MOSS_CARPET:
+    price: 1
+    points: 0.02
+    name: "&#F8BEFBМоховой ковёр"
+  HANGING_ROOTS:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBСвисающие корни"
+  BIG_DRIPLEAF:
+    price: 3
+    points: 0.06
+    name: "&#F8BEFBБольшой споровик"
+  SMALL_DRIPLEAF:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBМалый споровик"
+  SPORE_BLOSSOM:
+    price: 5
+    points: 0.12
+    name: "&#F8BEFBСпороцвет"
+  CACTUS_FLOWER:
+    price: 3
+    points: 0.06
+    name: "&#F8BEFBЦветок кактуса"
+  FIREFLY_BUSH:
+    price: 4
+    points: 0.08
+    name: "&#F8BEFBСветлячковый куст"
+  WILDFLOWERS:
+    price: 3
+    points: 0.06
+    name: "&#F8BEFBДикие цветы"
+  CLOSED_EYEBLOSSOM:
+    price: 3
+    points: 0.06
+    name: "&#F8BEFBЗакрытый глазоцвет"
+  OPEN_EYEBLOSSOM:
+    price: 3
+    points: 0.06
+    name: "&#F8BEFBОткрытый глазоцвет"
+  LEAF_LITTER:
+    price: 1
+    points: 0.02
+    name: "&#F8BEFBОпавшая листва"
+  SHORT_DRY_GRASS:
+    price: 1
+    points: 0.02
+    name: "&#F8BEFBНизкая сухая трава"
+  TALL_DRY_GRASS:
+    price: 1
+    points: 0.02
+    name: "&#F8BEFBВысокая сухая трава"
+  PALE_HANGING_MOSS:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBБледный свисающий мох"
+  PALE_MOSS_BLOCK:
+    price: 3
+    points: 0.06
+    name: "&#F8BEFBБлок бледного мха"
+  PALE_MOSS_CARPET:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBКовёр из бледного мха"
+  DRIED_GHAST:
+    price: 28
+    points: 1.0
+    name: "&#F8BEFBВысушенный гаст"
+
+  # ────────────────────────────────────
+  # Руды и рудные блоки
+  # ────────────────────────────────────
+  COAL_ORE:
+    price: 8
+    points: 0.1
+    name: "&#F8BEFBУгольная руда"
+  DEEPSLATE_COAL_ORE:
+    price: 8
+    points: 0.1
+    name: "&#F8BEFBУгольная руда в глубинном сланце"
+  IRON_ORE:
+    price: 12
+    points: 0.5
+    name: "&#F8BEFBЖелезная руда"
+  DEEPSLATE_IRON_ORE:
+    price: 12
+    points: 0.5
+    name: "&#F8BEFBЖелезная руда в глубинном сланце"
+  COPPER_ORE:
+    price: 6
+    points: 0.2
+    name: "&#F8BEFBМедная руда"
+  DEEPSLATE_COPPER_ORE:
+    price: 6
+    points: 0.2
+    name: "&#F8BEFBМедная руда в глубинном сланце"
+  GOLD_ORE:
+    price: 18
+    points: 0.7
+    name: "&#F8BEFBЗолотая руда"
+  DEEPSLATE_GOLD_ORE:
+    price: 18
+    points: 0.7
+    name: "&#F8BEFBЗолотая руда в глубинном сланце"
+  REDSTONE_ORE:
+    price: 9
+    points: 0.1
+    name: "&#F8BEFBРедстоуновая руда"
+  DEEPSLATE_REDSTONE_ORE:
+    price: 9
+    points: 0.1
+    name: "&#F8BEFBРедстоуновая руда в глубинном сланце"
+  LAPIS_ORE:
+    price: 10
+    points: 0.1
+    name: "&#F8BEFBЛазуритовая руда"
+  DEEPSLATE_LAPIS_ORE:
+    price: 10
+    points: 0.1
+    name: "&#F8BEFBЛазуритовая руда в глубинном сланце"
+  DIAMOND_ORE:
+    price: 50
+    points: 2.0
+    name: "&#F8BEFBАлмазная руда"
+  DEEPSLATE_DIAMOND_ORE:
+    price: 50
+    points: 2.0
+    name: "&#F8BEFBАлмазная руда в глубинном сланце"
+  EMERALD_ORE:
+    price: 70
+    points: 2.5
+    name: "&#F8BEFBИзумрудная руда"
+  DEEPSLATE_EMERALD_ORE:
+    price: 70
+    points: 2.5
+    name: "&#F8BEFBИзумрудная руда в глубинном сланце"
+  NETHER_QUARTZ_ORE:
+    price: 14
+    points: 0.2
+    name: "&#F8BEFBНезер-кварцевая руда"
+  NETHER_GOLD_ORE:
+    price: 6
+    points: 0.2
+    name: "&#F8BEFBНезерская золотая руда"
+  AMETHYST_CLUSTER:
+    price: 18
+    points: 0.3
+    name: "&#F8BEFBСкопление аметиста"
+  COPPER_NUGGET:
+    price: 2
+    points: 0.05
+    name: "&#F8BEFBМедный самородок"
+
+  # ────────────────────────────────────
+  # Новые предметы мобов и испытаний
+  # ────────────────────────────────────
+  GOAT_HORN:
+    price: 32
+    points: 1.2
+    name: "&#F8BEFBКозий рог"
+  OCHRE_FROGLIGHT:
+    price: 18
+    points: 0.6
+    name: "&#F8BEFBОхристый светолягушатник"
+  PEARLESCENT_FROGLIGHT:
+    price: 18
+    points: 0.6
+    name: "&#F8BEFBПерламутровый светолягушатник"
+  VERDANT_FROGLIGHT:
+    price: 18
+    points: 0.6
+    name: "&#F8BEFBЗелёный светолягушатник"
+  AXOLOTL_BUCKET:
+    price: 35
+    points: 1.4
+    name: "&#F8BEFBАксолотль в ведре"
+  TADPOLE_BUCKET:
+    price: 25
+    points: 1.0
+    name: "&#F8BEFBГоловастик в ведре"
+  TIPPED_ARROW:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBСтрела с эффектом"
+  OMINOUS_BOTTLE:
+    price: 25
+    points: 1.0
+    name: "&#F8BEFBЗловещая бутылка"
+  MUSIC_DISC_PRECIPICE:
+    price: 100
+    points: 5.0
+    name: "&#F8BEFBПластинка «Осадок»"
+  RESIN_CLUMP:
+    price: 6
+    points: 0.2
+    name: "&#F8BEFBКомок смолы"
+  RESIN_BRICK:
+    price: 12
+    points: 0.4
+    name: "&#F8BEFBСмоляной кирпич"
+  RESIN_BRICKS:
+    price: 48
+    points: 1.8
+    name: "&#F8BEFBСмоляные кирпичи"
+  RESIN_BLOCK:
+    price: 45
+    points: 1.6
+    name: "&#F8BEFBБлок смолы"
+  CREAKING_HEART:
+    price: 80
+    points: 3.5
+    name: "&#F8BEFBСкрипучее сердце"

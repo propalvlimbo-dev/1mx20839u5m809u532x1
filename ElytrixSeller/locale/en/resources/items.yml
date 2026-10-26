@@ -321,10 +321,10 @@ items:
     price: 15
     points: 0.4
     name: "&#F8BEFBCrossbow"
-  OMINOUS_BANNER:
+  WHITE_BANNER:
     price: 35
     points: 1.5
-    name: "&#F8BEFBOminous Banner"
+    name: "&#F8BEFBWhite Banner"
   SADDLE:
     price: 40
     points: 2.0
@@ -520,6 +520,10 @@ items:
     price: 3
     points: 0.06
     name: "&#F8BEFBPotato"
+  BAKED_POTATO:
+    price: 6
+    points: 0.12
+    name: "&#F8BEFBBaked Potato"
   BEETROOT:
     price: 3
     points: 0.06
@@ -804,3 +808,415 @@ items:
     price: 4
     points: 0.08
     name: "&#F8BEFBWarped Stem"
+  # ────────────────────────────────────
+  # Farm crops and harvestable plants
+  # ────────────────────────────────────
+  WHEAT_SEEDS:
+    price: 1
+    points: 0.02
+    name: "&#F8BEFBWheat Seeds"
+  BEETROOT_SEEDS:
+    price: 1
+    points: 0.02
+    name: "&#F8BEFBBeetroot Seeds"
+  PUMPKIN_SEEDS:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBPumpkin Seeds"
+  MELON_SEEDS:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBMelon Seeds"
+  POISONOUS_POTATO:
+    price: 1
+    points: 0.02
+    name: "&#F8BEFBPoisonous Potato"
+  SUGAR_CANE:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBSugar Cane"
+  CACTUS:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBCactus"
+  COCOA_BEANS:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBCocoa Beans"
+  SWEET_BERRIES:
+    price: 3
+    points: 0.06
+    name: "&#F8BEFBSweet Berries"
+  GLOW_BERRIES:
+    price: 4
+    points: 0.08
+    name: "&#F8BEFBGlow Berries"
+  BROWN_MUSHROOM:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBBrown Mushroom"
+  RED_MUSHROOM:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBRed Mushroom"
+  BROWN_MUSHROOM_BLOCK:
+    price: 5
+    points: 0.1
+    name: "&#F8BEFBBrown Mushroom Block"
+  RED_MUSHROOM_BLOCK:
+    price: 5
+    points: 0.1
+    name: "&#F8BEFBRed Mushroom Block"
+  MUSHROOM_STEM:
+    price: 4
+    points: 0.08
+    name: "&#F8BEFBMushroom Stem"
+  SEA_PICKLE:
+    price: 3
+    points: 0.06
+    name: "&#F8BEFBSea Pickle"
+  VINE:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBVine"
+  LILY_PAD:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBLily Pad"
+  CHORUS_FLOWER:
+    price: 8
+    points: 0.2
+    name: "&#F8BEFBChorus Flower"
+  CRIMSON_FUNGUS:
+    price: 3
+    points: 0.06
+    name: "&#F8BEFBCrimson Fungus"
+  WARPED_FUNGUS:
+    price: 3
+    points: 0.06
+    name: "&#F8BEFBWarped Fungus"
+  CRIMSON_ROOTS:
+    price: 1
+    points: 0.02
+    name: "&#F8BEFBCrimson Roots"
+  WARPED_ROOTS:
+    price: 1
+    points: 0.02
+    name: "&#F8BEFBWarped Roots"
+  NETHER_SPROUTS:
+    price: 1
+    points: 0.02
+    name: "&#F8BEFBNether Sprouts"
+  WEEPING_VINES:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBWeeping Vines"
+  TWISTING_VINES:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBTwisting Vines"
+  TORCHFLOWER:
+    price: 12
+    points: 0.4
+    name: "&#F8BEFBTorchflower"
+  PITCHER_PLANT:
+    price: 15
+    points: 0.5
+    name: "&#F8BEFBPitcher Plant"
+  OAK_SAPLING:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBOak Sapling"
+  SPRUCE_SAPLING:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBSpruce Sapling"
+  BIRCH_SAPLING:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBBirch Sapling"
+  JUNGLE_SAPLING:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBJungle Sapling"
+  ACACIA_SAPLING:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBAcacia Sapling"
+  DARK_OAK_SAPLING:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBDark Oak Sapling"
+  MANGROVE_PROPAGULE:
+    price: 3
+    points: 0.06
+    name: "&#F8BEFBMangrove Propagule"
+  CHERRY_SAPLING:
+    price: 3
+    points: 0.06
+    name: "&#F8BEFBCherry Sapling"
+  PALE_OAK_SAPLING:
+    price: 3
+    points: 0.06
+    name: "&#F8BEFBPale Oak Sapling"
+  AZALEA:
+    price: 3
+    points: 0.06
+    name: "&#F8BEFBAzalea"
+  FLOWERING_AZALEA:
+    price: 4
+    points: 0.08
+    name: "&#F8BEFBFlowering Azalea"
+  AZALEA_LEAVES:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBAzalea Leaves"
+  FLOWERING_AZALEA_LEAVES:
+    price: 3
+    points: 0.06
+    name: "&#F8BEFBFlowering Azalea Leaves"
+  MOSS_BLOCK:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBMoss Block"
+  MOSS_CARPET:
+    price: 1
+    points: 0.02
+    name: "&#F8BEFBMoss Carpet"
+  HANGING_ROOTS:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBHanging Roots"
+  BIG_DRIPLEAF:
+    price: 3
+    points: 0.06
+    name: "&#F8BEFBBig Dripleaf"
+  SMALL_DRIPLEAF:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBSmall Dripleaf"
+  SPORE_BLOSSOM:
+    price: 5
+    points: 0.12
+    name: "&#F8BEFBSpore Blossom"
+  CACTUS_FLOWER:
+    price: 3
+    points: 0.06
+    name: "&#F8BEFBCactus Flower"
+  FIREFLY_BUSH:
+    price: 4
+    points: 0.08
+    name: "&#F8BEFBFirefly Bush"
+  WILDFLOWERS:
+    price: 3
+    points: 0.06
+    name: "&#F8BEFBWildflowers"
+  CLOSED_EYEBLOSSOM:
+    price: 3
+    points: 0.06
+    name: "&#F8BEFBClosed Eyeblossom"
+  OPEN_EYEBLOSSOM:
+    price: 3
+    points: 0.06
+    name: "&#F8BEFBOpen Eyeblossom"
+  LEAF_LITTER:
+    price: 1
+    points: 0.02
+    name: "&#F8BEFBLeaf Litter"
+  SHORT_DRY_GRASS:
+    price: 1
+    points: 0.02
+    name: "&#F8BEFBShort Dry Grass"
+  TALL_DRY_GRASS:
+    price: 1
+    points: 0.02
+    name: "&#F8BEFBTall Dry Grass"
+  PALE_HANGING_MOSS:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBPale Hanging Moss"
+  PALE_MOSS_BLOCK:
+    price: 3
+    points: 0.06
+    name: "&#F8BEFBPale Moss Block"
+  PALE_MOSS_CARPET:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBPale Moss Carpet"
+  DRIED_GHAST:
+    price: 28
+    points: 1.0
+    name: "&#F8BEFBDried Ghast"
+
+  # ────────────────────────────────────
+  # Ores and ore blocks
+  # ────────────────────────────────────
+  COAL_ORE:
+    price: 8
+    points: 0.1
+    name: "&#F8BEFBCoal Ore"
+  DEEPSLATE_COAL_ORE:
+    price: 8
+    points: 0.1
+    name: "&#F8BEFBDeepslate Coal Ore"
+  IRON_ORE:
+    price: 12
+    points: 0.5
+    name: "&#F8BEFBIron Ore"
+  DEEPSLATE_IRON_ORE:
+    price: 12
+    points: 0.5
+    name: "&#F8BEFBDeepslate Iron Ore"
+  COPPER_ORE:
+    price: 6
+    points: 0.2
+    name: "&#F8BEFBCopper Ore"
+  DEEPSLATE_COPPER_ORE:
+    price: 6
+    points: 0.2
+    name: "&#F8BEFBDeepslate Copper Ore"
+  GOLD_ORE:
+    price: 18
+    points: 0.7
+    name: "&#F8BEFBGold Ore"
+  DEEPSLATE_GOLD_ORE:
+    price: 18
+    points: 0.7
+    name: "&#F8BEFBDeepslate Gold Ore"
+  REDSTONE_ORE:
+    price: 9
+    points: 0.1
+    name: "&#F8BEFBRedstone Ore"
+  DEEPSLATE_REDSTONE_ORE:
+    price: 9
+    points: 0.1
+    name: "&#F8BEFBDeepslate Redstone Ore"
+  LAPIS_ORE:
+    price: 10
+    points: 0.1
+    name: "&#F8BEFBLapis Lazuli Ore"
+  DEEPSLATE_LAPIS_ORE:
+    price: 10
+    points: 0.1
+    name: "&#F8BEFBDeepslate Lapis Lazuli Ore"
+  DIAMOND_ORE:
+    price: 50
+    points: 2.0
+    name: "&#F8BEFBDiamond Ore"
+  DEEPSLATE_DIAMOND_ORE:
+    price: 50
+    points: 2.0
+    name: "&#F8BEFBDeepslate Diamond Ore"
+  EMERALD_ORE:
+    price: 70
+    points: 2.5
+    name: "&#F8BEFBEmerald Ore"
+  DEEPSLATE_EMERALD_ORE:
+    price: 70
+    points: 2.5
+    name: "&#F8BEFBDeepslate Emerald Ore"
+  NETHER_QUARTZ_ORE:
+    price: 14
+    points: 0.2
+    name: "&#F8BEFBNether Quartz Ore"
+  NETHER_GOLD_ORE:
+    price: 6
+    points: 0.2
+    name: "&#F8BEFBNether Gold Ore"
+  AMETHYST_CLUSTER:
+    price: 18
+    points: 0.3
+    name: "&#F8BEFBAmethyst Cluster"
+  COPPER_NUGGET:
+    price: 2
+    points: 0.05
+    name: "&#F8BEFBCopper Nugget"
+
+  # ────────────────────────────────────
+  # New mob and trial loot
+  # ────────────────────────────────────
+  GOAT_HORN:
+    price: 32
+    points: 1.2
+    name: "&#F8BEFBGoat Horn"
+  OCHRE_FROGLIGHT:
+    price: 18
+    points: 0.6
+    name: "&#F8BEFBOchre Froglight"
+  PEARLESCENT_FROGLIGHT:
+    price: 18
+    points: 0.6
+    name: "&#F8BEFBPearlescent Froglight"
+  VERDANT_FROGLIGHT:
+    price: 18
+    points: 0.6
+    name: "&#F8BEFBVerdant Froglight"
+  AXOLOTL_BUCKET:
+    price: 35
+    points: 1.4
+    name: "&#F8BEFBAxolotl Bucket"
+  TADPOLE_BUCKET:
+    price: 25
+    points: 1.0
+    name: "&#F8BEFBTadpole Bucket"
+  TIPPED_ARROW:
+    price: 2
+    points: 0.04
+    name: "&#F8BEFBTipped Arrow"
+  OMINOUS_BOTTLE:
+    price: 25
+    points: 1.0
+    name: "&#F8BEFBOminous Bottle"
+  MUSIC_DISC_PRECIPICE:
+    price: 100
+    points: 5.0
+    name: "&#F8BEFBMusic Disc: Precipice"
+  RESIN_CLUMP:
+    price: 6
+    points: 0.2
+    name: "&#F8BEFBResin Clump"
+  RESIN_BRICK:
+    price: 12
+    points: 0.4
+    name: "&#F8BEFBResin Brick"
+  RESIN_BRICKS:
+    price: 48
+    points: 1.8
+    name: "&#F8BEFBResin Bricks"
+  RESIN_BLOCK:
+    price: 45
+    points: 1.6
+    name: "&#F8BEFBBlock of Resin"
+  CREAKING_HEART:
+    price: 80
+    points: 3.5
+    name: "&#F8BEFBCreaking Heart"
+  # Cooked animal and fish products
+  COOKED_BEEF:
+    price: 10
+    points: 0.2
+    name: "&#F8BEFBCooked Beef"
+  COOKED_PORKCHOP:
+    price: 10
+    points: 0.2
+    name: "&#F8BEFBCooked Porkchop"
+  COOKED_CHICKEN:
+    price: 10
+    points: 0.2
+    name: "&#F8BEFBCooked Chicken"
+  COOKED_MUTTON:
+    price: 10
+    points: 0.2
+    name: "&#F8BEFBCooked Mutton"
+  COOKED_RABBIT:
+    price: 10
+    points: 0.2
+    name: "&#F8BEFBCooked Rabbit"
+  COOKED_COD:
+    price: 8
+    points: 0.16
+    name: "&#F8BEFBCooked Cod"
+  COOKED_SALMON:
+    price: 10
+    points: 0.2
+    name: "&#F8BEFBCooked Salmon"

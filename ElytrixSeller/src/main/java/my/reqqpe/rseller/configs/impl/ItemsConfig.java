@@ -56,7 +56,7 @@ public class ItemsConfig extends CustomConfig {
             double price = itemsSec.getDouble(id + ".price");
             double points = itemsSec.getDouble(id + ".points");
 
-            Material material = Material.getMaterial(id);
+            Material material = resolveMaterial(id);
             ItemData data = null;
 
             if (material == null && customSec != null) {
@@ -64,7 +64,7 @@ public class ItemsConfig extends CustomConfig {
                 var c = customSec.getConfigurationSection(id);
                 if (c == null) continue;
 
-                material = Material.getMaterial(c.getString("material", ""));
+                material = resolveMaterial(c.getString("material", ""));
                 if (material == null) continue;
 
                 var dataSec = c.getConfigurationSection("item-data");
@@ -77,6 +77,18 @@ public class ItemsConfig extends CustomConfig {
 
             items.add(new Item(id, material, data, price, points));
         }
+    }
+
+    private Material resolveMaterial(String id) {
+        if (id == null || id.isBlank()) return null;
+
+        Material material = Material.getMaterial(id);
+        if (material != null) return material;
+
+        // Bukkit renamed SCUTE to TURTLE_SCUTE after 1.16.5.
+        if ("SCUTE".equalsIgnoreCase(id)) return Material.getMaterial("TURTLE_SCUTE");
+        if ("TURTLE_SCUTE".equalsIgnoreCase(id)) return Material.getMaterial("SCUTE");
+        return null;
     }
 
     private ItemData loadItemData(ConfigurationSection sec) {

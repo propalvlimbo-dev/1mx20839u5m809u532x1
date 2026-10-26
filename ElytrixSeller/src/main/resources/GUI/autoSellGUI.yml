@@ -37,10 +37,25 @@ items:
     right_click_actions:
       - '[open_category] mobs'
 
+  category_farms:
+    material: wheat
+    name: "&7« &#F8BEFBФермерские товары &7»"
+    slot: 24
+    lore:
+      - '&#F8BEFB&l '
+      - '&#F8BEFB&l┃ &fКультуры, урожай и продукты ферм'
+      - '&#F8BEFB&l┃ &fВключая адский нарост и новые растения'
+      - '&#F8BEFB&l '
+      - '&7● &fНажмите для перехода'
+    left_click_actions:
+      - '[open_category] farms'
+    right_click_actions:
+      - '[open_category] farms'
+
   disable_all:
     material: BARRIER
     name: "&7« &cОтключить всё &7»"
-    slot: 24
+    slot: 31
     lore:
       - '&#F8BEFB&l '
       - '&#F8BEFB&l &fОтключить автоскупку'
