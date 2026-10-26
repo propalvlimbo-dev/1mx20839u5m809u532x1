@@ -66,8 +66,10 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ElytrixSeller-2.0.0-ElytriX
-          path: downloads/ElytrixSeller-*.jar
+          name: ElytrixSeller-2.0.1-ElytriX
+          path: |
+            downloads/ElytrixSeller-2.0.1-ElytriX.jar
+            downloads/ElytrixSeller-2.0.1-ElytriX-en.jar
           if-no-files-found: error
           retention-days: 30
 
@@ -75,6 +77,10 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add downloads/ElytrixSeller-*.jar
-          git commit -m "Build ElytrixSeller Russian and English JARs"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
+          git add downloads/ElytrixSeller-2.0.1-ElytriX.jar downloads/ElytrixSeller-2.0.1-ElytriX-en.jar
+          if git diff --cached --quiet; then
+            echo "Built JARs are already up to date."
+          else
+            git commit -m "Build ElytrixSeller Russian and English JARs"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
