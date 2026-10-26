@@ -1,9 +1,11 @@
 package ru.elytrix.duelsbridge;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
@@ -61,6 +63,7 @@ final class Queue {
 
     private final ElytrixDuelsBridge plugin;
     private final List<Entry> entries = new ArrayList<Entry>();
+    private final Map<UUID, Long> lastPublicBroadcast = new HashMap<UUID, Long>();
 
     Queue(ElytrixDuelsBridge plugin) {
         this.plugin = plugin;
@@ -117,6 +120,13 @@ final class Queue {
             kitUnknown(player, kit);
             return;
         }
+        Entry current = entryOf(id);
+        if (current != null && !current.pair() && current.team == team
+                && current.kit.equalsIgnoreCase(name)) {
+            plugin.msg(player, msg("messages.queue-already",
+                    "&#F8BEFBДуэли &8» &7Ты уже ищешь бой с этим набором."));
+            return;
+        }
         leave(player, false);
         Entry entry = new Entry(id, null, name, team, System.currentTimeMillis());
         synchronized (entries) {
@@ -139,9 +149,21 @@ final class Queue {
             kitUnknown(owner, kit);
             return;
         }
+        UUID ownerId = owner.getUniqueId();
+        UUID mateId = mate.getUniqueId();
+        Entry current = entryOf(ownerId);
+        boolean samePair = current != null && current.team && current.pair()
+                && current.kit.equalsIgnoreCase(name)
+                && ((current.owner.equals(ownerId) && current.mate.equals(mateId))
+                        || (current.owner.equals(mateId) && current.mate.equals(ownerId)));
+        if (samePair) {
+            plugin.msg(owner, msg("messages.queue-already",
+                    "&#F8BEFBДуэли &8» &7Ты уже ищешь бой с этим набором."));
+            return;
+        }
         leave(owner, false);
-        plugin.duels().nativeLeave(mate.getUniqueId());
-        Entry entry = new Entry(owner.getUniqueId(), mate.getUniqueId(), name, true,
+        plugin.duels().nativeLeave(mateId);
+        Entry entry = new Entry(ownerId, mateId, name, true,
                 System.currentTimeMillis());
         synchronized (entries) {
             entries.add(entry);
@@ -565,7 +587,7 @@ final class Queue {
     /** Объявление в чат с кнопкой «встать в очередь» для остальных. */
     private void broadcast(Entry entry) {
         Player owner = Bukkit.getPlayer(entry.owner);
-        if (owner == null) return;
+        if (owner == null || !allowPublicBroadcast(entry)) return;
         String text;
         String button;
         String command;
@@ -595,6 +617,28 @@ final class Queue {
             if (entry.has(online.getUniqueId())) continue;
             Text.send(online, line);
         }
+    }
+
+    /** Share a search announcement at most once per member per cooldown window. */
+    private boolean allowPublicBroadcast(Entry entry) {
+        long cooldownSeconds = Math.min(3600L, Math.max(0L,
+                plugin.getConfig().getLong("queue.broadcast-cooldown-seconds", 10L)));
+        if (cooldownSeconds == 0L) return true;
+        long now = System.currentTimeMillis();
+        long cooldownMillis = cooldownSeconds * 1000L;
+        for (UUID member : entry.members()) {
+            Long last = lastPublicBroadcast.get(member);
+            if (last != null && now - last < cooldownMillis) return false;
+        }
+        for (UUID member : entry.members()) lastPublicBroadcast.put(member, now);
+        if (lastPublicBroadcast.size() > 1024) {
+            long retainMillis = Math.max(cooldownMillis * 10L, 60_000L);
+            Iterator<Map.Entry<UUID, Long>> iterator = lastPublicBroadcast.entrySet().iterator();
+            while (iterator.hasNext()) {
+                if (now - iterator.next().getValue() > retainMillis) iterator.remove();
+            }
+        }
+        return true;
     }
 
     private String name(UUID id) {

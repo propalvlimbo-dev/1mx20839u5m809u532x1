@@ -137,6 +137,15 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
                 config.set("queue.broadcast", true);
                 changed = true;
             }
+            if (config.getLong("queue.broadcast-cooldown-seconds", -1L) < 0L) {
+                config.set("queue.broadcast-cooldown-seconds", 10);
+                changed = true;
+            }
+            if (config.getString("messages.queue-already") == null) {
+                config.set("messages.queue-already",
+                        "&#F8BEFBДуэли &8» &7Ты уже ищешь бой с этим набором.");
+                changed = true;
+            }
             if (config.getString("protection.block-place") == null) {
                 config.set("protection.block-place", true);
                 config.set("protection.explosions", true);
@@ -145,12 +154,48 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
             if (config.getString("protection.leave") == null) {
                 config.set("protection.leave", true);
                 config.set("protection.pearl-limit", true);
-                config.set("protection.max-height", 7);
-                config.set("protection.arena-margin", 20);
-                config.set("protection.min-drop", 25);
+                config.set("protection.arena-margin", 50);
                 config.set("protection.blocked-commands", Arrays.asList(
                         "spawn", "hub", "lobby", "tpa", "tpahere", "tpaccept",
                         "warp", "home", "back"));
+                changed = true;
+            }
+            // Migrate the former default 20-block margin; keep deliberate custom values.
+            double configuredMargin = config.getDouble("protection.arena-margin", Double.NaN);
+            if (Double.isNaN(configuredMargin)
+                    || Math.abs(configuredMargin - 20.0) < 0.0001) {
+                config.set("protection.arena-margin", 50);
+                changed = true;
+            }
+            if (Double.isNaN(config.getDouble("protection.height-warning-blocks", Double.NaN))) {
+                config.set("protection.height-warning-blocks", 15);
+                changed = true;
+            }
+            if (config.getLong("protection.height-warning-seconds", -1L) < 0L) {
+                config.set("protection.height-warning-seconds", 10);
+                changed = true;
+            }
+            for (String obsolete : new String[]{"protection.max-height", "protection.mace-height",
+                    "protection.min-drop"}) {
+                if (!Double.isNaN(config.getDouble(obsolete, Double.NaN))) {
+                    config.set(obsolete, null);
+                    changed = true;
+                }
+            }
+            if (config.getString("messages.arena-height-warning") == null) {
+                config.set("messages.arena-height-warning",
+                        "&#F8BEFBДуэли &8» &cТы выше &f%blocks%&c блоков от спавна. "
+                                + "Спустись за &f%seconds%&c секунд, иначе будет засчитано поражение.");
+                changed = true;
+            }
+            String oldPearlMessage = "&#F8BEFBДуэли &8» &cПёрл туда не сработает: за ареной или слишком высоко.";
+            if (oldPearlMessage.equals(config.getString("messages.pearl-blocked"))) {
+                config.set("messages.pearl-blocked",
+                        "&#F8BEFBДуэли &8» &cПёрл за горизонтальную границу не сработает — возвращаю на свой спавн.");
+                changed = true;
+            }
+            if (config.getString("messages.arena-height") != null) {
+                config.set("messages.arena-height", null);
                 changed = true;
             }
             // в старом сообщении не было списка арен — дописываем
@@ -589,9 +634,12 @@ public final class ElytrixDuelsBridge extends JavaPlugin implements Listener {
         }
         msg(player, "&#F8BEFBДуэли &8» &fАрена: &f" + bounds.world);
         msg(player, "&7  центр: &f" + round(bounds.centerX) + " " + round(bounds.centerZ)
-                + " &7| радиус: &f" + round(bounds.radius));
-        msg(player, "&7  высота: &f" + round(bounds.baseY) + " + " + round(bounds.maxY - bounds.baseY)
-                + " &7| низ: &f" + round(bounds.minY));
+                + " &7| радиус по горизонтали: &f" + round(bounds.radius));
+        msg(player, "&7  высотных границ нет; предупреждение: выше спавна на &f"
+                + round(Math.max(0.0, getConfig().getDouble("protection.height-warning-blocks", 15.0)))
+                + " &7блоков, на спуск &f"
+                + Math.max(1L, Math.min(3600L,
+                        getConfig().getLong("protection.height-warning-seconds", 10L))) + " с.");
     }
 
     private static String round(double value) {
