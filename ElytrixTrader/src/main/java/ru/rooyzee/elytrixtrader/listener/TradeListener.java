@@ -55,7 +55,7 @@ public class TradeListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onInteract(PlayerInteractEvent event) {
-        if (plugin.interactions().available()) {
+        if (plugin.interactions().isAttached(event.getPlayer())) {
             return;
         }
         Action action = event.getAction();
@@ -83,7 +83,7 @@ public class TradeListener implements Listener {
     @EventHandler
     public void onClose(InventoryCloseEvent event) {
         if (event.getInventory().getHolder() instanceof MenuHolder && event.getPlayer() instanceof Player) {
-            plugin.menus().onClose((Player) event.getPlayer());
+            plugin.menus().onInventoryClose((Player) event.getPlayer(), event.getInventory());
         }
     }
 }

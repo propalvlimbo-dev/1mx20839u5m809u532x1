@@ -2,18 +2,6 @@ hot-reload: false # автоматически перезагружать кон
 
 # Здесь можете назначить команды для открытия меню
 open_commands:
-  bmenu_seller:
-    aliases:
-      - bseller
-    menu: example:seller
-    permission: ~ # не обязательный параметр
-  bmenu_kick:
-    menu: example:kick
-    tab-completer:
-      PLAYER:
-        type: player
-        exx: [ ]
-
 # Перенесённые команды DeluxeMenus (исходные файлы DeluxeMenus не изменялись)
   help_freedonate:
     menu: elytrix:help_freedonate
@@ -113,9 +101,10 @@ open_commands:
     permission: deluxemenus.admin
   elytrix_lobby:
     menu: elytrix:lobby
-  rub:
+  salary:
     menu: elytrix:salary_rub
     aliases:
+      - rub
       - rubsalary
   elytrix_frun_legacy:
     menu: elytrix:zelevarki_fr_legacy

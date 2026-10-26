@@ -121,6 +121,9 @@ public final class Main extends JavaPlugin {
                 traders.stopImmediate();
             } catch (Throwable ignored) {}
         }
+        if (menus != null) {
+            menus.cancelAnimations();
+        }
         if (interactions != null) {
             interactions.detachAll();
         }

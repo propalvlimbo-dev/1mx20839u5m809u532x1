@@ -9,9 +9,13 @@ items:
     name: '&7« &#B7A8FFГде искать &7»'
     lore:
     - '&#B7A8FF&l┃ '
-    - '&#B7A8FF&l┃ &fЭндер-мир, центральный остров у дракона.'
-    - '&#B7A8FF&l┃ &fПоявляется в рамках расписания торговцев.'
+    - '&#B7A8FF&l┃ &fМир: &#B7A8FF%elytrixtrader_ghost_world%'
+    - '&#B7A8FF&l┃ &fКоординаты: &#B7A8FFX %elytrixtrader_ghost_x%, Y %elytrixtrader_ghost_y%, Z %elytrixtrader_ghost_z%'
+    - '&#B7A8FF&l┃ &fСтатус: &#B7A8FF%elytrixtrader_ghost_status%'
+    - '&#B7A8FF&l┃ &fПоявление: &#B7A8FF%elytrixtrader_ghost_time%'
     - '&#B7A8FF&l┃ '
+    tick_speed: 400
+    on_tick: '[update]'
   currency:
     material: amethyst_shard
     name: '&7« &#B7A8FFВалюта обмена &7»'

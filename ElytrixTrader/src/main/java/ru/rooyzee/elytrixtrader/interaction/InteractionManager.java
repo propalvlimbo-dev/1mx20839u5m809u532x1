@@ -35,20 +35,40 @@ public class InteractionManager {
     }
 
     private void detect() {
+        usePacket = null;
+        attackPacket = null;
+        String version = null;
         try {
-            String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+            String[] parts = Bukkit.getServer().getClass().getPackage().getName().split("\\.");
+            if (parts.length > 0) version = parts[parts.length - 1];
+        } catch (Throwable ignored) {
+        }
+
+        if (version != null && !version.isEmpty()) {
             String root = "net.minecraft.server." + version + ".";
-            usePacket = Class.forName(root + "PacketPlayInUseEntity");
+            try {
+                usePacket = Class.forName(root + "PacketPlayInUseEntity");
+            } catch (Throwable ignored) {
+            }
             try {
                 attackPacket = Class.forName(root + "PacketPlayInAttackEntity");
             } catch (Throwable ignored) {
-                attackPacket = null;
             }
-        } catch (Throwable throwable) {
-            usePacket = null;
-            attackPacket = null;
-            broken = true;
         }
+
+        // 1.17+ moved inbound packets out of the versioned NMS package and renamed UseEntity.
+        if (usePacket == null) {
+            for (String name : new String[]{
+                    "net.minecraft.network.protocol.game.ServerboundInteractPacket",
+                    "net.minecraft.network.protocol.game.PacketPlayInUseEntity"}) {
+                try {
+                    usePacket = Class.forName(name);
+                    break;
+                } catch (Throwable ignored) {
+                }
+            }
+        }
+        if (usePacket == null) broken = true;
     }
 
     public void attach(Player player) {
@@ -117,14 +137,28 @@ public class InteractionManager {
         return usePacket != null;
     }
 
+    /** Whether this player's packet hook is attached; otherwise Bukkit click fallback must stay enabled. */
+    public boolean isAttached(Player player) {
+        if (player == null) return false;
+        Channel channel = attached.get(player.getUniqueId());
+        if (channel == null) return false;
+        try {
+            return channel.pipeline().get(HANDLER) != null;
+        } catch (Throwable ignored) {
+            return false;
+        }
+    }
+
     private Channel channel(Player player) {
         try {
             Object handle = player.getClass().getMethod("getHandle").invoke(player);
-            Object connection = fieldByType(handle, "PlayerConnection", "playerConnection");
+            Object connection = fieldByType(handle,
+                    "PlayerConnection", "ServerGamePacketListenerImpl", "playerConnection", "connection");
             if (connection == null) {
                 return null;
             }
-            Object manager = fieldByType(connection, "NetworkManager", "networkManager");
+            Object manager = fieldByType(connection,
+                    "NetworkManager", "Connection", "networkManager", "connection");
             if (manager == null) {
                 return null;
             }
@@ -135,7 +169,7 @@ public class InteractionManager {
         }
     }
 
-    private Object fieldByType(Object target, String simpleType, String fallbackName) {
+    private Object fieldByType(Object target, String... candidates) {
         if (target == null) {
             return null;
         }
@@ -145,11 +179,13 @@ public class InteractionManager {
                 if (Modifier.isStatic(field.getModifiers())) {
                     continue;
                 }
-                if (field.getType().getSimpleName().equals(simpleType) || field.getName().equals(fallbackName)) {
-                    try {
-                        field.setAccessible(true);
-                        return field.get(target);
-                    } catch (Throwable ignored) {
+                for (String candidate : candidates) {
+                    if (field.getType().getSimpleName().equals(candidate) || field.getName().equals(candidate)) {
+                        try {
+                            field.setAccessible(true);
+                            return field.get(target);
+                        } catch (Throwable ignored) {
+                        }
                     }
                 }
             }
@@ -161,16 +197,21 @@ public class InteractionManager {
     private int entityId(Object packet) {
         Field field = intFields.get(packet.getClass());
         if (field == null) {
+            Field firstInt = null;
             Class<?> current = packet.getClass();
             while (current != null && field == null) {
                 for (Field candidate : current.getDeclaredFields()) {
-                    if (candidate.getType() == int.class && !Modifier.isStatic(candidate.getModifiers())) {
+                    if (candidate.getType() != int.class || Modifier.isStatic(candidate.getModifiers())) continue;
+                    if (firstInt == null) firstInt = candidate;
+                    String name = candidate.getName().toLowerCase(java.util.Locale.ROOT);
+                    if (name.contains("entity") || name.equals("id")) {
                         field = candidate;
                         break;
                     }
                 }
                 current = current.getSuperclass();
             }
+            if (field == null) field = firstInt;
             if (field == null) {
                 return -1;
             }
@@ -190,7 +231,10 @@ public class InteractionManager {
             Class<?> current = packet.getClass();
             while (current != null && field == null) {
                 for (Field candidate : current.getDeclaredFields()) {
-                    if (candidate.getType().isEnum() && !Modifier.isStatic(candidate.getModifiers())) {
+                    if (Modifier.isStatic(candidate.getModifiers()) || candidate.getType().isPrimitive()) continue;
+                    String fieldName = candidate.getName().toLowerCase(java.util.Locale.ROOT);
+                    String typeName = candidate.getType().getSimpleName().toLowerCase(java.util.Locale.ROOT);
+                    if (fieldName.contains("action") || typeName.contains("action")) {
                         field = candidate;
                         break;
                     }
@@ -205,7 +249,10 @@ public class InteractionManager {
         }
         try {
             Object value = field.get(packet);
-            return value != null && value.toString().toUpperCase(java.util.Locale.ROOT).contains("ATTACK");
+            if (value == null) return false;
+            String description = (value.toString() + " " + value.getClass().getSimpleName())
+                    .toUpperCase(java.util.Locale.ROOT);
+            return description.contains("ATTACK");
         } catch (Throwable throwable) {
             return false;
         }

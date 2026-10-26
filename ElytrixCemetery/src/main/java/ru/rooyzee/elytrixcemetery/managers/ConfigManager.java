@@ -82,7 +82,8 @@ public class ConfigManager {
     }
 
     public int getGhostCount() {
-        return Math.max(0, Math.min(64, config.getInt("ghosts.count", 8)));
+        // The cemetery population is a hard limit, not a configurable multiplier.
+        return Math.max(0, Math.min(8, config.getInt("ghosts.count", 8)));
     }
 
     public double getGhostHealth() {
@@ -90,8 +91,10 @@ public class ConfigManager {
         return Double.isFinite(health) ? Math.max(1.0, Math.min(2048.0, health)) : 16.0;
     }
 
+    /** Cemetery ghosts always respawn exactly ten minutes after death. */
+    @Deprecated
     public int getGhostRespawnCooldownSeconds() {
-        return Math.max(1, Math.min(86400, config.getInt("ghosts.respawn-cooldown-seconds", 60)));
+        return 600;
     }
 
     public boolean isGraveHologramsEnabled() {

@@ -1,5 +1,5 @@
-# Заголовок = просто имя торговца (цвет берётся из traders/*.yml)
-title: '{trader_colored}'
+# Фирменная чёрно-пурпурная рамка ElytriX; оттенок торговца задаётся в traders/*.yml.
+title: '&#F8BEFB&lᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &8» {trader_colored}'
 size: 54
 
 # Слоты под предметы покупки (два центральных ряда по 7 = 14 предметов)
@@ -77,3 +77,8 @@ icons:
       - '&7● &fНажмите для покупки'
 
 buttons: {}
+
+# Рамка и товары появляются каскадом, в стиле главного меню ElytriX.
+animation:
+  enabled: true
+  delay-ticks: 1

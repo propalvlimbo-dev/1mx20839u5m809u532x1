@@ -5,10 +5,13 @@ import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import ru.rooyzee.elytrixtrader.Main;
+import ru.rooyzee.elytrixtrader.model.TraderConfig;
 import ru.rooyzee.elytrixtrader.model.TraderInstance;
 import ru.rooyzee.elytrixtrader.util.ColorUtil;
+import ru.rooyzee.elytrixtrader.util.Numbers;
 
 import java.util.List;
+import java.util.Locale;
 
 public class TraderExpansion extends PlaceholderExpansion {
 
@@ -37,7 +40,7 @@ public class TraderExpansion extends PlaceholderExpansion {
     public String getAuthor() { return "rooyzee"; }
 
     @Override
-    public String getVersion() { return "1.0.0"; }
+    public String getVersion() { return "1.1.0"; }
 
     @Override
     public String onPlaceholderRequest(Player player, String params) {
@@ -50,86 +53,159 @@ public class TraderExpansion extends PlaceholderExpansion {
     }
 
     private String handle(String params) {
-        List<TraderInstance> instances = plugin.traders().instances();
-        TraderInstance active = null;
-        for (TraderInstance inst : instances) {
-            if (inst.alive()) {
-                active = inst;
-                break;
+        String key = params == null ? "" : params.toLowerCase(Locale.ROOT).replace('-', '_');
+        String field = key;
+        String traderId = null;
+
+        // Supports both the legacy global placeholders and trader-specific forms such as
+        // %elytrixtrader_ghost_location% / %elytrixtrader_experienced_x%.
+        int longestPrefix = -1;
+        for (TraderConfig config : plugin.traderConfigs().values()) {
+            if (config == null || config.id() == null) continue;
+            String id = config.id().toLowerCase(Locale.ROOT);
+            if (key.equals(id)) {
+                traderId = id;
+                field = "formatted";
+                longestPrefix = id.length();
+            } else if (key.startsWith(id + "_") && id.length() > longestPrefix) {
+                traderId = id;
+                field = key.substring(id.length() + 1);
+                longestPrefix = id.length();
             }
         }
 
-        if (params == null || params.isEmpty() || params.equalsIgnoreCase("formatted") || params.equalsIgnoreCase("tracker")) {
-            if (active != null) {
-                Location loc = active.location();
-                int x = loc.getBlockX();
-                int y = loc.getBlockY();
-                int z = loc.getBlockZ();
-                return ColorUtil.translate("&aАктивен &8(&fX: " + x + ", Y: " + y + ", Z: " + z + "&8)");
-            }
+        List<TraderInstance> instances = plugin.traders().instances();
+        TraderInstance active = activeInstance(instances, traderId);
 
+        if (field.isEmpty() || field.equals("formatted") || field.equals("tracker")) {
+            if (active != null && active.location() != null) {
+                return ColorUtil.translate("&aАктивен &8(&f" + locationText(active.location()) + "&8)");
+            }
+            TraderConfig config = traderId == null ? null : config(traderId);
+            if (config != null && !config.enabled()) return ColorUtil.translate("&cВыключен");
             if (!plugin.config().scheduleEnabled() || plugin.config().scheduleTimes().isEmpty()) {
                 return ColorUtil.translate("&cВыключен");
             }
             return ColorUtil.translate("&#F8BEFB" + plugin.traders().nextEventTime());
         }
 
-        String lower = params.toLowerCase().replace("-", "_");
-        switch (lower) {
+        switch (field) {
             case "status":
-                return active != null ? ColorUtil.translate("&aАктивен") : ColorUtil.translate("&cНе активен");
+                if (active != null) return ColorUtil.translate("&aАктивен");
+                TraderConfig statusConfig = traderId == null ? null : config(traderId);
+                if (statusConfig != null && !statusConfig.enabled()) return ColorUtil.translate("&cВыключен");
+                return ColorUtil.translate("&cНе активен");
 
             case "time":
             case "timer":
             case "next":
             case "next_time":
                 if (active != null) {
-                    return ColorUtil.translate("&aИдет сейчас");
+                    return ColorUtil.translate("&aИдёт сейчас &8| &fдо исчезновения: "
+                            + Numbers.duration(active.remainingSeconds()));
                 }
+                TraderConfig timeConfig = traderId == null ? null : config(traderId);
+                if (timeConfig != null && !timeConfig.enabled()) return ColorUtil.translate("&cВыключен");
                 return ColorUtil.translate("&#F8BEFB" + plugin.traders().nextEventTime());
 
             case "location":
             case "coords":
             case "coordinates":
-                if (active != null && active.location() != null) {
-                    Location loc = active.location();
-                    return "X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + ", Z: " + loc.getBlockZ();
-                }
-                return ColorUtil.translate("&#F8BEFBСлучайные координаты");
+                return locationPlaceholder(traderId, active, false);
 
             case "location_full":
-                if (active != null && active.location() != null) {
-                    Location loc = active.location();
-                    String world = loc.getWorld() == null ? "world" : loc.getWorld().getName();
-                    return world + " " + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ();
-                }
-                return ColorUtil.translate("&7Не заспавнен");
+                return locationPlaceholder(traderId, active, true);
 
             case "x":
-                return active != null && active.location() != null ? String.valueOf(active.location().getBlockX()) : "0";
-
+                return coordinate(traderId, active, 0);
             case "y":
-                return active != null && active.location() != null ? String.valueOf(active.location().getBlockY()) : "0";
-
+                return coordinate(traderId, active, 1);
             case "z":
-                return active != null && active.location() != null ? String.valueOf(active.location().getBlockZ()) : "0";
+                return coordinate(traderId, active, 2);
 
             case "world":
-                return active != null && active.location() != null && active.location().getWorld() != null
-                        ? active.location().getWorld().getName() : "world";
+                if (active != null && active.location() != null && active.location().getWorld() != null) {
+                    return active.location().getWorld().getName();
+                }
+                TraderConfig worldConfig = traderId == null ? null : config(traderId);
+                if (worldConfig != null && worldConfig.hasFixedSpawnLocation()) return worldConfig.fixedSpawnWorld();
+                return "world";
 
             case "count":
             case "total":
-                return String.valueOf(plugin.traders().total());
+                return String.valueOf(traderId == null
+                        ? plugin.traders().total() : plugin.traders().count(traderId));
 
             case "name":
             case "trader_name":
                 if (active != null && active.config() != null) {
                     return ColorUtil.translate(active.config().displayName());
                 }
+                TraderConfig nameConfig = traderId == null ? null : config(traderId);
+                if (nameConfig != null) return ColorUtil.translate(nameConfig.displayName());
                 return ColorUtil.translate("&aТорговец опытом");
-        }
 
+            default:
+                return null;
+        }
+    }
+
+    private TraderInstance activeInstance(List<TraderInstance> instances, String traderId) {
+        if (instances == null) return null;
+        for (TraderInstance instance : instances) {
+            if (instance == null || !instance.alive() || instance.config() == null) continue;
+            if (traderId == null || instance.config().id().equalsIgnoreCase(traderId)) return instance;
+        }
         return null;
+    }
+
+    private TraderConfig config(String traderId) {
+        if (traderId == null) return null;
+        for (TraderConfig config : plugin.traderConfigs().values()) {
+            if (config != null && config.id() != null && config.id().equalsIgnoreCase(traderId)) return config;
+        }
+        return null;
+    }
+
+    private String locationPlaceholder(String traderId, TraderInstance active, boolean full) {
+        if (active != null && active.location() != null) {
+            Location location = active.location();
+            String coords = locationText(location);
+            String world = location.getWorld() == null ? "world" : location.getWorld().getName();
+            return full ? world + " " + location.getBlockX() + " " + location.getBlockY() + " " + location.getBlockZ()
+                    : coords;
+        }
+        TraderConfig config = traderId == null ? null : config(traderId);
+        if (config != null && config.hasFixedSpawnLocation()) {
+            int x = (int) Math.floor(config.fixedSpawnX());
+            int y = (int) Math.floor(config.fixedSpawnY());
+            int z = (int) Math.floor(config.fixedSpawnZ());
+            return full ? config.fixedSpawnWorld() + " " + x + " " + y + " " + z
+                    : "X: " + x + ", Y: " + y + ", Z: " + z;
+        }
+        if (traderId == null) return ColorUtil.translate("&#F8BEFBСлучайные координаты");
+        return ColorUtil.translate("&7Не заспавнен");
+    }
+
+    private String coordinate(String traderId, TraderInstance active, int axis) {
+        if (active != null && active.location() != null) {
+            Location location = active.location();
+            switch (axis) {
+                case 0: return String.valueOf(location.getBlockX());
+                case 1: return String.valueOf(location.getBlockY());
+                default: return String.valueOf(location.getBlockZ());
+            }
+        }
+        TraderConfig config = traderId == null ? null : config(traderId);
+        if (config == null || !config.hasFixedSpawnLocation()) return "0";
+        switch (axis) {
+            case 0: return String.valueOf((int) Math.floor(config.fixedSpawnX()));
+            case 1: return String.valueOf((int) Math.floor(config.fixedSpawnY()));
+            default: return String.valueOf((int) Math.floor(config.fixedSpawnZ()));
+        }
+    }
+
+    private String locationText(Location location) {
+        return "X: " + location.getBlockX() + ", Y: " + location.getBlockY() + ", Z: " + location.getBlockZ();
     }
 }

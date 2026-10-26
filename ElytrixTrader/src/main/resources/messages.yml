@@ -22,6 +22,7 @@ general:
 trade:
   success: '{prefix}&aУспешно &8| &fПолучено: &a{amount}x {item} &8| &f-{price}'
   no-permission: '{prefix}&cНедостаточно прав &7({permission})'
+  ghost-currency: '{prefix}&cПризрачный торговец принимает только кастомные осколки призрака.'
   not-enough:
     - '&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBНедостаточно {currency}'
     - '&#F8BEFB&l┃ &fНужно: &c{price}'

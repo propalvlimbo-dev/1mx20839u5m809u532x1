@@ -35,6 +35,12 @@ public class MenuHolder implements InventoryHolder {
     /** slot -> tradeId (для свежего TradeConfig при покупке) */
     private final Map<Integer, String> tradeIds = new HashMap<>();
 
+    public void clearMappings() {
+        trades.clear();
+        tradeIds.clear();
+        buttons.clear();
+    }
+
     public void mapTrade(int slot, TradeConfig trade) {
         trades.put(slot, trade);
         tradeIds.put(slot, trade.id());

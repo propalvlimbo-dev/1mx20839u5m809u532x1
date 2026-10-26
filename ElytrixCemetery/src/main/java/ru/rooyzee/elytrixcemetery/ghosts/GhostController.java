@@ -16,7 +16,10 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.WitherSkeleton;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
@@ -33,7 +36,10 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class GhostController {
+public class GhostController implements Listener {
+
+    private static final int MAX_ACTIVE_GHOSTS = 8;
+    private static final long GHOST_RESPAWN_DELAY_MILLIS = 10L * 60L * 1000L;
 
     private final Main plugin;
     private final NamespacedKey ghostPdc;
@@ -41,7 +47,8 @@ public class GhostController {
     private final Set<UUID> activeGhosts = Collections.newSetFromMap(new ConcurrentHashMap<UUID, Boolean>());
     private final Set<UUID> activeGuardians = Collections.newSetFromMap(new ConcurrentHashMap<UUID, Boolean>());
     private final Map<UUID, Grave> guardianGraves = new ConcurrentHashMap<>();
-    private long nextRespawnTime = 0L;
+    private final PriorityQueue<Long> pendingGhostRespawns = new PriorityQueue<>();
+    private boolean initialPopulationSpawned;
 
     private static EntityType GHOST_ENTITY_TYPE;
     private static Sound AMBIENT_SOUND;
@@ -85,6 +92,25 @@ public class GhostController {
         this.guardianPdc = new NamespacedKey(plugin, "cemetery_guardian");
     }
 
+    /** Remove entities left behind by an older persistent build when their chunk loads. */
+    @EventHandler
+    public void onChunkLoad(ChunkLoadEvent event) {
+        for (Entity entity : event.getChunk().getEntities()) {
+            if (hasMarker(entity, ghostPdc) || hasMarker(entity, guardianPdc)) {
+                entity.remove();
+            }
+        }
+    }
+
+    private boolean hasMarker(Entity entity, NamespacedKey key) {
+        if (entity == null) return false;
+        try {
+            return entity.getPersistentDataContainer().has(key, PersistentDataType.BYTE);
+        } catch (Throwable ignored) {
+            return false;
+        }
+    }
+
     public boolean isGhost(Entity entity) {
         if (entity == null) return false;
         if (activeGhosts.contains(entity.getUniqueId())) return true;
@@ -113,23 +139,20 @@ public class GhostController {
         Location center = plugin.getConfigManager().getCenterLocation();
         if (center == null || center.getWorld() == null) return;
         World world = center.getWorld();
-
         int maxRadius = plugin.getConfigManager().getBoundaryRadius();
 
-        // 1. Проверяем живых призраков и удерживаем их в границах кладбища
+        // Track loaded cemetery ghosts and keep them inside the configured boundary.
         Iterator<UUID> it = activeGhosts.iterator();
         while (it.hasNext()) {
             UUID id = it.next();
             Entity ent = Bukkit.getEntity(id);
             if (ent == null || ent.isDead() || !ent.isValid()) {
                 it.remove();
+                queueGhostRespawn(System.currentTimeMillis());
                 continue;
             }
 
-            // Шлейф частиц за призраком
             ParticleUtil.spawn(world, ParticleUtil.SOUL, ent.getLocation().clone().add(0, 0.3, 0), 2, 0.1, 0.1, 0.1, 0.01);
-
-            // Если призрак улетел за ограду кладбища — возвращаем его внутрь
             double distSq = ent.getLocation().distanceSquared(center);
             if (distSq > (maxRadius - 3) * (maxRadius - 3)) {
                 Location back = getRandomSpawnPoint(center, 25);
@@ -139,7 +162,6 @@ public class GhostController {
             }
         }
 
-        // 2. Проверяем стражей могил
         Iterator<UUID> git = activeGuardians.iterator();
         while (git.hasNext()) {
             UUID id = git.next();
@@ -150,20 +172,38 @@ public class GhostController {
             }
         }
 
-        // 3. Спавн / респавн новой волны призраков
-        int targetCount = plugin.getConfigManager().getGhostCount();
-        if (activeGhosts.size() < targetCount) {
-            long now = System.currentTimeMillis();
-            if (now >= nextRespawnTime) {
+        int targetCount = Math.min(MAX_ACTIVE_GHOSTS, plugin.getConfigManager().getGhostCount());
+        if (!initialPopulationSpawned && pendingGhostRespawns.isEmpty()) {
+            try {
                 spawnUpTo(center, targetCount);
-                nextRespawnTime = now + plugin.getConfigManager().getGhostRespawnCooldownSeconds() * 1000L;
+            } catch (Throwable ignored) {
+                // Retry silently on the next tick if the world cannot spawn a ghost yet.
             }
+            initialPopulationSpawned = activeGhosts.size() >= targetCount || targetCount == 0;
+        }
+
+        long now = System.currentTimeMillis();
+        while (activeGhosts.size() < targetCount && !pendingGhostRespawns.isEmpty()
+                && pendingGhostRespawns.peek() <= now) {
+            int countBefore = activeGhosts.size();
+            try {
+                spawnUpTo(center, countBefore + 1);
+            } catch (Throwable ignored) {
+                // Keep the due respawn queued and retry quietly when spawning is possible.
+                break;
+            }
+            if (activeGhosts.size() == countBefore) {
+                // Keep the due respawn queued and retry quietly when a safe block is available.
+                break;
+            }
+            pendingGhostRespawns.poll();
         }
     }
 
     public void spawnUpTo(Location center, int targetCount) {
         World world = center.getWorld();
         if (world == null) return;
+        targetCount = Math.max(0, Math.min(MAX_ACTIVE_GHOSTS, targetCount));
 
         double hp = plugin.getConfigManager().getGhostHealth();
 
@@ -182,6 +222,7 @@ public class GhostController {
             } catch (Throwable ignored) {}
 
             ghost.setRemoveWhenFarAway(false);
+            ghost.setPersistent(false);
             ghost.setCanPickupItems(false);
             ghost.setCustomName(ColorUtil.colorize("&#F8BEFB&lПризрак"));
             ghost.setCustomNameVisible(true);
@@ -212,6 +253,7 @@ public class GhostController {
         } catch (Throwable ignored) {}
 
         le.setRemoveWhenFarAway(false);
+        le.setPersistent(false);
         le.setCustomName(ColorUtil.colorize("&#F8BEFB&lОсквернённый Страж"));
         le.setCustomNameVisible(true);
 
@@ -289,24 +331,20 @@ public class GhostController {
     public void handleDeath(EntityDeathEvent event) {
         LivingEntity dead = event.getEntity();
         if (isGhost(dead)) {
-            activeGhosts.remove(dead.getUniqueId());
+            if (activeGhosts.remove(dead.getUniqueId())) {
+                queueGhostRespawn(System.currentTimeMillis());
+            }
             event.getDrops().clear();
-            event.setDroppedExp(15);
+            event.setDroppedExp(0);
 
-            List<ItemStack> drops = plugin.getLootStorageManager().rollGhostDrops();
-            for (ItemStack is : drops) {
-                if (is != null) event.getDrops().add(is.clone());
+            for (ItemStack shard : plugin.getLootStorageManager().rollGhostDrops()) {
+                if (shard != null) event.getDrops().add(shard.clone());
             }
 
             Location loc = dead.getLocation();
             dead.getWorld().playSound(loc, DEATH_SOUND, 1.2f, 0.7f);
             dead.getWorld().playSound(loc, Sound.BLOCK_SOUL_SAND_BREAK, 1.5f, 0.8f);
             ParticleUtil.spawn(dead.getWorld(), ParticleUtil.SOUL, loc.clone().add(0, 0.5, 0), 25, 0.4, 0.4, 0.4, 0.05);
-
-            Player killer = dead.getKiller();
-            if (killer != null) {
-                killer.sendMessage(ColorUtil.colorize("&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &aВы повергли &fПризрака&a и получили ценный дроп!"));
-            }
         } else if (isGuardian(dead)) {
             activeGuardians.remove(dead.getUniqueId());
             guardianGraves.remove(dead.getUniqueId());
@@ -344,6 +382,10 @@ public class GhostController {
                 + " оставил ключ Хранилища: &f" + displayName));
     }
 
+    private void queueGhostRespawn(long deathTimeMillis) {
+        pendingGhostRespawns.add(deathTimeMillis + GHOST_RESPAWN_DELAY_MILLIS);
+    }
+
     public void clearAll() {
         for (World world : Bukkit.getWorlds()) {
             for (Entity ent : world.getEntities()) {
@@ -355,6 +397,8 @@ public class GhostController {
         activeGhosts.clear();
         activeGuardians.clear();
         guardianGraves.clear();
+        pendingGhostRespawns.clear();
+        initialPopulationSpawned = false;
     }
 
     private Location getRandomSpawnPoint(Location center, int radius) {

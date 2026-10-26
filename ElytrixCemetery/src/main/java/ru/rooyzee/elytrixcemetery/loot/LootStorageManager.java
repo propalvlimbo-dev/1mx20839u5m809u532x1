@@ -246,12 +246,10 @@ public class LootStorageManager {
         return result;
     }
 
-    /** Rolls the same shard and bonus-loot pool for cemetery ghosts. */
+    /** Cemetery ghosts drop only the canonical custom shard; no bonus loot or keys. */
     public List<ItemStack> rollGhostDrops() {
-        List<ItemStack> result = new ArrayList<>();
-        result.add(createGhostShard(1));
-        addGhostTableBonus(result);
-        return result;
+        ItemStack shard = createGhostShard(1);
+        return shard == null ? Collections.<ItemStack>emptyList() : Collections.singletonList(shard);
     }
 
     /** Guardians retain their grave loot, but the shard reward is capped at one. */

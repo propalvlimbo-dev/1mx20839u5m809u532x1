@@ -20,13 +20,12 @@ wither-skeleton-chance: 25.0
 # Шанс ключа Хранилища за победу над Осквернённым Стражем (%)
 guardian-key-drop-chance: 50.0
 
-# Настройки призраков (Allay)
+# Настройки призраков (Allay). Фактический предел — 8; после смерти
+# призрак тихо возвращается ровно через 10 минут и оставляет только осколок.
 ghosts:
   count: 8
   health: 16.0
-  respawn-cooldown-seconds: 60
-  # Шанс дополнительного предмета из таблицы GHOSTS (%)
-  bonus-loot-chance: 35.0
+  respawn-cooldown-seconds: 600
 
 # Ключи ElytrixVault выпадают только с Осквернённого Стража на Кладбище.
 guardian-key-weights:

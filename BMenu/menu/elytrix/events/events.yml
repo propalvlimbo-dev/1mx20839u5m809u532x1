@@ -1,4 +1,5 @@
-# Главная навигация по событиям, данжам и постоянным активностям сервера.
+# Список событий, торговцев и постоянных активностей. Стеклянная рамка
+# использует тот же черно-пурпурный ElytriX-рисунок, что и /menu.
 id: elytrix:events
 provider: default
 type: chest
@@ -9,135 +10,129 @@ items:
     material: beacon
     name: '&7« &#F8BEFBРайское место &7»'
     lore:
-    - '&#F8BEFB&l┃ '
-    - '&#F8BEFB&l┃ &fСтатус: &#96FF91Активно всегда'
-    - '&#F8BEFB&l┃ &fМеханики: &#F8BEFBОсколки Рая и Сердце Рая'
-    - '&#F8BEFB&l┃ &fНаграды: &#F8BEFBресурсы и опыт'
-    - '&#F8BEFB&l┃ '
-    - '&7● &fНажмите, чтобы посмотреть подробности'
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСтатус: &#96FF91Активно всегда'
+      - '&#F8BEFB&l┃ &fМеханики: &#F8BEFBОсколки Рая и Сердце Рая'
+      - '&#F8BEFB&l┃ &fПодробности: &#F8BEFBнажми, чтобы открыть страницу'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для подробностей'
     on_click:
-    - '[open] elytrix:paradise_event'
+      - '[open] elytrix:paradise_event'
   airdrops:
     material: ender_chest
     name: '&7« &#F8BEFBАирдропы &7»'
     lore:
-    - '&#F8BEFB&l┃ '
-    - '&#F8BEFB&l┃ &fДо начала: &#F8BEFB%elytrixairdrop_time%'
-    - '&#F8BEFB&l┃ &fЛокация: &#F8BEFB%elytrixairdrop_location%'
-    - '&#F8BEFB&l┃ &fСуть: &#F8BEFBсражение за припасы'
-    - '&#F8BEFB&l┃ '
-    - '&7● &fНажмите, чтобы посмотреть подробности'
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fДо начала: &#F8BEFB%elytrixairdrop_time%'
+      - '&#F8BEFB&l┃ &fЛокация: &#F8BEFB%elytrixairdrop_location%'
+      - '&#F8BEFB&l┃ &fСуть: &#F8BEFBсражение за припасы'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для подробностей'
     on_click:
-    - '[open] elytrix:airdrop_event'
+      - '[open] elytrix:airdrop_event'
     tick_speed: 400
     on_tick: '[update]'
   pvp_shulkers:
     material: purple_shulker_box
     name: '&7« &#F8BEFBШалкеры на PvP &7»'
     lore:
-    - '&#F8BEFB&l┃ '
-    - '&#F8BEFB&l┃ &fЛокация: &#F8BEFB/warp pvp'
-    - '&#F8BEFB&l┃ &fПоявление: &#F8BEFBкаждые 15–30 минут'
-    - '&#F8BEFB&l┃ &fСуть: &#F8BEFBзабрать добычу в PvP-зоне'
-    - '&#F8BEFB&l┃ '
-    - '&7● &fНажмите, чтобы посмотреть подробности'
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fЛокация: &#F8BEFB/warp pvp'
+      - '&#F8BEFB&l┃ &fПоявление: &#F8BEFBкаждые 15–30 минут'
+      - '&#F8BEFB&l┃ &fСуть: &#F8BEFBзабрать добычу в PvP-зоне'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для подробностей'
     on_click:
-    - '[open] elytrix:shulkerpvp_event'
+      - '[open] elytrix:shulkerpvp_event'
   talisman:
     material: totem_of_undying
     name: '&7« &#F8BEFBЗахват талисмана &7»'
     lore:
-    - '&#F8BEFB&l┃ '
-    - '&#F8BEFB&l┃ &fРасписание: &#F8BEFBежедневно в 17:30'
-    - '&#F8BEFB&l┃ &fФормат: &#F8BEFBклановое событие'
-    - '&#F8BEFB&l┃ &fЦель: &#F8BEFBудержание точки'
-    - '&#F8BEFB&l┃ '
-    - '&7● &fНажмите, чтобы посмотреть подробности'
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fРасписание: &#F8BEFBежедневно в 17:30'
+      - '&#F8BEFB&l┃ &fФормат: &#F8BEFBклановое событие'
+      - '&#F8BEFB&l┃ &fЦель: &#F8BEFBудержание точки'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для подробностей'
     on_click:
-    - '[open] elytrix:talisman_event'
+      - '[open] elytrix:talisman_event'
   exp_merchant:
     material: experience_bottle
     name: '&7« &aОпытный торговец &7»'
     lore:
-    - '&#F8BEFB&l┃ '
-    - '&#F8BEFB&l┃ &fСледующее появление: &#F8BEFB%elytrixtrader_time%'
-    - '&#F8BEFB&l┃ &fЛокация: &#F8BEFB%elytrixtrader_location%'
-    - '&#F8BEFB&l┃ &fОплата: &aуровни опыта'
-    - '&#F8BEFB&l┃ '
-    - '&7● &fНажмите, чтобы посмотреть подробности'
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСледующее появление: &#F8BEFB%elytrixtrader_experienced_time%'
+      - '&#F8BEFB&l┃ &fЛокация: &#F8BEFB%elytrixtrader_experienced_location%'
+      - '&#F8BEFB&l┃ &fКоординаты: &#F8BEFBX %elytrixtrader_experienced_x%, Y %elytrixtrader_experienced_y%, Z %elytrixtrader_experienced_z%'
+      - '&#F8BEFB&l┃ &fОплата: &aуровни опыта'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для подробностей'
     on_click:
-    - '[open] elytrix:merchant_event'
+      - '[open] elytrix:merchant_event'
     tick_speed: 400
     on_tick: '[update]'
   ghost_trader:
     material: amethyst_shard
     name: '&7« &#B7A8FFПризрачный торговец &7»'
     lore:
-    - '&#B7A8FF&l┃ '
-    - '&#B7A8FF&l┃ &fМесто: &#B7A8FFЭндер-мир, остров дракона'
-    - '&#B7A8FF&l┃ &fВалюта обмена: &#B7A8FFПризрачные осколки'
-    - '&#B7A8FF&l┃ &fОткрытие сделок: &#B7A8FFПКМ по торговцу'
-    - '&#B7A8FF&l┃ '
-    - '&7● &fНажмите, чтобы посмотреть подробности'
+      - '&#B7A8FF&l┃ '
+      - '&#B7A8FF&l┃ &fСледующее появление: &#B7A8FF%elytrixtrader_ghost_time%'
+      - '&#B7A8FF&l┃ &fМир: &#B7A8FF%elytrixtrader_ghost_world%'
+      - '&#B7A8FF&l┃ &fКоординаты: &#B7A8FFX %elytrixtrader_ghost_x%, Y %elytrixtrader_ghost_y%, Z %elytrixtrader_ghost_z%'
+      - '&#B7A8FF&l┃ &fВалюта: &#B7A8FFПризрачные осколки'
+      - '&#B7A8FF&l┃ '
+      - '&7● &fНажмите для подробностей'
     on_click:
-    - '[open] elytrix:ghost_trader_event'
+      - '[open] elytrix:ghost_trader_event'
+    tick_speed: 400
+    on_tick: '[update]'
   dungeons:
     material: trial_key
     name: '&7« &#F8BEFBДанжи мира &7»'
     lore:
-    - '&#F8BEFB&l┃ '
-    - '&#F8BEFB&l┃ &fТипы: &#F8BEFBназемные дома и подземные данжи'
-    - '&#F8BEFB&l┃ &fСписок и статус: &#F8BEFB/dungeons'
-    - '&#F8BEFB&l┃ &fЛут: &#F8BEFBсундуки, шалкеры и добыча данжей'
-    - '&#F8BEFB&l┃ '
-    - '&7● &fНажмите, чтобы посмотреть подробности'
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fТипы: &#F8BEFBназемные дома и подземные данжи'
+      - '&#F8BEFB&l┃ &fСписок и статус: &#F8BEFB/dungeons'
+      - '&#F8BEFB&l┃ &fЛут: &#F8BEFBсундуки, шалкеры и добыча данжей'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для подробностей'
     on_click:
-    - '[open] elytrix:dungeons_event'
+      - '[open] elytrix:dungeons_event'
   cemetery:
     material: iron_shovel
     name: '&7« &#F8BEFBКладбище &7»'
     lore:
-    - '&#F8BEFB&l┃ '
-    - '&#F8BEFB&l┃ &fСтатус: &#96FF91активно всегда'
-    - '&#F8BEFB&l┃ &fМогилы, призраки и Призрачные осколки'
-    - '&#F8BEFB&l┃ &fИнформация: &#F8BEFB/cemetery info'
-    - '&#F8BEFB&l┃ &fТелепорт: &#F8BEFB/cemetery tp'
-    - '&#F8BEFB&l┃ '
-    - '&7● &fНажмите, чтобы посмотреть подробности'
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСтатус: &#96FF91активно всегда'
+      - '&#F8BEFB&l┃ &fМогилы, призраки и Призрачные осколки'
+      - '&#F8BEFB&l┃ &fКоманды: &#F8BEFB/cemetery info, /cemetery tp'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для подробностей'
     on_click:
-    - '[open] elytrix:cemetery_event'
+      - '[open] elytrix:cemetery_event'
   info:
     material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0=
     name: '&7« &#F8BEFBПолезные сведения &7»'
     lore:
-    - '&#F8BEFB&l┃ '
-    - '&#F8BEFB&l┃ &fИвенты: &#F8BEFBпо расписанию и постоянно'
-    - '&#F8BEFB&l┃ &fДанжи: &#F8BEFB/dungeons'
-    - '&#F8BEFB&l┃ &fКладбище: &#F8BEFB/cemetery info'
-    - '&#F8BEFB&l┃ '
-    - '&7● &fНажмите для ссылок на сообщества'
-    on_click:
-    - '[message]'
-    - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBСообщества'
-    - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
-    - '[message] &#F8BEFB&l┃ &fTelegram: &#229ED9t.me/elytrix_ru'
-    - '[message] &#F8BEFB&l┃ &fDiscord: &#5865F2dsc.gg/elytrix'
-    - '[message]'
-    - '[close]'
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fИвенты: &#F8BEFBпо расписанию и постоянно'
+      - '&#F8BEFB&l┃ &fДанжи: &#F8BEFB/dungeons'
+      - '&#F8BEFB&l┃ &fКладбище: &#F8BEFB/cemetery info'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fСписок активностей ElytriX'
   close:
     material: red_dye
-    name: '&7« &cЗакрыть &7»'
+    name: '&7« &cЗакрыть меню &7»'
     lore:
-    - '&#F8BEFB&l┃ &fЗакрыть меню событий.'
+      - '&#F8BEFB&l┃ &fЗакрыть меню событий.'
     on_click:
-    - '[close]'
+      - '[close]'
   design_purple_panel:
     material: purple_stained_glass_pane
     name: '&r'
   design_black_panel:
     material: black_stained_glass_pane
     name: '&r'
-
 animation:
   - tick: 0
     opcodes:
@@ -149,36 +144,37 @@ animation:
       - st: design_purple_panel 48,50,51,52,53
       - sound: 'block.note_block.chime 0.22 0.91'
   - opcodes:
-      - st: design_purple_panel 36,37,42,43,44
+      - st: design_purple_panel 36,37,43,44
   - opcodes:
-      - st: design_black_panel 0,1,2,3,4,5,6,7,8
+      - st: design_purple_panel 27,35
+      - st: design_black_panel 18,26
       - sound: 'block.note_block.chime 0.25 1.05'
   - opcodes:
-      - st: design_black_panel 9,10,16,17,18,19,24,25,26
+      - st: design_black_panel 9,10,16,17
   - opcodes:
-      - st: design_black_panel 27,28,33,34,35
+      - st: design_black_panel 0,1,2,3,4,5,6,7,8
       - sound: 'block.note_block.chime 0.28 1.21'
   - opcodes:
-      - st: paradise 20
+      - st: paradise 19
       - sound: 'block.note_block.pling 0.26 1.0'
   - opcodes:
       - st: airdrops 21
       - sound: 'block.note_block.pling 0.27 1.07'
   - opcodes:
-      - st: pvp_shulkers 22
+      - st: pvp_shulkers 23
       - sound: 'block.note_block.pling 0.28 1.14'
   - opcodes:
-      - st: talisman 23
+      - st: talisman 25
       - sound: 'block.note_block.pling 0.29 1.21'
   - opcodes:
-      - st: exp_merchant 29
+      - st: exp_merchant 28
       - sound: 'block.note_block.pling 0.30 1.28'
   - opcodes:
       - st: ghost_trader 30
       - sound: 'block.note_block.pling 0.31 1.35'
   - opcodes:
-      - st: dungeons 31
+      - st: dungeons 32
       - sound: 'block.note_block.pling 0.33 1.42'
   - opcodes:
-      - st: cemetery 32
+      - st: cemetery 34
       - sound: 'block.amethyst_block.chime 0.4 1.5'

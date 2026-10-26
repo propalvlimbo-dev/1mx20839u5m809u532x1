@@ -44,6 +44,9 @@ public class Main extends JavaPlugin {
         this.lootStorageManager = new LootStorageManager(this);
         this.graveManager = new GraveManager(this);
         this.ghostController = new GhostController(this);
+        Bukkit.getPluginManager().registerEvents(ghostController, this);
+        // Clean up Cemetery-owned mobs left by a previous plugin build before respawning them.
+        ghostController.clearAll();
         this.schematicManager = new SchematicManager(this);
         this.regionManager = new RegionManager(this);
         this.hologramManager = new CemeteryHologramManager(this);
@@ -111,8 +114,8 @@ public class Main extends JavaPlugin {
         if (actionBarTask != null) actionBarTask.cancel();
 
         if (hologramManager != null) hologramManager.removeMainHologram();
-        if (graveManager != null) graveManager.clearAll();
         if (ghostController != null) ghostController.clearAll();
+        if (graveManager != null) graveManager.clearAll();
         if (schematicManager != null && schematicManager.getGenerator() != null) {
             schematicManager.getGenerator().clearCemeteryBlocks();
         }

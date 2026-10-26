@@ -19,6 +19,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import ru.rooyzee.elytrixtrader.Main;
+import ru.rooyzee.elytrixtrader.currency.GhostShardCost;
 import ru.rooyzee.elytrixtrader.model.TradeConfig;
 import ru.rooyzee.elytrixtrader.model.TraderConfig;
 import ru.rooyzee.elytrixtrader.model.TraderInstance;
@@ -377,6 +378,19 @@ public class TradeEditorManager implements Listener {
        GUI — редактор трейда
        ════════════════════════════════════════════════════════════════════════ */
 
+    private Material ghostShardIconMaterial() {
+        Material shard = Material.matchMaterial("AMETHYST_SHARD");
+        return shard == null ? Material.PRISMARINE_SHARD : shard;
+    }
+
+    private int ghostShardPrice(EditableTrade trade) {
+        if (trade == null) return 0;
+        for (ItemStack item : trade.itemCosts()) {
+            if (GhostShardCost.isGhostShard(item)) return item.getAmount();
+        }
+        return 0;
+    }
+
     public void openTradeEdit(Player player, String traderId, String tradeId) {
         if (player == null) {
             return;
@@ -410,10 +424,22 @@ public class TradeEditorManager implements Listener {
         }
 
         /* ── кнопки ── */
-        inventory.setItem(BTN_EXP, button(Material.EXPERIENCE_BOTTLE,
-                C_ACCENT + "Цена опытом: " + C_WHITE
-                        + (trade.expCost() > 0 ? trade.expCost() + " ур." : "бесплатно"),
-                C_GRAY + "ЛКМ — изменить (ввод в чат)"));
+        if (GhostShardCost.isGhostTrader(traderId)) {
+            int shardPrice = ghostShardPrice(trade);
+            inventory.setItem(BTN_EXP, button(ghostShardIconMaterial(),
+                    C_ACCENT + "Цена осколками: " + C_WHITE
+                            + (shardPrice > 0 ? shardPrice + " шт." : "не задана"),
+                    Arrays.asList(
+                            C_GRAY + "Возьми кастомные осколки призрака в руку,",
+                            C_GRAY + "затем нажми ЛКМ — весь стек станет ценой.",
+                            C_RED + "ПКМ — убрать цену.",
+                            C_GRAY + "Опыт и обычные предметы не принимаются.")));
+        } else {
+            inventory.setItem(BTN_EXP, button(Material.EXPERIENCE_BOTTLE,
+                    C_ACCENT + "Цена опытом: " + C_WHITE
+                            + (trade.expCost() > 0 ? trade.expCost() + " ур." : "бесплатно"),
+                    C_GRAY + "ЛКМ — изменить (ввод в чат)"));
+        }
 
         inventory.setItem(BTN_STOCK, button(Material.COMPARATOR,
                 C_ACCENT + "Количество: " + C_WHITE + stockText(trade),
@@ -616,7 +642,11 @@ public class TradeEditorManager implements Listener {
             return;
         }
         trade.rewards(rewards);
-        trade.itemCosts(new ArrayList<>());
+        if (GhostShardCost.isGhostTrader(holder.traderId())) {
+            trade.expCost(0);
+        } else {
+            trade.itemCosts(new ArrayList<>());
+        }
         saveTrader(holder.traderId());
     }
 
@@ -670,6 +700,39 @@ public class TradeEditorManager implements Listener {
         Inventory inventory = holder.getInventory();
 
         if (slot == BTN_EXP) {
+            if (GhostShardCost.isGhostTrader(traderId)) {
+                EditableTrade trade = getTrade(traderId, tradeId);
+                if (trade == null) {
+                    player.sendMessage(ColorUtil.translate(C_RED + "Трейд не найден."));
+                    return;
+                }
+                if (click == ClickType.RIGHT || click == ClickType.SHIFT_RIGHT) {
+                    trade.itemCosts(new ArrayList<>());
+                    trade.expCost(0);
+                    saveTrader(traderId);
+                    player.sendMessage(ColorUtil.translate(C_GREEN + "Цена осколками удалена."));
+                    openTradeEdit(player, traderId, tradeId);
+                    return;
+                }
+                if (click != ClickType.LEFT && click != ClickType.SHIFT_LEFT) {
+                    return;
+                }
+                ItemStack held = player.getInventory().getItemInMainHand();
+                if (!GhostShardCost.isGhostShard(held)) {
+                    player.sendMessage(ColorUtil.translate(C_RED
+                            + "Возьми в руку кастомный осколок призрака — обычные предметы не принимаются."));
+                    return;
+                }
+                List<ItemStack> costs = new ArrayList<>();
+                costs.add(held.clone());
+                trade.itemCosts(costs);
+                trade.expCost(0);
+                saveTrader(traderId);
+                player.sendMessage(ColorUtil.translate(C_GREEN + "Цена установлена: "
+                        + held.getAmount() + " кастомных осколков призрака."));
+                openTradeEdit(player, traderId, tradeId);
+                return;
+            }
             pending.put(player.getUniqueId(), new PendingInput("exp", traderId, tradeId));
             player.closeInventory();
             player.sendMessage(ColorUtil.translate(C_YELLOW
@@ -718,7 +781,11 @@ public class TradeEditorManager implements Listener {
                 return;
             }
             trade.rewards(rewards);
-            trade.itemCosts(new ArrayList<>());
+            if (GhostShardCost.isGhostTrader(traderId)) {
+                trade.expCost(0);
+            } else {
+                trade.itemCosts(new ArrayList<>());
+            }
             saveTrader(traderId);
             player.sendMessage(ColorUtil.translate(C_GREEN + "✔ Сохранено!"));
             openTradeEdit(player, traderId, tradeId);

@@ -27,6 +27,8 @@ public class GuiConfig {
     private final boolean overrideTradeLore;
     private final boolean tradeGlow;
     private final List<Decoration> decorations;
+    private final boolean animationEnabled;
+    private final int animationDelayTicks;
 
     public GuiConfig(YamlConfiguration config) {
         title = Cfg.str(config, "title", "&#F8BEFBТорговец &8» &#F8BEFB{trader}");
@@ -76,6 +78,10 @@ public class GuiConfig {
                 decorations.add(new Decoration(icon, slots));
             }
         }
+        ConfigurationSection animation = config == null ? null : config.getConfigurationSection("animation");
+        animationEnabled = Cfg.bool(animation, "enabled", true);
+        animationDelayTicks = Cfg.clamp(Cfg.num(animation, "delay-ticks", 1), 1, 20);
+
         allowedAmounts = new ArrayList<>();
         ConfigurationSection amount = config == null ? null : config.getConfigurationSection("amount");
         for (Integer value : readAmounts(amount)) {
@@ -208,6 +214,14 @@ public class GuiConfig {
 
     public List<Decoration> decorations() {
         return decorations;
+    }
+
+    public boolean animationEnabled() {
+        return animationEnabled;
+    }
+
+    public int animationDelayTicks() {
+        return animationDelayTicks;
     }
 
     public static final class Decoration {

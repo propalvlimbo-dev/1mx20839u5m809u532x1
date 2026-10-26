@@ -1,10 +1,13 @@
 package ru.rooyzee.elytrixtrader.gui;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import ru.rooyzee.elytrixtrader.Main;
 import ru.rooyzee.elytrixtrader.config.GuiConfig;
 import ru.rooyzee.elytrixtrader.model.IconConfig;
@@ -16,7 +19,9 @@ import ru.rooyzee.elytrixtrader.util.Sounds;
 import ru.rooyzee.elytrixtrader.util.Text;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -26,6 +31,7 @@ public class TradeMenuGui {
     private final Main plugin;
     private final Map<UUID, MenuHolder> opened = new HashMap<>();
     private final Map<UUID, TraderInstance> active = new HashMap<>();
+    private final Map<UUID, BukkitTask> animationTasks = new HashMap<>();
 
     public TradeMenuGui(Main plugin) {
         this.plugin = plugin;
@@ -46,77 +52,238 @@ public class TradeMenuGui {
             plugin.messages().send(player, "interaction.too-far", player, map);
             return;
         }
-        Sounds.play(player, plugin.config().openSound(), 0.6F, 1.1F);
         open(player, instance, 0);
     }
 
     public void open(Player player, TraderInstance instance, int page) {
+        if (player == null || instance == null || !instance.alive()) return;
+        UUID playerId = player.getUniqueId();
+        cancelAnimation(playerId);
         GuiConfig gui = plugin.gui();
         List<TradeConfig> trades = available(player, instance);
-        active.put(player.getUniqueId(), instance);
-        // Если установлен BMenu — рендерим меню им (как DeluxeMenus), иначе встроенное меню
+        active.put(playerId, instance);
+        // Если BMenu установлен и интеграция включена — используем его; иначе штатное меню.
         if (plugin.bmenu() != null && plugin.bmenu().available()
                 && plugin.bmenu().open(player, instance, trades)) {
             return;
         }
-        int capacity = gui.pageSize();
+        int capacity = Math.max(1, gui.pageSize());
         int pages = Math.max(1, (int) Math.ceil(trades.size() / (double) capacity));
         int safePage = Math.max(0, Math.min(pages - 1, page));
-        InventoryHolder holder = new MenuHolder(instance, safePage, pages);
-        Inventory inventory = Bukkit.createInventory(holder, gui.size(), ColorUtil.translate(Text.apply(gui.title(), player, basePlaceholders(player, instance, safePage, pages))));
-        MenuHolder menuHolder = (MenuHolder) holder;
-        menuHolder.setInventory(inventory);
-        fill(inventory, menuHolder, player, trades);
-        opened.put(player.getUniqueId(), menuHolder);
+        MenuHolder holder = new MenuHolder(instance, safePage, pages);
+        Map<String, String> base = basePlaceholders(player, instance, safePage, pages);
+        Inventory inventory = Bukkit.createInventory(holder, gui.size(),
+                ColorUtil.translate(Text.apply(gui.title(), player, base)));
+        holder.setInventory(inventory);
+        opened.put(playerId, holder);
+        prepareInventory(inventory, player, base);
         player.openInventory(inventory);
+        if (gui.animationEnabled()) {
+            animateOpen(player, holder, trades, base);
+        } else {
+            Sounds.play(player, "BLOCK_ENCHANTMENT_TABLE_USE", 0.28F, 1.4F);
+            fill(inventory, holder, player, trades);
+        }
+    }
+
+    private void prepareInventory(Inventory inventory, Player player, Map<String, String> base) {
+        inventory.clear();
+        GuiConfig gui = plugin.gui();
+        if (gui.filler().material() != null && !gui.filler().material().isAir()) {
+            ItemStack filler = IconFactory.build(gui.filler(), player, base, 1);
+            for (int slot = 0; slot < inventory.getSize(); slot++) {
+                inventory.setItem(slot, filler == null ? null : filler.clone());
+            }
+        }
+    }
+
+    private Map<Integer, ItemStack> buildDecorations(Inventory inventory, Player player, Map<String, String> base) {
+        Map<Integer, ItemStack> decorations = new LinkedHashMap<>();
+        for (GuiConfig.Decoration decoration : plugin.gui().decorations()) {
+            ItemStack item = IconFactory.build(decoration.icon(), player, base, 1);
+            if (item == null) continue;
+            for (int slot : decoration.slots()) {
+                if (slot >= 0 && slot < inventory.getSize()) decorations.put(slot, item.clone());
+            }
+        }
+        return decorations;
+    }
+
+    private static final class TradeSlotItem {
+        private final int slot;
+        private final TradeConfig trade;
+        private final ItemStack icon;
+
+        private TradeSlotItem(int slot, TradeConfig trade, ItemStack icon) {
+            this.slot = slot;
+            this.trade = trade;
+            this.icon = icon;
+        }
+    }
+
+    private List<TradeSlotItem> visibleTradeItems(Inventory inventory, MenuHolder holder, Player player,
+                                                   List<TradeConfig> trades, Map<String, String> base) {
+        GuiConfig gui = plugin.gui();
+        List<TradeSlotItem> visible = new ArrayList<>();
+        int index = holder.page() * gui.pageSize();
+        List<Integer> slots = gui.tradeSlots();
+        if (!slots.isEmpty()) {
+            for (int slot : slots) {
+                if (index >= trades.size()) break;
+                TradeConfig trade = trades.get(index++);
+                visible.add(new TradeSlotItem(slot, trade, tradeIcon(player, holder.instance(), trade, base)));
+            }
+        } else {
+            int end = Math.min(gui.endSlot(), inventory.getSize() - 1);
+            for (int slot = gui.startSlot(); slot <= end && index < trades.size(); slot++) {
+                TradeConfig trade = trades.get(index++);
+                visible.add(new TradeSlotItem(slot, trade, tradeIcon(player, holder.instance(), trade, base)));
+            }
+        }
+        return visible;
     }
 
     private void fill(Inventory inventory, MenuHolder holder, Player player, List<TradeConfig> trades) {
         GuiConfig gui = plugin.gui();
-        TraderInstance instance = holder.instance();
-        Map<String, String> base = basePlaceholders(player, instance, holder.page(), holder.pages());
-        // Фон заливаем только если filler не AIR (иначе слоты остаются пустыми)
-        if (gui.filler().material() != null && gui.filler().material() != org.bukkit.Material.AIR) {
-            ItemStack filler = IconFactory.build(gui.filler(), player, base, 1);
-            for (int slot = 0; slot < inventory.getSize(); slot++) {
-                inventory.setItem(slot, filler);
-            }
+        Map<String, String> base = basePlaceholders(player, holder.instance(), holder.page(), holder.pages());
+        holder.clearMappings();
+        prepareInventory(inventory, player, base);
+        for (Map.Entry<Integer, ItemStack> entry : buildDecorations(inventory, player, base).entrySet()) {
+            inventory.setItem(entry.getKey(), entry.getValue());
         }
-        // Декоративные панели (как в DeluxeMenus)
-        for (GuiConfig.Decoration decoration : gui.decorations()) {
-            ItemStack decorItem = IconFactory.build(decoration.icon(), player, base, 1);
-            for (int slot : decoration.slots()) {
-                if (slot >= 0 && slot < inventory.getSize()) {
-                    inventory.setItem(slot, decorItem);
-                }
-            }
-        }
-        List<Integer> slots = gui.tradeSlots();
-        int pageStart = holder.page() * gui.pageSize();
-        if (!slots.isEmpty()) {
-            int index = pageStart;
-            for (int slot : slots) {
-                if (index >= trades.size()) {
-                    break;
-                }
-                inventory.setItem(slot, tradeIcon(player, instance, trades.get(index), base));
-                holder.mapTrade(slot, trades.get(index));
-                index++;
-            }
+        List<TradeSlotItem> visible = visibleTradeItems(inventory, holder, player, trades, base);
+        if (visible.isEmpty()) {
+            inventory.setItem(emptyOfferSlot(gui, inventory), emptyOfferIcon(holder.instance()));
         } else {
-            int start = gui.startSlot();
-            int end = Math.min(gui.endSlot(), inventory.getSize() - 1);
-            int index = pageStart;
-            for (int slot = start; slot <= end; slot++, index++) {
-                if (index >= trades.size()) {
-                    break;
-                }
-                TradeConfig trade = trades.get(index);
-                inventory.setItem(slot, tradeIcon(player, instance, trade, base));
-                holder.mapTrade(slot, trade);
+            for (TradeSlotItem entry : visible) {
+                inventory.setItem(entry.slot, entry.icon);
+                holder.mapTrade(entry.slot, entry.trade);
             }
         }
-        // Без кнопок: слоты 44-53 остаются пурпурными стёклами (как в DeluxeMenus)
+        addControls(inventory, holder, player, base);
+    }
+
+    private void animateOpen(Player player, MenuHolder holder, List<TradeConfig> trades, Map<String, String> base) {
+        UUID playerId = player.getUniqueId();
+        Inventory inventory = holder.getInventory();
+        GuiConfig gui = plugin.gui();
+        holder.clearMappings();
+        prepareInventory(inventory, player, base);
+        List<Runnable> steps = new ArrayList<>();
+        steps.add(() -> Sounds.play(player, "BLOCK_ENCHANTMENT_TABLE_USE", 0.28F, 1.4F));
+
+        int paneCount = 0;
+        for (Map.Entry<Integer, ItemStack> entry : buildDecorations(inventory, player, base).entrySet()) {
+            final int slot = entry.getKey();
+            final ItemStack item = entry.getValue();
+            steps.add(() -> inventory.setItem(slot, item));
+            paneCount++;
+            if (paneCount % 5 == 0) {
+                final float pitch = 0.88F + Math.min(0.55F, paneCount * 0.018F);
+                steps.add(() -> Sounds.play(player, "BLOCK_NOTE_BLOCK_CHIME", 0.20F, pitch));
+            }
+        }
+
+        List<TradeSlotItem> visible = visibleTradeItems(inventory, holder, player, trades, base);
+        if (visible.isEmpty()) {
+            int slot = emptyOfferSlot(gui, inventory);
+            ItemStack item = emptyOfferIcon(holder.instance());
+            steps.add(() -> inventory.setItem(slot, item));
+        } else {
+            for (TradeSlotItem entry : visible) {
+                steps.add(() -> {
+                    inventory.setItem(entry.slot, entry.icon);
+                    holder.mapTrade(entry.slot, entry.trade);
+                    Sounds.play(player, "BLOCK_NOTE_BLOCK_PLING", 0.22F, 1.0F + Math.min(0.45F, entry.slot * 0.008F));
+                });
+            }
+        }
+        steps.add(() -> addControls(inventory, holder, player, base));
+        steps.add(() -> Sounds.play(player, "BLOCK_AMETHYST_BLOCK_CHIME", 0.36F, 1.35F));
+
+        final int[] cursor = {0};
+        BukkitRunnable animator = new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!player.isOnline() || opened.get(playerId) != holder
+                        || player.getOpenInventory().getTopInventory() != inventory) {
+                    cancelAnimation(playerId);
+                    return;
+                }
+                if (cursor[0] >= steps.size()) {
+                    cancelAnimation(playerId);
+                    return;
+                }
+                try {
+                    steps.get(cursor[0]++).run();
+                } catch (Throwable ignored) {
+                    // A cosmetic frame must never prevent the trade menu from remaining usable.
+                }
+            }
+        };
+        animationTasks.put(playerId, animator.runTaskTimer(plugin, 0L, gui.animationDelayTicks()));
+    }
+
+    private int emptyOfferSlot(GuiConfig gui, Inventory inventory) {
+        if (!gui.tradeSlots().isEmpty()) {
+            return gui.tradeSlots().get(gui.tradeSlots().size() / 2);
+        }
+        return Math.max(0, Math.min(inventory.getSize() - 1, (gui.startSlot() + gui.endSlot()) / 2));
+    }
+
+    private ItemStack emptyOfferIcon(TraderInstance instance) {
+        ItemStack item = new ItemStack(Material.BOOK);
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            String title = "&7« &#F8BEFBПредложений пока нет &7»";
+            String detail = instance != null && "ghost".equalsIgnoreCase(instance.config().id())
+                    ? "Товары и цены ещё не настроены."
+                    : "Сейчас торговец не предлагает сделки.";
+            meta.setDisplayName(ColorUtil.translate(title));
+            meta.setLore(Arrays.asList(
+                    ColorUtil.translate("&#F8BEFB&l┃ "),
+                    ColorUtil.translate("&#F8BEFB&l┃ &f" + detail),
+                    ColorUtil.translate("&#F8BEFB&l┃ &7Загляни позже.")));
+            item.setItemMeta(meta);
+        }
+        return item;
+    }
+
+    private void addControls(Inventory inventory, MenuHolder holder, Player player, Map<String, String> base) {
+        if (inventory.getSize() < 9) return;
+        int footer = inventory.getSize() - 9;
+        if (holder.page() > 0) {
+            setControl(inventory, holder, player, base, footer + 1, "previous", Material.ARROW,
+                    "&7« &#F8BEFBПредыдущая страница &7»",
+                    Arrays.asList("&#F8BEFB&l┃ &fСтраница: &#F8BEFB{previous} / {pages}", "&7● &fНажмите для перехода"));
+        }
+        setControl(inventory, holder, player, base, footer + 4, "info", Material.PAPER,
+                "&7« &#F8BEFB{trader_colored} &7»",
+                Arrays.asList("&#F8BEFB&l┃ ", "&#F8BEFB&l┃ &fМир: &#F8BEFB{world}",
+                        "&#F8BEFB&l┃ &fКоординаты: &#F8BEFBX {x}, Y {y}, Z {z}",
+                        "&#F8BEFB&l┃ &fДо исчезновения: &#F8BEFB{left}",
+                        "&#F8BEFB&l┃ &fСтраница: &#F8BEFB{page} / {pages}",
+                        "&#F8BEFB&l┃ ", "&7● &fТовары открываются нажатием"));
+        setControl(inventory, holder, player, base, footer + 5, "close", Material.RED_DYE,
+                "&7« &cЗакрыть меню &7»", Arrays.asList("&#F8BEFB&l┃ &fВернуться в мир."));
+        if (holder.page() + 1 < holder.pages()) {
+            setControl(inventory, holder, player, base, footer + 8, "next", Material.ARROW,
+                    "&7« &#F8BEFBСледующая страница &7»",
+                    Arrays.asList("&#F8BEFB&l┃ &fСтраница: &#F8BEFB{next} / {pages}", "&7● &fНажмите для перехода"));
+        }
+    }
+
+    private void setControl(Inventory inventory, MenuHolder holder, Player player, Map<String, String> base,
+                            int slot, String key, Material material, String name, List<String> lore) {
+        if (slot < 0 || slot >= inventory.getSize()) return;
+        IconConfig icon = new IconConfig(material, 1, false, 0, name, lore, null, null, slot);
+        inventory.setItem(slot, IconFactory.build(icon, player, base, 1));
+        holder.mapButton(slot, key);
+    }
+
+    private void cancelAnimation(UUID playerId) {
+        BukkitTask task = animationTasks.remove(playerId);
+        if (task != null) task.cancel();
     }
 
     private void icon(Inventory inventory, MenuHolder holder, IconConfig icon, Player player, Map<String, String> map, String key) {
@@ -295,7 +462,7 @@ public class TradeMenuGui {
                 break;
             case "info":
             default:
-                Sounds.play(player, "ENTITY_VILLAGER_AMBIENT", 0.8F, 1.0F);
+                Sounds.play(player, "BLOCK_NOTE_BLOCK_CHIME", 0.3F, 1.2F);
                 break;
         }
     }
@@ -305,12 +472,32 @@ public class TradeMenuGui {
         if (inventory == null) {
             return;
         }
+        cancelAnimation(player.getUniqueId());
         fill(inventory, holder, player, available(player, holder.instance()));
     }
 
+    /** Called for any inventory close (quit/teleport); clears current menu state. */
     public void onClose(Player player) {
-        opened.remove(player.getUniqueId());
-        active.remove(player.getUniqueId());
+        if (player == null) return;
+        UUID playerId = player.getUniqueId();
+        cancelAnimation(playerId);
+        opened.remove(playerId);
+        active.remove(playerId);
+    }
+
+    /** Ignore the close event of a previous page when a new Trader page is already open. */
+    public void onInventoryClose(Player player, Inventory closedInventory) {
+        if (player == null || closedInventory == null) return;
+        MenuHolder current = opened.get(player.getUniqueId());
+        if (current == null || current.getInventory() != closedInventory) return;
+        onClose(player);
+    }
+
+    public void cancelAnimations() {
+        for (BukkitTask task : new ArrayList<>(animationTasks.values())) {
+            if (task != null) task.cancel();
+        }
+        animationTasks.clear();
     }
 
     /**

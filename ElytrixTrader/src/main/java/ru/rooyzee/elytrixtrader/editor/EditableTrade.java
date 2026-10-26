@@ -3,6 +3,7 @@ package ru.rooyzee.elytrixtrader.editor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
+import ru.rooyzee.elytrixtrader.currency.GhostShardCost;
 import ru.rooyzee.elytrixtrader.model.CostConfig;
 import ru.rooyzee.elytrixtrader.model.IconConfig;
 import ru.rooyzee.elytrixtrader.model.ItemConfig;
@@ -186,12 +187,16 @@ public class EditableTrade {
         }
 
         List<CostConfig> costs = new ArrayList<>();
-        if (expCost > 0) {
+        boolean ghostTrader = GhostShardCost.isGhostTrader(traderId);
+        if (!ghostTrader && expCost > 0) {
             costs.add(new CostConfig(CostConfig.Type.EXPERIENCE_LEVELS, expCost, null, null));
         }
         for (ItemStack item : rawCosts) {
+            if (ghostTrader && !GhostShardCost.isGhostShard(item)) continue;
             costs.add(new CostConfig(CostConfig.Type.ITEM, Math.max(1, item.getAmount()),
                     item.getType(), null, item.clone()));
+            // Ghost Trader supports one canonical shard price only; it never composes currencies.
+            if (ghostTrader) break;
         }
 
         int iconAmount = rawRewards.isEmpty() ? 1 : Math.max(1, rawRewards.get(0).getAmount());

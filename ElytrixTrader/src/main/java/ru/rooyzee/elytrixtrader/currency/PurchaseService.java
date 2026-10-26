@@ -55,6 +55,11 @@ public class PurchaseService {
             deny(player, "trade.disabled", null);
             return Result.UNAVAILABLE;
         }
+        if (GhostShardCost.isGhostTrader(instance.config().id())
+                && !GhostShardCost.isOnlyGhostShardCost(trade)) {
+            plugin.messages().send(player, "trade.ghost-currency", player, null);
+            return Result.UNAVAILABLE;
+        }
         if (!instance.inRange(player)) {
             Map<String, String> map = new HashMap<>();
             map.put("distance", Numbers.amount((long) instance.distance(player)));

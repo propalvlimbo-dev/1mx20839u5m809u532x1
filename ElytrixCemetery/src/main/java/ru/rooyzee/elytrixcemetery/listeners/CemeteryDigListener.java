@@ -123,7 +123,7 @@ public class CemeteryDigListener implements Listener {
         plugin.getGraveManager().refreshHologramsInChunk(event.getChunk());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onEntityDeath(EntityDeathEvent event) {
         plugin.getGhostController().handleDeath(event);
     }
