@@ -32,12 +32,6 @@ items:
     - '&7● &fНажмите для перехода'
     on_click:
     - '[open] elytrix:menu'
-  design_magenta_panel:
-    material: magenta_stained_glass_pane
-    name: '&r'
-  design_purple_panel:
-    material: purple_stained_glass_pane
-    name: '&r'
   lite:
     material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDBmZDY3OTc4MDE0OTY5YzVmNTE3MmJmMzlkMjQzNDcyODFkNmQ5NWFlNzBmMTliNDlkODRmMWY4ZmVlNjg1In19fQ==
     name: '&#8D8D8D&lʟ&#969696&lɪ&#9F9F9F&lᴛ&#A8A8A8&lᴇ &f%player_name% &7| &#8D8D8D19 рублей&7/&fнавсегда'
@@ -217,33 +211,18 @@ items:
     - '&7● &fПокупка на сайте: &#AFFBBEelytrix.pw'
 
 # ---------------------------------------------------------------------------
-# Звук открытия — мягкий слой из sounds.json 1.21.4, без резких кликов:
-#   1-й кадр — block.enchantment_table.use: тихий воздушный «вжух»;
-#   рамка    — block.note_block.chime через кадр, тон плавно растёт;
-#   кнопки   — block.note_block.pling на каждой кнопке, тон плавно растёт;
-#   финал    — block.amethyst_block.chime: аметистовый «дзинь».
-# Громкость 0.2–0.45, питч 0.85–1.5: звуки почти не перекрываются и не
-# «пищат». Чтобы сделать тише/громче — правьте 2-е число у sound.
+# Звук открытия — мягкое вступление и негромкие звуки появления карточек.
+# 1-й кадр — лёгкий воздушный звук; далее каждая карточка появляется с тихим pling,
+# а последняя — с мягким аметистовым акцентом. Стеклянные панели не используются.
+# Громкость 0.2–0.45, питч 0.85–1.5: звуки почти не перекрываются и не «пищат».
 # ---------------------------------------------------------------------------
-# Ранги расположены в просторной симметричной сетке 3×3, по порядку от младших к старшим.
-# Имена, описания, цены и предметы карточек оставлены исходными.
+# Ранги остаются в симметричной сетке 3×3; их данные не меняются.
 animation:
   - tick: 0
     opcodes:
       - st: close 45
       - st: info 49
-      - st: design_magenta_panel 46,48,50,52
       - sound: 'block.enchantment_table.use 0.3 1.5'
-  - opcodes:
-      - st: design_magenta_panel 0,4,8,11,13,15
-      - st: design_purple_panel 1,2,3,5,6,7,9,17,47,51,53
-      - sound: 'block.note_block.chime 0.2 0.85'
-  - opcodes:
-      - st: design_magenta_panel 18,26,27,35,36,44
-      - sound: 'block.note_block.chime 0.25 1.05'
-  - opcodes:
-      - st: design_purple_panel 20,21,23,24,29,30,32,33,38,39,41,42
-      - sound: 'block.note_block.chime 0.28 1.21'
   - opcodes:
       - st: lite 19
       - sound: 'block.note_block.pling 0.26 1.0'
