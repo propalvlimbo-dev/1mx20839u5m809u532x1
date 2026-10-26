@@ -1,0 +1,34 @@
+name: ElytrixSeller
+version: '${version}'
+main: my.reqqpe.rseller.Main
+api-version: '1.16'
+authors: [ElytriX]
+description: '&#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» Продвинутая система скупки для ElytriX'
+website: 'elytrix.pw'
+depend: [PlaceholderAPI]
+softdepend: [NBTAPI, Vault, CoinsEngine, PlayerPoints]
+commands:
+  sell:
+    description: Открыть меню скупщика ElytrixSeller
+    aliases: [buyer, seller, elytrixsell]
+  rseller:
+    aliases: [sa, ba, buyadmin, selladmin, rs, elytrixseller]
+    permission: rseller.admin
+  autosell:
+    description: Переключение автоскупки ElytrixSeller
+    aliases: [autos, elytrixauto]
+
+permissions:
+  rseller.autosell:
+    default: true
+  rseller.autosell.command:
+    default: true
+  rseller.autosell.command.other:
+    default: op
+  rseller.admin:
+    default: op
+
+libraries:
+  - com.zaxxer:HikariCP:7.0.2
+  - com.mysql:mysql-connector-j:9.4.0
+  - org.postgresql:postgresql:42.7.8

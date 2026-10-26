@@ -1,0 +1,126 @@
+sell-command: "mainGUI"
+
+metrics: true
+update-check: true
+
+economy:
+  type: VAULT
+  coinsengine:
+    currency-name: money
+
+registered-menus:
+  - mainGUI
+
+autosell:
+  enable: true
+  message-settings:
+    type: sell
+    send-type: actionbar
+    task-delay: 5
+  settings:
+    type: pickup
+    sell-inventory: false
+    task-delay: 5
+  type-list: false
+  worlds-list:
+    - spawn
+  start_category: ores
+  categories:
+    ores:
+      name: "&#F8BEFBOres"
+      items:
+        - COAL
+        - LAPIS_LAZULI
+        - REDSTONE
+        - GLOWSTONE_DUST
+        - QUARTZ
+        - IRON_INGOT
+        - GOLD_INGOT
+        - COPPER_INGOT
+        - DIAMOND
+        - EMERALD
+        - NETHERITE_INGOT
+        - NETHERITE_SCRAP
+        - ANCIENT_DEBRIS
+    mobs:
+      name: "&#F8BEFBMobs"
+      items:
+        - ROTTEN_FLESH
+        - BONE
+        - ARROW
+        - GUNPOWDER
+        - STRING
+        - SPIDER_EYE
+        - ENDER_PEARL
+        - BLAZE_ROD
+        - BLAZE_POWDER
+        - MAGMA_CREAM
+        - SLIME_BALL
+        - PHANTOM_MEMBRANE
+        - PRISMARINE_SHARD
+        - PRISMARINE_CRYSTALS
+        - SHULKER_SHELL
+        - GHAST_TEAR
+        - LEATHER
+        - BEEF
+        - PORKCHOP
+        - MUTTON
+        - WHITE_WOOL
+        - FEATHER
+        - CHICKEN
+        - EGG
+        - RABBIT
+        - RABBIT_HIDE
+        - INK_SAC
+        - HONEYCOMB
+        - SCUTE
+        - TOTEM_OF_UNDYING
+        - WITHER_SKELETON_SKULL
+        - SKELETON_SKULL
+        - ZOMBIE_HEAD
+        - CREEPER_HEAD
+        - DRAGON_HEAD
+        - RABBIT_FOOT
+        - TRIDENT
+        - SPONGE
+        - HEART_OF_THE_SEA
+        - NAUTILUS_SHELL
+
+numbers_format:
+  placeholders:
+    points: "%.2f~"
+    points_needed: "%.2f~"
+    multiplier_points: "%.2f~"
+    multiplier_coins: "%.2f~"
+    points_fornextlevel: "%.2f~"
+  mainGUI:
+    sell_price: "%.2f~"
+    sell_points: "%.2f~"
+  autoSellGUI:
+    sell_price: "%.2f~"
+    sell_points: "%.2f~"
+  messages:
+    points: "%.2f~"
+    coins: "%.2f~"
+
+boosters:
+  elytrix:
+    coin-multiplier: 3.0
+    point-multiplier: 3.0
+  vip:
+    coin-multiplier: 2.0
+    point-multiplier: 2.0
+  premium:
+    coin-multiplier: 1.5
+    point-multiplier: 1.5
+
+sounds:
+  sell: "ENTITY_EXPERIENCE_ORB_PICKUP"
+  sell-volume: 1.0
+  sell-pitch: 1.0
+  autosell: "ENTITY_EXPERIENCE_ORB_PICKUP"
+  autosell-volume: 1.0
+  autosell-pitch: 1.2
+  no-sell: "BLOCK_NOTE_BLOCK_BASS"
+  no-sell-volume: 1.0
+  no-sell-pitch: 1.0

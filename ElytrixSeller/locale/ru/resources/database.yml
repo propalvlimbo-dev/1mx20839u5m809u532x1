@@ -1,0 +1,22 @@
+type: sqlite
+table_prefix: "elytrixseller_"
+
+logging-enabled: true
+log-purge-days: 30
+
+save-cache-timer: 1800
+
+hikari:
+  max-pool-size: 10
+  minimum-idle: 2
+  keep-alive: 120000
+  idle-timeout: 60000
+  connection-timeout: 30000
+  max-life-time: 1800000
+
+connection:
+  host: localhost
+  port: 3306
+  database: elytrixseller
+  username: "username"
+  password: "password"
