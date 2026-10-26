@@ -2,7 +2,7 @@
 
 ## Downloads
 
-- `ElytrixCemetery.jar` — Cemetery ghost cap is 8; killed ghosts respawn after 10 minutes; only canonical Ghost Shards drop, with no XP or player kill message. Cemetery ghosts are cleared on plugin shutdown.
+- `ElytrixCemetery.jar` — grave digging is reachable for normal players through explicit WorldGuard `BUILD`/`BLOCK_BREAK` allows; the plugin still protects unrelated blocks. On successful digging, the target block and the two blocks above it are set to air, clearing player headroom. The Cemetery region allows `DAMAGE_ANIMALS` so players can hit Allay ghosts. Ghost cap is 8, respawn is 10 minutes, drops are only canonical Ghost Shards (no XP/player kill message), and ghosts are cleared on shutdown.
 - `ElytrixTrader.jar` (2.3.1; also available as `downloads/ElytrixTrader-2.3.1.jar`) — chunk loading for scheduled/manual spawns uses Paper's asynchronous API; there is no synchronous `loadChunk()` or `getChunkAt()` path. The Experienced Trader now checks only safe surface positions (never caves/mines). Ghost Trader still appears for 1 hour every 2 hours, with a different nearby safe spawn point when alternatives exist. Both traders use the shared `ghost.schem`; Ghost trades accept only canonical Cemetery Ghost Shards, and offers/prices remain empty until configured with `/etr edit ghost`. On servers without Paper's async chunk API, unloaded chunks are skipped rather than synchronously loaded.
 
   SHA-256: `135c10b9f9ce25098295c37a01358ef3076ba2e0fb08f71ddeef33ad7618dd39`.
@@ -14,7 +14,7 @@
 - `ElytrixSeller-2.0.2-ElytriX.jar` (RU) and `ElytrixSeller-2.0.2-ElytriX-en.jar` (EN) — include the synchronous DB-schema fix for the reported `no such table` errors and fix `/seller` GUI navigation: button clicks now execute `opengui` actions instead of returning early. Built through GitHub Actions and descriptor-validated. The separate asynchronous PlayerData load/save race in AUD-01 remains; there was no live Paper test, so back up the database and smoke-test before production.
 
   SHA-256: RU `fca93cb7c09fd05279a0dd3a9251d3ad3d85b9aa6e20836420bed822bf9300b4`; EN `af8fbf84e07ed1d24efa6f18abd59dd6bb0ce4cd44c0352953f5a5f5fa934894`.
-- `ElytrixDungeons-1.0.0.jar` — refreshed root download, byte-identical to the current source build (the older `Elytrix-full.zip` remains historical).
+- `ElytrixDungeons-1.0.0.jar` — refreshed root download, byte-identical to the source build; the WorldGuard dungeon region explicitly allows `DAMAGE_ANIMALS` for Allay ghosts (the older `Elytrix-full.zip` remains historical).
 - `ElytrixCasino-2.2.1.jar` (also named `ElytrixCasino.jar` at the root) — config upgrades now merge missing defaults and create backups instead of replacing custom settings.
 - `Elytrix-Menus.zip` — compact BMenu overlay with the changed ElytriX menus and config.
 - `Elytrix-BMenu-Full-Fixed-2026-10-26.zip` — full 72-file BMenu configuration tree from the repository, including all menu folders and examples, plus `INSTALL.txt`. This is config/menu content, not the BMenu plugin JAR; merge server-specific settings instead of blindly replacing them. Includes the same fixes: `/salary`, `/seller`, `/free` run as the player; `/help` links to `/event` with Cemetery and Dungeons; `/moneyshop` stays empty; `/donate` keeps its original rank names, gradients, `%player_name%`, descriptions, prices, materials and actions exactly, with only the stained-glass palette and 3×3 card positions changed; no privileges or purchase/grant actions were added; Paradise Place stays absent.

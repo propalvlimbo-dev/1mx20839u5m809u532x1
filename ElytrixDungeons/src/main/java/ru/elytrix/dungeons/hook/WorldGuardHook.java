@@ -65,6 +65,9 @@ public final class WorldGuardHook {
             setStateFlagIfPresent(flagsClass, setFlag, region, "INTERACT", allowState);
             setStateFlagIfPresent(flagsClass, setFlag, region, "USE", allowState);
             setStateFlagIfPresent(flagsClass, setFlag, region, "CHEST_ACCESS", allowState);
+            // Surface-dungeon ghosts are Allays; explicitly allow players to damage them even
+            // when an inherited/global WorldGuard DAMAGE_ANIMALS flag denies it.
+            setStateFlagIfPresent(flagsClass, setFlag, region, "DAMAGE_ANIMALS", allowState);
             setStateFlagIfPresent(flagsClass, setFlag, region, "MOB_SPAWNING", allowState);
             setStateFlagIfPresent(flagsClass, setFlag, region, "PVP", allowPvp ? allowState : denyState);
 

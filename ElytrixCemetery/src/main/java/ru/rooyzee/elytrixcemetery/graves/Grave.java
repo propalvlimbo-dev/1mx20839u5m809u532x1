@@ -87,9 +87,11 @@ public class Grave {
         dug = true;
         dugAt = System.currentTimeMillis();
 
-        // 1. Убираем землю (открываем яму к сундуку)
+        // 1. Открываем могилу и оставляем игроку свободный двухблочный проход.
         Block block = digLocation.getBlock();
         block.setType(Material.AIR, false);
+        block.getRelative(0, 1, 0).setType(Material.AIR, false);
+        block.getRelative(0, 2, 0).setType(Material.AIR, false);
 
         // 2. Наполняем сундук лутом с учетом текущего онлайна
         Block cb = chestLocation.getBlock();

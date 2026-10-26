@@ -39,6 +39,12 @@ public class RegionManager {
             ProtectedCuboidRegion region = new ProtectedCuboidRegion(REGION_NAME, min, max);
             region.setPriority(100);
             region.setFlag(Flags.PVP, StateFlag.State.ALLOW);
+            // WorldGuard must let BlockBreakEvent reach CemeteryDigListener; the plugin's
+            // own listener still protects every non-grave block inside the boundary.
+            region.setFlag(Flags.BUILD, StateFlag.State.ALLOW);
+            region.setFlag(Flags.BLOCK_BREAK, StateFlag.State.ALLOW);
+            // Allay ghosts are passive entities and can be covered by a global WG deny.
+            region.setFlag(Flags.DAMAGE_ANIMALS, StateFlag.State.ALLOW);
             region.setFlag(Flags.MOB_SPAWNING, StateFlag.State.ALLOW);
             region.setFlag(Flags.CHEST_ACCESS, StateFlag.State.ALLOW);
             region.setFlag(Flags.USE, StateFlag.State.ALLOW);
@@ -47,8 +53,9 @@ public class RegionManager {
             region.setFlag(Flags.TNT, StateFlag.State.DENY);
             region.setFlag(Flags.OTHER_EXPLOSION, StateFlag.State.DENY);
 
+            if (rm.hasRegion(REGION_NAME)) rm.removeRegion(REGION_NAME);
             rm.addRegion(region);
-            plugin.getLogger().info("Регион Кладбища " + REGION_NAME + " успешно зарегистрирован в WorldGuard с доступом к сундукам.");
+            plugin.getLogger().info("Регион Кладбища " + REGION_NAME + " успешно зарегистрирован в WorldGuard с раскопкой могил и уроном по призракам.");
         } catch (Throwable t) {
             plugin.getLogger().warning("WorldGuard hook not loaded or unavailable: " + t.getMessage());
         }

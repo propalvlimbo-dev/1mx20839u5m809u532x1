@@ -1,0 +1,101 @@
+name: Build Cemetery and Dungeons
+
+on:
+  push:
+    branches:
+      - arena/6ab59a12-1mx20839u5m809u532x1
+    paths:
+      - .github/workflows/build-cemetery-dungeons.yml
+      - ElytrixCemetery/**
+      - ElytrixDungeons/**
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          cache-dependency-path: |
+            ElytrixCemetery/pom.xml
+            ElytrixDungeons/pom.xml
+
+      - name: Build Cemetery
+        run: mvn -B -ntp -f ElytrixCemetery/pom.xml clean package
+
+      - name: Build Dungeons
+        run: mvn -B -ntp -f ElytrixDungeons/pom.xml clean package
+
+      - name: Validate and copy release JARs
+        shell: bash
+        run: |
+          set -euo pipefail
+          cemetery='ElytrixCemetery/target/ElytrixCemetery.jar'
+          dungeons='ElytrixDungeons/target/ElytrixDungeons-1.0.0.jar'
+          test -f "$cemetery"
+          test -f "$dungeons"
+          python3 - "$cemetery" "$dungeons" <<'PY'
+          import re
+          import sys
+          from zipfile import ZipFile
+
+          expected = {
+              'ElytrixCemetery/target/ElytrixCemetery.jar': 'ru.rooyzee.elytrixcemetery.Main',
+              'ElytrixDungeons/target/ElytrixDungeons-1.0.0.jar': 'ru.elytrix.dungeons.ElytrixDungeonsPlugin',
+          }
+          for path in sys.argv[1:]:
+              with ZipFile(path) as archive:
+                  bad = archive.testzip()
+                  if bad:
+                      raise SystemExit(f'{path}: corrupt entry {bad}')
+                  entries = set(archive.namelist())
+                  descriptor = archive.read('plugin.yml').decode('utf-8')
+                  main = re.search(r'(?m)^main:\s*[\"\']?([^\s\"\']+)', descriptor)
+                  if not main or main.group(1) != expected[path]:
+                      raise SystemExit(f'{path}: unexpected plugin main')
+                  if main.group(1).replace('.', '/') + '.class' not in entries:
+                      raise SystemExit(f'{path}: declared main class is missing')
+                  print(f'validated {path}: {main.group(1)}')
+          PY
+          mkdir -p downloads/Elytrix-Update-2026-10-26
+          cp "$cemetery" downloads/ElytrixCemetery.jar
+          cp "$cemetery" downloads/Elytrix-Update-2026-10-26/ElytrixCemetery.jar
+          cp "$dungeons" downloads/ElytrixDungeons-1.0.0.jar
+          cp "$dungeons" downloads/Elytrix-Update-2026-10-26/ElytrixDungeons-1.0.0.jar
+          sha256sum downloads/ElytrixCemetery.jar downloads/ElytrixDungeons-1.0.0.jar
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ElytrixCemetery-and-Dungeons
+          path: |
+            downloads/ElytrixCemetery.jar
+            downloads/Elytrix-Update-2026-10-26/ElytrixCemetery.jar
+            downloads/ElytrixDungeons-1.0.0.jar
+            downloads/Elytrix-Update-2026-10-26/ElytrixDungeons-1.0.0.jar
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Commit built JARs to this branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add downloads/ElytrixCemetery.jar downloads/Elytrix-Update-2026-10-26/ElytrixCemetery.jar downloads/ElytrixDungeons-1.0.0.jar downloads/Elytrix-Update-2026-10-26/ElytrixDungeons-1.0.0.jar
+          if git diff --cached --quiet; then
+            echo "Built JARs are already up to date."
+          else
+            git commit -m "Build Cemetery and Dungeons fixes"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
