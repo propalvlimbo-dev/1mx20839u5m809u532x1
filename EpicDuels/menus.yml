@@ -1,0 +1,1307 @@
+menus:
+  main:
+    title: "<#F8BEFB><bold>Дуэли</bold>"
+    size: 27
+    buttons:
+      slot-4:
+        material: ENDER_EYE
+        name: "<#F8BEFB><bold>Наблюдение</bold>"
+        lore:
+          - "<#F8BEFB><bold>┃</bold> <white>Режим: <#F8BEFB>зритель"
+          - "<#F8BEFB><bold>┃</bold> "
+          - "<gray>● <white>Нажмите, чтобы смотреть бой"
+      slot-10:
+        material: NETHERITE_SWORD
+        name: "<#F8BEFB><bold>Дуэль</bold>"
+        lore:
+          - "<#F8BEFB><bold>┃</bold> <white>Формат: <#F8BEFB>1 на 1"
+          - "<#F8BEFB><bold>┃</bold> "
+          - "<gray>● <white>Нажмите, чтобы выбрать игрока"
+      slot-13:
+        material: BOOK
+        name: "<#F8BEFB><bold>Статистика</bold>"
+        lore:
+          - "<#F8BEFB><bold>┃</bold> <white>Данные: <#F8BEFB>победы и поражения"
+          - "<#F8BEFB><bold>┃</bold> "
+          - "<gray>● <white>Нажмите, чтобы открыть"
+      slot-16:
+        material: COMPASS
+        name: "<#F8BEFB><bold>Поиск соперника</bold>"
+        lore:
+          - "<#F8BEFB><bold>┃</bold> <white>Режим: <#F8BEFB>очередь"
+          - "<#F8BEFB><bold>┃</bold> "
+          - "<gray>● <white>Нажмите, чтобы найти соперника"
+      slot-22:
+        material: GRAY_STAINED_GLASS_PANE
+        name: "<dark_gray> "
+        lore: []
+  duels:
+    title: "<#F8BEFB><bold>Выбор игрока</bold>"
+    size: 54
+    buttons:
+      slot-10:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы вызвать на дуэль"
+      slot-11:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы вызвать на дуэль"
+      slot-12:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы вызвать на дуэль"
+      slot-13:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы вызвать на дуэль"
+      slot-14:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы вызвать на дуэль"
+      slot-15:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы вызвать на дуэль"
+      slot-16:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы вызвать на дуэль"
+      slot-19:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы вызвать на дуэль"
+      slot-20:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы вызвать на дуэль"
+      slot-21:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы вызвать на дуэль"
+      slot-22:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы вызвать на дуэль"
+      slot-23:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы вызвать на дуэль"
+      slot-24:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы вызвать на дуэль"
+      slot-25:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы вызвать на дуэль"
+      slot-28:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы вызвать на дуэль"
+      slot-29:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы вызвать на дуэль"
+      slot-30:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы вызвать на дуэль"
+      slot-31:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы вызвать на дуэль"
+      slot-32:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы вызвать на дуэль"
+      slot-33:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы вызвать на дуэль"
+      slot-34:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы вызвать на дуэль"
+      slot-37:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы вызвать на дуэль"
+      slot-38:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы вызвать на дуэль"
+      slot-39:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы вызвать на дуэль"
+      slot-40:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы вызвать на дуэль"
+      slot-41:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы вызвать на дуэль"
+      slot-42:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы вызвать на дуэль"
+      slot-43:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы вызвать на дуэль"
+      slot-45:
+        material: BLACK_DYE
+        name: "<#F8BEFB><bold>Назад</bold>"
+        lore:
+          - "<gray>● <white>Предыдущая страница"
+      slot-49:
+        material: RED_DYE
+        name: "<red><bold>Закрыть</bold>"
+        lore:
+          - "<gray>● <white>Вернуться в меню"
+      slot-53:
+        material: BLACK_DYE
+        name: "<#F8BEFB><bold>Далее</bold>"
+        lore:
+          - "<gray>● <white>Следующая страница"
+  stats:
+    title: "<#F8BEFB><bold>Статистика</bold>"
+    size: 27
+    buttons:
+      slot-4:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Профиль игрока"
+      slot-10:
+        name: "<green><bold>Победы</bold>"
+      slot-12:
+        name: "<red><bold>Поражения</bold>"
+      slot-14:
+        name: "<#F8BEFB><bold>Итоги</bold>"
+        lore:
+          - "<#F8BEFB><bold>┃</bold> <white>Процент побед: <#F8BEFB>в /duels"
+      slot-16:
+        name: "<#F8BEFB><bold>Очки</bold>"
+        lore:
+          - "<#F8BEFB><bold>┃</bold> <white>Топ игроков: <#F8BEFB>/duel leaderboard wins"
+      slot-22:
+        material: RED_DYE
+        name: "<red><bold>Закрыть</bold>"
+        lore:
+          - "<gray>● <white>Вернуться в меню"
+  matchmaking:
+    title: "<#F8BEFB><bold>Поиск соперника</bold>"
+    size: 54
+    buttons:
+      slot-10:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы встать в очередь"
+      slot-11:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы встать в очередь"
+      slot-12:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы встать в очередь"
+      slot-13:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы встать в очередь"
+      slot-14:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы встать в очередь"
+      slot-15:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы встать в очередь"
+      slot-16:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы встать в очередь"
+      slot-19:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы встать в очередь"
+      slot-20:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы встать в очередь"
+      slot-21:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы встать в очередь"
+      slot-22:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы встать в очередь"
+      slot-23:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы встать в очередь"
+      slot-24:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы встать в очередь"
+      slot-25:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы встать в очередь"
+      slot-28:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы встать в очередь"
+      slot-29:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы встать в очередь"
+      slot-30:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы встать в очередь"
+      slot-31:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы встать в очередь"
+      slot-32:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы встать в очередь"
+      slot-33:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы встать в очередь"
+      slot-34:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы встать в очередь"
+      slot-37:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы встать в очередь"
+      slot-38:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы встать в очередь"
+      slot-39:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы встать в очередь"
+      slot-40:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы встать в очередь"
+      slot-41:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы встать в очередь"
+      slot-42:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы встать в очередь"
+      slot-43:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы встать в очередь"
+      slot-45:
+        material: BLACK_DYE
+        name: "<#F8BEFB><bold>Назад</bold>"
+        lore:
+          - "<gray>● <white>Предыдущая страница"
+      slot-49:
+        material: RED_DYE
+        name: "<red><bold>Закрыть</bold>"
+        lore:
+          - "<gray>● <white>Вернуться в меню"
+      slot-53:
+        material: BLACK_DYE
+        name: "<#F8BEFB><bold>Далее</bold>"
+        lore:
+          - "<gray>● <white>Следующая страница"
+  kit-select:
+    title: "<#F8BEFB><bold>Выбор кита</bold>"
+    size: 54
+    buttons:
+      slot-10:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-11:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-12:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-13:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-14:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-15:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-16:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-19:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-20:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-21:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-22:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-23:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-24:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-25:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-28:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-29:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-30:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-31:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-32:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-33:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-34:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-37:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-38:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-39:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-40:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-41:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-42:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-43:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-45:
+        material: BLACK_DYE
+        name: "<#F8BEFB><bold>Назад</bold>"
+        lore:
+          - "<gray>● <white>Предыдущая страница"
+      slot-49:
+        material: RED_DYE
+        name: "<red><bold>Закрыть</bold>"
+        lore:
+          - "<gray>● <white>Вернуться в меню"
+      slot-53:
+        material: BLACK_DYE
+        name: "<#F8BEFB><bold>Далее</bold>"
+        lore:
+          - "<gray>● <white>Следующая страница"
+  rounds-select:
+    title: "<#F8BEFB><bold>Раунды</bold>"
+    size: 27
+    buttons:
+      slot-11:
+        material: PAPER
+        name: "<#F8BEFB><bold>1 раунд</bold>"
+        lore:
+          - "<#F8BEFB><bold>┃</bold> <white>Победа: <#F8BEFB>один бой"
+          - "<#F8BEFB><bold>┃</bold> "
+          - "<gray>● <white>Нажмите, чтобы выбрать"
+      slot-13:
+        material: BOOK
+        name: "<#F8BEFB><bold>3 раунда</bold>"
+        lore:
+          - "<#F8BEFB><bold>┃</bold> <white>Победа: <#F8BEFB>2 боя"
+          - "<#F8BEFB><bold>┃</bold> "
+          - "<gray>● <white>Нажмите, чтобы выбрать"
+      slot-15:
+        material: ENCHANTED_BOOK
+        name: "<#F8BEFB><bold>5 раундов</bold>"
+        lore:
+          - "<#F8BEFB><bold>┃</bold> <white>Победа: <#F8BEFB>3 боя"
+          - "<#F8BEFB><bold>┃</bold> "
+          - "<gray>● <white>Нажмите, чтобы выбрать"
+      slot-22:
+        material: RED_DYE
+        name: "<red><bold>Назад</bold>"
+        lore:
+          - "<gray>● <white>Вернуться к выбору кита"
+  arena-select:
+    title: "<#F8BEFB><bold>Выбор карты</bold>"
+    size: 54
+    buttons:
+      slot-10:
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать карту"
+      slot-11:
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать карту"
+      slot-12:
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать карту"
+      slot-13:
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать карту"
+      slot-14:
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать карту"
+      slot-15:
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать карту"
+      slot-16:
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать карту"
+      slot-19:
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать карту"
+      slot-20:
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать карту"
+      slot-21:
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать карту"
+      slot-22:
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать карту"
+      slot-23:
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать карту"
+      slot-24:
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать карту"
+      slot-25:
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать карту"
+      slot-28:
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать карту"
+      slot-29:
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать карту"
+      slot-30:
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать карту"
+      slot-31:
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать карту"
+      slot-32:
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать карту"
+      slot-33:
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать карту"
+      slot-34:
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать карту"
+      slot-37:
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать карту"
+      slot-38:
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать карту"
+      slot-39:
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать карту"
+      slot-40:
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать карту"
+      slot-41:
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать карту"
+      slot-42:
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать карту"
+      slot-43:
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать карту"
+      slot-45:
+        material: BLACK_DYE
+        name: "<#F8BEFB><bold>Назад</bold>"
+        lore:
+          - "<gray>● <white>Предыдущая страница"
+      slot-49:
+        material: RED_DYE
+        name: "<red><bold>Закрыть</bold>"
+        lore:
+          - "<gray>● <white>Вернуться в меню"
+      slot-53:
+        material: BLACK_DYE
+        name: "<#F8BEFB><bold>Далее</bold>"
+        lore:
+          - "<gray>● <white>Следующая страница"
+  kit-edit:
+    title: "<#F8BEFB><bold>Кит: <kit></bold>"
+    size: 54
+    buttons:
+      slot-53:
+        material: EMERALD
+        name: "<green><bold>Сохранить</bold>"
+        lore:
+          - "<gray>● <white>Записать кит"
+  kit-preview:
+    title: "<#F8BEFB><bold>Кит: <kit></bold>"
+    size: 54
+    buttons: {}
+  kit-customize:
+    title: "<#F8BEFB><bold>Раскладка: <kit></bold>"
+    size: 54
+    buttons: {}
+  kit-list:
+    title: "<#F8BEFB><bold>Киты</bold>"
+    size: 54
+    buttons:
+      slot-10:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы посмотреть кит"
+      slot-11:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы посмотреть кит"
+      slot-12:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы посмотреть кит"
+      slot-13:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы посмотреть кит"
+      slot-14:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы посмотреть кит"
+      slot-15:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы посмотреть кит"
+      slot-16:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы посмотреть кит"
+      slot-19:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы посмотреть кит"
+      slot-20:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы посмотреть кит"
+      slot-21:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы посмотреть кит"
+      slot-22:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы посмотреть кит"
+      slot-23:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы посмотреть кит"
+      slot-24:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы посмотреть кит"
+      slot-25:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы посмотреть кит"
+      slot-28:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы посмотреть кит"
+      slot-29:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы посмотреть кит"
+      slot-30:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы посмотреть кит"
+      slot-31:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы посмотреть кит"
+      slot-32:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы посмотреть кит"
+      slot-33:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы посмотреть кит"
+      slot-34:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы посмотреть кит"
+      slot-37:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы посмотреть кит"
+      slot-38:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы посмотреть кит"
+      slot-39:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы посмотреть кит"
+      slot-40:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы посмотреть кит"
+      slot-41:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы посмотреть кит"
+      slot-42:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы посмотреть кит"
+      slot-43:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы посмотреть кит"
+      slot-45:
+        material: BLACK_DYE
+        name: "<#F8BEFB><bold>Назад</bold>"
+        lore:
+          - "<gray>● <white>Предыдущая страница"
+      slot-49:
+        material: RED_DYE
+        name: "<red><bold>Закрыть</bold>"
+        lore:
+          - "<gray>● <white>Вернуться в меню"
+      slot-53:
+        material: BLACK_DYE
+        name: "<#F8BEFB><bold>Далее</bold>"
+        lore:
+          - "<gray>● <white>Следующая страница"
+  kit-editor-list:
+    title: "<#F8BEFB><bold>Раскладка</bold>"
+    size: 54
+    buttons:
+      slot-10:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы изменить"
+      slot-11:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы изменить"
+      slot-12:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы изменить"
+      slot-13:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы изменить"
+      slot-14:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы изменить"
+      slot-15:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы изменить"
+      slot-16:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы изменить"
+      slot-19:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы изменить"
+      slot-20:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы изменить"
+      slot-21:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы изменить"
+      slot-22:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы изменить"
+      slot-23:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы изменить"
+      slot-24:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы изменить"
+      slot-25:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы изменить"
+      slot-28:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы изменить"
+      slot-29:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы изменить"
+      slot-30:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы изменить"
+      slot-31:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы изменить"
+      slot-32:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы изменить"
+      slot-33:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы изменить"
+      slot-34:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы изменить"
+      slot-37:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы изменить"
+      slot-38:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы изменить"
+      slot-39:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы изменить"
+      slot-40:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы изменить"
+      slot-41:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы изменить"
+      slot-42:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы изменить"
+      slot-43:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы изменить"
+      slot-45:
+        material: BLACK_DYE
+        name: "<#F8BEFB><bold>Назад</bold>"
+        lore:
+          - "<gray>● <white>Предыдущая страница"
+      slot-49:
+        material: RED_DYE
+        name: "<red><bold>Закрыть</bold>"
+        lore:
+          - "<gray>● <white>Вернуться в меню"
+      slot-53:
+        material: BLACK_DYE
+        name: "<#F8BEFB><bold>Далее</bold>"
+        lore:
+          - "<gray>● <white>Следующая страница"
+  arena-list:
+    title: "<#F8BEFB><bold>Арены</bold>"
+    size: 54
+    buttons:
+      slot-10:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Карта для дуэлей"
+      slot-11:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Карта для дуэлей"
+      slot-12:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Карта для дуэлей"
+      slot-13:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Карта для дуэлей"
+      slot-14:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Карта для дуэлей"
+      slot-15:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Карта для дуэлей"
+      slot-16:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Карта для дуэлей"
+      slot-19:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Карта для дуэлей"
+      slot-20:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Карта для дуэлей"
+      slot-21:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Карта для дуэлей"
+      slot-22:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Карта для дуэлей"
+      slot-23:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Карта для дуэлей"
+      slot-24:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Карта для дуэлей"
+      slot-25:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Карта для дуэлей"
+      slot-28:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Карта для дуэлей"
+      slot-29:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Карта для дуэлей"
+      slot-30:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Карта для дуэлей"
+      slot-31:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Карта для дуэлей"
+      slot-32:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Карта для дуэлей"
+      slot-33:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Карта для дуэлей"
+      slot-34:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Карта для дуэлей"
+      slot-37:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Карта для дуэлей"
+      slot-38:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Карта для дуэлей"
+      slot-39:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Карта для дуэлей"
+      slot-40:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Карта для дуэлей"
+      slot-41:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Карта для дуэлей"
+      slot-42:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Карта для дуэлей"
+      slot-43:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Карта для дуэлей"
+      slot-45:
+        material: BLACK_DYE
+        name: "<#F8BEFB><bold>Назад</bold>"
+        lore:
+          - "<gray>● <white>Предыдущая страница"
+      slot-49:
+        material: RED_DYE
+        name: "<red><bold>Закрыть</bold>"
+        lore:
+          - "<gray>● <white>Вернуться в меню"
+      slot-53:
+        material: BLACK_DYE
+        name: "<#F8BEFB><bold>Далее</bold>"
+        lore:
+          - "<gray>● <white>Следующая страница"
+  party-mode:
+    title: "<#F8BEFB><bold>Группа</bold>"
+    size: 27
+    buttons:
+      slot-11:
+        material: DIAMOND_SWORD
+        name: "<#F8BEFB><bold>Командная дуэль</bold>"
+        lore:
+          - "<#F8BEFB><bold>┃</bold> <white>Формат: <#F8BEFB>2 на 2 — 4 на 4"
+          - "<#F8BEFB><bold>┃</bold> "
+          - "<gray>● <white>Нажмите, чтобы выбрать"
+      slot-15:
+        material: GOLDEN_HORSE_ARMOR
+        name: "<#F8BEFB><bold>Турнир</bold>"
+        lore:
+          - "<#F8BEFB><bold>┃</bold> <white>Формат: <#F8BEFB>сетка на вылет"
+          - "<#F8BEFB><bold>┃</bold> "
+          - "<gray>● <white>Нажмите, чтобы выбрать"
+  party-team-size:
+    title: "<#F8BEFB><bold>Размер команд</bold>"
+    size: 27
+    buttons:
+      slot-11:
+        name: "<#F8BEFB><bold>2 на 2</bold>"
+      slot-13:
+        name: "<#F8BEFB><bold>3 на 3</bold>"
+      slot-15:
+        name: "<#F8BEFB><bold>4 на 4</bold>"
+      slot-22:
+        material: RED_DYE
+        name: "<red><bold>Назад</bold>"
+        lore:
+          - "<gray>● <white>Вернуться в меню"
+  party-kit:
+    title: "<#F8BEFB><bold>Кит группы</bold>"
+    size: 54
+    buttons:
+      slot-10:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-11:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-12:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-13:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-14:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-15:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-16:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-19:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-20:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-21:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-22:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-23:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-24:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-25:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-28:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-29:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-30:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-31:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-32:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-33:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-34:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-37:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-38:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-39:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-40:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-41:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-42:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-43:
+        name: "<#F8BEFB><bold><kit></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы выбрать кит"
+      slot-45:
+        material: BLACK_DYE
+        name: "<#F8BEFB><bold>Назад</bold>"
+        lore:
+          - "<gray>● <white>Предыдущая страница"
+      slot-49:
+        material: RED_DYE
+        name: "<red><bold>Закрыть</bold>"
+        lore:
+          - "<gray>● <white>Вернуться в меню"
+      slot-53:
+        material: BLACK_DYE
+        name: "<#F8BEFB><bold>Далее</bold>"
+        lore:
+          - "<gray>● <white>Следующая страница"
+  party-confirm:
+    title: "<#F8BEFB><bold>Подтверждение</bold>"
+    size: 27
+    buttons:
+      slot-11:
+        material: LIME_WOOL
+        name: "<green><bold>Начать</bold>"
+        lore:
+          - "<gray>● <white>Запустить бой"
+      slot-15:
+        material: RED_DYE
+        name: "<red><bold>Отмена</bold>"
+        lore:
+          - "<gray>● <white>Закрыть меню"
+  spectate:
+    title: "<#F8BEFB><bold>Живые дуэли</bold>"
+    size: 54
+    buttons:
+      slot-10:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы смотреть"
+      slot-11:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы смотреть"
+      slot-12:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы смотреть"
+      slot-13:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы смотреть"
+      slot-14:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы смотреть"
+      slot-15:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы смотреть"
+      slot-16:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы смотреть"
+      slot-19:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы смотреть"
+      slot-20:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы смотреть"
+      slot-21:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы смотреть"
+      slot-22:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы смотреть"
+      slot-23:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы смотреть"
+      slot-24:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы смотреть"
+      slot-25:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы смотреть"
+      slot-28:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы смотреть"
+      slot-29:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы смотреть"
+      slot-30:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы смотреть"
+      slot-31:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы смотреть"
+      slot-32:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы смотреть"
+      slot-33:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы смотреть"
+      slot-34:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы смотреть"
+      slot-37:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы смотреть"
+      slot-38:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы смотреть"
+      slot-39:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы смотреть"
+      slot-40:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы смотреть"
+      slot-41:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы смотреть"
+      slot-42:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы смотреть"
+      slot-43:
+        name: "<#F8BEFB><bold><name></bold>"
+        lore:
+          - "<gray>● <white>Нажмите, чтобы смотреть"
+      slot-45:
+        material: BLACK_DYE
+        name: "<#F8BEFB><bold>Назад</bold>"
+        lore:
+          - "<gray>● <white>Предыдущая страница"
+      slot-49:
+        material: RED_DYE
+        name: "<red><bold>Закрыть</bold>"
+        lore:
+          - "<gray>● <white>Вернуться в меню"
+      slot-53:
+        material: BLACK_DYE
+        name: "<#F8BEFB><bold>Далее</bold>"
+        lore:
+          - "<gray>● <white>Следующая страница"

@@ -1,0 +1,111 @@
+name: Build ElytrixDuelsBridge
+
+on:
+  push:
+    branches:
+      - arena/6ab59a12-1mx20839u5m809u532x1
+    paths:
+      - .github/workflows/build-elytrix-duelsbridge.yml
+      - ElytrixDuelsBridge/**
+      - tools/pack_duels.py
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Compile and package Bridge
+        run: bash ElytrixDuelsBridge/build.sh "$JAVA_HOME"
+
+      - name: Validate release JAR and refresh full duels bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          jar='ElytrixDuelsBridge/ElytrixDuelsBridge-1.12.5.jar'
+          test -f "$jar"
+          python3 - "$jar" <<'PY'
+          import re
+          import sys
+          from zipfile import ZipFile
+
+          path = sys.argv[1]
+          with ZipFile(path) as archive:
+              bad = archive.testzip()
+              if bad:
+                  raise SystemExit(f'{path}: corrupt entry {bad}')
+              entries = set(archive.namelist())
+              descriptor = archive.read('plugin.yml').decode('utf-8')
+              main = re.search(r'(?m)^main:\s*[\"\']?([^\s\"\']+)', descriptor)
+              version = re.search(r'(?m)^version:\s*[\"\']?([^\s\"\']+)', descriptor)
+              if not main or main.group(1) != 'ru.elytrix.duelsbridge.ElytrixDuelsBridge':
+                  raise SystemExit(f'{path}: unexpected plugin main')
+              if main.group(1).replace('.', '/') + '.class' not in entries:
+                  raise SystemExit(f'{path}: declared main class is missing')
+              if not version or version.group(1) != '1.12.5':
+                  raise SystemExit(f'{path}: expected plugin version 1.12.5')
+              if 'ru/elytrix/duelsbridge/ArenaRules.class' not in entries:
+                  raise SystemExit(f'{path}: ArenaRules class is missing')
+              if any(name.startswith(('org/bukkit/', 'net/kyori/')) for name in entries):
+                  raise SystemExit(f'{path}: compile-only API stubs leaked into the JAR')
+              print(f'validated {path}: ElytrixDuelsBridge {version.group(1)}')
+          PY
+          mkdir -p downloads/Elytrix-Update-2026-10-26
+          cp "$jar" downloads/ElytrixDuelsBridge-1.12.5.jar
+          cp "$jar" downloads/Elytrix-Update-2026-10-26/ElytrixDuelsBridge-1.12.5.jar
+          python3 tools/pack_duels.py
+          python3 - <<'PY'
+          from io import BytesIO
+          from zipfile import ZipFile
+
+          bundle = 'downloads/ElytriX-duels-full.zip'
+          embedded = 'ElytriX-duels-full/plugins/ElytrixDuelsBridge-1.12.5.jar'
+          with ZipFile(bundle) as archive:
+              bad = archive.testzip()
+              if bad:
+                  raise SystemExit(f'{bundle}: corrupt entry {bad}')
+              with ZipFile(BytesIO(archive.read(embedded))) as jar:
+                  descriptor = jar.read('plugin.yml').decode('utf-8')
+                  if 'version: 1.12.5' not in descriptor:
+                      raise SystemExit('full duels bundle contains the wrong Bridge version')
+          print(f'validated {bundle}: Bridge 1.12.5 embedded')
+          PY
+          sha256sum downloads/ElytrixDuelsBridge-1.12.5.jar downloads/ElytriX-duels-full.zip
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ElytrixDuelsBridge-1.12.5
+          path: |
+            downloads/ElytrixDuelsBridge-1.12.5.jar
+            downloads/Elytrix-Update-2026-10-26/ElytrixDuelsBridge-1.12.5.jar
+            downloads/ElytriX-duels-full.zip
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Commit release artifacts to this branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add downloads/ElytrixDuelsBridge-1.12.5.jar \
+            downloads/Elytrix-Update-2026-10-26/ElytrixDuelsBridge-1.12.5.jar \
+            downloads/ElytriX-duels-full.zip
+          if git diff --cached --quiet; then
+            echo "Bridge release artifacts are already up to date."
+          else
+            git commit -m "Build ElytrixDuelsBridge 1.12.5"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi

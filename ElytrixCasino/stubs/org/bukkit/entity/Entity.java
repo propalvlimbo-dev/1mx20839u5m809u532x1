@@ -1,0 +1,58 @@
+package org.bukkit.entity;
+
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.util.Vector;
+
+public interface Entity {
+    Location getLocation();
+    Location getLocation(Location loc);
+    World getWorld();
+    UUID getUniqueId();
+    EntityType getType();
+    boolean isDead();
+    boolean isValid();
+    void remove();
+    boolean teleport(Location location);
+    Vector getVelocity();
+    void setVelocity(Vector velocity);
+    PersistentDataContainer getPersistentDataContainer();
+    Set<String> getScoreboardTags();
+    boolean addScoreboardTag(String tag);
+    boolean removeScoreboardTag(String tag);
+    float getFallDistance();
+    void setFallDistance(float distance);
+    int getTicksLived();
+    void setTicksLived(int value);
+    int getFireTicks();
+    void setFireTicks(int ticks);
+    List<Entity> getPassengers();
+    boolean eject();
+    boolean addPassenger(Entity passenger);
+    List<Entity> getNearbyEntities(double x, double y, double z);
+    double getHeight();
+    double getWidth();
+    void setGravity(boolean gravity);
+    boolean hasGravity();
+    void setInvulnerable(boolean flag);
+    boolean isInvulnerable();
+    String getCustomName();
+    void setCustomName(String name);
+    boolean isCustomNameVisible();
+    void setCustomNameVisible(boolean flag);
+    boolean isOnGround();
+    boolean isInsideVehicle();
+    Entity getVehicle();
+    void setSilent(boolean silent);
+    boolean isSilent();
+    boolean isPersistent();
+    void setPersistent(boolean persistent);
+    float getYaw();
+    float getPitch();
+    void setRotation(float yaw, float pitch);
+    int getEntityId();
+}

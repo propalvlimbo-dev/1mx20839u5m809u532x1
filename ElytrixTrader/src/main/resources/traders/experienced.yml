@@ -1,0 +1,60 @@
+# ═══════════════════════════════════════════════════════════════
+#  Опытный Торговец — торгует за уровни опыта
+#  id торговца = имя файла: experienced
+#  Торгуемые предметы настраиваются в игре: /etr edit experienced
+# ═══════════════════════════════════════════════════════════════
+
+enabled: true
+display-name: '&#F8BEFB&lОпытный Торговец'
+skin: 'Steve'
+hold-item: true
+spawn-sound: ENTITY_PLAYER_LEVELUP
+
+worlds:
+  - 'world'
+
+lifetime-seconds: 7200
+# Только верхняя поверхность: подземные пещеры и шахты исключены.
+surface-only: true
+random-trades: 14
+trade-cooldown-seconds: 60
+
+hologram:
+  enabled: true
+  height: 2.8
+  line-height: 0.30
+  lines:
+    - '&d&lОПЫТНЫЙ ТОРГОВЕЦ'
+    - '&fУникальный странствующий торговец'
+    - ' '
+    - '&d• &fПКМ &8— &fОткрыть меню сделок'
+    - '&d• &fИсчезнет через: &d{left}'
+    - ' '
+    - '&d• &fНаш сайт: &delytrix.pw'
+
+icon:
+  material: experience_bottle
+  amount: 1
+  glow: true
+
+info-item:
+  material: book
+  display-name: '&#F8BEFB&l{trader}'
+  lore:
+    - '&#F8BEFB&l┃ &fОпыт: &#F8BEFB{levels} ур. &8({exp} очк.)'
+    - '&#F8BEFB&l┃ &fДо исчезновения: &#F8BEFB{left}'
+    - '&#F8BEFB&l┃ '
+    - '• &#F8BEFBОплата опытом'
+    - '• &#F8BEFBПокупка раз в 1 минуту'
+
+schematic:
+  enabled: true
+  file: 'ghost.schem'
+  marker-material: BEEHIVE
+  rotation: 0
+  offset-x: 0
+  offset-y: 0
+  offset-z: 0
+  clear-radius: 0
+
+trades: []

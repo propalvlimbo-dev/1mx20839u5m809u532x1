@@ -1,0 +1,278 @@
+sell-command: "mainGUI"
+
+metrics: true
+update-check: true
+
+economy:
+  type: VAULT
+  coinsengine:
+    currency-name: money
+
+registered-menus:
+  - mainGUI
+
+autosell:
+  enable: true
+  message-settings:
+    type: sell
+    send-type: actionbar
+    task-delay: 5
+  settings:
+    type: pickup
+    sell-inventory: false
+    task-delay: 5
+  type-list: false
+  worlds-list:
+    - spawn
+  start_category: ores
+  categories:
+    ores:
+      name: "&#F8BEFBРуды"
+      items:
+        - COAL
+        - LAPIS_LAZULI
+        - REDSTONE
+        - GLOWSTONE_DUST
+        - QUARTZ
+        - IRON_INGOT
+        - GOLD_INGOT
+        - COPPER_INGOT
+        - DIAMOND
+        - EMERALD
+        - NETHERITE_INGOT
+        - NETHERITE_SCRAP
+        - ANCIENT_DEBRIS
+        - RAW_IRON
+        - RAW_GOLD
+        - RAW_COPPER
+        - COPPER_BLOCK
+        - COPPER_ORE
+        - DEEPSLATE_COPPER_ORE
+        - DEEPSLATE_COAL_ORE
+        - DEEPSLATE_IRON_ORE
+        - DEEPSLATE_GOLD_ORE
+        - DEEPSLATE_REDSTONE_ORE
+        - DEEPSLATE_LAPIS_ORE
+        - DEEPSLATE_DIAMOND_ORE
+        - DEEPSLATE_EMERALD_ORE
+        - AMETHYST_SHARD
+        - AMETHYST_BLOCK
+        - AMETHYST_CLUSTER
+        - COPPER_NUGGET
+        - NETHER_GOLD_ORE
+    mobs:
+      name: "&#F8BEFBМобы"
+      items:
+        - ROTTEN_FLESH
+        - BONE
+        - ARROW
+        - GUNPOWDER
+        - STRING
+        - SPIDER_EYE
+        - ENDER_PEARL
+        - BLAZE_ROD
+        - BLAZE_POWDER
+        - MAGMA_CREAM
+        - SLIME_BALL
+        - PHANTOM_MEMBRANE
+        - PRISMARINE_SHARD
+        - PRISMARINE_CRYSTALS
+        - SHULKER_SHELL
+        - GHAST_TEAR
+        - LEATHER
+        - BEEF
+        - PORKCHOP
+        - MUTTON
+        - WHITE_WOOL
+        - FEATHER
+        - CHICKEN
+        - EGG
+        - RABBIT
+        - RABBIT_HIDE
+        - INK_SAC
+        - HONEYCOMB
+        - SCUTE
+        - TOTEM_OF_UNDYING
+        - WITHER_SKELETON_SKULL
+        - SKELETON_SKULL
+        - ZOMBIE_HEAD
+        - CREEPER_HEAD
+        - DRAGON_HEAD
+        - RABBIT_FOOT
+        - TRIDENT
+        - SPONGE
+        - HEART_OF_THE_SEA
+        - NAUTILUS_SHELL
+        - GLOW_INK_SAC
+        - GOAT_HORN
+        - AXOLOTL_BUCKET
+        - TADPOLE_BUCKET
+        - OCHRE_FROGLIGHT
+        - PEARLESCENT_FROGLIGHT
+        - VERDANT_FROGLIGHT
+        - ARMADILLO_SCUTE
+        - BREEZE_ROD
+        - WIND_CHARGE
+        - TIPPED_ARROW
+        - ECHO_SHARD
+        - DISC_FRAGMENT_5
+        - SCULK_CATALYST
+        - OMINOUS_BOTTLE
+        - TRIAL_KEY
+        - OMINOUS_TRIAL_KEY
+        - HEAVY_CORE
+        - MACE
+        - MUSIC_DISC_PRECIPICE
+        - RESIN_CLUMP
+        - RESIN_BRICK
+        - RESIN_BRICKS
+        - RESIN_BLOCK
+        - CREAKING_HEART
+        - PIGLIN_HEAD
+        - WHITE_BANNER
+    farms:
+      name: "&#F8BEFBФермерство"
+      items:
+        - WHEAT
+        - WHEAT_SEEDS
+        - CARROT
+        - POTATO
+        - POISONOUS_POTATO
+        - BAKED_POTATO
+        - BEETROOT
+        - BEETROOT_SEEDS
+        - SUGAR
+        - SUGAR_CANE
+        - PUMPKIN
+        - PUMPKIN_SEEDS
+        - MELON_SLICE
+        - MELON_SEEDS
+        - CACTUS
+        - COCOA_BEANS
+        - BAMBOO
+        - NETHER_WART
+        - SWEET_BERRIES
+        - GLOW_BERRIES
+        - BROWN_MUSHROOM
+        - RED_MUSHROOM
+        - BROWN_MUSHROOM_BLOCK
+        - RED_MUSHROOM_BLOCK
+        - MUSHROOM_STEM
+        - KELP
+        - DRIED_KELP
+        - SEAGRASS
+        - SEA_PICKLE
+        - CRIMSON_FUNGUS
+        - WARPED_FUNGUS
+        - CRIMSON_ROOTS
+        - WARPED_ROOTS
+        - NETHER_SPROUTS
+        - WEEPING_VINES
+        - TWISTING_VINES
+        - VINE
+        - LILY_PAD
+        - CHORUS_FLOWER
+        - CHORUS_FRUIT
+        - POPPED_CHORUS_FRUIT
+        - TORCHFLOWER_SEEDS
+        - TORCHFLOWER
+        - PITCHER_POD
+        - PITCHER_PLANT
+        - TURTLE_EGG
+        - SNIFFER_EGG
+        - HONEY_BOTTLE
+        - HONEY_BLOCK
+        - DRIED_GHAST
+        - OAK_SAPLING
+        - SPRUCE_SAPLING
+        - BIRCH_SAPLING
+        - JUNGLE_SAPLING
+        - ACACIA_SAPLING
+        - DARK_OAK_SAPLING
+        - MANGROVE_PROPAGULE
+        - CHERRY_SAPLING
+        - PALE_OAK_SAPLING
+        - AZALEA
+        - FLOWERING_AZALEA
+        - AZALEA_LEAVES
+        - FLOWERING_AZALEA_LEAVES
+        - MOSS_BLOCK
+        - MOSS_CARPET
+        - HANGING_ROOTS
+        - BIG_DRIPLEAF
+        - SMALL_DRIPLEAF
+        - SPORE_BLOSSOM
+        - CACTUS_FLOWER
+        - FIREFLY_BUSH
+        - WILDFLOWERS
+        - CLOSED_EYEBLOSSOM
+        - OPEN_EYEBLOSSOM
+        - LEAF_LITTER
+        - SHORT_DRY_GRASS
+        - TALL_DRY_GRASS
+        - PALE_HANGING_MOSS
+        - PALE_MOSS_BLOCK
+        - PALE_MOSS_CARPET
+        - OAK_LOG
+        - BIRCH_LOG
+        - SPRUCE_LOG
+        - JUNGLE_LOG
+        - ACACIA_LOG
+        - DARK_OAK_LOG
+        - MANGROVE_LOG
+        - CHERRY_LOG
+        - CRIMSON_STEM
+        - WARPED_STEM
+        - MILK_BUCKET
+        - COOKED_BEEF
+        - COOKED_PORKCHOP
+        - COOKED_CHICKEN
+        - COOKED_MUTTON
+        - COOKED_RABBIT
+        - COOKED_COD
+        - COOKED_SALMON
+        - BREAD
+        - CAKE
+        - COOKIE
+        - MUSHROOM_STEW
+        - BEETROOT_SOUP
+        - RABBIT_STEW
+
+numbers_format:
+  placeholders:
+    points: "%.2f~"
+    points_needed: "%.2f~"
+    multiplier_points: "%.2f~"
+    multiplier_coins: "%.2f~"
+    points_fornextlevel: "%.2f~"
+  mainGUI:
+    sell_price: "%.2f~"
+    sell_points: "%.2f~"
+  autoSellGUI:
+    sell_price: "%.2f~"
+    sell_points: "%.2f~"
+  messages:
+    points: "%.2f~"
+    coins: "%.2f~"
+
+boosters:
+  elytrix:
+    coin-multiplier: 3.0
+    point-multiplier: 3.0
+  vip:
+    coin-multiplier: 2.0
+    point-multiplier: 2.0
+  premium:
+    coin-multiplier: 1.5
+    point-multiplier: 1.5
+
+sounds:
+  sell: "ENTITY_EXPERIENCE_ORB_PICKUP"
+  sell-volume: 1.0
+  sell-pitch: 1.0
+  autosell: "ENTITY_EXPERIENCE_ORB_PICKUP"
+  autosell-volume: 1.0
+  autosell-pitch: 1.2
+  no-sell: "BLOCK_NOTE_BLOCK_BASS"
+  no-sell-volume: 1.0
+  no-sell-pitch: 1.0

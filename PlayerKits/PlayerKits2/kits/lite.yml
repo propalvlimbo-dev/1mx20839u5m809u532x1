@@ -1,0 +1,145 @@
+cooldown: 86400
+permission_required: true
+auto_armor: true
+items:
+  1:
+    id: DIAMOND_SWORD
+    enchants:
+      - SHARPNESS;2
+      - UNBREAKING;1
+    preview_slot: 0
+  2:
+    id: DIAMOND_SHOVEL
+    enchants:
+      - EFFICIENCY;1
+      - UNBREAKING;1
+    preview_slot: 1
+  3:
+    id: DIAMOND_AXE
+    enchants:
+      - EFFICIENCY;1
+      - UNBREAKING;1
+    preview_slot: 2
+  4:
+    id: DIAMOND_PICKAXE
+    enchants:
+      - EFFICIENCY;1
+      - UNBREAKING;1
+    preview_slot: 3
+  5:
+    id: BOW
+    enchants:
+      - POWER;2
+      - UNBREAKING;1
+    preview_slot: 4
+  6:
+    id: GOLDEN_APPLE
+    amount: 12
+    preview_slot: 5
+  7:
+    id: ENDER_PEARL
+    amount: 12
+    preview_slot: 6
+  8:
+    id: CHORUS_FRUIT
+    amount: 32
+    preview_slot: 7
+  9:
+    id: EXPERIENCE_BOTTLE
+    amount: 8
+    preview_slot: 8
+  10:
+    id: ARROW
+    amount: 64
+    preview_slot: 9
+  11:
+    id: TOTEM_OF_UNDYING
+    preview_slot: 10
+  12:
+    id: COOKED_BEEF
+    amount: 64
+    preview_slot: 11
+  13:
+    id: GRAY_STAINED_GLASS
+    amount: 8
+    preview_slot: 12
+  14:
+    id: LIGHT_GRAY_CONCRETE_POWDER
+    amount: 8
+    preview_slot: 13
+  15:
+    id: GRAY_GLAZED_TERRACOTTA
+    amount: 8
+    preview_slot: 14
+  16:
+    id: LIGHT_GRAY_WOOL
+    amount: 8
+    preview_slot: 15
+  17:
+    id: LIGHT_GRAY_BED
+    preview_slot: 16
+  18:
+    id: IRON_BOOTS
+    enchants:
+      - PROTECTION;2
+      - UNBREAKING;1
+    preview_slot: 36
+  19:
+    id: IRON_LEGGINGS
+    enchants:
+      - PROTECTION;2
+      - UNBREAKING;1
+    preview_slot: 37
+  20:
+    id: IRON_CHESTPLATE
+    enchants:
+      - PROTECTION;2
+      - UNBREAKING;1
+    preview_slot: 38
+  21:
+    id: IRON_HELMET
+    enchants:
+      - PROTECTION;2
+      - UNBREAKING;1
+    preview_slot: 39
+actions:
+  claim:
+    1:
+      action: 'title: 10;35;20;#F8BEFBНабор &fʟɪᴛᴇ;&7получен'
+    2:
+      action: 'playsound: BLOCK_NOTE_BLOCK_PLING;1;1.4'
+  error:
+    1:
+      action: 'playsound: BLOCK_NOTE_BLOCK_BASS;1;0.8'
+    2:
+      action: 'actionbar: &7Набор &cнедоступен;60'
+display:
+  default:
+    id: LIGHT_GRAY_SHULKER_BOX
+    name: '&fНабор &x&8&D&8&D&8&D&lʟ&x&9&6&9&6&9&6&lɪ&x&9&F&9&F&9&F&lᴛ&x&A&8&A&8&A&8&lᴇ'
+    lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &aМожно получить'
+      - '#F8BEFB&l┃ &fПредметов: &f21'
+      - '#F8BEFB&l┃ &fПерезарядка: &f1 дн'
+      - '#F8BEFB&l┃ '
+      - '&7● &fВзять набор &7(ЛКМ)'
+      - '&7● &fПосмотреть набор &7(ПКМ)'
+  no_permission:
+    id: BARRIER
+    name: '&fНабор &x&8&D&8&D&8&D&lʟ&x&9&6&9&6&9&6&lɪ&x&9&F&9&F&9&F&lᴛ&x&A&8&A&8&A&8&lᴇ'
+    lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &cНет доступа'
+      - '#F8BEFB&l┃ &fПредметов: &f21'
+      - '#F8BEFB&l┃ '
+      - '&7● &fПосмотреть набор &7(ПКМ)'
+  cooldown:
+    id: LIGHT_GRAY_SHULKER_BOX
+    name: '&fНабор &x&8&D&8&D&8&D&lʟ&x&9&6&9&6&9&6&lɪ&x&9&F&9&F&9&F&lᴛ&x&A&8&A&8&A&8&lᴇ'
+    lore:
+      - '#F8BEFB&l┃ '
+      - '#F8BEFB&l┃ &fСтатус: &eПерезарядка'
+      - '#F8BEFB&l┃ &fОсталось: &f%time%'
+      - '#F8BEFB&l┃ '
+      - '&7● &fПосмотреть набор &7(ПКМ)'

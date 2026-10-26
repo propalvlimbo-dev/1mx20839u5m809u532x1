@@ -1,0 +1,222 @@
+id: elytrix:sub
+provider: default
+type: chest
+size: 54
+title: '&#F8BEFB&lПодписка ElytriX+'
+items:
+  informational:
+    material: paper
+    name: '&7« &#F8BEFBИнформация о подписке &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fСтатус подписки: %slidesubscribe_sub_status%'
+    - '&#F8BEFB&l┃ &fОсталось: &#F8BEFB%slidesubscribe_hassubscribe%'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЧто даёт подписка:'
+    - '&#F8BEFB&l┃ &7● &fРежим бессмертия: &#F8BEFB/god'
+    - '&#F8BEFB&l┃ &7● &fПеревод коинов: &#F8BEFB/p pay'
+    - '&#F8BEFB&l┃ &7● &fНабор plus: &#F8BEFB/kit plus'
+    - '&#F8BEFB&l┃ &7● &fЦветное описание варпов'
+    - '&#F8BEFB&l┃ &7● &fСвои цвета в чате'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЦены:'
+    - '&#F8BEFB&l┃ &7● &f30 дней: &#F8BEFB299₽'
+    - '&#F8BEFB&l┃ &7● &f90 дней: &#F8BEFB699₽'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для закрытия'
+    on_click:
+    - close: ''
+  anti-fall:
+    material: leather_boots
+    name: '&7« &#F8BEFBАнти-падение &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fУрон от падения полностью пропадает.'
+    - '&#F8BEFB&l┃ &fСтатус: %slidesubscribe_fn_anti-fall%'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для переключения'
+    on_click:
+    - player: 'subscribe toggle anti-fall'
+    - update: ''
+  auto-totem:
+    material: totem_of_undying
+    name: '&7« &#F8BEFBАвто-тотем &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fТотем срабатывает сам при смертельном ударе.'
+    - '&#F8BEFB&l┃ &fПерезарядка: &#F8BEFB30 секунд'
+    - '&#F8BEFB&l┃ &fСтатус: %slidesubscribe_fn_auto-totem%'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для переключения'
+    on_click:
+    - player: 'subscribe toggle auto-totem'
+    - update: ''
+  speed:
+    material: feather
+    name: '&7« &#F8BEFBСкорость &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fБонус: &#F8BEFB+20% к базовой скорости'
+    - '&#F8BEFB&l┃ &fСтатус: %slidesubscribe_fn_speed%'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для переключения'
+    on_click:
+    - player: 'subscribe toggle speed'
+    - update: ''
+  pets:
+    material: parrot_spawn_egg
+    name: '&7« &#F8BEFBПитомцы &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fПопугай, аллей и пчела.'
+    - '&#F8BEFB&l┃ &fВключить можно &fтолько одного&f.'
+    - '&#F8BEFB&l┃ &fСейчас: &#F8BEFB%slidesubscribe_pet%'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для выбора питомца'
+    on_click:
+    - open: 'elytrix:sub_pets'
+  anti-food:
+    material: cooked_beef
+    name: '&7« &#F8BEFBАнти-голод &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fСытость не уменьшается.'
+    - '&#F8BEFB&l┃ &fСтатус: %slidesubscribe_fn_antifood%'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для переключения'
+    on_click:
+    - player: 'subscribe toggle antifood'
+    - update: ''
+  plan_30:
+    material: emerald
+    name: '&7« &#F8BEFB30 дней &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fВсе возможности подписки'
+    - '&#F8BEFB&l┃ &fна 30 дней.'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЦена: &#F8BEFB299₽'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите, чтобы узнать, как купить'
+    on_click:
+    - message: ''
+    - message: '&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBПодписка на 30 дней'
+    - message: '&#F8BEFB&l┃ &fЦена: &#F8BEFB299₽'
+    - message: '&#F8BEFB&l┃ &fКупить: &#F8BEFBelytrix.pw'
+    - message: ''
+    - close: ''
+  plan_90:
+    material: diamond
+    name: '&7« &#F8BEFB90 дней &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fВсе возможности подписки'
+    - '&#F8BEFB&l┃ &fна 90 дней.'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЦена: &#F8BEFB699₽'
+    - '&#F8BEFB&l┃ &fВыгода: &#F8BEFB22%'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите, чтобы узнать, как купить'
+    on_click:
+    - message: ''
+    - message: '&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBПодписка на 90 дней'
+    - message: '&#F8BEFB&l┃ &fЦена: &#F8BEFB699₽'
+    - message: '&#F8BEFB&l┃ &fКупить: &#F8BEFBelytrix.pw'
+    - message: ''
+    - close: ''
+  info:
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0=
+    name: '&7« &#F8BEFBНаши сообщества &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fВсе новости и анонсы — в наших каналах.'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для отправки ссылок в чат'
+    on_click:
+    - message: ''
+    - message: '&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBСообщества'
+    - message: '&#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+    - message: '&#F8BEFB&l┃ &fTelegram канал: &#229ED9t.me/elytrix_ru'
+    - message: '&#F8BEFB&l┃ &fDiscord сервер: &#5865F2dsc.gg/elytrix'
+    - message: ''
+    - close: ''
+  close:
+    material: red_dye
+    name: '&7« &#F8BEFBЗакрыть &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fЗакрыть меню.'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для выхода'
+    on_click:
+    - close: ''
+  design_purple_panel:
+    material: purple_stained_glass_pane
+    name: '&r'
+  design_black_panel:
+    material: black_stained_glass_pane
+    name: '&r'
+animation:
+  - tick: 0
+    opcodes:
+      - st: close 45
+      - st: info 49
+      - st: design_purple_panel 46,47
+      - sound: 'block.enchantment_table.use 0.3 1.5'
+  - opcodes:
+      - st: design_purple_panel 48,50
+      - sound: 'block.note_block.chime 0.2 0.85'
+  - opcodes:
+      - st: design_purple_panel 51,52
+  - opcodes:
+      - st: design_purple_panel 53,36
+      - sound: 'block.note_block.chime 0.22 0.91'
+  - opcodes:
+      - st: design_purple_panel 37,43
+  - opcodes:
+      - st: design_purple_panel 44,27
+      - sound: 'block.note_block.chime 0.23 0.98'
+  - opcodes:
+      - st: design_purple_panel 35
+  - opcodes:
+      - st: design_black_panel 18,9
+      - sound: 'block.note_block.chime 0.25 1.05'
+  - opcodes:
+      - st: design_black_panel 10,0
+  - opcodes:
+      - st: design_black_panel 1,2
+      - sound: 'block.note_block.chime 0.27 1.13'
+  - opcodes:
+      - st: design_black_panel 3,5
+  - opcodes:
+      - st: design_black_panel 6,7
+      - sound: 'block.note_block.chime 0.28 1.21'
+  - opcodes:
+      - st: design_black_panel 8,16
+  - opcodes:
+      - st: design_black_panel 17,26
+      - sound: 'block.note_block.chime 0.3 1.3'
+  - opcodes:
+      - st: informational 4
+      - sound: 'block.note_block.pling 0.26 1.0'
+  - opcodes:
+      - st: anti-fall 20
+      - sound: 'block.note_block.pling 0.28 1.11'
+  - opcodes:
+      - st: auto-totem 21
+      - sound: 'block.note_block.pling 0.3 1.22'
+  - opcodes:
+      - st: speed 22
+      - sound: 'block.note_block.pling 0.32 1.36'
+  - opcodes:
+      - st: pets 23
+      - sound: 'block.note_block.pling 0.34 1.5'
+  - opcodes:
+      - st: anti-food 24
+      - sound: 'block.amethyst_block.chime 0.45 1.4'
+  - opcodes:
+      - st: plan_30 30
+      - sound: 'block.note_block.pling 0.36 1.6'
+  - opcodes:
+      - st: plan_90 32
+      - sound: 'block.note_block.pling 0.38 1.7'

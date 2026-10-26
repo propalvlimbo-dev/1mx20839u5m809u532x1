@@ -1,0 +1,123 @@
+id: elytrix:help_earnings
+provider: default
+type: chest
+size: 54
+title: '&#F8BEFB&lСпособы заработка'
+items:
+  salary:
+    material: gold_ingot
+    name: '&7« &#F8BEFBПолучить зарплату &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fКоманда: &#F8BEFB/salary'
+      - '&#F8BEFB&l┃ &fНажатие выполняет команду от вашего имени.'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите, чтобы вызвать /salary'
+    on_click:
+      - '[player] salary'
+      - '[close]'
+  auction:
+    material: emerald
+    name: '&7« &#F8BEFBАукцион игроков &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fВыставляй предметы на аукцион игроков.'
+      - '&#F8BEFB&l┃ &fКоманда: &#F8BEFB/ah sell <цена>'
+      - '&#F8BEFB&l┃ &fУсловия сделки смотри в интерфейсе аукциона.'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите, чтобы открыть аукцион'
+    on_click:
+      - '[player] ah'
+      - '[close]'
+  seller:
+    material: ender_pearl
+    name: '&7« &#F8BEFBСкупщик ресурсов &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fПродажа ресурсов открывается командой /seller.'
+      - '&#F8BEFB&l┃ &fИспользуется существующее меню скупщика.'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите, чтобы открыть скупщика'
+    on_click:
+      - '[player] seller'
+      - '[close]'
+  mob_coins:
+    material: iron_sword
+    name: '&7« &#F8BEFBМонеты за мобов &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fУбийства мобов приносят монеты.'
+      - '&#F8BEFB&l┃ &fРазмер награды зависит от моба.'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fИнформация о заработке'
+    on_click:
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &fРазмер награды зависит от убитого моба.'
+  moneyshop:
+    material: book
+    name: '&7« &#F8BEFBМагазин за монеты &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &f/moneyshop — пустая заглушка.'
+      - '&#F8BEFB&l┃ &fТовары и покупки не настроены.'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите, чтобы открыть заглушку'
+    on_click:
+      - '[open] elytrix:moneyshop'
+  back:
+    material: black_dye
+    name: '&7« &#F8BEFBНазад в меню помощи &7»'
+    lore:
+      - '&#F8BEFB&l┃ &fВернуться к разделам помощи.'
+    on_click:
+      - '[open] elytrix:help'
+  info:
+    material: paper
+    name: '&7« &#F8BEFBЗаработок на ElytriX &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСпособы: зарплата, аукцион, скупщик ресурсов'
+      - '&#F8BEFB&l┃ &fи награды за убийство мобов.'
+      - '&#F8BEFB&l┃ &fВыбирайте способ и используйте его команду.'
+      - '&#F8BEFB&l┃ '
+  design_purple_panel:
+    material: purple_stained_glass_pane
+    name: '&r'
+  design_black_panel:
+    material: black_stained_glass_pane
+    name: '&r'
+animation:
+  - tick: 0
+    opcodes:
+      - st: back 45
+      - st: info 49
+      - st: design_purple_panel 46,47
+      - sound: 'block.enchantment_table.use 0.3 1.5'
+  - opcodes:
+      - st: design_purple_panel 48,50,51,52,53
+      - sound: 'block.note_block.chime 0.22 0.91'
+  - opcodes:
+      - st: design_purple_panel 36,37,43,44
+  - opcodes:
+      - st: design_purple_panel 27,35
+      - st: design_black_panel 18,26
+      - sound: 'block.note_block.chime 0.25 1.05'
+  - opcodes:
+      - st: design_black_panel 9,10,16,17
+  - opcodes:
+      - st: design_black_panel 0,1,2,3,4,5,6,7,8
+      - sound: 'block.note_block.chime 0.28 1.21'
+  - opcodes:
+      - st: salary 20
+      - sound: 'block.note_block.pling 0.26 1.0'
+  - opcodes:
+      - st: auction 22
+      - sound: 'block.note_block.pling 0.28 1.1'
+  - opcodes:
+      - st: seller 24
+      - sound: 'block.note_block.pling 0.3 1.2'
+  - opcodes:
+      - st: mob_coins 30
+      - sound: 'block.note_block.pling 0.32 1.3'
+  - opcodes:
+      - st: moneyshop 32
+      - sound: 'block.amethyst_block.chime 0.4 1.4'

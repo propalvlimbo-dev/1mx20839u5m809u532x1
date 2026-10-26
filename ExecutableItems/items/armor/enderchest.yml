@@ -1,0 +1,127 @@
+name: '&x&F&5&9&9&0&C&l☬ &#FFC321&lНебесный &#E0A300&lСундук'
+lore:
+- ''
+- "&7☉ &#ddddddУникальный переносной &#DDE000эндер-сундук"
+- "&7☉ &#ddddddКоторый можно открыть в &#00E034абсолютно &#ddddddлюбом месте"
+- ''
+- '&#C88114&l⋐ &7Кликните пкм, чтобы использовать!'
+- ''
+material: PLAYER_HEAD
+glow: false
+disableStack: false
+keepItemOnDeath: false
+canBeUsedOnlyByTheOwner: false
+cancelEventIfNotOwner: false
+onlyOwnerBlackListedActivators: []
+storeItemInfo: false
+unbreakable: false
+usage: 1
+usageLimit: -1
+cancelEventIfNoPerm: false
+disabledWorlds: []
+recognitions: []
+headValue: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTg4MTQ5ZTU2Y2RlMDJlZWU2MjA5ODI4ODRiODkzNjM0NzU2YmU5MTQxZjJlMjc3N2I1MWNiMGE2NmMzMWRjZSJ9fX0=
+config_5: true
+config_update: true
+nbt:
+  '0':
+    key: PublicBukkitValues
+    type: COMPOUND
+    value:
+      nbt:
+        '0':
+          key: executableitems:ei-owner
+          type: STRING
+          value: 9a58008a-f008-34a7-acb8-5bcdcc0e96d8
+  '1':
+    key: SkullOwner
+    type: COMPOUND
+    value:
+      nbt:
+        '0':
+          key: Properties
+          type: COMPOUND
+  '2':
+    key: display
+    type: COMPOUND
+  '3':
+    key: id
+    type: STRING
+    value: '1437825961'
+dropFeatures:
+  glowDrop: false
+  glowDropColor: WHITE
+  displayNameDrop: false
+hiders:
+  hideEnchantments: false
+  hideUnbreakable: false
+  hideAttributes: false
+  hidePotionEffects: false
+  hideUsage: true
+  hideDestroys: false
+  hidePlacedOn: false
+enchantments: {}
+giveFirstJoinFeatures:
+  giveFirstJoin: false
+  giveFirstJoinAmount: 1
+  giveFirstJoinSlot: 0
+restrictions:
+  cancel-item-place: true
+variables: {}
+activators:
+  activator0:
+    name: '&eActivator'
+    option: PLAYER_RIGHT_CLICK
+    typeTarget: NO_TYPE_TARGET
+    usageModification: -1
+    cancelEvent: false
+    noActivatorRunIfTheEventIsCancelled: false
+    silenceOutput: false
+    autoUpdateItem: false
+    updateName: true
+    updateLore: true
+    updateDurability: false
+    updateAttributes: false
+    updateEnchants: false
+    updateCustomModelData: false
+    cooldownFeatures:
+      cooldown: 0
+      isCooldownInTicks: false
+      cooldownMsg: '&cYou are in cooldown ! &7(&e%time_H%&6H &e%time_M%&6M &e%time_S%&6S&7)'
+      displayCooldownMessage: true
+      cancelEventIfInCooldown: false
+      pauseWhenOffline: false
+      pausePlaceholdersConditions: {}
+    globalCooldownFeatures:
+      cooldown: 0
+      isCooldownInTicks: false
+      cooldownMsg: '&cYou are in cooldown ! &7(&e%time_H%&6H &e%time_M%&6M &e%time_S%&6S&7)'
+      displayCooldownMessage: true
+      cancelEventIfInCooldown: false
+      pauseWhenOffline: false
+      pausePlaceholdersConditions: {}
+    otherEICooldowns: {}
+    requiredItems: {}
+    requiredExecutableItems: {}
+    requiredMagics: {}
+    detailedSlots:
+    - -1
+    commands:
+    - OPEN_ENDERCHEST
+    playerConditions:
+      ifIsOnTheBlock:
+        blocks: []
+    worldConditions: {}
+    itemConditions: {}
+    customConditions: {}
+    placeholdersConditions: {}
+    variablesModification: {}
+displayConditions:
+  playerConditions:
+    ifIsOnTheBlock:
+      blocks: []
+  worldConditions: {}
+  itemConditions: {}
+  placeholdersConditions: {}
+  enableFeature: false
+attributes: {}

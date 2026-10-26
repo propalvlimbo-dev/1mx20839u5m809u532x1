@@ -1,0 +1,25 @@
+title: "&#F8BEFB&lРулетка"
+rows: 6
+bet-item: GOLD_INGOT
+bet-name: "&7« &#F8BEFBСтавка %bet% &7»"
+bet-lore:
+  - "&#F8BEFB&l┃ "
+  - "&#F8BEFB&l┃ &fСтавка: &#F8BEFB%bet% монет"
+  - "&#F8BEFB&l┃ &fИгра: &#F8BEFBКолесо удачи"
+  - "&#F8BEFB&l┃ "
+  - "&7● &fНажмите, чтобы крутить"
+show-chances: false
+bets: [100, 500, 1000, 5000, 10000]
+bet-slots: [20, 21, 22, 23, 24]
+close-item: RED_DYE
+close-slot: 45
+close-name: "&7« &cЗакрыть меню &7»"
+close-lore:
+  - "&#F8BEFB&l┃ "
+  - "&#F8BEFB&l┃ &fВыход в игровой мир."
+  - "&#F8BEFB&l┃ "
+  - "&7● &fНажмите для закрытия"
+black-pane: BLACK_STAINED_GLASS_PANE
+purple-pane: PURPLE_STAINED_GLASS_PANE
+black-slots: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 16, 17, 18, 26]
+purple-slots: [27, 35, 36, 37, 43, 44, 46, 47, 48, 49, 50, 51, 52, 53]

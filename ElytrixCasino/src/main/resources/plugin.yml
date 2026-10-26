@@ -1,0 +1,24 @@
+name: ElytrixCasino
+version: '2.2.1'
+main: ru.rooyzee.elytrixcasino.Main
+load: POSTWORLD
+api-version: '1.21'
+author: rooyzee
+depend:
+  - Vault
+  - VirtualEntityApi
+  - BLib
+commands:
+  elytrixcasino:
+    description: Управление казино ElytriX
+    usage: /<command> help
+    aliases: [ec, casino]
+permissions:
+  elytrixcasino.use:
+    description: Возможность играть в казино
+    default: true
+  elytrixcasino.admin:
+    description: Управление казино
+    default: op
+    children:
+      elytrixcasino.use: true

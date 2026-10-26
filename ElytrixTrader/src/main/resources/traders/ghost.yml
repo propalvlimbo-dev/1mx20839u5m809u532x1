@@ -1,0 +1,68 @@
+# Призрачный торговец появляется на центральном острове Эндер-мира — рядом с драконом.
+# Он использует обычную систему сделок ElytrixTrader. Товары и цены намеренно
+# оставлены пустыми: добавьте реальные предложения через /etr edit ghost.
+# Редактор Ghost Trader принимает в качестве цены только канонический кастомный
+# осколок Cemetery (PDC item_id=ghost_shard), установленный из стака в руке.
+# Для постройки используется ровно ghost.schem; сам файл в исходном комплекте отсутствует.
+
+enabled: true
+display-name: '&#B7A8FF&lПризрачный Торговец'
+skin: 'Steve'
+hold-item: true
+spawn-sound: ENTITY_WITHER_SPAWN
+
+worlds:
+  - 'world_the_end'
+
+# Фиксированная точка у центрального острова; торговец ищет безопасный блок
+# рядом с заданной высотой в радиусе 6 и проверяет границы мира.
+spawn:
+  world: 'world_the_end'
+  x: 5.5
+  y: 65.0
+  z: 0.5
+  search-radius: 6
+
+# Появляется сразу после включения плагина, затем каждые 2 часа;
+# каждый выход торговца длится 1 час.
+spawn-interval-seconds: 7200
+lifetime-seconds: 3600
+random-trades: 14
+trade-cooldown-seconds: 60
+
+hologram:
+  enabled: true
+  height: 2.8
+  line-height: 0.30
+  lines:
+    - '&d&lПРИЗРАЧНЫЙ ТОРГОВЕЦ'
+    - '&dСтранник &fс края мира'
+    - ' '
+    - '&d• &fПКМ &8— &dоткрыть обмен'
+    - '&d• &fВалюта: &dПризрачные осколки'
+    - '&d• &fМесто: &dостров дракона'
+
+icon:
+  material: amethyst_shard
+  amount: 1
+  glow: true
+
+info-item:
+  material: book
+  display-name: '&#B7A8FF&l{trader}'
+  lore:
+    - '&#B7A8FF&l┃ &fДо исчезновения: &#B7A8FF{left}'
+    - '&#B7A8FF&l┃ &fМесто: &#B7A8FFЭндер-мир, остров дракона'
+    - '&#B7A8FF&l┃ &fВалюта: &#B7A8FFПризрачные осколки'
+
+schematic:
+  enabled: true
+  file: 'ghost.schem'
+  marker-material: BEEHIVE
+  rotation: 0
+  offset-x: 0
+  offset-y: 0
+  offset-z: 0
+  clear-radius: 0
+
+trades: []

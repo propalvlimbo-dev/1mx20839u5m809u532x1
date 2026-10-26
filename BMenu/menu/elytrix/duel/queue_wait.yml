@@ -1,0 +1,32 @@
+id: elytrix:duel_queue_wait
+provider: default
+type: chest
+size: 27
+title: "&#F8BEFB&lПоиск боя"
+args:
+  mode: "1 на 1"
+  kit: "—"
+  waited: "0:00"
+
+items:
+  cancel:
+    material: barrier
+    name: "&7« &cОтменить поиск &7»"
+    lore:
+      - "&#F8BEFB&l┃ "
+      - "&#F8BEFB&l┃ &fРежим: &#F8BEFB{mode}"
+      - "&#F8BEFB&l┃ &fКит: &#F8BEFB{kit}"
+      - "&#F8BEFB&l┃ &fЖдём: &#F8BEFB{waited}"
+      - "&#F8BEFB&l┃ "
+      - "&7● &fНажмите, чтобы выйти из очереди"
+    on_click:
+      - sound: 'ui.button.click 0.4 1.0'
+      - "[player] duelx queue leave"
+      - "[close]"
+
+animation:
+  - tick: 0
+    opcodes:
+      - sound: 'block.note_block.pling 0.3 1.0'
+      - st: cancel 13
+      - sound: 'block.note_block.chime 0.2 0.9'

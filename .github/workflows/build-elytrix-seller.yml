@@ -1,0 +1,86 @@
+name: Build ElytrixSeller JARs
+
+on:
+  push:
+    branches:
+      - arena/6ab59a12-1mx20839u5m809u532x1
+    paths:
+      - .github/workflows/build-elytrix-seller.yml
+      - ElytrixSeller/**
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+          cache-dependency-path: ElytrixSeller/gradle/libs.versions.toml
+
+      - name: Build Russian and English Seller JARs
+        working-directory: ElytrixSeller
+        run: ./gradlew --no-daemon jarRu jarEn
+
+      - name: Validate and copy JARs to downloads
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          jars=(ElytrixSeller/build/libs/*.jar)
+          test "${#jars[@]}" -eq 2
+          python3 - "${jars[@]}" <<'PY'
+          import re
+          import sys
+          from zipfile import ZipFile
+
+          for path in sys.argv[1:]:
+              with ZipFile(path) as jar:
+                  bad = jar.testzip()
+                  if bad:
+                      raise SystemExit(f'{path}: corrupt entry {bad}')
+                  names = set(jar.namelist())
+                  text = jar.read('plugin.yml').decode('utf-8')
+                  main = re.search(r'(?m)^main:\s*[\"\']?([^\s\"\']+)', text)
+                  if not main or main.group(1).replace('.', '/') + '.class' not in names:
+                      raise SystemExit(f'{path}: plugin.yml main class missing')
+                  if 'ElytrixSeller' not in text:
+                      raise SystemExit(f'{path}: unexpected plugin descriptor')
+                  print(f'validated {path}')
+          PY
+          mkdir -p downloads
+          cp "${jars[0]}" downloads/
+          cp "${jars[1]}" downloads/
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ElytrixSeller-2.0.2-ElytriX
+          path: |
+            downloads/ElytrixSeller-2.0.2-ElytriX.jar
+            downloads/ElytrixSeller-2.0.2-ElytriX-en.jar
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Commit built JARs to this branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add downloads/ElytrixSeller-2.0.2-ElytriX.jar downloads/ElytrixSeller-2.0.2-ElytriX-en.jar
+          if git diff --cached --quiet; then
+            echo "Built JARs are already up to date."
+          else
+            git commit -m "Build ElytrixSeller Russian and English JARs"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi

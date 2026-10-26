@@ -1,0 +1,167 @@
+id: elytrix:duel
+provider: default
+type: chest
+size: 54
+title: "&#F8BEFB&lДуэли"
+items:
+  duel:
+    material: netherite_sword
+    name: "&7« &#F8BEFBДуэль 1 на 1 &7»"
+    lore:
+      - "&#F8BEFB&l┃ "
+      - "&#F8BEFB&l┃ &fФормат: &#F8BEFB1 на 1"
+      - "&#F8BEFB&l┃ &fКит: &#F8BEFBвыбираешь сам"
+      - "&#F8BEFB&l┃ &fРаунды: &#F8BEFBвыбираешь сам"
+      - "&#F8BEFB&l┃ "
+      - "&7● &fНажмите, чтобы выбрать игрока"
+    on_click:
+      - sound: 'block.note_block.pling 0.4 1.1'
+      - "[player] duelx pick"
+  team:
+    material: iron_sword
+    name: "&7« &#F8BEFBБои 2 на 2 &7»"
+    lore:
+      - "&#F8BEFB&l┃ "
+      - "&#F8BEFB&l┃ &fФормат: &#F8BEFB2 на 2"
+      - "&#F8BEFB&l┃ &fТиммейт: &#F8BEFBс подтверждением"
+      - "&#F8BEFB&l┃ &fОчередь: &#F8BEFBпарой или рандом"
+      - "&#F8BEFB&l┃ "
+      - "&7● &fНажмите, чтобы позвать напарника"
+    on_click:
+      - sound: 'block.note_block.pling 0.4 1.18'
+      - "[player] duelx team"
+  queue:
+    material: compass
+    name: "&7« &#F8BEFBПодбор соперника &7»"
+    lore:
+      - "&#F8BEFB&l┃ "
+      - "&#F8BEFB&l┃ &fРежим: &#F8BEFBочередь"
+      - "&#F8BEFB&l┃ &fКит: &#F8BEFBвыбираешь сам"
+      - "&#F8BEFB&l┃ &fСоперник: &#F8BEFBподбирается сразу"
+      - "&#F8BEFB&l┃ "
+      - "&7● &fНажмите, чтобы выбрать кит"
+    on_click:
+      - sound: 'block.note_block.pling 0.4 1.26'
+      - "[open] elytrix:duel_queue"
+  stats:
+    material: book
+    name: "&7« &#F8BEFBСтатистика &7»"
+    lore:
+      - "&#F8BEFB&l┃ "
+      - "&#F8BEFB&l┃ &fПобеды, поражения, процент"
+      - "&#F8BEFB&l┃ &fОчки и место в рейтинге"
+      - "&#F8BEFB&l┃ "
+      - "&7● &fНажмите, чтобы открыть"
+    on_click:
+      - sound: 'block.note_block.pling 0.4 1.34'
+      - "[player] duelx stats"
+  top:
+    material: nether_star
+    name: "&7« &#F8BEFBРейтинг &7»"
+    lore:
+      - "&#F8BEFB&l┃ "
+      - "&#F8BEFB&l┃ &fСписок: &#F8BEFBтоп-10 по победам"
+      - "&#F8BEFB&l┃ &fОбновление: &#F8BEFBкаждый бой"
+      - "&#F8BEFB&l┃ "
+      - "&7● &fНажмите, чтобы посмотреть"
+    on_click:
+      - sound: 'block.note_block.pling 0.4 1.42'
+      - "[player] duelx top"
+  help:
+    material: knowledge_book
+    name: "&7« &#F8BEFBКак играть &7»"
+    lore:
+      - "&#F8BEFB&l┃ "
+      - "&#F8BEFB&l┃ &fГайд: &#F8BEFB4 шага до боя"
+      - "&#F8BEFB&l┃ &fКоманды: &#F8BEFBвнутри"
+      - "&#F8BEFB&l┃ "
+      - "&7● &fНажмите, чтобы открыть"
+    on_click:
+      - sound: 'block.note_block.pling 0.4 1.5'
+      - "[open] elytrix:duel_help"
+  profile:
+    material: player_head
+    name: "&7« &#F8BEFBТвой профиль &7»"
+    lore:
+      - "&#F8BEFB&l┃ "
+      - "&#F8BEFB&l┃ &fПобеды и поражения"
+      - "&#F8BEFB&l┃ &fПроцент побед и очки"
+      - "&#F8BEFB&l┃ "
+      - "&7● &fНажмите, чтобы открыть"
+    on_click:
+      - sound: 'block.note_block.pling 0.4 1.30'
+      - "[player] duelx stats"
+  back:
+    material: black_dye
+    name: "&7« &#F8BEFBГлавное меню &7»"
+    lore:
+      - "&#F8BEFB&l┃ "
+      - "&#F8BEFB&l┃ &fВернуться в общее меню сервера"
+      - "&#F8BEFB&l┃ "
+      - "&7● &fНажмите для возврата"
+    on_click:
+      - sound: 'ui.button.click 0.4 1.0'
+      - "[open] elytrix:menu"
+  close:
+    material: red_dye
+    name: "&7« &cЗакрыть меню &7»"
+    lore:
+      - "&#F8BEFB&l┃ "
+      - "&#F8BEFB&l┃ &fВыход в игровой мир."
+      - "&#F8BEFB&l┃ "
+      - "&7● &fНажмите для закрытия"
+    on_click:
+      - sound: 'ui.button.click 0.4 1.0'
+      - "[close]"
+  design_purple_panel:
+    material: purple_stained_glass_pane
+    name: '&r'
+  design_black_panel:
+    material: black_stained_glass_pane
+    name: '&r'
+
+animation:
+  - tick: 0
+    opcodes:
+      - st: back 45
+      - sound: 'block.enchantment_table.use 0.3 1.5'
+      - st: close 49
+  - opcodes:
+      - st: design_purple_panel 46,47,48,50,51,52,53
+      - sound: 'block.note_block.chime 0.2 0.85'
+  - opcodes:
+      - st: design_purple_panel 36,37,43,44
+      - sound: 'block.note_block.chime 0.22 0.91'
+  - opcodes:
+      - st: design_purple_panel 27,35
+      - sound: 'block.note_block.chime 0.23 0.98'
+  - opcodes:
+      - st: design_black_panel 18,26
+      - sound: 'block.note_block.chime 0.25 1.05'
+  - opcodes:
+      - st: design_black_panel 9,10,16,17
+      - sound: 'block.note_block.chime 0.27 1.13'
+  - opcodes:
+      - st: design_black_panel 0,1,2,3,5,6,7,8
+      - sound: 'block.note_block.chime 0.28 1.21'
+  - opcodes:
+      - st: duel 20
+      - sound: 'block.note_block.pling 0.28 1.00'
+  - opcodes:
+      - st: team 21
+      - sound: 'block.note_block.pling 0.30 1.07'
+  - opcodes:
+      - st: queue 22
+      - sound: 'block.note_block.pling 0.32 1.14'
+  - opcodes:
+      - st: stats 23
+      - sound: 'block.note_block.pling 0.34 1.21'
+  - opcodes:
+      - st: top 24
+      - sound: 'block.note_block.pling 0.36 1.28'
+  - opcodes:
+      - st: help 31
+      - sound: 'block.note_block.pling 0.38 1.35'
+  - opcodes:
+      - st: profile 4
+      - sound: 'block.note_block.pling 0.40 1.42'

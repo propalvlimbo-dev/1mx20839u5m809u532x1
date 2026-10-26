@@ -1,0 +1,203 @@
+package dev.epicduels.manager;
+
+import dev.epicduels.EpicDuels;
+import dev.epicduels.i18n.Messages;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
+public class QueueManager {
+
+    private final EpicDuels plugin;
+    // kitName -> list of queued player UUIDs
+    private final Map<String, List<UUID>> queues = new ConcurrentHashMap<>();
+    // player UUID -> kit they're queued for
+    private final Map<UUID, String> playerQueue = new ConcurrentHashMap<>();
+    // player UUID -> timestamp when they joined queue
+    private final Map<UUID, Long> queueJoinTime = new ConcurrentHashMap<>();
+    private static final Random RANDOM = new Random();
+    private BukkitTask actionBarTask;
+    private BukkitTask matchmakingTask;
+
+    public QueueManager(EpicDuels plugin) {
+        this.plugin = plugin;
+        startActionBarTask();
+        startMatchmakingTask();
+    }
+
+    public boolean joinQueue(UUID playerId, String kitName) {
+        Player player = Bukkit.getPlayer(playerId);
+        if (!plugin.isFeatureEnabled("matchmaking") || player == null || !player.hasPermission("epicduels.duel")) return false;
+        if (playerQueue.containsKey(playerId)) return false;
+        if (plugin.getDuelManager().isBusy(playerId)) return false;
+
+        queues.computeIfAbsent(kitName.toLowerCase(), k -> Collections.synchronizedList(new ArrayList<>())).add(playerId);
+        playerQueue.put(playerId, kitName.toLowerCase());
+        queueJoinTime.put(playerId, System.currentTimeMillis());
+        return true;
+    }
+
+    public boolean leaveQueue(UUID playerId) {
+        String kitName = playerQueue.remove(playerId);
+        if (kitName == null) return false;
+
+        List<UUID> queue = queues.get(kitName);
+        if (queue != null) {
+            queue.remove(playerId);
+        }
+        queueJoinTime.remove(playerId);
+        return true;
+    }
+
+    public boolean isInQueue(UUID playerId) {
+        return playerQueue.containsKey(playerId);
+    }
+
+    public String getQueuedKit(UUID playerId) {
+        return playerQueue.get(playerId);
+    }
+
+    public int getQueueSize(String kitName) {
+        List<UUID> queue = queues.get(kitName.toLowerCase());
+        return queue != null ? queue.size() : 0;
+    }
+
+    public void removePlayer(UUID playerId) {
+        leaveQueue(playerId);
+    }
+
+    private void startActionBarTask() {
+        actionBarTask = new BukkitRunnable() {
+            @Override
+            public void run() {
+                Iterator<Map.Entry<UUID, String>> it = playerQueue.entrySet().iterator();
+                while (it.hasNext()) {
+                    Map.Entry<UUID, String> entry = it.next();
+                    Player player = Bukkit.getPlayer(entry.getKey());
+                    if (player == null || !player.isOnline()) {
+                        it.remove();
+                        queueJoinTime.remove(entry.getKey());
+                        String kit = entry.getValue();
+                        List<UUID> q = queues.get(kit);
+                        if (q != null) q.remove(entry.getKey());
+                        continue;
+                    }
+                    String kitName = entry.getValue();
+                    long joinTime = queueJoinTime.getOrDefault(entry.getKey(), System.currentTimeMillis());
+                    long seconds = (System.currentTimeMillis() - joinTime) / 1000;
+
+                    var kit = plugin.getKitManager().getKit(kitName);
+                    String displayKit = kit != null ? kit.getName() : kitName;
+
+                    player.sendActionBar(Messages.get("queue.actionbar",
+                            Messages.unparsed("kit", displayKit), Messages.unparsed("seconds", seconds)));
+                }
+            }
+        }.runTaskTimer(plugin, 20L, 20L);
+    }
+
+    private void startMatchmakingTask() {
+        matchmakingTask = new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!plugin.isFeatureEnabled("matchmaking")) {
+                    clearWaitingPlayers();
+                    return;
+                }
+                for (Map.Entry<String, List<UUID>> entry : queues.entrySet()) {
+                    List<UUID> queue = entry.getValue();
+                    if (queue.size() < 2) continue;
+
+                    // Take first two players
+                    UUID player1Id = queue.remove(0);
+                    UUID player2Id = queue.remove(0);
+
+                    String kitName = entry.getKey();
+                    playerQueue.remove(player1Id);
+                    playerQueue.remove(player2Id);
+                    queueJoinTime.remove(player1Id);
+                    queueJoinTime.remove(player2Id);
+
+                    Player p1 = Bukkit.getPlayer(player1Id);
+                    Player p2 = Bukkit.getPlayer(player2Id);
+
+                    boolean valid1 = p1 != null && p1.isOnline() && p1.hasPermission("epicduels.duel") && !plugin.getDuelManager().isBusy(player1Id);
+                    boolean valid2 = p2 != null && p2.isOnline() && p2.hasPermission("epicduels.duel") && !plugin.getDuelManager().isBusy(player2Id);
+                    if (!valid1 || !valid2) {
+                        // Put back whoever is still eligible instead of
+                        // silently dropping them from the queue
+                        if (valid1) {
+                            queue.add(0, player1Id);
+                            playerQueue.put(player1Id, kitName);
+                            queueJoinTime.put(player1Id, System.currentTimeMillis());
+                        }
+                        if (valid2) {
+                            queue.add(0, player2Id);
+                            playerQueue.put(player2Id, kitName);
+                            queueJoinTime.put(player2Id, System.currentTimeMillis());
+                        }
+                        continue;
+                    }
+
+                    // Pick a random ready arena
+                    List<String> readyArenas = plugin.getArenaManager().getReadyArenaNames();
+                    if (readyArenas.isEmpty()) {
+                        Messages.send(p1, "queue.no-arenas");
+                        Messages.send(p2, "queue.no-arenas");
+                        p1.sendActionBar(Component.empty());
+                        p2.sendActionBar(Component.empty());
+                        continue;
+                    }
+
+                    String arenaName = readyArenas.get(RANDOM.nextInt(readyArenas.size()));
+
+                    p1.sendActionBar(Component.empty());
+                    p2.sendActionBar(Component.empty());
+                    Messages.send(p1, "queue.match-found", Messages.unparsed("player", p2.getName()));
+                    Messages.send(p2, "queue.match-found", Messages.unparsed("player", p1.getName()));
+
+                    // Resolve kit name for display
+                    var kit = plugin.getKitManager().getKit(kitName);
+                    String resolvedKit = kit != null ? kit.getName() : kitName;
+
+                    plugin.getDuelManager().startQueueDuel(p1, p2, arenaName, resolvedKit);
+                }
+            }
+        }.runTaskTimer(plugin, 40L, 20L); // Check every second, start after 2s
+    }
+
+    public void clearWaitingPlayers() {
+        for (UUID id : playerQueue.keySet()) {
+            Player player = Bukkit.getPlayer(id);
+            if (player != null) player.sendActionBar(Component.empty());
+        }
+        queues.clear();
+        playerQueue.clear();
+        queueJoinTime.clear();
+    }
+
+    public void cleanup() {
+        if (actionBarTask != null) {
+            actionBarTask.cancel();
+            actionBarTask = null;
+        }
+        if (matchmakingTask != null) {
+            matchmakingTask.cancel();
+            matchmakingTask = null;
+        }
+        queues.clear();
+        playerQueue.clear();
+        queueJoinTime.clear();
+    }
+}

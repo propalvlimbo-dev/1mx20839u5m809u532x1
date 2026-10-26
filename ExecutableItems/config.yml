@@ -1,0 +1,34 @@
+# Download it here: https://black-minecraft.com/resources/230/
+# ----------------------------------
+# -
+#       ExecutableItems
+# -
+#         By: Ssomar
+# -
+# ----------------------------------
+# -
+# WIKI HERE : https://docs.ssomar.com/executableitems/information-ei
+# DISCORD HERE : https://discord.com/invite/TRmSwJaYNv
+# -
+pickupLimit: -1
+disabledWorlds: []
+whitelistedWorlds: []
+whitelistItemsPerWorld: []
+premiumEnableCooldownForOp: true
+checkVersionMsg: false
+disableTestItems: false
+silentMessagePreventionErrorHeadDBError: false
+disableBackup: true
+deleteBackupsAfterDays: 7
+enableGarbageCollectorAfterReload: false
+giveLimit: 100
+enableTexturesPack: true
+texturesPackUrl: https://github.com/Ssomar-Developement/items/raw/main/__textures__/ExecutableItems_Pack.zip
+logs:
+  dropped: false
+  spawned: false
+debugOnlyRun: false
+itemCheckWithNBTAPI: false
+config_12_04_2024: true
+silentGive: false
+updateOldItems: false

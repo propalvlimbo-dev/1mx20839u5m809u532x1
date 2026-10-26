@@ -1,0 +1,31 @@
+# DecentHolograms 2.10+ — панель (BLOCK) под голограммой cases
+# Большой квадрат за текстом. Удалить файл — панели не будет.
+type: BLOCK
+block: 'minecraft:black_concrete'
+location:
+  world: spawn
+  x: 41.611
+  y: 52.900
+  z: 0.564
+  yaw: 0.0
+  pitch: 0.0
+settings:
+  enabled: true
+  display-range: 48
+  update-interval: 20
+attributes:
+  billboard:
+    value-type: billboard_constraints
+    value: CENTER
+  scale:
+    value-type: vector3f
+    value:
+      x: 6.75
+      y: 6.75
+      z: 0.05
+  translation:
+    value-type: vector3f
+    value:
+      x: -3.38
+      y: -4.28
+      z: -0.06

@@ -1,0 +1,50 @@
+config-version: 2
+
+settings:
+  pushback:
+    enabled: true
+    horizontal: 0.55
+    vertical: 0.26
+
+animation:
+  key-insert-ticks: 12
+  close-delay-ticks: 16
+  visual-item-lifetime-ticks: 22
+
+hologram:
+  enabled: true
+  idle-height-offset: 1.65
+  active-height-offset: 2.25
+  line-width: 240
+  view-range: 0.65
+  idle-lines:
+    - "&#F8BEFBХранилище"
+    - "&7ПКМ ключом для открытия"
+  opening-start-lines:
+    - "{key}"
+    - "&7Открывает: &#F8BEFB{player}"
+  opening-reward-lines:
+    - "{reward}"
+    - "&7Открывает: &#F8BEFB{player}"
+
+rarities:
+  COMMON:
+    name: "Обычный"
+    color: "&f"
+    weight: 50
+  UNCOMMON:
+    name: "Необычный"
+    color: "&a"
+    weight: 30
+  RARE:
+    name: "Редкий"
+    color: "&b"
+    weight: 15
+  EPIC:
+    name: "Эпический"
+    color: "&d"
+    weight: 6
+  LEGENDARY:
+    name: "Легендарный"
+    color: "&#F8BEFB"
+    weight: 2

@@ -1,0 +1,22 @@
+name: ElytrixVault
+version: 1.0.1
+main: ru.elytrix.vault.ElytrixVaultPlugin
+api-version: '1.21'
+author: ElytriX
+softdepend:
+  - ElytrixItem
+  - ExecutableItems
+
+commands:
+  evault:
+    description: Управление хранилищем и ключами ElytriX
+    usage: /evault
+    aliases:
+      - storage
+      - vaultcase
+      - hranilische
+
+permissions:
+  elytrixvault.admin:
+    description: Полный доступ к настройке хранилищ, ключей и редактору лута
+    default: op

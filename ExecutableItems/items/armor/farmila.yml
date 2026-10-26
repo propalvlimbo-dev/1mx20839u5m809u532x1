@@ -1,0 +1,62 @@
+name: §x§F§8§B§E§F§B« §x§F§8§B§E§F§BМ§x§F§4§B§E§F§Bе§x§F§0§B§F§F§Bч §x§E§C§B§F§F§Bф§x§E§8§B§F§F§Bа§x§E§4§B§F§F§Bр§x§E§0§C§0§F§Bм§x§D§C§C§0§F§Bи§x§D§8§C§0§F§Bл§x§D§4§C§0§F§Bы §x§F§8§B§E§F§B»
+lore: []
+material: NETHERITE_SWORD
+glow: false
+disableStack: false
+keepItemOnDeath: false
+canBeUsedOnlyByTheOwner: false
+cancelEventIfNotOwner: false
+onlyOwnerBlackListedActivators: []
+storeItemInfo: false
+unbreakable: false
+usage: 0
+usageLimit: -1
+cancelEventIfNoPermission: false
+whitelistedWorlds: []
+recognitions: []
+keepDefaultAttributes: false
+ignoreKeepDefaultAttributesFeature: true
+config_5: true
+config_update: true
+dropFeatures:
+  glowDrop: false
+  glowDropColor: WHITE
+  displayNameDrop: false
+hiders:
+  hideEnchantments: false
+  hideUnbreakable: false
+  hideAttributes: false
+  hidePotionEffects: false
+  hideUsage: false
+  hideDestroys: false
+  hidePlacedOn: false
+enchantments:
+  enchantment0:
+    enchantment: Sharpness
+    level: 5
+  enchantment1:
+    enchantment: Fire_aspect
+    level: 2
+  enchantment2:
+    enchantment: Looting
+    level: 4
+  enchantment3:
+    enchantment: Mending
+    level: 1
+  enchantment4:
+    enchantment: Unbreaking
+    level: 3
+giveFirstJoinFeatures:
+  giveFirstJoin: false
+  giveFirstJoinAmount: 1
+  giveFirstJoinSlot: 0
+restrictions: {}
+variables: {}
+activators: {}
+displayConditions:
+  playerConditions: {}
+  worldConditions: {}
+  itemConditions: {}
+  placeholdersConditions: {}
+  enableFeature: false
+attributes: {}

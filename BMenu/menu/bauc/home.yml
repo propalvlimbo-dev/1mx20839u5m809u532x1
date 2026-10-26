@@ -1,118 +1,333 @@
-include: [
-  "./lots_items.yml"
-]
+# Шаблоны лотов (lots_items.yml) вставлены прямо сюда: BMenu-препроцессор
+# ломается на многострочном include, поэтому файл самодостаточный.
+item_info_lore: &info
+  - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>${price}'
+  - '<#F8BEFB><b>┃</b> <white>Продавец: <#F8BEFB>{seller_name}'
+  - '<#F8BEFB><b>┃</b> <white>Истекает: <#F8BEFB>{expires}'
+
+vault_lot:
+  lore:
+    - '<#F8BEFB><b>┃</b> '
+    - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>${price}'
+    - '<#F8BEFB><b>┃</b> <white>Статус: <#F8BEFB>{lot_status}'
+    - '<#F8BEFB><b>┃</b> <white>Удаление: <#F8BEFB>{expires}'
+    - '<#F8BEFB><b>┃</b> '
+    - '<gray>● <white>Нажмите, чтобы забрать'
+  on_click:
+    - take_lot: ''
+
+sold:
+  name: '<gray>Товар не актуален'
+  material: gray_dye
+  lore:
+    - '<#F8BEFB><b>┃</b> '
+    - *info
+    - '<#F8BEFB><b>┃</b> '
+    - '<gray>● <white>F — найти аналоги'
+  on_swap_offhand_click:
+    - find_analogs: ''
+    - delay: '1 [research]'
+  all_flags: true
+  on_click:
+    - '<white>☁ <#F8BEFB>ᴇ<#F6BEFB>ʟ<#F3BEFB>ʏ<#F1BFFB>ᴛ<#EEBFFB>ʀ<#ECBFFB>ɪ<#E9BFFB>x <gray>» <red>Товар больше не актуален'
+    - sound: 'block.note_block.basedrum 0.35 1'
+
+purchased:
+  name: '<green>Товар куплен'
+  material: lime_dye
+  lore:
+    - '<#F8BEFB><b>┃</b> '
+    - *info
+    - '<#F8BEFB><b>┃</b> '
+    - '<gray>● <white>F — найти аналоги'
+  on_swap_offhand_click:
+    - find_analogs: ''
+    - delay: '1 [research]'
+  all_flags: true
+  on_click:
+    - '<white>☁ <#F8BEFB>ᴇ<#F6BEFB>ʟ<#F3BEFB>ʏ<#F1BFFB>ᴛ<#EEBFFB>ʀ<#ECBFFB>ɪ<#E9BFFB>x <gray>» <red>Вы уже купили этот товар'
+    - sound: 'block.note_block.basedrum 0.35 1'
+
+taken:
+  name: '<green>Товар забран'
+  material: lime_dye
+  lore:
+    - '<#F8BEFB><b>┃</b> '
+    - *info
+    - '<#F8BEFB><b>┃</b> '
+    - '<gray>● <white>F — найти аналоги'
+  on_swap_offhand_click:
+    - find_analogs: ''
+    - delay: '1 [research]'
+  all_flags: true
+  on_click:
+    - '<white>☁ <#F8BEFB>ᴇ<#F6BEFB>ʟ<#F3BEFB>ʏ<#F1BFFB>ᴛ<#EEBFFB>ʀ<#ECBFFB>ɪ<#E9BFFB>x <gray>» <red>Вы уже забрали этот товар'
+    - sound: 'block.note_block.basedrum 0.35 1'
+
+owned:
+  lore:
+    - '<#F8BEFB><b>┃</b> '
+    - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>${price}'
+    - '<#F8BEFB><b>┃</b> <white>Статус: <#F8BEFB>ваш лот'
+    - '<#F8BEFB><b>┃</b> '
+    - '<gray>● <white>Нажмите, чтобы забрать'
+  on_swap_offhand_click:
+    - find_analogs: ''
+    - delay: '1 [research]'
+  on_click:
+    - take_lot: ''
+
+one:
+  lore:
+    - '<#F8BEFB><b>┃</b> '
+    - *info
+    - '<#F8BEFB><b>┃</b> '
+    - '<gray>● <white>ЛКМ — купить'
+    - '<gray>● <white>Shift + ЛКМ — купить сразу'
+  on_swap_offhand_click:
+    - find_analogs: ''
+    - delay: '1 [research]'
+  on_left_click:
+    - open:
+        menu: 'bauc:confirm'
+        on_accept_command: '[buy_lot]'
+  on_shift_left_click:
+    - buy_lot: ''
+
+container:
+  lore:
+    - '<#F8BEFB><b>┃</b> '
+    - *info
+    - '<#F8BEFB><b>┃</b> '
+    - '<gray>● <white>ЛКМ — купить'
+    - '<gray>● <white>ПКМ — посмотреть содержимое'
+  on_swap_offhand_click:
+    - find_analogs: ''
+    - delay: '1 [research]'
+  on_left_click:
+    - open:
+        menu: 'bauc:confirm'
+        on_accept_command: '[buy_lot]'
+  on_shift_left_click:
+    - buy_lot: ''
+  on_right_click:
+    - open: 'bauc:container_view'
+
+many:
+  lore:
+    - '<#F8BEFB><b>┃</b> '
+    - *info
+    - '<#F8BEFB><b>┃</b> '
+    - '<gray>● <white>ЛКМ — купить'
+    - '<gray>● <white>ПКМ — выбрать количество'
+  on_swap_offhand_click:
+    - find_analogs: ''
+    - delay: '1 [research]'
+  on_left_click:
+    - open:
+        menu: 'bauc:confirm'
+        on_accept_command: '[buy_lot]'
+  on_shift_left_click:
+    - buy_lot: ''
+  on_right_click:
+    - open:
+        menu: 'bauc:select_count'
+        on_accept_command: '[buy_lot] {result_count}'
+
 id: bauc:home
 provider: bauc:home
-title: "<lang:bauctionv2.categories.{current_category_id}.title>{search_input}<off_title><b><gray>[<gold>{current_page}<gray>/<gold>{max_page}<gray>]"
+title: '<lang:bauctionv2.categories.{current_category_id}.title>{search_input}<off_title><gray>[<#F8BEFB>{current_page}<gray>/<#F8BEFB>{max_page}<gray>]'
 
-slots: 0-44
+slots: 10-16,19-25,28-34,37-43
 
 category_line:
-  if_selected: '<white><gold>✔ <lang:bauctionv2.categories.{id}.name>'
-  else: '<white><#9CF9FF>●<white> <lang:bauctionv2.categories.{id}.name>'
+  if_selected: '<#F8BEFB>● <white><lang:bauctionv2.categories.{id}.name>'
+  else: '<gray>● <white><lang:bauctionv2.categories.{id}.name>'
 sorting_line:
-  if_selected: '<white><gold>✔ <lang:bauctionv2.sorting.{id}.name>'
-  else: '<white><#9CF9FF>●<white> <lang:bauctionv2.sorting.{id}.name>'
+  if_selected: '<#F8BEFB>● <white><lang:bauctionv2.sorting.{id}.name>'
+  else: '<gray>● <white><lang:bauctionv2.sorting.{id}.name>'
 
 items:
   vault:
     slot: 46
-    material: ender_chest
-    name: "<#FF0000>[☃]<#FF6600> Хранилище"
+    material: purple_bundle
+    name: '<#F8BEFB>Хранилище'
     lore:
-      - "<#FF6600>➥ Нажмите<#FFFFE6>, чтобы перейти"
-      - ""
-      - "<#FFFFE6>Здесь хранятся товары,"
-      - "<#FFFFE6>которые Вы продаете, или"
-      - "<#FFFFE6>ваши купленные предметы"
+      - '<#F8BEFB><b>┃</b> '
+      - '<#F8BEFB><b>┃</b> <white>Товары, которые вы продаёте'
+      - '<#F8BEFB><b>┃</b> <white>и купленные лоты'
+      - '<#F8BEFB><b>┃</b> '
+      - '<gray>● <white>Нажмите, чтобы открыть'
     on_click:
-      - sound: 'ui.button.click 1 1'
+      - sound: 'ui.button.click 0.35 1'
       - open: 'bauc:vault'
+
   research:
     slot: 49
-    name: "<#FF0000>[⟲]<#FF6600> Обновить"
+    material: music_disc_mellohi
+    name: '<#F8BEFB>Обновить'
     lore:
-      - "<#FF6600>➥ Нажмите<#FFFFE6>, чтобы обновить"
-      - ""
-      - "<#FFFFE6>Эта кнопка позволяет"
-      - "<#FFFFE6>обновить список товаров"
-    material: nether_star
+      - '<#F8BEFB><b>┃</b> '
+      - '<#F8BEFB><b>┃</b> <white>Обновляет список лотов'
+      - '<#F8BEFB><b>┃</b> '
+      - '<gray>● <white>Нажмите, чтобы обновить'
     on_click:
-      - sound: 'entity.ender_eye.launch 1 1'
+      - sound: 'entity.ender_eye.launch 0.35 1'
       - '[research]'
+
   categories:
     slot: 52
-    name: "<#FF0000>[❖]<#FF6600> Категории"
-    lore:
-      - "<#FF6600>➥ Нажмите<#FFFFE6>, чтобы перейти"
-      - ""
-      - "<#FFFFE6>В этом меню можно"
-      - "<#FFFFE6>удобно отсортировать"
-      - "<#FFFFE6>товары по категориям"
     material: chest
+    name: '<#F8BEFB>Категории'
+    lore:
+      - '<#F8BEFB><b>┃</b> '
+      - '<#F8BEFB><b>┃</b> <white>Все разделы аукциона'
+      - '<#F8BEFB><b>┃</b> '
+      - '<gray>● <white>Нажмите, чтобы выбрать'
     on_click:
-      - sound: 'ui.button.click 1 1'
+      - sound: 'ui.button.click 0.35 1'
       - open: 'bauc:select_category'
 
   categories_HW:
     slot: 51
-    name: "<#FF0000>[❖]<#FF6600> Категории"
-    lore:
-      - '{all_categories}'
     material: chest_minecart
+    name: '<#F8BEFB>Категории'
+    lore:
+      - '<#F8BEFB><b>┃</b> '
+      - '{all_categories}'
+      - '<#F8BEFB><b>┃</b> '
+      - '<gray>● <white>ЛКМ / ПКМ — листать'
     on_left_click:
-      - sound: 'ui.button.click 1 1'
+      - sound: 'ui.button.click 0.35 1'
       - next_category: ''
     on_right_click:
-      - sound: 'ui.button.click 1 1'
+      - sound: 'ui.button.click 0.35 1'
       - previous_category: ''
 
   sorting_HW:
     slot: 45
-    name: "<#00D8FF> Сортировка"
-    lore:
-      - '{all_sorting}'
     material: hopper
+    name: '<#F8BEFB>Сортировка'
+    lore:
+      - '<#F8BEFB><b>┃</b> '
+      - '{all_sorting}'
+      - '<#F8BEFB><b>┃</b> '
+      - '<gray>● <white>ЛКМ / ПКМ — листать'
     on_left_click:
-      - sound: 'ui.button.click 1 1'
+      - sound: 'ui.button.click 0.35 1'
       - next_sorting: ''
     on_right_click:
-      - sound: 'ui.button.click 1 1'
+      - sound: 'ui.button.click 0.35 1'
       - previous_sorting: ''
 
   rent:
     slot: 53
-    name: "<#FF0000>[☃]<#FF6600> Аренда слотов"
-    lore:
-      - "<#FF6600>➥ Нажмите<#FFFFE6>, чтобы перейти"
-      - ""
-      - "<#FFFFE6>Здесь можно арендовать,"
-      - "<#FFFFE6>дополнительные слоты"
-    all_flags: true
     material: crafting_table
+    name: '<#F8BEFB>Аренда слотов'
+    lore:
+      - '<#F8BEFB><b>┃</b> '
+      - '<#F8BEFB><b>┃</b> <white>Больше лотов на аукционе'
+      - '<#F8BEFB><b>┃</b> '
+      - '<gray>● <white>Нажмите, чтобы открыть'
+    all_flags: true
     on_click:
-      - '[sound] ui.button.click 1 1'
+      - sound: 'ui.button.click 0.35 1'
       - open: 'auc_rent:home'
 
-  # фулл скрыть next_page если нет некст страницы не получится из-за особеностей вычисления {has_next_page}
   next_page:
     slot: 50
-    material: spectral_arrow
+    material: black_dye
     oneOf:
       - on_view: '{has_next_page} == true'
-        name: "<#FF0000>[»]<#FF6600> Следующая страница"
-      - name: "<gray>[»] Следующая страница"
+        name: '<#F8BEFB>Вперёд'
+        lore:
+          - '<#F8BEFB><b>┃</b> '
+          - '<gray>● <white>Следующая страница'
+      - name: '<gray>Вперёд'
+        lore:
+          - '<#F8BEFB><b>┃</b> '
+          - '<dark_gray>● Последняя страница'
     on_click:
-      - sound: 'entity.ender_eye.launch 1 1'
+      - sound: 'entity.ender_eye.launch 0.35 1'
       - next_page: ''
 
   previous_page:
     slot: 48
-    material: spectral_arrow
+    material: black_dye
     oneOf:
       - on_view: '{current_page} != 1'
-        name: "<#FF0000>[«]<#FF6600> Предыдущая страница"
-      - name: "<gray>[«] Предыдущая страница"
+        name: '<#F8BEFB>Назад'
+        lore:
+          - '<#F8BEFB><b>┃</b> '
+          - '<gray>● <white>Предыдущая страница'
+      - name: '<gray>Назад'
+        lore:
+          - '<#F8BEFB><b>┃</b> '
+          - '<dark_gray>● Первая страница'
     on_click:
-      - sound: 'entity.ender_eye.launch 1 1'
+      - sound: 'entity.ender_eye.launch 0.35 1'
       - previous_page: ''
+
+  frame:
+    slot: 9,17,18,26,27,35,36,44
+    name: ''
+    material: iron_chain
+  accent:
+    slot: 0-8
+    name: ''
+    material: purple_stained_glass_pane
+  info:
+    slot: 47
+    material: paper
+    name: '<#F8BEFB>Как выставлять лоты'
+    lore:
+      - '<#F8BEFB><b>┃</b> '
+      - '<#F8BEFB><b>┃</b> <white>Возьми предмет в руку'
+      - '<#F8BEFB><b>┃</b> <white>и напиши: <#F8BEFB>/ah sell 1000'
+      - '<#F8BEFB><b>┃</b> <white>1000 — цена в монетах'
+      - '<#F8BEFB><b>┃</b> '
+      - '<#F8BEFB><b>┃</b> <white>Несколько сразу:'
+      - '<#F8BEFB><b>┃</b> <#F8BEFB>/ah sellgui 1000'
+      - '<#F8BEFB><b>┃</b> '
+      - '<gray>● <white>Поиск: <#F8BEFB>/ah search алмаз'
+      - '<gray>● <white>Аренда слотов: <#F8BEFB>/ah rent'
+      - '<gray>● <white>Лот висит: <#F8BEFB>1 день'
+    all_flags: true
+  cover:
+    name: ''
+    material: iron_chain
+
+animation:
+  # Цепная клетка: при открытии сетка лотов закована в цепи, затем они
+  # снимаются ряд за рядом снизу вверх. Цепи лежат в слое 3, поверх лотов
+  # (они в слое 2). Звуки — родная группа block.chain.* (1.21.11).
+  # Кадр 1 повторяет установку: при открытии LotsMenu.generate() чистит слой 3.
+  - tick: 0
+    opcodes:
+      - cmd: '[layer] 3 set cover 10-16,19-25,28-34,37-43'
+      - sound: 'block.chain.place 0.50 1.10'
+  - tick: 1
+    opcodes:
+      - cmd: '[layer] 3 set cover 10-16,19-25,28-34,37-43'
+  - tick: 3
+    opcodes:
+      - cmd: '[layer] 3 remove 37-43'
+      - sound: 'block.chain.break 0.55 1.05'
+  - tick: 6
+    opcodes:
+      - cmd: '[layer] 3 remove 28-34'
+      - sound: 'block.chain.break 0.60 1.15'
+  - tick: 9
+    opcodes:
+      - cmd: '[layer] 3 remove 19-25'
+      - sound: 'block.chain.break 0.65 1.25'
+  - tick: 12
+    opcodes:
+      - cmd: '[layer] 3 remove 10-16'
+      - sound: 'block.chain.break 0.70 1.35'
+  - tick: 14
+    opcodes:
+      - sound: 'block.chain.fall 0.45 1.20'
+  - tick: 16
+    opcodes:
+      - sound: 'block.amethyst_block.chime 0.30 1.45'

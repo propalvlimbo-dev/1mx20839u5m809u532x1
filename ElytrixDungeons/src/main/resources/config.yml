@@ -1,0 +1,119 @@
+# ElytrixDungeons — до 7 наземных домов и 7 подземных данжей.
+config-version: 10
+# Схемы плагин не создаёт: загрузите собственные файлы .schem в нужную папку.
+#   plugins/ElytrixDungeons/schematics/surface/<id-схемы>.schem
+#   plugins/ElytrixDungeons/schematics/underground/<id-схемы>.schem
+# Затем выберите загруженную схему командой:
+#   /elytrixdungeon create surface <id-схемы>
+#   /elytrixdungeon create underground <id-схемы>
+
+world-settings:
+  world: world
+  center-x: 0
+  center-z: 0
+  half-size: 1420
+  spawn-exclusion-radius: 200
+  min-distance-between-dungeons: 340
+  underground-min-y: -24
+  underground-max-y: 8
+
+auto-spawn:
+  # Массовое создание при первом запуске выключено. Создавайте данжи по одному командой create.
+  startup-enabled: false
+  # Эти значения применяются только при запуске массового поиска через административные инструменты.
+  surface-count: 7
+  underground-count: 7
+  # Сколько безопасных мест проверить перед выбором лучшего.
+  candidates-per-dungeon: 24
+  # Проверок чанков за один шаг поиска.
+  scan-interval-ticks: 4
+  # Блоков схемы устанавливается за один тик.
+  blocks-per-tick: 1200
+  # При выключении плагина вернуть исходный рельеф; координаты остаются в dungeons.yml.
+  hide-dungeons-on-disable: true
+
+protection:
+  # Радиус запрета приватов (/rg claim и аналоги) вокруг наземных данжей.
+  claim-padding-blocks: 40
+  # Размер буфера природного рельефа, сохраняемого и восстанавливаемого вокруг схемы.
+  surround-restore-padding-xz: 12
+  surround-restore-padding-y: 8
+  # Для подземного данжа сохранять и восстанавливать породу до поверхности.
+  restore-column-to-surface: true
+  allow-pvp: true
+  # true — блоки внутри зоны можно менять; ландшафт восстановится при обновлении данжа.
+  allow-block-modify-in-zone: true
+
+player-teleport:
+  # false — телепорт доступен администраторам с правом elytrixdungeons.tp.
+  allow-all-players: false
+
+regeneration:
+  # Полное обновление данжа и ландшафта вокруг раз в 12 часов.
+  interval-seconds: 43200
+  relocate-on-reset: false
+
+surface-dungeon:
+  chest-stacks: 8
+  shulker-stacks: 14
+  # Содержимое и редкость каждого шалкера обновляются раз в 6 часов, даже если его не открывали.
+  shulker-refresh-seconds: 21600
+  landscaping:
+    enabled: true
+    # Плавный природный склон вокруг основания дома (в пределах снимка местности).
+    radius: 6
+  ghosts:
+    # Отдельная популяция для каждого надземного данжа; не связана с призраками Кладбища.
+    initial-count: 6
+    respawn-cooldown-seconds: 7200
+    health: 16.0
+  ambience:
+    enabled: true
+    # Жуткая MUSIC_DISC_5 — персональная музыка для каждого игрока внутри дома, с автоповтором.
+    volume: 2.0
+    pitch: 0.85
+
+underground-dungeon:
+  # Компактный радиус WorldGuard и запрета приватов вокруг подземного данжа.
+  claim-padding-blocks: 8
+  shulker-stacks: 7
+  side-container-stacks: 4
+  # Пауза между зачисткой волны и появлением следующей.
+  wave-delay-seconds: 3
+  # Параметры 5 обычных визер-скелетов первой волны.
+  wither-skeleton-health: 36.0
+  wither-skeleton-damage: 8.0
+  # Параметры сильных скелетов и лучников.
+  guard-health: 64.0
+  guard-damage: 14.5
+  # Параметры финального босса.
+  leader-health: 150.0
+  leader-damage: 18.5
+  # Ключи Хранилища выпадают только на Кладбище.
+  fight-timeout-seconds: 690
+
+# Общая голограмма данжа и подписи сундуков выключены. Над призраками отображается только их имя.
+hologram:
+  enabled: false
+  chest-hint:
+    enabled: false
+  ghost:
+    enabled: false
+  shulker:
+    enabled: true
+
+# Elytrix AuctionBar-style status. Each line remains visible for 15 seconds.
+auctionbar:
+  enabled: true
+  cycle-seconds: 15
+  reset-line: "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &8» &7{dungeon} &8┃ &fПолный сброс через &#96FF91{timer}"
+  ghosts-line: "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &8» &7{dungeon} &8┃ &f{ghost-label}: &#F8BEFB{ghosts}&7/{ghost-total}"
+  surface-event-line: "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &8» &7{dungeon} &8┃ &fПризраков в данже: &#F8BEFB{ghosts}&7/{ghost-total}"
+  loot-line: "&f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &8» &7{dungeon} &8┃ &fЛут шалкеров обновится через &#96FF91{timer}"
+
+# Подавление шумных серверных записей. Эти настройки применяются при запуске плагина;
+# значения исходных настроек Paper/Spigot восстанавливаются при выключении ElytrixDungeons.
+console-logs:
+  suppress-named-entity-deaths: true
+  suppress-player-command-logs: true
+  suppress-admin-command-feedback: true

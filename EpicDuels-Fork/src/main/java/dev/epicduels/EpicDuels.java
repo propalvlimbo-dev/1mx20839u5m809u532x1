@@ -1,0 +1,427 @@
+package dev.epicduels;
+
+import dev.epicduels.command.DuelCommand;
+import dev.epicduels.command.DuelTabCompleter;
+import dev.epicduels.command.PartyCommand;
+import dev.epicduels.command.PartyTabCompleter;
+import dev.epicduels.listener.FriendlyFireListener;
+import dev.epicduels.listener.GUIListener;
+import dev.epicduels.listener.LobbyProtectionListener;
+import dev.epicduels.listener.PlayerListener;
+import dev.epicduels.listener.WorldProtectionListener;
+import dev.epicduels.manager.*;
+import dev.epicduels.model.Arena;
+import dev.epicduels.world.VoidWorldGenerator;
+import org.bukkit.*;
+import org.bukkit.command.PluginCommand;
+import org.bukkit.generator.ChunkGenerator;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.File;
+
+/*
+ * ============================================================
+ * EpicDuels — Architecture Overview
+ * ============================================================
+ *
+ * This plugin is organized around six manager classes, each
+ * responsible for a distinct domain. They are all instantiated
+ * in onEnable() and accessed through getter methods on the
+ * main plugin class.
+ *
+ * ArenaManager
+ *   Handles arena CRUD: creating void template worlds, saving/
+ *   loading arena definitions (spawns, icons, ready state) from
+ *   arenas.yml, and copying template worlds into isolated
+ *   instance worlds for each duel. Also responsible for
+ *   recording original block positions when an instance is
+ *   created (so the WorldProtectionListener can tell template
+ *   blocks from player-placed ones) and for deleting instance
+ *   worlds after duels finish.
+ *
+ * KitManager
+ *   Manages kit CRUD: saving player inventories (contents,
+ *   armor, offhand) as Base64-encoded data in kits.yml, plus
+ *   per-kit display icons. Provides lookup and listing methods
+ *   used by both commands and GUIs.
+ *
+ * PlayerKitManager
+ *   Per-player kit personalization (the Kit Editor): stores each
+ *   player's preferred item arrangement per kit in playerkits.yml
+ *   and resolves the layout to apply when a duel starts. Layouts
+ *   are validated as pure rearrangements of the base kit.
+ *
+ * DuelManager
+ *   Owns the full duel lifecycle: sending / accepting / denying
+ *   challenge requests, starting duels (teleport, kit apply,
+ *   countdown, freeze), detecting wins (death or disconnect),
+ *   ending duels (stats update, announcements, cleanup).
+ *   Also exposes startQueueDuel() for the QueueManager to
+ *   initiate matchmade duels without a challenge request.
+ *
+ * QueueManager
+ *   Implements kit-based matchmaking. Players join a queue for
+ *   a specific kit; a repeating task checks each queue every
+ *   second and pairs the first two players, picking a random
+ *   ready arena. A separate task sends action-bar updates
+ *   showing queue time. Handles cleanup on disconnect.
+ *
+ * StatsManager
+ *   Simple per-player win/loss tracker backed by stats.yml.
+ *   Provides getStats(), addWin(), addLoss() and auto-saves
+ *   after every change.
+ *
+ * GUIManager
+ *   Builds and manages all chest-based GUIs: the redesigned
+ *   main menu (three-section layout with challenge, stats, and
+ *   queue), player selection, kit selection, map selection
+ *   (with random-map animation), kit edit/preview, and arena/
+ *   kit list views. Tracks per-player GUI state for the
+ *   multi-step challenge flow (player -> kit -> map).
+ *
+ * Listeners
+ *   - PlayerListener: join (lobby TP), quit (cleanup), move
+ *     freeze, damage cancel during countdown, death handling.
+ *   - GUIListener: routes inventory clicks to the correct
+ *     handler based on InventoryHolder and persistent button IDs.
+ *   - WorldProtectionListener: protects lobby, allows admin
+ *     building in templates, allows player block placement in
+ *     instances but prevents breaking original map blocks.
+ * ============================================================
+ */
+public class EpicDuels extends JavaPlugin {
+
+    private ArenaManager arenaManager;
+    private KitManager kitManager;
+    private PlayerKitManager playerKitManager;
+    private DuelManager duelManager;
+    private QueueManager queueManager;
+    private StatsManager statsManager;
+    private GUIManager guiManager;
+    private MenuPresentationManager menuPresentationManager;
+    private ScoreboardManager scoreboardManager;
+    private HologramManager hologramManager;
+    private PartyManager partyManager;
+    private TeamDuelManager teamDuelManager;
+    private TournamentManager tournamentManager;
+    private RematchManager rematchManager;
+    private ResultCommandManager resultCommandManager;
+    private InventoryBackupManager inventoryBackupManager;
+    private LobbyProtectionListener lobbyProtectionListener;
+
+    @Override
+    public void onEnable() {
+        // Save default config
+        saveDefaultConfig();
+
+        // PDC keys for GUI button items (must exist before any menu is built)
+        dev.epicduels.gui.MenuKeys.init(this);
+
+        // Localized messages (lang/messages_<code>.yml, selected via "language")
+        dev.epicduels.i18n.Messages.init(this);
+
+        // Initialize managers
+        arenaManager = new ArenaManager(this);
+        kitManager = new KitManager(this);
+        playerKitManager = new PlayerKitManager(this);
+        inventoryBackupManager = new InventoryBackupManager(this);
+        statsManager = new StatsManager(this);
+        menuPresentationManager = new MenuPresentationManager(this);
+        guiManager = new GUIManager(this);
+        duelManager = new DuelManager(this);
+        queueManager = new QueueManager(this);
+        hologramManager = new HologramManager(this);
+        partyManager = new PartyManager(this);
+        teamDuelManager = new TeamDuelManager(this);
+        tournamentManager = new TournamentManager(this);
+        rematchManager = new RematchManager(this);
+        resultCommandManager = new ResultCommandManager(this);
+        scoreboardManager = new ScoreboardManager(this);
+
+        // Optional PlaceholderAPI hook (softdepend) — the expansion class is
+        // only classloaded inside this guard
+        if (getServer().getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            new dev.epicduels.hook.EpicDuelsExpansion(this).register();
+            getLogger().info("PlaceholderAPI detected — %epicduels_*% placeholders registered.");
+        }
+
+        // Register commands
+        PluginCommand duelCmd = getCommand("duel");
+        if (duelCmd != null) {
+            duelCmd.setExecutor(new DuelCommand(this));
+            duelCmd.setTabCompleter(new DuelTabCompleter(this));
+        }
+        PluginCommand partyCmd = getCommand("party");
+        if (partyCmd != null) {
+            partyCmd.setExecutor(new PartyCommand(this));
+            partyCmd.setTabCompleter(new PartyTabCompleter());
+        }
+
+        // Register listeners
+        getServer().getPluginManager().registerEvents(new dev.epicduels.listener.InventoryGuardListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
+        getServer().getPluginManager().registerEvents(new GUIListener(this), this);
+        getServer().getPluginManager().registerEvents(new WorldProtectionListener(this), this);
+        getServer().getPluginManager().registerEvents(new FriendlyFireListener(this), this);
+        lobbyProtectionListener = new LobbyProtectionListener(this);
+        getServer().getPluginManager().registerEvents(lobbyProtectionListener, this);
+
+        // Defer world operations to first tick (cannot create worlds during STARTUP phase)
+        Bukkit.getScheduler().runTask(this, () -> {
+            cleanupLeftoverInstances();
+            setupVoidWorld();
+            loadArenaWorlds();
+            hologramManager.load();
+            getLogger().info("Arena worlds loaded.");
+        });
+
+        getLogger().info("EpicDuels v" + getDescription().getVersion() + " enabled!");
+    }
+
+    @Override
+    public void onDisable() {
+        if (scoreboardManager != null) scoreboardManager.shutdown();
+        // Tear down party-related managers first so callbacks don't fire mid-shutdown
+        if (tournamentManager != null) tournamentManager.cleanupAll();
+        if (teamDuelManager != null) teamDuelManager.cleanupAll();
+        if (partyManager != null) partyManager.cleanup();
+
+        // End all active duels
+        if (duelManager != null) {
+            duelManager.cleanupAll();
+        }
+        if (rematchManager != null) rematchManager.cleanup();
+
+        // Cleanup queue
+        if (queueManager != null) {
+            queueManager.cleanup();
+        }
+
+        // Despawn leaderboard holograms
+        if (hologramManager != null) {
+            hologramManager.shutdown();
+        }
+
+        // Save all data
+        if (arenaManager != null) arenaManager.saveArenas();
+        if (kitManager != null) kitManager.saveKits();
+        if (statsManager != null) {
+            statsManager.saveStats();
+            statsManager.pushAllToRemote();
+        }
+
+        getLogger().info("EpicDuels disabled!");
+    }
+
+    @Override
+    public @Nullable ChunkGenerator getDefaultWorldGenerator(@NotNull String worldName, @Nullable String id) {
+        return new VoidWorldGenerator();
+    }
+
+    private void cleanupLeftoverInstances() {
+        File worldContainer = Bukkit.getWorldContainer();
+        File[] dirs = worldContainer.listFiles(File::isDirectory);
+        if (dirs == null) return;
+        int cleaned = 0;
+        for (File dir : dirs) {
+            if (dir.getName().startsWith("arena_instance_")) {
+                World w = Bukkit.getWorld(dir.getName());
+                if (w != null) {
+                    for (org.bukkit.entity.Player p : w.getPlayers()) {
+                        p.teleport(getLobbyLocation());
+                    }
+                    if (!Bukkit.unloadWorld(w, false)) {
+                        getLogger().warning("Retaining loaded instance: " + dir.getName());
+                        continue;
+                    }
+                }
+                ArenaManager.deleteWorldFolder(dir);
+                cleaned++;
+            }
+        }
+        if (cleaned > 0) {
+            getLogger().info("Cleaned up " + cleaned + " leftover instance world(s) from previous run.");
+        }
+    }
+
+    private void setupVoidWorld() {
+        if (!getConfig().getBoolean("lobby.configure-void-world", false)) return;
+        org.bukkit.Location lobby = getLobbyLocation();
+        World defaultWorld = lobby == null ? null : lobby.getWorld();
+        if (defaultWorld == null || !(defaultWorld.getGenerator() instanceof VoidWorldGenerator)) {
+            getLogger().warning("Lobby setup requires an explicitly configured void world.");
+            return;
+        }
+        if (defaultWorld != null) {
+            File markerFile = new File(getDataFolder(), ".void-setup-complete");
+            if (!markerFile.exists()) {
+                getDataFolder().mkdirs();
+                try {
+                    markerFile.createNewFile();
+                } catch (Exception e) {
+                    getLogger().warning("Could not create marker file");
+                }
+
+                defaultWorld.setGameRule(GameRule.DO_MOB_SPAWNING, false);
+                defaultWorld.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
+                defaultWorld.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
+                defaultWorld.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
+                defaultWorld.setGameRule(GameRule.DO_FIRE_TICK, false);
+                defaultWorld.setDifficulty(Difficulty.PEACEFUL);
+                defaultWorld.setTime(6000);
+                defaultWorld.setSpawnLocation(0, 100, 0);
+
+                getLogger().info("Default world configured for lobby use.");
+            }
+        }
+    }
+
+    private void loadArenaWorlds() {
+        File worldContainer = Bukkit.getWorldContainer();
+        File[] dirs = worldContainer.listFiles(File::isDirectory);
+        if (dirs == null) return;
+
+        for (File dir : dirs) {
+            if (dir.getName().startsWith("arena_template_")) {
+                String worldName = dir.getName();
+                if (Bukkit.getWorld(worldName) == null) {
+                    WorldCreator creator = new WorldCreator(worldName);
+                    creator.generator(new VoidWorldGenerator());
+                    creator.type(WorldType.FLAT);
+                    creator.generateStructures(false);
+                    World world = Bukkit.createWorld(creator);
+                    if (world != null) {
+                        world.setGameRule(GameRule.DO_MOB_SPAWNING, false);
+                        world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
+                        world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
+                        getLogger().info("Loaded arena world: " + worldName);
+                    }
+                }
+                // Resolve spawn locations now that the world is loaded
+                String arenaName = dir.getName().substring("arena_template_".length());
+                Arena arena = arenaManager.getArena(arenaName);
+                if (arena != null) {
+                    arenaManager.resolveSpawnWorlds(arena);
+                    getLogger().info("Arena '" + arena.getName() + "' spawns resolved: spawn1="
+                            + (arena.getSpawn1() != null ? arena.getSpawn1() : "null")
+                            + ", spawn2=" + (arena.getSpawn2() != null ? arena.getSpawn2() : "null"));
+                } else {
+                    getLogger().warning("No arena config found for world: " + dir.getName());
+                }
+            }
+        }
+    }
+
+    // --- Feature toggles ---
+
+    /**
+     * Checks a feature toggle from the config's features: section.
+     * Unknown/missing toggles default to enabled, so old configs keep
+     * every feature on.
+     */
+    public boolean isFeatureEnabled(String feature) {
+        return getConfig().getBoolean("features." + feature, true);
+    }
+
+    /**
+     * Own-inventory (no-kit) duels toggle. Reads features.own-inventory-duels
+     * and falls back to the legacy duel.allow-own-inventory key from early
+     * 3.0.0 builds.
+     */
+    public boolean isOwnInventoryDuelsEnabled() {
+        return getConfig().getBoolean("features.own-inventory-duels",
+                getConfig().getBoolean("duel.allow-own-inventory", true));
+    }
+
+    // --- Location helpers ---
+
+    public Location getLobbyLocation() {
+        String worldName = getConfig().getString("lobby.world", "world");
+        World world = Bukkit.getWorld(worldName);
+        if (world == null) world = Bukkit.getWorlds().get(0);
+        return new Location(
+                world,
+                getConfig().getDouble("lobby.x", 0),
+                getConfig().getDouble("lobby.y", 100),
+                getConfig().getDouble("lobby.z", 0),
+                (float) getConfig().getDouble("lobby.yaw", 0),
+                (float) getConfig().getDouble("lobby.pitch", 0)
+        );
+    }
+
+    public void setLobbyLocation(Location loc) {
+        getConfig().set("lobby.world", loc.getWorld().getName());
+        getConfig().set("lobby.x", loc.getX());
+        getConfig().set("lobby.y", loc.getY());
+        getConfig().set("lobby.z", loc.getZ());
+        getConfig().set("lobby.yaw", (double) loc.getYaw());
+        getConfig().set("lobby.pitch", (double) loc.getPitch());
+        saveConfig();
+    }
+
+    // --- Manager getters ---
+    public MenuPresentationManager getMenuPresentationManager() { return menuPresentationManager; }
+    public ScoreboardManager getScoreboardManager() { return scoreboardManager; }
+
+    public ArenaManager getArenaManager() {
+        return arenaManager;
+    }
+
+    public KitManager getKitManager() {
+        return kitManager;
+    }
+
+    public PlayerKitManager getPlayerKitManager() {
+        return playerKitManager;
+    }
+
+    public DuelManager getDuelManager() {
+        return duelManager;
+    }
+
+    public QueueManager getQueueManager() {
+        return queueManager;
+    }
+
+    public StatsManager getStatsManager() {
+        return statsManager;
+    }
+
+    public GUIManager getGUIManager() {
+        return guiManager;
+    }
+
+    public HologramManager getHologramManager() {
+        return hologramManager;
+    }
+
+    public LobbyProtectionListener getLobbyProtectionListener() {
+        return lobbyProtectionListener;
+    }
+
+    public PartyManager getPartyManager() {
+        return partyManager;
+    }
+
+    public TeamDuelManager getTeamDuelManager() {
+        return teamDuelManager;
+    }
+
+    public TournamentManager getTournamentManager() {
+        return tournamentManager;
+    }
+
+    public RematchManager getRematchManager() {
+        return rematchManager;
+    }
+
+    public ResultCommandManager getResultCommandManager() {
+        return resultCommandManager;
+    }
+
+    public InventoryBackupManager getInventoryBackupManager() {
+        return inventoryBackupManager;
+    }
+}

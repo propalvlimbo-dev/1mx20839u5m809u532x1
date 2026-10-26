@@ -1,0 +1,290 @@
+# Converted from DeluxeMenus/gui_menus/main/don.yml; source kept unchanged.
+id: elytrix:don
+provider: default
+type: chest
+size: 54
+title: '&#F8BEFB&lСписок привилегий'
+items:
+  info:
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0=
+    name: '&7« &#F8BEFBНаши сообщества &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fБудьте в курсе: &#F8BEFBВсех новостей'
+    - '&#F8BEFB&l┃ &fСвежие обновления: &#F8BEFBАнонсы'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для отправки ссылок в чат'
+    on_click:
+    - '[message]'
+    - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &#F8BEFBСообщества'
+    - '[message] &#F8BEFB&l┃ &fНаш сайт: &#F8BEFBelytrix.pw'
+    - '[message] &#F8BEFB&l┃ &fTelegram канал: &#229ED9t.me/elytrix_ru'
+    - '[message] &#F8BEFB&l┃ &fDiscord сервер: &#5865F2dsc.gg/elytrix'
+    - '[message]'
+    - '[close]'
+  close:
+    material: black_dye
+    name: '&7« &#F8BEFBНазад &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fВернуться в предыдущее меню.'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите для перехода'
+    on_click:
+    - '[open] elytrix:menu'
+  design_purple_panel:
+    material: purple_stained_glass_pane
+    name: '&r'
+  design_black_panel:
+    material: black_stained_glass_pane
+    name: '&r'
+  lite:
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDBmZDY3OTc4MDE0OTY5YzVmNTE3MmJmMzlkMjQzNDcyODFkNmQ5NWFlNzBmMTliNDlkODRmMWY4ZmVlNjg1In19fQ==
+    name: '&#8D8D8D&lʟ&#969696&lɪ&#9F9F9F&lᴛ&#A8A8A8&lᴇ &f%player_name% &7| &#8D8D8D19 рублей&7/&fнавсегда'
+    lore:
+    - '&#8D8D8D&l┃ '
+    - '&#8D8D8D&l┃ &fВозможности:'
+    - '&#8D8D8D&l┃ &7● &fДоступ к наборам: &#8D8D8D/kits'
+    - '&#8D8D8D&l┃ &7● &fПолучение зарплаты: &#8D8D8D/salary'
+    - '&#8D8D8D&l┃ &7● &fВиртуальный верстак: &#8D8D8D/craft'
+    - '&#8D8D8D&l┃ &7● &fНадеть предмет на голову: &#8D8D8D/hat'
+    - '&#8D8D8D&l┃ &7● &fУбить себя: &#8D8D8D/suicide'
+    - '&#8D8D8D&l┃ '
+    - '&#8D8D8D&l┃ &fПараметры:'
+    - '&#8D8D8D&l┃ &7● &fКоличество приватов: &#8D8D8D1'
+    - '&#8D8D8D&l┃ &7● &fРазмер приватов: &#8D8D8D10000'
+    - '&#8D8D8D&l┃ &7● &fТочек дома: &#8D8D8D1'
+    - '&#8D8D8D&l┃ &7● &fСлотов на аукционе: &#8D8D8D2'
+    - '&#8D8D8D&l┃ '
+    - '&7● &fПокупка на сайте: &#8D8D8Delytrix.pw'
+  prime:
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2RiMTc5YWUyYmZkOGRlNjdiZmIyYmMzMDhhMjEzNGJkNzUxOTQyZDM0Mjg3NGY4NmI1NzQ3ZDE2ZWVkNzIifX19
+    name: '&#89A0FF&lᴘ&#99AEFF&lʀ&#A8BCFF&lɪ&#B8CAFF&lᴍ&#C7D8FF&lᴇ &f%player_name% &7| &#89A0FF29 рублей&7/&fнавсегда'
+    lore:
+    - '&#89A0FF&l┃ '
+    - '&#89A0FF&l┃ &fВозможности:'
+    - '&#89A0FF&l┃ &7● &fДоступ к наборам: &#89A0FF/kits'
+    - '&#89A0FF&l┃ &7● &fПолучение зарплаты: &#89A0FF/salary'
+    - '&#89A0FF&l┃ &7● &fОтключить/Включить ЛС: &#89A0FF/msgtoggle'
+    - '&#89A0FF&l┃ &7● &fВиртуальная мусорка: &#89A0FF/trash'
+    - '&#89A0FF&l┃ &7● &fВиртуальная наковальня: &#89A0FF/anvil'
+    - '&#89A0FF&l┃ '
+    - '&#89A0FF&l┃ &fПараметры:'
+    - '&#89A0FF&l┃ &7● &fКоличество приватов: &#89A0FF1'
+    - '&#89A0FF&l┃ &7● &fРазмер приватов: &#89A0FF12500'
+    - '&#89A0FF&l┃ &7● &fТочек дома: &#89A0FF2'
+    - '&#89A0FF&l┃ &7● &fСлотов на аукционе: &#89A0FF3'
+    - '&#89A0FF&l┃ '
+    - '&7● &fПокупка на сайте: &#89A0FFelytrix.pw'
+  griefer:
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWI0ZWFjZWRiYjEzNWZlMTEwNzcyMWZhYmFiOTFhYjZjYjc4YjBmNDM2ZTQ1YmE2OTBjMzQ5N2M3ZGU4M2U3NyJ9fX0=
+    name: '&#FF9191&lɢ&#FF9999&lʀ&#FFA1A1&lɪ&#FFAAAA&lᴇ&#FFB2B2&lꜰ&#FFBABA&lᴇ&#FFC2C2&lʀ &f%player_name% &7| &#FF919139 рублей&7/&fнавсегда'
+    lore:
+    - '&#FF9191&l┃ '
+    - '&#FF9191&l┃ &fВозможности:'
+    - '&#FF9191&l┃ &7● &fДоступ к наборам: &#FF9191/kits'
+    - '&#FF9191&l┃ &7● &fПолучение зарплаты: &#FF9191/salary'
+    - '&#FF9191&l┃ &7● &fВиртуальный эндер-сундук: &#FF9191/ec'
+    - '&#FF9191&l┃ &7● &fВосстановить сытость: &#FF9191/feed'
+    - '&#FF9191&l┃ &7● &fТелепортировать к себе: &#FF9191/tpahere'
+    - '&#FF9191&l┃ '
+    - '&#FF9191&l┃ &fПараметры:'
+    - '&#FF9191&l┃ &7● &fКоличество приватов: &#FF91912'
+    - '&#FF9191&l┃ &7● &fРазмер приватов: &#FF919115000'
+    - '&#FF9191&l┃ &7● &fТочек дома: &#FF91913'
+    - '&#FF9191&l┃ &7● &fСлотов на аукционе: &#FF91915'
+    - '&#FF9191&l┃ '
+    - '&7● &fПокупка на сайте: &#FF9191elytrix.pw'
+  wither:
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODUyODQ5YjY0NWZjZTg2YWNiZDIzMTk5MWJhOTBkMjBkYTQyZTNhOWE4YjU4ZTc2ZGQ0ZTM4NmRiZThiIn19fQ==
+    name: '&#96FF91&lᴡ&#A0FF9D&lɪ&#AAFFA8&lᴛ&#B3FFB4&lʜ&#BDFFBF&lᴇ&#C7FFCB&lʀ &f%player_name% &7| &#96FF9179 рублей&7/&fнавсегда'
+    lore:
+    - '&#96FF91&l┃ '
+    - '&#96FF91&l┃ &fВозможности:'
+    - '&#96FF91&l┃ &7● &fДоступ к наборам: &#96FF91/kits'
+    - '&#96FF91&l┃ &7● &fПолучение зарплаты: &#96FF91/salary'
+    - '&#96FF91&l┃ &7● &fПроверить игроков рядом: &#96FF91/near &7(до 50 блоков)'
+    - '&#96FF91&l┃ &7● &fОсмотреть инвентарь игрока: &#96FF91/inv'
+    - '&#96FF91&l┃ &7● &fПочинить предмет в руке: &#96FF91/repair'
+    - '&#96FF91&l┃ &7● &fДалекая телепортация: &#96FF91/rtp far'
+    - '&#96FF91&l┃ '
+    - '&#96FF91&l┃ &fПараметры:'
+    - '&#96FF91&l┃ &7● &fКоличество приватов: &#96FF913'
+    - '&#96FF91&l┃ &7● &fРазмер приватов: &#96FF9117500'
+    - '&#96FF91&l┃ &7● &fТочек дома: &#96FF914'
+    - '&#96FF91&l┃ &7● &fСлотов на аукционе: &#96FF917'
+    - '&#96FF91&l┃ '
+    - '&7● &fПокупка на сайте: &#96FF91elytrix.pw'
+  immortal:
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmFjNTAxM2IyMjdhNDk0ZWMxNmM0ZWFmYWIxZjg0ZGVhNTcyZWZiMmYzYzRiNWMzZmY4ODI1MmYzNTZhMDJiIn19fQ==
+    name: '&#FF3030&lɪ&#FF3A3A&lᴍ&#FF4444&lᴍ&#FF4E4E&lᴏ&#FF5757&lʀ&#FF6161&lᴛ&#FF6B6B&lᴀ&#FF7575&lʟ &f%player_name% &7| &#FF3030279 рублей&7/&fнавсегда'
+    lore:
+    - '&#FF3030&l┃ '
+    - '&#FF3030&l┃ &fВозможности:'
+    - '&#FF3030&l┃ &7● &fДоступ к наборам: &#FF3030/kits'
+    - '&#FF3030&l┃ &7● &fПолучение зарплаты: &#FF3030/salary'
+    - '&#FF3030&l┃ &7● &fОсмотреть броню игрока: &#FF3030/inv -a'
+    - '&#FF3030&l┃ &7● &fУстановить себе погоду: &#FF3030/pweather'
+    - '&#FF3030&l┃ &7● &fВиртуальное точило: &#FF3030/grindstone'
+    - '&#FF3030&l┃ &7● &fИсцелить себя: &#FF3030/heal'
+    - '&#FF3030&l┃ &7● &fПотушить себя: &#FF3030/ext'
+    - '&#FF3030&l┃ '
+    - '&#FF3030&l┃ &fПараметры:'
+    - '&#FF3030&l┃ &7● &fКоличество приватов: &#FF30303'
+    - '&#FF3030&l┃ &7● &fРазмер приватов: &#FF303020000'
+    - '&#FF3030&l┃ &7● &fТочек дома: &#FF30305'
+    - '&#FF3030&l┃ &7● &fСлотов на аукционе: &#FF30309'
+    - '&#FF3030&l┃ '
+    - '&7● &fПокупка на сайте: &#FF3030elytrix.pw'
+  dragon:
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDZiMDdlNzEyNThkYjhmZTI0MWJjNjU5ZTg3NDk0MWNjYjNkMTJjNzVlNDgyZWE5YjUwYTA0OGU2Njc3YTMifX19
+    name: '&#FF7AFE&lᴅ&#FF81FB&lʀ&#FF88F7&lᴀ&#FF90F4&lɢ&#FF97F0&lᴏ&#FF9EED&lɴ &f%player_name% &7| &#FF7AFE429 рублей&7/&fнавсегда'
+    lore:
+    - '&#FF7AFE&l┃ '
+    - '&#FF7AFE&l┃ &fВозможности:'
+    - '&#FF7AFE&l┃ &7● &fДоступ к наборам: &#FF7AFE/kits'
+    - '&#FF7AFE&l┃ &7● &fПолучение зарплаты: &#FF7AFE/salary'
+    - '&#FF7AFE&l┃ &7● &fУстановить варп: &#FF7AFE/setwarp'
+    - '&#FF7AFE&l┃ &7● &fУдалить варп: &#FF7AFE/delwarp'
+    - '&#FF7AFE&l┃ &7● &fВиртуальный кузнечный стол: &#FF7AFE/smitchingtable'
+    - '&#FF7AFE&l┃ &7● &fУдарить себя молнией: &#FF7AFE/thor'
+    - '&#FF7AFE&l┃ &7● &fУстановить себе время: &#FF7AFE/ptime'
+    - '&#FF7AFE&l┃ &7● &fПочинить весь инвентарь: &#FF7AFE/repair all'
+    - '&#FF7AFE&l┃ &7● &fВосстановить сытость игроку: &#FF7AFE/feed'
+    - '&#FF7AFE&l┃ '
+    - '&#FF7AFE&l┃ &fПараметры:'
+    - '&#FF7AFE&l┃ &7● &fКоличество приватов: &#FF7AFE3'
+    - '&#FF7AFE&l┃ &7● &fРазмер приватов: &#FF7AFE22500'
+    - '&#FF7AFE&l┃ &7● &fТочек дома: &#FF7AFE7'
+    - '&#FF7AFE&l┃ &7● &fСлотов на аукционе: &#FF7AFE11'
+    - '&#FF7AFE&l┃ '
+    - '&7● &fПокупка на сайте: &#FF7AFEelytrix.pw'
+  elder:
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMDFiOTUzYzg4ODU5NGE1N2EzNzY1YjA4YjU5NzIxNTcyNmM2NTkwYTJmNzMwZjA0N2NiOTU1YTI5ZmRmYWI2In19fQ==
+    name: '&#AC72FF&lᴇ&#AF74FF&lʟ&#B376FF&lᴅ&#B678FF&lᴇ&#B97AFF&lʀ &f%player_name% &7| &#AC72FF&l699 рублей&7/&fнавсегда'
+    lore:
+    - '&#AC72FF&l┃ '
+    - '&#AC72FF&l┃ &fВозможности:'
+    - '&#AC72FF&l┃ &7● &fДоступ к наборам: &#AC72FF/kits'
+    - '&#AC72FF&l┃ &7● &fПолучение зарплаты: &#AC72FF/salary'
+    - '&#AC72FF&l┃ &7● &fОчистить инвентарь: &#AC72FF/clear'
+    - '&#AC72FF&l┃ &7● &fПроверить игроков рядом: &#AC72FF/near &7(до 75 блоков)'
+    - '&#AC72FF&l┃ &7● &fПросмотреть эндер-сундук игрока: &#AC72FF/ec'
+    - '&#AC72FF&l┃ &7● &fПотушить игрока: &#AC72FF/ext'
+    - '&#AC72FF&l┃ &7● &fСтрелять котиками: &#AC72FF/kittycannon'
+    - '&#AC72FF&l┃ &7● &fСтрелять пчёлами: &#AC72FF/beezooka'
+    - '&#AC72FF&l┃ &7● &fТелепорт к игрокам: &#AC72FF/rtp near'
+    - '&#AC72FF&l┃ '
+    - '&#AC72FF&l┃ &fПараметры:'
+    - '&#AC72FF&l┃ &7● &fКоличество приватов: &#AC72FF4'
+    - '&#AC72FF&l┃ &7● &fРазмер приватов: &#AC72FF25000'
+    - '&#AC72FF&l┃ &7● &fТочек дома: &#AC72FF8'
+    - '&#AC72FF&l┃ &7● &fСлотов на аукционе: &#AC72FF15'
+    - '&#AC72FF&l┃ '
+    - '&7● &fПокупка на сайте: &#AC72FFelytrix.pw'
+  eternity:
+    material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNThiOWUyOWFiMWE3OTVlMmI4ODdmYWYxYjFhMzEwMjVlN2NjMzA3MzMzMGFmZWMzNzUzOTNiNDVmYTMzNWQxIn19fQ==
+    name: '&#F8BEFB&lᴇᴛᴇʀɴɪᴛʏ &f%player_name% &7| &#F8BEFB&l&n799 рублей&7/&fнавсегда'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fВозможности:'
+    - '&#F8BEFB&l┃ &7● &fДоступ к наборам: &#F8BEFB/kits'
+    - '&#F8BEFB&l┃ &7● &fПолучение зарплаты: &#F8BEFB/salary'
+    - '&#F8BEFB&l┃ &7● &fРежим полёта: &#F8BEFB/fly'
+    - '&#F8BEFB&l┃ &7● &fУстановить день: &#F8BEFB/day'
+    - '&#F8BEFB&l┃ &7● &fУстановить ночь: &#F8BEFB/night'
+    - '&#F8BEFB&l┃ &7● &fИсцелить игрока: &#F8BEFB/heal'
+    - '&#F8BEFB&l┃ &7● &fУдарить игрока молнией: &#F8BEFB/thor'
+    - '&#F8BEFB&l┃ &7● &fПроверить игроков рядом: &#F8BEFB/near &7(до 100 блоков)'
+    - '&#F8BEFB&l┃ &7● &fПросмотреть сведения о сервере: &#F8BEFB/gc'
+    - '&#F8BEFB&l┃ &7● &fОбход защиты чата, пишите всё что хотите!'
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fПараметры:'
+    - '&#F8BEFB&l┃ &7● &fКоличество приватов: &#F8BEFB5'
+    - '&#F8BEFB&l┃ &7● &fРазмер приватов: &#F8BEFB30000'
+    - '&#F8BEFB&l┃ &7● &fТочек дома: &#F8BEFB10'
+    - '&#F8BEFB&l┃ &7● &fСлотов на аукционе: &#F8BEFB20'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fПокупка на сайте: &#F8BEFBelytrix.pw'
+  custom:
+    material: nether_star
+    name: '#AFFBBE&lᴄ#BAFCC8&lᴜ#C6FDD2&lѕ#D1FDDC&lᴛ#DDFEE6&lᴏ#E8FFF0&lᴍ &f%player_name% &7| &#AFFBBE&l1299 рублей'
+    lore:
+    - '&#AFFBBE&l┃ '
+    - '&#AFFBBE&l┃ &fПакет: &#AFFBBEКастомный донат'
+    - '&#AFFBBE&l┃ &fСтоимость: &#AFFBBE1299 рублей'
+    - '&#AFFBBE&l┃ '
+    - '&7● &fПокупка на сайте: &#AFFBBEelytrix.pw'
+
+# ---------------------------------------------------------------------------
+# Рамка из пурпурных и чёрных стёкол повторяет стиль /menu;
+# расположение адаптировано так, чтобы не закрывать карточки 3×3.
+# Звук открытия — мягкое вступление, стеклянные акценты и тихие звуки появления карточек.
+# ---------------------------------------------------------------------------
+animation:
+  - tick: 0
+    opcodes:
+      - st: close 45
+      - st: info 49
+      - st: design_purple_panel 46,47
+      - sound: 'block.enchantment_table.use 0.3 1.5'
+  - opcodes:
+      - st: design_purple_panel 48,50
+      - sound: 'block.note_block.chime 0.2 0.85'
+  - opcodes:
+      - st: design_purple_panel 51,52
+  - opcodes:
+      - st: design_purple_panel 53,36
+      - sound: 'block.note_block.chime 0.22 0.91'
+  - opcodes:
+      - st: design_purple_panel 44,27
+  - opcodes:
+      - st: design_purple_panel 35
+      - sound: 'block.note_block.chime 0.23 0.98'
+  - opcodes:
+      - st: design_black_panel 18,9
+      - sound: 'block.note_block.chime 0.25 1.05'
+  - opcodes:
+      - st: design_black_panel 10,0
+  - opcodes:
+      - st: design_black_panel 1,2
+      - sound: 'block.note_block.chime 0.27 1.13'
+  - opcodes:
+      - st: design_black_panel 3,4
+  - opcodes:
+      - st: design_black_panel 5,6
+      - sound: 'block.note_block.chime 0.28 1.21'
+  - opcodes:
+      - st: design_black_panel 7,8
+  - opcodes:
+      - st: design_black_panel 16,17
+      - sound: 'block.note_block.chime 0.3 1.3'
+  - opcodes:
+      - st: design_black_panel 26
+  - opcodes:
+      - st: lite 19
+      - sound: 'block.note_block.pling 0.26 1.0'
+  - opcodes:
+      - st: prime 22
+      - sound: 'block.note_block.pling 0.27 1.07'
+  - opcodes:
+      - st: griefer 25
+      - sound: 'block.note_block.pling 0.28 1.14'
+  - opcodes:
+      - st: wither 28
+      - sound: 'block.note_block.pling 0.29 1.21'
+  - opcodes:
+      - st: immortal 31
+      - sound: 'block.note_block.pling 0.3 1.28'
+  - opcodes:
+      - st: dragon 34
+      - sound: 'block.note_block.pling 0.31 1.35'
+  - opcodes:
+      - st: elder 37
+      - sound: 'block.note_block.pling 0.32 1.42'
+  - opcodes:
+      - st: eternity 40
+      - sound: 'block.note_block.pling 0.33 1.48'
+  - opcodes:
+      - st: custom 43
+      - sound: 'block.amethyst_block.chime 0.45 1.5'

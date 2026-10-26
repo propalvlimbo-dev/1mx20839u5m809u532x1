@@ -1,0 +1,92 @@
+id: elytrix:ghost_trader_event
+provider: default
+type: chest
+size: 54
+title: '&#B7A8FF&lПризрачный торговец'
+items:
+  informations:
+    material: paper
+    name: '&7« &#B7A8FFПризрачный торговец &7»'
+    lore:
+      - '&#B7A8FF&l┃ '
+      - '&#B7A8FF&l┃ &fСтатус: &#B7A8FF%elytrixtrader_ghost_status%'
+      - '&#B7A8FF&l┃ &fПоявление: &#B7A8FF%elytrixtrader_ghost_time%'
+      - '&#B7A8FF&l┃ &fВремя работы: &#B7A8FF1 час каждые 2 часа'
+      - '&#B7A8FF&l┃ '
+      - '&7● &fСтатус обновляется автоматически'
+    tick_speed: 400
+    on_tick: '[update]'
+  coordinates:
+    material: compass
+    name: '&7« &#B7A8FFКоординаты торговца &7»'
+    lore:
+      - '&#B7A8FF&l┃ '
+      - '&#B7A8FF&l┃ &fМир: &#B7A8FF%elytrixtrader_ghost_world%'
+      - '&#B7A8FF&l┃ &fX: &#B7A8FF%elytrixtrader_ghost_x% &fY: &#B7A8FF%elytrixtrader_ghost_y% &fZ: &#B7A8FF%elytrixtrader_ghost_z%'
+      - '&#B7A8FF&l┃ '
+      - '&7● &fНажмите, чтобы отправить координаты в чат'
+    on_click:
+      - '[message] &f☁ &#B7A8FFПризрачный торговец: %elytrixtrader_ghost_world% %elytrixtrader_ghost_x% %elytrixtrader_ghost_y% %elytrixtrader_ghost_z%'
+    tick_speed: 400
+    on_tick: '[update]'
+  assortment:
+    material: amethyst_shard
+    name: '&7« &#B7A8FFОбмен и валюта &7»'
+    lore:
+      - '&#B7A8FF&l┃ '
+      - '&#B7A8FF&l┃ &fВалюта: &#B7A8FFкастомные Призрачные осколки'
+      - '&#B7A8FF&l┃ &fДругие предметы и валюты не принимаются.'
+      - '&#B7A8FF&l┃ &fСделки показывает меню торговца по ПКМ.'
+      - '&#B7A8FF&l┃ '
+      - '&7● &fАссортимент настраивается владельцем сервера'
+  back:
+    material: black_dye
+    name: '&7« &#B7A8FFНазад к событиям &7»'
+    lore:
+      - '&#B7A8FF&l┃ &fВернуться к списку активностей.'
+    on_click:
+      - '[open] elytrix:events'
+  info:
+    material: paper
+    name: '&7« &#B7A8FFРасписание &7»'
+    lore:
+      - '&#B7A8FF&l┃ '
+      - '&#B7A8FF&l┃ &fТорговец появляется на 1 час каждые 2 часа.'
+      - '&#B7A8FF&l┃ &fОбмен доступен только во время его появления.'
+      - '&#B7A8FF&l┃ '
+  design_purple_panel:
+    material: purple_stained_glass_pane
+    name: '&r'
+  design_black_panel:
+    material: black_stained_glass_pane
+    name: '&r'
+animation:
+  - tick: 0
+    opcodes:
+      - st: back 45
+      - st: info 49
+      - st: design_purple_panel 46,47
+      - sound: 'block.enchantment_table.use 0.3 1.5'
+  - opcodes:
+      - st: design_purple_panel 48,50,51,52,53
+      - sound: 'block.note_block.chime 0.22 0.91'
+  - opcodes:
+      - st: design_purple_panel 36,37,43,44
+  - opcodes:
+      - st: design_purple_panel 27,35
+      - st: design_black_panel 18,26
+      - sound: 'block.note_block.chime 0.25 1.05'
+  - opcodes:
+      - st: design_black_panel 9,10,16,17
+  - opcodes:
+      - st: design_black_panel 0,1,2,3,4,5,6,7,8
+      - sound: 'block.note_block.chime 0.28 1.21'
+  - opcodes:
+      - st: informations 20
+      - sound: 'block.note_block.pling 0.26 1.0'
+  - opcodes:
+      - st: coordinates 22
+      - sound: 'block.note_block.pling 0.3 1.2'
+  - opcodes:
+      - st: assortment 24
+      - sound: 'block.amethyst_block.chime 0.4 1.4'

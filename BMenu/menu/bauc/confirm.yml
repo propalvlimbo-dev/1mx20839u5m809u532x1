@@ -2,7 +2,7 @@ id: bauc:confirm
 provider: bauc:confirm
 type: chest
 size: 27
-title: "<#FF0000>☃<b><#FF6600> Подтверждение покупки"
+title: '<#F8BEFB>☁ <white>Подтверждение'
 
 args:
   on_accept_command: '[console] say bauc:confirm no command!'
@@ -10,34 +10,38 @@ args:
 show_item:
   slot: 13
   lore:
-    - ""
-    - "<#00FF00>$<#FFFFE6> Ценa:<#00FF00> $${price}"
-    - "<#FF6600>?<#FFFFE6> Продавец:<#FF6600> {seller_name}"
-    - ""
+    - '<#F8BEFB><b>┃</b> '
+    - '<#F8BEFB><b>┃</b> <white>Цена: <#F8BEFB>${price}'
+    - '<#F8BEFB><b>┃</b> <white>Продавец: <#F8BEFB>{seller_name}'
+    - '<#F8BEFB><b>┃</b> '
+    - '<gray>● <white>Нажмите, чтобы купить'
   on_click:
     - accept: ''
 
 items:
   confirm:
-    slot: 0,1,2,9,10,11,18,19,20
-    name: "<#00FF00>[Кyпить]"
+    slot: 11
+    name: '<green>Купить'
+    lore:
+      - '<#F8BEFB><b>┃</b> '
+      - '<gray>● <white>Подтвердить покупку'
     all_flags: true
-    material: lime_stained_glass_pane
+    material: lime_dye
     on_click:
+      - sound: 'entity.item.pickup 0.35 1'
       - accept: ''
   deny:
-    slot: 6,7,8,15,16,17,24,25,26
-    name: "<#FF0000>[Вернуться]"
+    slot: 15
+    name: '<red>Отмена'
     lore:
-      - "<#FFFFE6>Отказаться от покупки"
-      - "<#FFFFE6>и вернуться в меню"
+      - '<#F8BEFB><b>┃</b> '
+      - '<gray>● <white>Вернуться в аукцион'
     all_flags: true
-    material: red_stained_glass_pane
+    material: red_dye
     on_click:
+      - sound: 'ui.button.click 0.35 1'
       - back_or_close: ''
   gui:
-    slot: 3,4,5,12,14,21,22,23
-    name: ""
-    all_flags: true
+    slot: 0-10,12,14,16-26
+    name: ''
     material: black_stained_glass_pane
-

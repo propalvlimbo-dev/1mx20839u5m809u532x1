@@ -1,0 +1,32 @@
+type: ITEM
+location:
+  world: spawn
+  x: 11.408
+  y: 59.4
+  z: 0.437
+  yaw: 0.0
+  pitch: 0.0
+settings:
+  enabled: true
+  display-range: 48.0
+  update-interval: 20
+attributes:
+  display-type:
+    value-type: item_display_type
+    value: FIXED
+  translation:
+    value-type: vector3f
+    value:
+      x: -2.5
+      y: -2.6600000858306885
+      z: 0.05000000074505806
+  scale:
+    value-type: vector3f
+    value:
+      x: 0.6000000238418579
+      y: 0.6000000238418579
+      z: 0.6000000238418579
+  billboard:
+    value-type: billboard_constraints
+    value: VERTICAL
+item: minecraft:knowledge_book

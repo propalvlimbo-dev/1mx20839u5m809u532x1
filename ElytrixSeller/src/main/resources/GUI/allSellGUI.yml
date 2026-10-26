@@ -1,0 +1,90 @@
+title: "&#F8BEFBУниверсальный скупщик"
+size: 54
+special-slots:
+  - 0-44
+
+animation:
+  enabled: true
+  delay: 1
+  sound: "BLOCK_NOTE_BLOCK_PLING"
+
+update_interval: 10
+
+items:
+  back:
+    material: black_dye
+    model-data: -1
+    slot: 45
+    name: "&7« &#F8BEFBГлавное меню &7»"
+    lore:
+      - '&#F8BEFB&l '
+      - '&#F8BEFB&l┃ &fВернуться назад: &#F8BEFBВ главное меню'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для возврата'
+    left_click_actions:
+      - '[opengui] mainGUI'
+    right_click_actions:
+      - '[opengui] mainGUI'
+
+  sell_item:
+    material: EMERALD
+    update: true
+    name: "&7« &#F8BEFBПродать всё &7»"
+    slot: 49
+    lore:
+      - '&#F8BEFB&l '
+      - '&#F8BEFB&l┃ &fМонеты за продажу: &#F8BEFB{sell_price}'
+      - '&#F8BEFB&l┃ &fОчки за продажу: &#F8BEFB{sell_points}'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для продажи'
+    left_click_actions:
+      - '[sell]'
+    right_click_actions:
+      - '[sell]'
+
+  level_info:
+    slot: 53
+    update: true
+    material: BOOK
+    name: "&7« &#F8BEFBСистема прокачки &7»"
+    lore:
+      - '&#F8BEFB&l '
+      - '&#F8BEFB&l┃ &fElytrixSeller — &fуникальный заработок'
+      - '&#F8BEFB&l &fПродавайте лут — &fпрокачивайте бустеры'
+      - '&#F8BEFB&l '
+      - '&#F8BEFB&l┃ &fКак продавать: &#F8BEFBПоложите лут → Продайте'
+      - '&#F8BEFB&l '
+      - '&#F8BEFB&l┃ &fВаш уровень: &#F8BEFB%rseller_level%'
+      - '&#F8BEFB&l┃ &fПрогресс: &#F8BEFB%rseller_points%/%rseller_points_needed%'
+      - '&#F8BEFB&l '
+      - '&#F8BEFB&l┃ &fБустер монет: &#F8BEFBx%rseller_multiplier_coins%'
+      - '&#F8BEFB&l &fБустер очков: &#F8BEFBx%rseller_multiplier_points%'
+      - '&#F8BEFB&l '
+      - '&7● &fПродавайте больше — зарабатывайте быстрее'
+    left_click_actions: []
+    right_click_actions: []
+
+  top_decorate:
+    material: purple_stained_glass_pane
+    name: "&r"
+    slots:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+      - 8
+
+  decorate:
+    material: purple_stained_glass_pane
+    name: "&r"
+    slots:
+      - 46
+      - 47
+      - 48
+      - 50
+      - 51
+      - 52

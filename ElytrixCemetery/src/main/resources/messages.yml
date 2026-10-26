@@ -1,0 +1,11 @@
+prefix:
+  admin: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» "
+  player: "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» "
+
+help:
+  - ""
+  - "&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &#F8BEFBКладбище"
+  - "&#F8BEFB&l┃ &f/cemetery tp &8— &#F8BEFBТелепортация на Кладбище"
+  - "&#F8BEFB&l┃ &f/cemetery info &8— &#F8BEFBИнформация об ивенте"
+  - "&#F8BEFB&l┃ &f/cemetery actionbar &8— &#F8BEFBВкл/Выкл Actionbar"
+  - ""

@@ -1,0 +1,60 @@
+# Пустая заглушка: товары, цены и покупки здесь не настроены.
+id: elytrix:moneyshop
+provider: default
+type: chest
+size: 54
+title: '&#F8BEFB&lМагазин за монеты'
+items:
+  placeholder:
+    material: gold_ingot
+    name: '&7« &#F8BEFBМагазин за монеты &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fТовары и цены пока не настроены.'
+      - '&#F8BEFB&l┃ &7Покупки здесь не выполняются.'
+      - '&#F8BEFB&l┃ '
+  back:
+    material: black_dye
+    name: '&7« &#F8BEFBНазад в главное меню &7»'
+    lore:
+      - '&#F8BEFB&l┃ &fВернуться в главное меню сервера.'
+    on_click:
+      - '[open] elytrix:menu'
+  info:
+    material: paper
+    name: '&7« &#F8BEFBИнформация &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fЭто пустая информационная заглушка.'
+      - '&#F8BEFB&l┃ &fТранзакции и товары отсутствуют.'
+      - '&#F8BEFB&l┃ '
+  design_purple_panel:
+    material: purple_stained_glass_pane
+    name: '&r'
+  design_black_panel:
+    material: black_stained_glass_pane
+    name: '&r'
+animation:
+  - tick: 0
+    opcodes:
+      - st: back 45
+      - st: info 49
+      - st: design_purple_panel 46,47
+      - sound: 'block.enchantment_table.use 0.3 1.5'
+  - opcodes:
+      - st: design_purple_panel 48,50,51,52,53
+      - sound: 'block.note_block.chime 0.22 0.91'
+  - opcodes:
+      - st: design_purple_panel 36,37,43,44
+  - opcodes:
+      - st: design_purple_panel 27,35
+      - st: design_black_panel 18,26
+      - sound: 'block.note_block.chime 0.25 1.05'
+  - opcodes:
+      - st: design_black_panel 9,10,16,17
+  - opcodes:
+      - st: design_black_panel 0,1,2,3,4,5,6,7,8
+      - sound: 'block.note_block.chime 0.28 1.21'
+  - opcodes:
+      - st: placeholder 22
+      - sound: 'block.amethyst_block.chime 0.4 1.4'

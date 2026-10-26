@@ -1,0 +1,97 @@
+config-version: 3
+
+roulette:
+  min-bet: 100
+  max-bet: 100000
+  spin-duration-ticks: 200
+  spin-turns: 5
+  max-spin-speed: 0.2
+  first-stage-speed: 0.45
+  second-swing-tick: 14
+  walk-ticks: 20
+  npc-spin-distance: 1.5
+  npc-side-offset: -0.9
+  npc-look-side-offset: -0.9
+  npc-look-height-offset: -0.3
+  turn-ticks: 30
+  look-turn-speed: 6
+  walk-turn-speed: 16
+  view-radius: 48
+  look-radius: 10
+  spin-sound: true
+  npc:
+    name: "ec_r_npc"
+    hide-from-tab: true
+    hand-item: ""
+    hologram:
+      height: 2.08
+      lines:
+        - "&#F8BEFB&lРУЛЕТКА"
+        - "&fНажмите, чтобы &#F8BEFBиграть"
+    skin:
+      player: ""
+      value: "ewogICJ0aW1lc3RhbXAiIDogMTcyNjgzNTY0Mzk1OSwKICAicHJvZmlsZUlkIiA6ICI3NjczNTA4YTI4MTk0ODMwYTY0YzhjYWFjNGJhNmM2NiIsCiAgInByb2ZpbGVOYW1lIiA6ICJKb3Jpc0hlcm9zIiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzE4NTIzNzMxN2JkNzc5ODZlNTgxYzRkZTM5OWFjMGFmYWU3YmUzZTgwY2RjODNlNjUxOTBhM2ViZTg3ODQ0ZTgiCiAgICB9CiAgfQp9"
+      signature: "S/9Or0ThDcU7SCW6GSINBwLA5fSClCnGdMsA76gpoH/RVeSEtoG4pGOuCQy7cG7frN6qcsT6wtPbf49nFOiOgTSwER6+XX/uUvaZKfn2/59HuIW9M7gIeWv6cy6jaX9RvWqaQFFTbhMRmw/9hVpOIov3RKOpq5c1d1LtzqUlQk0exM/CqgEc8TrF4fKsxY9hFEmVtbu0cVSCZ1aRsVyV7M3B/n5LebspvMKo3n+L5Lt4dJvQ6AdYAmisC5QB5azw7f8UipNbOkIFX1XqFk/howUZAO/1hxPT3YUXyXlU89Cg7+gaA8SbYBZgfnCUHpmgwA0vhneTpqkLUzAha2qF+PtWZRl1AJoQHj6rpFY2ZjfgsUnEHRn6j9W3QjgiUv6KMJ3Bo6frbmliy7w5Pyh75szemkST1jO1/5oDWwmSCe4AQMck/pCChp9Dl3uZ5gxr0dbiXYt+TRKINN9PYyjZ9xvUNyfFd+l1sCVKA1Pa5JNmzR2nQm1+kYzeoBMRRzwxI0hlzapdjzPCX5sXmrF4AUg/lJ3Hz6rTK9UGA6pro3tC1lmZPrBqRFKMGkNUPrGgKMVK2jt1egnFSsMVzYJLulwjNDZzk1N941nkU+Vv3bKuRfqlcMVyYK+Xg4tm3+EbFKu7OhnexVqIkCTPPF75lm97IgNmpl5jhYgPFWjuli0="
+  wheel:
+    distance: 3.5
+    height: 2.0
+    radius: 1.5
+    slots: 12
+    item-y-offset: -0.7
+    radius-compensation: true
+    pointer:
+      item: GOLDEN_SWORD
+      height: 1.35
+      side-offset: -0.38
+      pose: [0.0, 0.0, 135.0]
+    show-labels: true
+  sectors:
+    - { multiplier: 0, weight: 71, color: "&c", material: RED_WOOL }
+    - { multiplier: 2, weight: 19, color: "&a", material: LIME_WOOL }
+    - { multiplier: 3, weight: 7, color: "&b", material: LIGHT_BLUE_WOOL }
+    - { multiplier: 5, weight: 3, color: "&#F8BEFB", material: GOLD_BLOCK }
+  jackpot:
+    multiplier: 5
+    item: GOLD_NUGGET
+    count: 14
+    ticks: 50
+
+automate:
+  bet: 1000
+  spin-ticks: 48
+  reel-stop-delay: 7
+  max-multiplier: 15
+  bottom-block: PINK_CONCRETE
+  top-block: PINK_STAINED_GLASS
+  symbols:
+    - { id: flesh, material: ROTTEN_FLESH, weight: 34, name: "&8Гнилая плоть", pay3: 1.2, pay4: 1.2, pay5: 1.2 }
+    - { id: potato, material: POISONOUS_POTATO, weight: 16, name: "&aЯд. картофель", pay3: 1.5, pay4: 1.5, pay5: 1.5 }
+    - { id: eye, material: SPIDER_EYE, weight: 13, name: "&cПаучий глаз", pay3: 2.0, pay4: 2.0, pay5: 2.0 }
+    - { id: bread, material: BREAD, weight: 10, name: "&6Хлеб", pay3: 2.5, pay4: 2.5, pay5: 2.5 }
+    - { id: beef, material: COOKED_BEEF, weight: 8, name: "&cСтейк", pay3: 3.5, pay4: 3.5, pay5: 3.5 }
+    - { id: carrot, material: GOLDEN_CARROT, weight: 6, name: "&6Зол. морковь", pay3: 4.5, pay4: 4.5, pay5: 4.5 }
+    - { id: apple, material: APPLE, weight: 5, name: "&cЯблоко", pay3: 6.0, pay4: 6.0, pay5: 6.0 }
+    - { id: gapple, material: GOLDEN_APPLE, weight: 4, name: "&eЗол. яблоко", pay3: 8.0, pay4: 8.0, pay5: 8.0 }
+    - { id: pie, material: PUMPKIN_PIE, weight: 3, name: "&6Пирог", pay3: 10.0, pay4: 10.0, pay5: 10.0 }
+    - { id: cake, material: CAKE, weight: 1, name: "&#F8BEFBТорт", pay3: 15.0, pay4: 15.0, pay5: 15.0 }
+
+miner:
+  skin: "ExplodingTNT"
+  skin-value: "ewogICJ0aW1lc3RhbXAiIDogMTc5Mjc2ODE3OTg2NCwKICAicHJvZmlsZUlkIiA6ICJjMGU5MTRmZDRlYjY0N2I3OTgwNmVlMzZkY2U5ZjYwOCIsCiAgInByb2ZpbGVOYW1lIiA6ICJFeHBsb2RpbmdUTlQiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDkwYjQ0ZmEwODg5MjJmMTQ2NzhiMjMxNTc4NTQxNDg1NGQ4MmFiNmU5M2ZlYzljNjJkYThiMDEzYWNlNzljZCIKICAgIH0sCiAgICAiQ0FQRSIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTJlOGQ5N2VjNzkxMDBlOTBhNzVkMzY5ZDFiM2JhODEyNzNjNGY4MmJjMWI3MzdlOTM0ZWVkNGE4NTRiZTFiNiIKICAgIH0KICB9Cn0="
+  skin-signature: "A0QYz+WvCKJCSi7+4jWzD1xR6McT3Mrv1gS7Halci+75hWkq4VFY9eIsQ18RGZ9h/gONG/Acri9DHgkMWETZITOy0fSy7Bz/UwGFLTsbG+5/R3fVoR2Ywt/geqLktL6Blj0ZLJqroVhZkOcoU5etxZmluE1ILqnlMGBsTdXKGyiZpUtd4muEaqy8OYN2qjbn5XbGQSrI9ulws1uERPTEDc6HjJ1/05CIkP9tdvm1UFxX71wd8Aj48r+ZFdj/MXmz4iXK5aCwbn7w+aOWc97d5K34H0+KEaPNJEsvzEqigIa5mUlDxR9GQFRxQXKOuoILRu4Zy2ev54rkEPehE+cXZbkSwR1+Z60jBSFseocYNIPmYYXfCCDMzt7tDc4cZ80nsXfEX4n5fNN+YKfql5HbMRC7KcMyMqacxKi6PCG7YLEbmfnGFuTrXkZbhHra/vjx4PLsYeWMiB8r9uWhhQaukidK+GoZo4OfzxsoZrWW04Adek0320VGe8ivCRBMr8s04opUL+GIOAX9YjG8ml59rD38/kt8qZpuRln6mdu+8BB6MZCO+5jqDt8BtutvODBI6n1qzP9lErSXC82iTdv0bOXqWNe6pHyA5AmCh/VIbM2CpewX6sizHkqWD6dpTUo/ZbLneAZax8utAbB2pfiN20DtN2dbwGYxHXOE712j5Tk="
+  view-distance: 48
+  throw-interval-ticks: 60
+  turn-angle: 28.0
+  ground-lifetime-ticks: 36
+  hologram:
+    height: 2.08
+    lines:
+      - "&#F8BEFB&lМИНЁР"
+      - "&fНажмите, чтобы &#F8BEFBиграть"
+  field:
+    mines: 14
+    coin-tiers:
+      - { icon: SUNFLOWER, name: "&eМонеты", multiplier: 0.40, count: 8 }
+      - { icon: GOLD_NUGGET, name: "&6Самородки", multiplier: 0.60, count: 6 }
+      - { icon: GOLD_INGOT, name: "&6Слиток", multiplier: 0.85, count: 4 }
+      - { icon: EMERALD, name: "&aИзумруд", multiplier: 1.15, count: 2 }

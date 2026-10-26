@@ -1,0 +1,101 @@
+# ElytrixSubscribe 2.0.1
+
+Подписка ElytriX+ для Paper 1.21.11: меню на BMenu, функции и **три питомца**
+(попугай, аллей, пчела) на VirtualEntityApi.
+
+## Что нового
+
+- **Меню переехали в BMenu** с нашей анимацией: `elytrix:sub`,
+  `elytrix:sub_pets`, `elytrix:sub_pet_parrot`, `elytrix:sub_pet_allay`,
+  `elytrix:sub_pet_bee`. Файлы — в `BMenu/menu/elytrix/main/`.
+- **Три питомца**, включить можно **только одного**: включение второго
+  выключает первого. У каждого свои режимы:
+  - попугай — Круг, Рядом, На плече (+ окрас, 5 цветов);
+  - аллей — Круг, Рядом, Позади, Танец (+ свечение);
+  - пчела — Круг, Рядом, Зигзаг, Кувырок (+ размер, малыш).
+- **ПКМ по питомцу в мире** открывает его личное меню настроек (имя, режим,
+  внешний вид). Внутри — кнопки «Включить/выключить», «Поведение», «Окрас»,
+  «Имя».
+- **Настройки сохраняются** между перезаходами (`plugins/ElytrixSubscribe/data.yml`).
+
+## Возможности подписки
+
+Функции (переключаются в меню): **анти-падение**, **авто-тотем**
+(перезарядка 30 сек), **скорость +20%**, **анти-голод**. Плюс три питомца.
+
+Права выдаются через LuckPerms на время подписки и снимаются, когда она
+кончилась (`settings.permissions` в `config.yml`):
+
+| Право | Что даёт |
+|---|---|
+| `playerpoints.pay` | перевод коинов: `/p pay` |
+| `essentials.god` | режим бессмертия: `/god` |
+| `elytrixcore.warp.description.color` | цветное описание варпов |
+| `elytrixcore.broadcast.color` | свои цвета в чате |
+| `playerkits.kit.plus` | набор `plus` в PlayerKits2: `/kit plus` |
+
+Цены: **30 дней — 299₽**, **90 дней — 699₽**. В меню подписки это два
+отдельных предмета-тарифа.
+
+## Установка
+
+1. Положить `ElytrixSubscribe-2.0.1.jar` в `plugins/`.
+2. Зависимости на сервере: **Paper 1.21.11**, **BMenu**, **PlaceholderAPI**,
+   **LuckPerms**, **VirtualEntityApi** + **BLib** (без них питомцы отключатся).
+3. Скопировать 5 файлов меню из `BMenu/menu/elytrix/main/` в
+   `plugins/BMenu/menu/elytrix/main/` (`sub.yml`, `sub_pets.yml`,
+   `sub_pet_parrot.yml`, `sub_pet_allay.yml`, `sub_pet_bee.yml`).
+4. Перезапустить сервер: создастся `config.yml` и `data.yml`.
+
+## Команды
+
+| Команда | Что делает |
+|---|---|
+| `/subscribe` | меню подписки (функции) |
+| `/subscribe pets` | выбор питомца |
+| `/subscribe pet <parrot\|allay\|bee> toggle` | включить/выключить |
+| `/subscribe pet <…> behavior` | следующий режим |
+| `/subscribe pet <…> variant` | следующий окрас/свечение/размер |
+| `/subscribe pet <…> name <имя>` | имя (`сброс` — убрать) |
+| `/subscribe delay` | сколько осталось |
+| `/subscribe add <ник> <дни>` | выдать (право `elytrixsubscribe.add`) |
+| `/subscribe remove <ник>` | забрать (право `elytrixsubscribe.add`) |
+
+Имя задаётся **в чате**: кнопка «Имя питомца» → пишете строку в чат → она
+становится именем, сообщение в общий чат не уходит. Цветокоды и hex
+работают (`&c`, `&a`, `&#F8BEFB`, `#F8BEFB`). `сброс` — убрать имя.
+Если чат перехватывает другой плагин, откроется табличка, а вручную всегда
+есть `/subscribe pet <питомец> name <имя>`.
+
+## Плейсхолдеры
+
+`%slidesubscribe_hassubscribe%`, `%slidesubscribe_sub_status%`,
+`%slidesubscribe_pet%`, `%slidesubscribe_fn_auto-totem%`,
+`%slidesubscribe_pet_parrot_status%`, `%slidesubscribe_pet_parrot_name%`,
+`%slidesubscribe_pet_parrot_behavior%`, `%slidesubscribe_pet_parrot_look%`
+(то же для `allay` и `bee`).
+
+## Если питомец не появился
+
+В чат придёт `Питомец не появился: <причина>`, а в консоли — полный стек.
+Самые частые причины: нет `VirtualEntityApi`/`BLib`, у игрока нет подписки,
+`pets.enabled: false` в `config.yml`.
+
+## Важно при обновлении
+
+- Старый `database.db` (SQLite) **не читается**: драйвера `sqlite-jdbc` на
+  сервере нет, поэтому прежняя версия не сохраняла данные. Срок подписки
+  теперь пишется в `data.yml`.
+- Если игрокам нужно вернуть срок — `/subscribe add <ник> <дни>`.
+- Настройки «БД» из старого `config.yml` (`database.*`) больше не нужны.
+
+## Сборка
+
+В песочнице нет Maven — собираем ECJ:
+
+```bash
+bash tools/build.sh <путь к java-runtime> /tmp/ecj.jar
+```
+
+Готовый jar: `ElytrixSubscribe-2.0.1.jar`. Стабы Bukkit/Adventure/
+VirtualEntityApi лежат в `stubs/` и в jar не попадают.

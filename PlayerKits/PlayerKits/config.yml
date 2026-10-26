@@ -1,0 +1,181 @@
+Messages:
+  prefix: '&f☁ #F8BEFBᴇ#F6BEFBʟ#F3BEFBʏ#F1BFFBᴛ#EEBFFBʀ#ECBFFBɪ#E9BFFBx &7» '
+  noPermissions: '&cУ вас недостаточно прав!'
+  commandCreateError: '&cИспользование: #F8BEFB/kit create <название>'
+  commandDeleteError: '&cИспользование: #F8BEFB/kit delete <название>'
+  commandClaimError: '&cИспользование: #F8BEFB/kit claim <набор>'
+  commandGiveError: '&cИспользование: #F8BEFB/kit give <набор> <ник>'
+  commandEditError: '&cИспользование: #F8BEFB/kit edit <набор>'
+  commandPreviewError: '&cИспользование: #F8BEFB/kit preview <набор>'
+  commandOpenError: '&cИспользование: #F8BEFB/kit open <ник> <страница>'
+  kitAlreadyExists: '&cНабор #F8BEFB%name% &cуже существует!'
+  kitDoesNotExists: '&cНабор #F8BEFB%name% &cне существует!'
+  inventoryEmpty: '&cВаш инвентарь пуст! Положите вещи для создания набора.'
+  kitCreated: '&aНабор #F8BEFB%name% &aуспешно создан!'
+  kitRemoved: '&aНабор #F8BEFB%name% &aуспешно удалён!'
+  inventoryName: '#F8BEFB&lНаборы'
+  kitReceived: '&fВы &aуспешно &fполучили набор #F8BEFB%name%&f!'
+  configReload: '&aКонфигурация плагина перезагружена!'
+  seconds: ' сек.'
+  minutes: ' мин.'
+  hours: ' ч.'
+  days: ' дн.'
+  cooldownPlaceholderReady: '&aГотов к получению'
+  cooldownError: '&fПодождите #F8BEFB%time% &fперед повторным получением!'
+  kitNoPermissions: '&cВы не можете получить данный набор!'
+  kitInCooldownLore:
+    - '#F8BEFB&l┃ '
+    - '#F8BEFB&l┃ &fПерезарядка: #F8BEFB%time%'
+    - '#F8BEFB&l┃ '
+    - '&7● &fПКМ &7— &fпросмотр набора'
+  commandList: '#F8BEFB&lСписок наборов:'
+  commandListKit: '#F8BEFB&l┃ #F8BEFB%number% &7» #F8BEFB%kit%'
+  commandListKitNoPermissions: '#F8BEFB&l┃ #F8BEFB%number% &7» &c%kit% &7(Недоступно)'
+  commandListKitInCooldown: '#F8BEFB&l┃ #F8BEFB%number% &7» &c%kit% &7(Перезарядка: %time%)'
+  commandListKitOneTime: '#F8BEFB&l┃ #F8BEFB%number% &7» #F8BEFB%kit% &7(Одноразовый)'
+  noSpaceError: '&cУ вас недостаточно места в инвентаре!'
+  materialNameError: '&cОшибка в конфиге! Материал %material% неизвестен.'
+  oneTimeError: '&cВы уже получали данный набор!'
+  kitOneTimeLore:
+    - '#F8BEFB&l┃ '
+    - '#F8BEFB&l┃ &fСтатус: &cУже получен'
+    - '#F8BEFB&l┃ '
+  previewInventoryName: 'Просмотр набора'
+  backItemName: '&7« #F8BEFBНазад &7»'
+  playerNotOnline: '&cИгрок #F8BEFB%player% &cне в сети!'
+  kitGive: '&aНабор #F8BEFB%kit% &aуспешно выдан игроку #F8BEFB%player%&a!'
+  noMoneyError: '&cУ вас недостаточно монет! #F8BEFB(%current_money%&7/#F8BEFB%required_money%)'
+  moneyInventoryName: '#F8BEFB&lПодтверждение покупки'
+  moneyInventoryYes: '&a&lДА'
+  moneyInventoryNo: '&c&lНЕТ'
+  moneyInventoryConfirmationName: '#F8BEFBПодтверждаете покупку?'
+  moneyInventoryConfirmationLore:
+    - '#F8BEFB&l┃ '
+    - '#F8BEFB&l┃ &fСтоимость: #F8BEFB%price%'
+    - '#F8BEFB&l┃ '
+  kitInventoryOpen: '&fОткрыто меню наборов для игрока #F8BEFB%player%'
+  errorPage: '&cДанная страница недоступна!'
+  commandResetError: '&cИспользование: #F8BEFB/kit reset <набор> <игрок>'
+  kitResetCorrect: '&aКулдаун набора #F8BEFB%kit% &aсброшен для игрока #F8BEFB%player%&a!'
+  kitResetFail: '&cНе удалось сбросить кулдаун набора #F8BEFB%kit% &cдля #F8BEFB%player%'
+  noPreviewError: '&cПросмотр данного набора недоступен!'
+  cantPreviewError: '&cВы не можете посмотреть этот набор!'
+
+Config:
+  inventorySize: 54
+  previewInventorySize: 54
+  preview_inventory_back_item_slot: 45
+  kit_preview: true
+  kit_preview_back_item: false
+  hide_kits_with_permissions: false
+  close_inventory_on_claim: false
+  drop_items_if_full_inventory: true
+  commands_before_items: false
+  preview_inventory_requires_permission: false
+  kit_error_sound: BLOCK_LAVA_POP;10;0.1
+  kit_claim_sound: ENTITY_PLAYER_LEVELUP;10;1.5
+  kit_page_sound: BLOCK_LAVA_POP;10;1
+  update_notify: false
+  player_data_save_time: 300
+  mysql_database:
+    enabled: false
+    host: localhost
+    port: 3306
+    username: root
+    password: root
+    database: database
+  Inventory:
+    '0':
+      id: BLACK_STAINED_GLASS_PANE
+      name: '&r'
+    '1':
+      id: BLACK_STAINED_GLASS_PANE
+      name: '&r'
+    '2':
+      id: BLACK_STAINED_GLASS_PANE
+      name: '&r'
+    '3':
+      id: BLACK_STAINED_GLASS_PANE
+      name: '&r'
+    '4':
+      id: BLACK_STAINED_GLASS_PANE
+      name: '&r'      
+    '5':
+      id: BLACK_STAINED_GLASS_PANE
+      name: '&r'      
+    '6':
+      id: BLACK_STAINED_GLASS_PANE
+      name: '&r'      
+    '7':
+      id: BLACK_STAINED_GLASS_PANE
+      name: '&r'    
+    '8':
+      id: BLACK_STAINED_GLASS_PANE
+      name: '&r'      
+    '9':
+      id: BLACK_STAINED_GLASS_PANE
+      name: '&r'      
+    '10':
+      id: BLACK_STAINED_GLASS_PANE
+      name: '&r'      
+    '16':
+      id: BLACK_STAINED_GLASS_PANE
+      name: '&r'       
+    '17':
+      id: BLACK_STAINED_GLASS_PANE
+      name: '&r' 
+    '18':
+      id: BLACK_STAINED_GLASS_PANE
+      name: '&r' 
+    '26':
+      id: BLACK_STAINED_GLASS_PANE
+      name: '&r' 
+    '27':
+      id: PURPLE_STAINED_GLASS_PANE
+      name: '&r'  
+    '35':
+      id: PURPLE_STAINED_GLASS_PANE
+      name: '&r'       
+    '36':
+      id: PURPLE_STAINED_GLASS_PANE
+      name: '&r'  
+    '37':
+      id: PURPLE_STAINED_GLASS_PANE
+      name: '&r'     
+    '43':
+      id: PURPLE_STAINED_GLASS_PANE
+      name: '&r'
+    '44':
+      id: PURPLE_STAINED_GLASS_PANE
+      name: '&r'     
+    '46':
+      id: PURPLE_STAINED_GLASS_PANE
+      name: '&r'       
+    '47':
+      id: PURPLE_STAINED_GLASS_PANE
+      name: '&r'      
+    '48':
+      id: PURPLE_STAINED_GLASS_PANE
+      name: '&r'       
+    '50':
+      id: PURPLE_STAINED_GLASS_PANE
+      name: '&r'
+    '51':
+      id: PURPLE_STAINED_GLASS_PANE
+      name: '&r'
+    '52':
+      id: PURPLE_STAINED_GLASS_PANE
+      name: '&r'   
+    '53':
+      id: PURPLE_STAINED_GLASS_PANE
+      name: '&r'    
+    '49':
+      id: PURPLE_STAINED_GLASS_PANE
+      name: '&r'   
+    '45':
+      id: PURPLE_STAINED_GLASS_PANE
+      name: '&r'  
+  nbt_alternative_data_save: false
+  claim_kit_short_command: false
+  inventory_pages_names:
+    '1': '#F8BEFB&lНаборы'
