@@ -28,7 +28,7 @@ import ru.rooyzee.elytrixsubscribe.utils.SignInput;
 import ru.rooyzee.elytrixsubscribe.utils.Utils;
 
 /**
- * ElytrixSubscribe 2.0 — подписка ElytriX+.
+ * ElytrixSubscribe 2.0.1 — подписка ElytriX+.
  *
  * Что внутри: меню на BMenu, три питомца (попугай, аллей, пчела) со своими
  * режимами поведения, функции подписки и хранение настроек в data.yml.

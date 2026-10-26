@@ -2,6 +2,7 @@ package ru.rooyzee.elytrixcasino;
 
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -25,6 +26,14 @@ import ru.rooyzee.elytrixcasino.restore.CasinoLoader;
 import ru.rooyzee.elytrixcasino.roulette.RouletteManager;
 import ru.rooyzee.elytrixcasino.roulette.RouletteSettings;
 import ru.rooyzee.elytrixcasino.util.SkinFetcher;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 public class Main extends JavaPlugin {
 
@@ -121,15 +130,80 @@ public class Main extends JavaPlugin {
 
     private void migrateConfigsIfNeeded() {
         reloadConfig();
-        if (getConfig().getInt("config-version", 1) >= CURRENT_CONFIG_VERSION) {
+        File currentConfigFile = new File(getDataFolder(), "config.yml");
+        int oldVersion = YamlConfiguration.loadConfiguration(currentConfigFile)
+                .getInt("config-version", 1);
+        if (oldVersion >= CURRENT_CONFIG_VERSION) {
             return;
         }
-        saveResource("config.yml", true);
-        saveResource("messages.yml", true);
-        saveResource("GUI/roulette.yml", true);
-        saveResource("GUI/miner.yml", true);
-        saveResource("GUI/automate.yml", true);
+
+        String[] resources = {
+                "config.yml",
+                "messages.yml",
+                "GUI/roulette.yml",
+                "GUI/miner.yml",
+                "GUI/automate.yml"
+        };
+        for (String resource : resources) {
+            if (!mergeResourceDefaults(resource, oldVersion)) {
+                // Не помечаем миграцию завершённой: следующий запуск сможет повторить её.
+                return;
+            }
+        }
+
         reloadConfig();
+        getConfig().set("config-version", CURRENT_CONFIG_VERSION);
+        saveConfig();
+    }
+
+    /** Сохраняет пользовательские значения и добавляет только новые значения из ресурса. */
+    private boolean mergeResourceDefaults(String resourcePath, int oldVersion) {
+        File file = new File(getDataFolder(), resourcePath);
+        if (!file.exists()) {
+            try {
+                saveResource(resourcePath, false);
+                return true;
+            } catch (IllegalArgumentException error) {
+                getLogger().warning("Не найден ресурс конфигурации " + resourcePath + ": " + error.getMessage());
+                return false;
+            }
+        }
+
+        File backup = new File(file.getParentFile(), file.getName() + ".pre-v" + oldVersion + ".bak");
+        try {
+            if (!backup.exists()) {
+                Files.copy(file.toPath(), backup.toPath(), StandardCopyOption.COPY_ATTRIBUTES);
+            }
+        } catch (IOException error) {
+            getLogger().warning("Не удалось создать резервную копию " + backup.getName()
+                    + "; конфиг не изменён: " + error.getMessage());
+            return false;
+        }
+
+        YamlConfiguration current = new YamlConfiguration();
+        try {
+            current.load(file);
+        } catch (Exception error) {
+            getLogger().warning("Конфиг " + file.getName() + " повреждён; исходник сохранён как "
+                    + backup.getName() + ", будут восстановлены значения по умолчанию.");
+            current = new YamlConfiguration();
+        }
+
+        try (InputStream stream = getResource(resourcePath)) {
+            if (stream == null) {
+                getLogger().warning("Не найден ресурс конфигурации " + resourcePath);
+                return false;
+            }
+            YamlConfiguration defaults = YamlConfiguration.loadConfiguration(
+                    new InputStreamReader(stream, StandardCharsets.UTF_8));
+            current.addDefaults(defaults);
+            current.options().copyDefaults(true);
+            current.save(file);
+            return true;
+        } catch (IOException error) {
+            getLogger().warning("Не удалось обновить конфиг " + file.getName() + ": " + error.getMessage());
+            return false;
+        }
     }
 
     private void loadSkinAsync() {

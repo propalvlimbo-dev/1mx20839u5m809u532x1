@@ -4,7 +4,13 @@
 
 - `ElytrixCemetery.jar` — Cemetery ghost cap is 8; killed ghosts respawn after 10 minutes; only canonical Ghost Shards drop, with no XP or player kill message. Cemetery ghosts are cleared on plugin shutdown.
 - `ElytrixTrader.jar` (2.3; also available as `downloads/ElytrixTrader-2.3.jar`) — Ghost Trader appears for 1 hour every 2 hours, with a different nearby safe spawn point when alternatives exist. Both traders use the shared `ghost.schem`; hologram lines use visible legacy colors. Ghost trades still accept only canonical Cemetery Ghost Shards, and offers/prices remain empty until configured with `/etr edit ghost`.
-- `ElytrixItem-2.5.7.jar` — Donshar now reflects the raw attack damage before the target's armor/mitigation, with a 5% chance. The returned hit uses a magic source and is not reduced by the holder's armor. Existing real enchantments and potion/arrow effects remain.
+- `ElytrixItem-2.5.7.jar` — Donshar now reflects the raw attack damage before the target's armor/mitigation, with a 5% chance. The returned hit uses a magic source and is not reduced by the holder's armor. Existing real enchantments and potion/arrow effects remain. `ElytrixItem-2.5.6.jar` in this folder is an older release; use 2.5.7.
+- `ElytrixSubscribe-2.0.1.jar` — fixes a lost-wakeup race in asynchronous `data.yml` saves and ensures shutdown writes the final snapshot.
+- `ElytrixDuelsBridge-1.12.4.jar` — separates the 2v2 queue-cancel message from the 1v1 `queue-left` key; duplicate YAML key removed.
+- `ElytrixVault-1.0.1.jar` — current Vault artifact; Maven and custom-build artifact versions now match the plugin version.
+- `NoSpears-1.1.1.jar` — detects Lunge stored on enchanted books and periodically removes later-issued spears/Lunge books from online player inventories, ender chests, and cursors.
+- `ElytrixDungeons-1.0.0.jar` — refreshed root download, byte-identical to the current source build (the older `Elytrix-full.zip` remains historical).
+- `ElytrixCasino-2.2.1.jar` (also named `ElytrixCasino.jar` at the root) — config upgrades now merge missing defaults and create backups instead of replacing custom settings.
 - `Elytrix-Menus.zip` — updated BMenu menus and config. The salary button runs `/salary` as the player; the seller button opens the existing `/seller`; free donate runs `/free`. `/help` links back to `/event`, and `/event` includes Cemetery and Dungeons; Paradise Place remains absent. Ghost Trader and empty `/moneyshop` info pages use the 54-slot style of the Experienced Trader page.
 - `ElytrixSeller-configs.zip` — RU/EN seller defaults with farmer crops (including Nether Wart), a new farm autosell category, deepslate/raw/copper/amethyst ore types and loot from newer mobs/trial chambers. Merge into existing files; this is a config pack, not a Seller JAR.
 
@@ -28,6 +34,14 @@ Both bundled trader configs now reference exactly `ghost.schem`. The original sc
 - Trader: VirtualEntityApi and BLib are required; WorldEdit/FAWE, Vault, PlaceholderAPI and BMenu are optional.
 - ElytrixItem: Paper 1.21.11; optional WorldGuard and Vault integrations.
 
+## Plugin audit
+
+The full report is `../../PLUGIN_AUDIT.md`. It covers all 24 plugin/config bundles in the repository, including the menu/config-only folders, with findings, affected paths, fixes, and limitations. The most important open deployment warning is the missing server-supplied `ghost.schem`; the legacy DeluxeMenus bundle also has conditional route issues if it is active alongside BMenu.
+
 ## Build and test notes
 
-Cemetery compiled for Java 8 against the project's local Spigot 1.16.5 and plugin API jars (7 warnings). Trader compiled for Java 17 with ECJ; unavailable `provided` dependency APIs were represented by compile-only stubs matching the declared API signatures, and those stubs are not included in the JAR. ElytrixItem compiled for Java 21 with ECJ; its 1,193 checked Paper API references had zero signature mismatches. BMenu and Seller YAML/config references passed validation; Seller `ItemsConfig` compiled against the local Spigot 1.16.5 API, but a full Seller JAR build was unavailable because Gradle and its distribution were not present. No live-server smoke test was available; back up existing files and test on the target server before deployment.
+- Casino, Dungeons, Item, PotionStacker, Subscribe, and Vault isolated ECJ builds completed successfully; Subscribe 2.0.1 and Vault 1.0.1 were rebuilt after this audit's changes. DuelsBridge 1.12.4 built successfully. Cemetery compiled to 25 classes with zero ECJ errors/warnings. Trader compiled with compile-only stubs for unavailable provided APIs; those stubs are not packaged.
+- NoSpears 1.1.1 compiled against the vendored Spigot API and its JAR passed integrity/plugin-descriptor checks. This is a compile check, not a live Paper behavior test.
+- All 50 repository JAR copies (including project targets and download duplicates) passed ZIP integrity checks; all 44 embedded `plugin.yml` descriptors parse and their declared main classes exist. All 249 YAML files parse as YAML streams; the only repeated mapping keys are intentional examples in `BMenu/reference.yml` (`slot` and `on_view`). Current BMenu routing and material references validated.
+- A full Seller Gradle build was unavailable (no Gradle distribution); EpicDuels-Fork regression suites were not run (Maven and Adventure/Paper test classpath unavailable); AddonSphere could not be rebuilt because its declared BCases/VirtualEntityApi/BLib dependencies are not present locally. Its source/POM now target 1.43, but the available 1.42 JAR does not contain that source-only fix. Build and smoke-test on the target server before deployment.
+- No live-server smoke test was available. `downloads/Elytrix-full.zip` and the dated `Elytrix-Dungeons-Cemetery-2026-10-25` package are historical bundles; use the 2026-10-26 update folder for the refreshed artifacts, and supply `ghost.schem` separately.

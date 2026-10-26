@@ -1,6 +1,12 @@
 package ru.elytrix.vault;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -65,9 +71,44 @@ public final class ElytrixVaultPlugin extends JavaPlugin {
     }
 
     private void upgradeConfigIfNeeded() {
-        if (getConfig().getInt("config-version", 1) < CURRENT_CONFIG_VERSION) {
-            saveResource("config.yml", true);
+        File file = new File(getDataFolder(), "config.yml");
+        int oldVersion = YamlConfiguration.loadConfiguration(file).getInt("config-version", 1);
+        if (oldVersion >= CURRENT_CONFIG_VERSION) return;
+
+        File backup = new File(file.getParentFile(), file.getName() + ".pre-v" + oldVersion + ".bak");
+        try {
+            if (!backup.exists()) {
+                Files.copy(file.toPath(), backup.toPath(), StandardCopyOption.COPY_ATTRIBUTES);
+            }
+        } catch (IOException error) {
+            getLogger().warning("Не удалось создать резервную копию config.yml; файл не изменён: "
+                    + error.getMessage());
+            return;
+        }
+
+        YamlConfiguration current = new YamlConfiguration();
+        try {
+            current.load(file);
+        } catch (Exception error) {
+            getLogger().warning("config.yml повреждён; исходник сохранён как " + backup.getName()
+                    + ", будут восстановлены значения по умолчанию.");
+            current = new YamlConfiguration();
+        }
+
+        try (InputStream stream = getResource("config.yml")) {
+            if (stream == null) {
+                getLogger().warning("Ресурс config.yml отсутствует в JAR; миграция пропущена.");
+                return;
+            }
+            YamlConfiguration defaults = YamlConfiguration.loadConfiguration(
+                    new InputStreamReader(stream, StandardCharsets.UTF_8));
+            current.addDefaults(defaults);
+            current.options().copyDefaults(true);
+            current.set("config-version", CURRENT_CONFIG_VERSION);
+            current.save(file);
             reloadConfig();
+        } catch (IOException error) {
+            getLogger().warning("Не удалось обновить config.yml: " + error.getMessage());
         }
     }
 

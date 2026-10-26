@@ -1,4 +1,4 @@
-# ElytrixSubscribe 2.0
+# ElytrixSubscribe 2.0.1
 
 Подписка ElytriX+ для Paper 1.21.11: меню на BMenu, функции и **три питомца**
 (попугай, аллей, пчела) на VirtualEntityApi.
@@ -39,7 +39,7 @@
 
 ## Установка
 
-1. Положить `ElytrixSubscribe-2.0.jar` в `plugins/`.
+1. Положить `ElytrixSubscribe-2.0.1.jar` в `plugins/`.
 2. Зависимости на сервере: **Paper 1.21.11**, **BMenu**, **PlaceholderAPI**,
    **LuckPerms**, **VirtualEntityApi** + **BLib** (без них питомцы отключатся).
 3. Скопировать 5 файлов меню из `BMenu/menu/elytrix/main/` в
@@ -97,5 +97,5 @@
 bash tools/build.sh <путь к java-runtime> /tmp/ecj.jar
 ```
 
-Готовый jar: `ElytrixSubscribe-2.0.jar`. Стабы Bukkit/Adventure/
+Готовый jar: `ElytrixSubscribe-2.0.1.jar`. Стабы Bukkit/Adventure/
 VirtualEntityApi лежат в `stubs/` и в jar не попадают.

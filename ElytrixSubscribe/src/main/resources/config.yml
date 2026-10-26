@@ -1,4 +1,4 @@
-# ElytrixSubscribe 2.0 — подписка ElytriX+
+# ElytrixSubscribe 2.0.1 — подписка ElytriX+
 #
 # Меню рисует BMenu: файлы лежат в plugins/BMenu/menu/elytrix/main/sub.yml
 # (главное) и plugins/BMenu/menu/elytrix/sub/*.yml (питомцы и функции).

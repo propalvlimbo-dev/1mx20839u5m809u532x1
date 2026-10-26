@@ -25,9 +25,12 @@ public class Storage {
     private final File file;
     private YamlConfiguration data;
     /** Последний снимок, который ещё не записан; null — писать нечего. */
-    private volatile String pending;
-    private final java.util.concurrent.atomic.AtomicBoolean writing =
-            new java.util.concurrent.atomic.AtomicBoolean(false);
+    private String pending;
+    /** Эти поля защищены монитором Storage.this. */
+    private boolean writing;
+    private boolean closed;
+    /** Не даёт отложенной записи затереть финальный снимок из saveNow(). */
+    private final Object fileLock = new Object();
 
     public Storage(Main plugin) {
         this.plugin = plugin;
@@ -49,37 +52,86 @@ public class Storage {
      */
     public void saveAsync() {
         synchronized (this) {
+            if (this.closed) return;
             this.pending = this.data.saveToString();
+            if (this.writing) return;
+
+            this.writing = true;
+            try {
+                // Планируем задачу под тем же монитором: при ошибке запуска другой
+                // saveAsync не сможет оставить снимок между writing=true/false.
+                Bukkit.getScheduler().runTaskAsynchronously(this.plugin, this::writePending);
+            } catch (RuntimeException error) {
+                this.writing = false;
+                this.plugin.getLogger().warning("Не удалось запустить сохранение data.yml: " + error);
+            }
         }
-        if (!this.writing.compareAndSet(false, true)) return;
-        Bukkit.getScheduler().runTaskAsynchronously(this.plugin, this::writePending);
     }
 
     private void writePending() {
-        try {
-            while (true) {
-                String snapshot;
-                synchronized (this) {
-                    snapshot = this.pending;
+        while (true) {
+            String snapshot;
+            synchronized (this) {
+                if (this.closed) {
                     this.pending = null;
+                    this.writing = false;
+                    return;
                 }
-                if (snapshot == null) break;
-                java.nio.file.Files.write(this.file.toPath(),
-                        snapshot.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                snapshot = this.pending;
+                if (snapshot == null) {
+                    // Сброс writing выполняется в том же мониторе, что и saveAsync,
+                    // поэтому новый снимок не потеряется на границе завершения потока.
+                    this.writing = false;
+                    return;
+                }
+                this.pending = null;
             }
-        } catch (IOException error) {
-            this.plugin.getLogger().warning("Не удалось сохранить data.yml: " + error);
-        } finally {
-            this.writing.set(false);
+
+            try {
+                synchronized (this.fileLock) {
+                    synchronized (this) {
+                        if (this.closed) {
+                            this.pending = null;
+                            this.writing = false;
+                            return;
+                        }
+                    }
+                    java.nio.file.Files.write(this.file.toPath(),
+                            snapshot.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                }
+            } catch (IOException error) {
+                boolean retryNewerSnapshot;
+                synchronized (this) {
+                    if (this.closed) {
+                        this.pending = null;
+                        this.writing = false;
+                        return;
+                    }
+                    if (this.pending == null) this.pending = snapshot;
+                    retryNewerSnapshot = !this.pending.equals(snapshot);
+                    if (!retryNewerSnapshot) this.writing = false;
+                }
+                this.plugin.getLogger().warning("Не удалось сохранить data.yml: " + error);
+                if (!retryNewerSnapshot) return;
+            }
         }
     }
 
-    /** Сохранить сразу, в текущем потоке (onDisable — асинхронные задачи уже не примут). */
-    public synchronized void saveNow() {
-        try {
-            this.data.save(this.file);
-        } catch (IOException error) {
-            this.plugin.getLogger().warning("Не удалось сохранить data.yml: " + error);
+    /** Сохранить финальный снимок и запретить отложенным задачам его перезаписать. */
+    public void saveNow() {
+        String snapshot;
+        synchronized (this) {
+            this.closed = true;
+            this.pending = null;
+            snapshot = this.data.saveToString();
+        }
+        synchronized (this.fileLock) {
+            try {
+                java.nio.file.Files.write(this.file.toPath(),
+                        snapshot.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            } catch (IOException error) {
+                this.plugin.getLogger().warning("Не удалось сохранить data.yml: " + error);
+            }
         }
     }
 

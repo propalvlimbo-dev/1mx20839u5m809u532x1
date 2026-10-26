@@ -6,7 +6,7 @@ JAVA_BIN="$1/bin/java"
 ECJ_JAR="$2"
 OUT=build/classes
 STUBS=build/stubs
-ARTIFACT="target/ElytrixVault-1.0.0.jar"
+ARTIFACT="target/ElytrixVault-1.0.1.jar"
 
 rm -rf build
 mkdir -p "$OUT" "$STUBS" target

@@ -2,13 +2,13 @@ package ru.rooyzee.elytrixaddonsphere;
 
 import dev.by1337.bc.addon.AbstractAddon;
 import dev.by1337.bc.animation.AnimationRegistry;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.by1337.blib.util.SpacedNameKey;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.logging.Level;
@@ -42,8 +42,8 @@ public final class Main extends AbstractAddon {
             File targetFile = new File(dir, RESOURCE_NAME);
 
             if (targetFile.exists()) {
-                String current = new String(Files.readAllBytes(targetFile.toPath()), StandardCharsets.UTF_8);
-                if (current.contains("configVersion: \"" + CONFIG_VERSION + "\"")) {
+                YamlConfiguration current = YamlConfiguration.loadConfiguration(targetFile);
+                if (CONFIG_VERSION.equals(current.getString("configVersion"))) {
                     return; // конфиг актуальный
                 }
                 File backup = new File(dir, "sphereAnimation.old.yml");

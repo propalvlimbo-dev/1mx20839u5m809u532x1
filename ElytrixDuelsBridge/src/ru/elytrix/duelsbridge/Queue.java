@@ -174,8 +174,11 @@ final class Queue {
         }
         clearActionBar(removed);
         if (!notify) return;
-        String text = msg("messages.queue-left",
-                "&#F8BEFBДуэли &8» &7Поиск отменён.");
+        String messageKey = removed.team ? "messages.queue-team-left" : "messages.queue-left";
+        String fallback = removed.team
+                ? "&#F8BEFBДуэли &8» &7Поиск пары отменён."
+                : "&#F8BEFBДуэли &8» &7Поиск отменён.";
+        String text = msg(messageKey, fallback);
         for (UUID id : removed.members()) plugin.msg(Bukkit.getPlayer(id), text);
     }
 

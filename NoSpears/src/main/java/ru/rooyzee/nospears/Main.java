@@ -17,10 +17,13 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.world.LootGenerateEvent;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,6 +36,8 @@ import java.util.List;
  * а найденные в инвентарях удаляются.
  */
 public final class Main extends JavaPlugin implements Listener {
+
+    private BukkitTask inventorySweepTask;
 
     @Override
     public void onEnable() {
@@ -53,6 +58,22 @@ public final class Main extends JavaPlugin implements Listener {
                 getLogger().info("Удалено копий у игроков при запуске: " + removed);
             }
         }
+        scheduleInventorySweep();
+    }
+
+    private void scheduleInventorySweep() {
+        if (inventorySweepTask != null) {
+            inventorySweepTask.cancel();
+            inventorySweepTask = null;
+        }
+        long interval = getConfig().getLong("inventory-sweep-ticks", 20L);
+        if (interval <= 0L) return;
+        interval = Math.max(1L, interval);
+        inventorySweepTask = getServer().getScheduler().runTaskTimer(this, () -> {
+            for (Player player : getServer().getOnlinePlayers()) {
+                clean(player);
+            }
+        }, interval, interval);
     }
 
     // ── крафт ────────────────────────────────────────────────────────────────
@@ -160,6 +181,19 @@ public final class Main extends JavaPlugin implements Listener {
                     removed++;
                 }
             }
+
+            Inventory enderChest = player.getEnderChest();
+            for (int i = 0; i < enderChest.getSize(); i++) {
+                if (shouldRemove(enderChest.getItem(i))) {
+                    enderChest.setItem(i, null);
+                    removed++;
+                }
+            }
+
+            if (shouldRemove(player.getItemOnCursor())) {
+                player.setItemOnCursor(null);
+                removed++;
+            }
         } catch (Throwable ignored) {
         }
         return removed;
@@ -175,6 +209,7 @@ public final class Main extends JavaPlugin implements Listener {
         }
         if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
             reloadConfig();
+            scheduleInventorySweep();
             sender.sendMessage("§aNoSpears: конфиг перезагружен.");
             return true;
         }
@@ -200,20 +235,32 @@ public final class Main extends JavaPlugin implements Listener {
     }
 
     /** Есть ли на предмете зачарование Lunge (1.21.11+, на 1.21.4 не отображается). */
-    @SuppressWarnings("deprecation")
     private static boolean hasLunge(ItemStack item) {
         if (item == null) return false;
         try {
             ItemMeta meta = item.getItemMeta();
             if (meta == null) return false;
-            for (Enchantment enchantment : meta.getEnchants().keySet()) {
-                if (enchantment != null && enchantment.getKey().getKey().equalsIgnoreCase("lunge")) {
-                    return true;
+
+            // Enchanted books store their enchantments separately from ordinary item meta.
+            if (meta instanceof EnchantmentStorageMeta) {
+                EnchantmentStorageMeta storageMeta = (EnchantmentStorageMeta) meta;
+                for (Enchantment enchantment : storageMeta.getStoredEnchants().keySet()) {
+                    if (isLunge(enchantment)) return true;
                 }
+            }
+
+            for (Enchantment enchantment : meta.getEnchants().keySet()) {
+                if (isLunge(enchantment)) return true;
             }
         } catch (Throwable ignored) {
         }
         return false;
+    }
+
+    private static boolean isLunge(Enchantment enchantment) {
+        return enchantment != null
+                && enchantment.getKey() != null
+                && "lunge".equalsIgnoreCase(enchantment.getKey().getKey());
     }
 
     /** Копьё = любой материал, имя которого заканчивается на _SPEAR. */

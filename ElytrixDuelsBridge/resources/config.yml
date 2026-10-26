@@ -137,7 +137,7 @@ messages:
   member-busy: "&#F8BEFBДуэли &8» &cКто-то из пары уже в бою."
   pair-broken: "&#F8BEFBДуэли &8» &cВ паре должен быть ровно один напарник."
   queue-wait: "&#F8BEFBДуэли &8» &fИщем вторую пару &7(кит &f%kit%&7)&f. &7Не выходи из игры."
-  queue-left: "&#F8BEFBДуэли &8» &7Поиск пары отменён."
+  queue-team-left: "&#F8BEFBДуэли &8» &7Поиск пары отменён."
   pair-found: "&#F8BEFBДуэли &8» &fПара найдена: &d%mate% &fпротив &d%a% &f+ &d%b%"
   cancelled: "&#F8BEFBДуэли &8» &7Отменено."
   group-removed: "&#F8BEFBДуэли &8» &fКомандные дуэли теперь в &f/duels&f: &f«Бои 2 на 2»"
