@@ -85,12 +85,12 @@ public class SellLogRepository {
                     """.formatted(table);
         };
 
-        CompletableFuture.runAsync(() -> {
-            for (String statement : splitStatements(sql)) {
-                execute(statement, "create-sell-log-table");
-            }
-            migrateTable();
-        });
+        // Keep sell-log DDL complete before the purge task or sale listeners can query it.
+        for (String statement : splitStatements(sql)) {
+            execute(statement, "create-sell-log-table");
+        }
+        migrateTable();
+        dbManager.getPlugin().getLogger().info("[DB] Sell log table ready: " + table);
     }
 
     private void migrateTable() {
@@ -137,7 +137,7 @@ public class SellLogRepository {
             return rs.next();
         } catch (SQLException e) {
             log("column-check-" + column, e);
-            return false;
+            throw new IllegalStateException("Unable to inspect sell log schema: " + table, e);
         }
     }
 
@@ -368,6 +368,7 @@ public class SellLogRepository {
             ps.executeUpdate();
         } catch (SQLException e) {
             log(action, e);
+            throw new IllegalStateException("Unable to initialize sell log table: " + table, e);
         }
     }
 

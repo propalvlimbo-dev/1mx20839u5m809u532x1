@@ -49,10 +49,12 @@ public class PlayerRepository {
                 """.formatted(table);
         };
 
-        CompletableFuture.runAsync(() -> {
-            execute(sql, "create-table");
-            migrateTable();
-        });
+        // Initialize the schema before listeners and periodic save tasks are registered.
+        // Running this asynchronously allowed player loads/saves to query a table that
+        // had not been created yet.
+        execute(sql, "create-table");
+        migrateTable();
+        dbManager.getPlugin().getLogger().info("[DB] Player table ready: " + table);
     }
 
     private void migrateTable() {
@@ -74,7 +76,7 @@ public class PlayerRepository {
             return rs.next();
         } catch (SQLException e) {
             log("column-check", e);
-            return false;
+            throw new IllegalStateException("Unable to inspect player table schema: " + table, e);
         }
     }
 
@@ -164,6 +166,7 @@ public class PlayerRepository {
             ps.executeUpdate();
         } catch (SQLException e) {
             log(action, e);
+            throw new IllegalStateException("Unable to initialize player table: " + table, e);
         }
     }
 
