@@ -16,6 +16,7 @@ public class TraderConfig {
     private final String skin;
     private final List<String> worlds;
     private final int lifetimeSeconds;
+    private final int spawnIntervalSeconds;
     private final List<String> hologramLines;
     private final double hologramHeight;
     private final double hologramLineHeight;
@@ -36,7 +37,7 @@ public class TraderConfig {
     private final int fixedSpawnSearchRadius;
 
     public TraderConfig(String id, boolean enabled, String displayName, String plainName, String skin,
-                        List<String> worlds, int lifetimeSeconds,
+                        List<String> worlds, int lifetimeSeconds, int spawnIntervalSeconds,
                         List<String> hologramLines, double hologramHeight, double hologramLineHeight,
                         boolean hologramEnabled, IconConfig icon, IconConfig infoItem,
                         SchematicConfig schematic, List<String> tradeIds, boolean holdItem,
@@ -50,6 +51,7 @@ public class TraderConfig {
         this.skin = skin;
         this.worlds = worlds;
         this.lifetimeSeconds = Math.max(60, lifetimeSeconds);
+        this.spawnIntervalSeconds = Math.max(0, spawnIntervalSeconds);
         this.hologramLines = hologramLines;
         this.hologramHeight = hologramHeight;
         this.hologramLineHeight = hologramLineHeight;
@@ -76,6 +78,13 @@ public class TraderConfig {
         ConfigurationSection spawn = section.getConfigurationSection("spawn");
         boolean hasFixedSpawn = spawn != null && spawn.contains("world")
                 && spawn.contains("x") && spawn.contains("y") && spawn.contains("z");
+        boolean ghost = "ghost".equalsIgnoreCase(id);
+        boolean hasSpawnInterval = section.contains("spawn-interval-seconds");
+        int spawnIntervalSeconds = Cfg.num(section, "spawn-interval-seconds", ghost ? 7200 : 0);
+        int lifetimeSeconds = Cfg.num(section, "lifetime-seconds", 7200);
+        // Existing installs keep their old traders/ghost.yml. If it predates the new
+        // interval key, migrate Ghost Trader to the requested one-hour lifetime.
+        if (ghost && !hasSpawnInterval) lifetimeSeconds = 3600;
         return new TraderConfig(
                 id,
                 Cfg.bool(section, "enabled", true),
@@ -83,7 +92,8 @@ public class TraderConfig {
                 ru.rooyzee.elytrixtrader.util.ColorUtil.plain(display),
                 Cfg.str(section, "skin", "Steve"),
                 Cfg.list(section, "worlds"),
-                Cfg.num(section, "lifetime-seconds", 7200),
+                lifetimeSeconds,
+                spawnIntervalSeconds,
                 Cfg.orEmpty(section.getConfigurationSection("hologram"), "lines", new ArrayList<>()),
                 Cfg.dbl(section.getConfigurationSection("hologram"), "height", 2.8D),
                 Cfg.dbl(section.getConfigurationSection("hologram"), "line-height", 0.30D),
@@ -111,6 +121,7 @@ public class TraderConfig {
     public String skin() { return skin; }
     public List<String> worlds() { return worlds; }
     public int lifetimeSeconds() { return lifetimeSeconds; }
+    public int spawnIntervalSeconds() { return spawnIntervalSeconds; }
     public List<String> hologramLines() { return hologramLines; }
     public double hologramHeight() { return hologramHeight; }
     public double hologramLineHeight() { return hologramLineHeight; }

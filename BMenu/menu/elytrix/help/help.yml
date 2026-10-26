@@ -17,37 +17,25 @@ items:
     - '&7● &fНажмите для перехода'
     on_click:
     - '[open] elytrix:help_basics'
-  events:
-    material: nether_star
-    name: '&7« &#F8BEFBИвенты сервера &7»'
-    lore:
-    - '&#F8BEFB&l┃ '
-    - '&#F8BEFB&l┃ &fЧто внутри: &#F8BEFBСписок всех ивентов'
-    - '&#F8BEFB&l┃ &fТемы: &#F8BEFBРасписание и награды'
-    - '&#F8BEFB&l┃ &fПолезно: &#F8BEFBПрокачка и заработок коинов'
-    - '&#F8BEFB&l┃ '
-    - '&7● &fНажмите для перехода'
-    on_click:
-    - '[open] elytrix:events'
   free_donate:
     material: honeycomb
     name: '&7« &#F8BEFBБесплатный донат &7»'
     lore:
     - '&#F8BEFB&l┃ '
-    - '&#F8BEFB&l┃ &fЧто внутри: &#F8BEFBСпособы получить ElytriX+'
-    - '&#F8BEFB&l┃ &fТемы: &#F8BEFBЗадания, активность, топы'
-    - '&#F8BEFB&l┃ &fПолезно: &#F8BEFBПривилегии без вложений'
+    - '&#F8BEFB&l┃ &fКоманда: &#F8BEFB/free'
+    - '&#F8BEFB&l┃ &fКоманда выполнится от вашего имени.'
     - '&#F8BEFB&l┃ '
-    - '&7● &fНажмите для перехода'
+    - '&7● &fНажмите, чтобы вызвать /free'
     on_click:
-    - '[open] elytrix:help_freedonate'
+    - '[player] free'
+    - '[close]'
   earnings:
     material: gold_ingot
     name: '&7« &#F8BEFBЗаработок &7»'
     lore:
     - '&#F8BEFB&l┃ '
-    - '&#F8BEFB&l┃ &fЧто внутри: &#F8BEFBзарплата, аукцион и добыча'
-    - '&#F8BEFB&l┃ &fГде искать: &#F8BEFBданжи, Кладбище и ивенты'
+    - '&#F8BEFB&l┃ &fСпособы: &#F8BEFBзарплата, аукцион, скупщик'
+    - '&#F8BEFB&l┃ &fДополнительно: &#F8BEFBнаграды за мобов'
     - '&#F8BEFB&l┃ &fКоманды и подсказки без выдуманных цен'
     - '&#F8BEFB&l┃ '
     - '&7● &fНажмите для перехода'
@@ -141,9 +129,6 @@ animation:
   - opcodes:
       - st: basics 21
       - sound: 'block.note_block.pling 0.26 1.0'
-  - opcodes:
-      - st: events 22
-      - sound: 'block.note_block.pling 0.3 1.22'
   - opcodes:
       - st: free_donate 23
       - sound: 'block.note_block.pling 0.34 1.5'

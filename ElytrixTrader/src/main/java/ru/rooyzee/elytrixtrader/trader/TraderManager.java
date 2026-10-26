@@ -30,6 +30,8 @@ public class TraderManager {
     private final RegionManager regionManager;
     private final DisappearAnimation animation;
     private BukkitTask scheduleTask;
+    private final Map<String, BukkitTask> intervalScheduleTasks = new HashMap<>();
+    private final Map<String, Long> nextIntervalSpawnAtMillis = new HashMap<>();
     private int cycleIndex;
     private boolean eventEndedAnnounced;
 
@@ -44,6 +46,38 @@ public class TraderManager {
     public void start() {
         stopImmediate();
         scheduleNextEvent();
+        scheduleIntervalTraders();
+    }
+
+    private void scheduleIntervalTraders() {
+        for (TraderConfig config : plugin.traderConfigs().values()) {
+            if (config == null || !config.enabled() || config.spawnIntervalSeconds() <= 0) continue;
+
+            String id = config.id().toLowerCase(Locale.ROOT);
+            long intervalTicks = Math.max(1L, config.spawnIntervalSeconds()) * 20L;
+            nextIntervalSpawnAtMillis.put(id, System.currentTimeMillis() + 50L);
+            BukkitTask task = Bukkit.getScheduler().runTaskTimer(plugin,
+                    () -> fireIntervalEvent(id), 1L, intervalTicks);
+            intervalScheduleTasks.put(id, task);
+        }
+    }
+
+    private void fireIntervalEvent(String traderId) {
+        TraderConfig config = plugin.traderConfigs().get(traderId);
+        if (config == null || !config.enabled() || config.spawnIntervalSeconds() <= 0) return;
+
+        nextIntervalSpawnAtMillis.put(traderId,
+                System.currentTimeMillis() + config.spawnIntervalSeconds() * 1000L);
+        if (count(traderId) > 0) return;
+
+        TraderInstance spawned = null;
+        try {
+            spawned = spawn(config, false);
+        } catch (Throwable ignored) {
+        }
+        if (spawned != null) {
+            try { plugin.announcer().eventStarted(Collections.singletonList(spawned)); } catch (Throwable ignored) {}
+        }
     }
 
     private void scheduleNextEvent() {
@@ -57,6 +91,7 @@ public class TraderManager {
     }
 
     private long nextEventDelaySeconds() {
+        if (!plugin.config().scheduleEnabled()) return -1;
         long now = java.time.LocalTime.now().toSecondOfDay();
         long best = Long.MAX_VALUE;
         for (String time : plugin.config().scheduleTimes()) {
@@ -86,14 +121,28 @@ public class TraderManager {
         for (TraderConfig trader : plugin.traderConfigs().values()) {
             if (trader.enabled()) enabled.add(trader);
         }
-        if (enabled.isEmpty()) { scheduleNextEvent(); return; }
+        if (enabled.isEmpty() || !plugin.config().scheduleEnabled()) {
+            scheduleNextEvent();
+            return;
+        }
 
-        if (total() > 0) { scheduleNextEvent(); return; }
+        // Interval-scheduled traders (such as Ghost Trader) run independently and
+        // must not block the ordinary event schedule while they are active.
+        for (TraderInstance instance : instances) {
+            if (instance.alive() && instance.config().spawnIntervalSeconds() <= 0) {
+                scheduleNextEvent();
+                return;
+            }
+        }
 
         TraderInstance spawned = null;
         for (int attempt = 0; attempt < enabled.size(); attempt++) {
             TraderConfig config = enabled.get(cycleIndex % enabled.size());
             cycleIndex = (cycleIndex + 1) % enabled.size();
+
+            // Keep the old rotation slots, but skip interval-scheduled traders
+            // rather than running them from the global clock.
+            if (config.spawnIntervalSeconds() > 0) continue;
             try { spawned = spawn(config, false); } catch (Throwable ignored) { spawned = null; }
             if (spawned != null) break;
         }
@@ -108,6 +157,18 @@ public class TraderManager {
         if (delay < 0) return "—";
         long abs = (java.time.LocalTime.now().toSecondOfDay() + delay) % (24L * 3600L);
         return String.format("%02d:%02d", abs / 3600, (abs % 3600) / 60);
+    }
+
+    public String nextEventTime(String traderId) {
+        if (traderId == null) return nextEventTime();
+        TraderConfig config = plugin.traderConfigs().get(traderId.toLowerCase(Locale.ROOT));
+        if (config == null || config.spawnIntervalSeconds() <= 0) return nextEventTime();
+
+        long nextAt = nextIntervalSpawnAtMillis.getOrDefault(config.id().toLowerCase(Locale.ROOT),
+                System.currentTimeMillis() + config.spawnIntervalSeconds() * 1000L);
+        long delaySeconds = Math.max(0L, (nextAt - System.currentTimeMillis() + 999L) / 1000L);
+        java.time.LocalTime next = java.time.LocalTime.now().plusSeconds(delaySeconds);
+        return String.format("%02d:%02d", next.getHour(), next.getMinute());
     }
 
     public TraderInstance spawn(TraderConfig config) {
@@ -435,6 +496,11 @@ public class TraderManager {
 
     public void stopImmediate() {
         if (scheduleTask != null) { scheduleTask.cancel(); scheduleTask = null; }
+        for (BukkitTask task : intervalScheduleTasks.values()) {
+            if (task != null) task.cancel();
+        }
+        intervalScheduleTasks.clear();
+        nextIntervalSpawnAtMillis.clear();
         for (TraderInstance inst : new ArrayList<>(instances)) {
             despawnImmediate(inst);
         }

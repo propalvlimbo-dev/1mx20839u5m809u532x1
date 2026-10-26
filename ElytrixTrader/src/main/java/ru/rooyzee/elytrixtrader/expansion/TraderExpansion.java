@@ -83,10 +83,8 @@ public class TraderExpansion extends PlaceholderExpansion {
             }
             TraderConfig config = traderId == null ? null : config(traderId);
             if (config != null && !config.enabled()) return ColorUtil.translate("&cВыключен");
-            if (!plugin.config().scheduleEnabled() || plugin.config().scheduleTimes().isEmpty()) {
-                return ColorUtil.translate("&cВыключен");
-            }
-            return ColorUtil.translate("&#F8BEFB" + plugin.traders().nextEventTime());
+            if (!hasSchedule(config)) return ColorUtil.translate("&cВыключен");
+            return ColorUtil.translate("&#F8BEFB" + plugin.traders().nextEventTime(traderId));
         }
 
         switch (field) {
@@ -106,7 +104,8 @@ public class TraderExpansion extends PlaceholderExpansion {
                 }
                 TraderConfig timeConfig = traderId == null ? null : config(traderId);
                 if (timeConfig != null && !timeConfig.enabled()) return ColorUtil.translate("&cВыключен");
-                return ColorUtil.translate("&#F8BEFB" + plugin.traders().nextEventTime());
+                if (!hasSchedule(timeConfig)) return ColorUtil.translate("&cВыключен");
+                return ColorUtil.translate("&#F8BEFB" + plugin.traders().nextEventTime(traderId));
 
             case "location":
             case "coords":
@@ -165,6 +164,11 @@ public class TraderExpansion extends PlaceholderExpansion {
             if (config != null && config.id() != null && config.id().equalsIgnoreCase(traderId)) return config;
         }
         return null;
+    }
+
+    private boolean hasSchedule(TraderConfig trader) {
+        return (trader != null && trader.spawnIntervalSeconds() > 0)
+                || (plugin.config().scheduleEnabled() && !plugin.config().scheduleTimes().isEmpty());
     }
 
     private String locationPlaceholder(String traderId, TraderInstance active, boolean full) {

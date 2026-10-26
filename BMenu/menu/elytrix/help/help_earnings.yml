@@ -6,15 +6,16 @@ title: '&#F8BEFB&lСпособы заработка'
 items:
   salary:
     material: gold_ingot
-    name: '&7« &#F8BEFBЕжедневная зарплата &7»'
+    name: '&7« &#F8BEFBПолучить зарплату &7»'
     lore:
       - '&#F8BEFB&l┃ '
       - '&#F8BEFB&l┃ &fКоманда: &#F8BEFB/salary'
-      - '&#F8BEFB&l┃ &fДоступ и размер зависят от привилегии.'
+      - '&#F8BEFB&l┃ &fНажатие выполняет команду от вашего имени.'
       - '&#F8BEFB&l┃ '
-      - '&7● &fНажмите, чтобы открыть зарплаты'
+      - '&7● &fНажмите, чтобы вызвать /salary'
     on_click:
-      - '[open] elytrix:salary_rub'
+      - '[player] salary'
+      - '[close]'
   auction:
     material: emerald
     name: '&7« &#F8BEFBАукцион игроков &7»'
@@ -33,68 +34,31 @@ items:
     name: '&7« &#F8BEFBСкупщик ресурсов &7»'
     lore:
       - '&#F8BEFB&l┃ '
-      - '&#F8BEFB&l┃ &fРаздел скупщика пока является заглушкой.'
-      - '&#F8BEFB&l┃ &fПродажа ресурсов и выплаты не настроены.'
+      - '&#F8BEFB&l┃ &fПродажа ресурсов открывается командой /seller.'
+      - '&#F8BEFB&l┃ &fИспользуется существующее меню скупщика.'
       - '&#F8BEFB&l┃ '
-      - '&7● &fНажмите, чтобы посмотреть статус'
+      - '&7● &fНажмите, чтобы открыть скупщика'
     on_click:
-      - '[open] elytrix:seller_stub'
+      - '[player] seller'
+      - '[close]'
   mob_coins:
     material: iron_sword
     name: '&7« &#F8BEFBМонеты за мобов &7»'
     lore:
       - '&#F8BEFB&l┃ '
       - '&#F8BEFB&l┃ &fУбийства мобов приносят монеты.'
-      - '&#F8BEFB&l┃ &fРазмер награды зависит от настроек сервера.'
-      - '&#F8BEFB&l┃ &fТочные ставки этим меню не задаются.'
+      - '&#F8BEFB&l┃ &fРазмер награды зависит от моба.'
       - '&#F8BEFB&l┃ '
       - '&7● &fИнформация о заработке'
     on_click:
-      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &fМонеты начисляются за убийства согласно настройкам сервера.'
-  cemetery:
-    material: iron_shovel
-    name: '&7« &#F8BEFBКладбище &7»'
-    lore:
-      - '&#F8BEFB&l┃ '
-      - '&#F8BEFB&l┃ &fРаскопывай могилы и забирай добычу из сундуков.'
-      - '&#F8BEFB&l┃ &fПризраки и стражи дают Призрачные осколки.'
-      - '&#F8BEFB&l┃ &fКоманда: &#F8BEFB/cemetery tp'
-      - '&#F8BEFB&l┃ '
-      - '&7● &fНажмите, чтобы отправиться на Кладбище'
-    on_click:
-      - '[close]'
-      - '[player] cemetery tp'
-  dungeons:
-    material: trial_key
-    name: '&7« &#F8BEFBДанжи &7»'
-    lore:
-      - '&#F8BEFB&l┃ '
-      - '&#F8BEFB&l┃ &fИщи добычу в наземных и подземных данжах.'
-      - '&#F8BEFB&l┃ &fСильные мобы и боссы могут оставить осколки.'
-      - '&#F8BEFB&l┃ &fСписок данжей: &#F8BEFB/dungeons'
-      - '&#F8BEFB&l┃ '
-      - '&7● &fНажмите, чтобы открыть список данжей'
-    on_click:
-      - '[player] dungeons'
-      - '[close]'
-  events:
-    material: nether_star
-    name: '&7« &#F8BEFBСерверные ивенты &7»'
-    lore:
-      - '&#F8BEFB&l┃ '
-      - '&#F8BEFB&l┃ &fУчаствуй в событиях и забирай доступную добычу.'
-      - '&#F8BEFB&l┃ &fСписок и расписание: &#F8BEFB/event'
-      - '&#F8BEFB&l┃ '
-      - '&7● &fНажмите, чтобы открыть ивенты'
-    on_click:
-      - '[open] elytrix:events'
+      - '[message] &f☁ &#F8BEFBᴇ&#F6BEFBʟ&#F3BEFBʏ&#F1BFFBᴛ&#EEBFFBʀ&#ECBFFBɪ&#E9BFFBx &7» &fРазмер награды зависит от убитого моба.'
   moneyshop:
     material: book
     name: '&7« &#F8BEFBМагазин за монеты &7»'
     lore:
       - '&#F8BEFB&l┃ '
-      - '&#F8BEFB&l┃ &f/moneyshop сейчас является заглушкой.'
-      - '&#F8BEFB&l┃ &fТовары, цены и покупки не настроены.'
+      - '&#F8BEFB&l┃ &f/moneyshop — пустая заглушка.'
+      - '&#F8BEFB&l┃ &fТовары и покупки не настроены.'
       - '&#F8BEFB&l┃ '
       - '&7● &fНажмите, чтобы открыть заглушку'
     on_click:
@@ -111,9 +75,9 @@ items:
     name: '&7« &#F8BEFBЗаработок на ElytriX &7»'
     lore:
       - '&#F8BEFB&l┃ '
-      - '&#F8BEFB&l┃ &fИсточники: зарплата, аукцион, монеты за мобов,'
-      - '&#F8BEFB&l┃ &fивенты, данжи и Кладбище.'
-      - '&#F8BEFB&l┃ &fЦены и ставки указаны только там, где они настроены.'
+      - '&#F8BEFB&l┃ &fСпособы: зарплата, аукцион, скупщик ресурсов'
+      - '&#F8BEFB&l┃ &fи награды за убийство мобов.'
+      - '&#F8BEFB&l┃ &fВыбирайте способ и используйте его команду.'
       - '&#F8BEFB&l┃ '
   design_purple_panel:
     material: purple_stained_glass_pane
@@ -121,7 +85,6 @@ items:
   design_black_panel:
     material: black_stained_glass_pane
     name: '&r'
-
 animation:
   - tick: 0
     opcodes:
@@ -144,26 +107,17 @@ animation:
       - st: design_black_panel 0,1,2,3,4,5,6,7,8
       - sound: 'block.note_block.chime 0.28 1.21'
   - opcodes:
-      - st: salary 19
+      - st: salary 20
       - sound: 'block.note_block.pling 0.26 1.0'
   - opcodes:
-      - st: auction 21
-      - sound: 'block.note_block.pling 0.27 1.07'
+      - st: auction 22
+      - sound: 'block.note_block.pling 0.28 1.1'
   - opcodes:
-      - st: seller 23
-      - sound: 'block.note_block.pling 0.28 1.14'
+      - st: seller 24
+      - sound: 'block.note_block.pling 0.3 1.2'
   - opcodes:
-      - st: mob_coins 25
-      - sound: 'block.note_block.pling 0.29 1.21'
+      - st: mob_coins 30
+      - sound: 'block.note_block.pling 0.32 1.3'
   - opcodes:
-      - st: cemetery 28
-      - sound: 'block.note_block.pling 0.30 1.28'
-  - opcodes:
-      - st: dungeons 30
-      - sound: 'block.note_block.pling 0.31 1.35'
-  - opcodes:
-      - st: events 32
-      - sound: 'block.note_block.pling 0.33 1.42'
-  - opcodes:
-      - st: moneyshop 34
-      - sound: 'block.amethyst_block.chime 0.4 1.5'
+      - st: moneyshop 32
+      - sound: 'block.amethyst_block.chime 0.4 1.4'

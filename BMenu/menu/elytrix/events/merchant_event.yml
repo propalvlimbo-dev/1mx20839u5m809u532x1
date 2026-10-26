@@ -52,8 +52,8 @@ items:
     name: '&7« &#F8BEFBСобытия ElytriX &7»'
     lore:
       - '&#F8BEFB&l┃ '
-      - '&#F8BEFB&l┃ &fРасписание торговцев: &#F8BEFB00:00, 04:00, 08:00,'
-      - '&#F8BEFB&l┃ &f12:00, 16:00 и 20:00 (время сервера).'
+      - '&#F8BEFB&l┃ &fРасписание задаётся в конфигурации ElytrixTrader.'
+      - '&#F8BEFB&l┃ &fСледующее время смотри в меню /event.'
       - '&#F8BEFB&l┃ '
   design_purple_panel:
     material: purple_stained_glass_pane

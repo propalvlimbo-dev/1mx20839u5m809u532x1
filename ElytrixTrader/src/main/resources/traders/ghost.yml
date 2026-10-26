@@ -23,7 +23,10 @@ spawn:
   z: 0.5
   search-radius: 8
 
-lifetime-seconds: 7200
+# Появляется сразу после включения плагина, затем каждые 2 часа;
+# каждый выход торговца длится 1 час.
+spawn-interval-seconds: 7200
+lifetime-seconds: 3600
 random-trades: 14
 trade-cooldown-seconds: 60
 

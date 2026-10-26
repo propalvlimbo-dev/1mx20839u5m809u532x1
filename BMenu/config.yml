@@ -3,10 +3,6 @@ hot-reload: false # автоматически перезагружать кон
 # Здесь можете назначить команды для открытия меню
 open_commands:
 # Перенесённые команды DeluxeMenus (исходные файлы DeluxeMenus не изменялись)
-  help_freedonate:
-    menu: elytrix:help_freedonate
-    aliases:
-      - фришка
   help_basics:
     menu: elytrix:help_basics
     aliases:
@@ -85,11 +81,6 @@ open_commands:
     aliases:
       - event_airdrop
       - airdrops_menu
-  paradise_event:
-    menu: elytrix:paradise_event
-    aliases:
-      - event_paradise
-      - paradise_menu
   events:
     menu: elytrix:events
     aliases:
@@ -101,11 +92,6 @@ open_commands:
     permission: deluxemenus.admin
   elytrix_lobby:
     menu: elytrix:lobby
-  salary:
-    menu: elytrix:salary_rub
-    aliases:
-      - rub
-      - rubsalary
   elytrix_frun_legacy:
     menu: elytrix:zelevarki_fr_legacy
   elytrix_wheel:
