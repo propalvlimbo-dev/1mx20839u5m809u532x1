@@ -35,6 +35,7 @@ public class TraderConfig {
     private final double fixedSpawnY;
     private final double fixedSpawnZ;
     private final int fixedSpawnSearchRadius;
+    private final boolean surfaceOnly;
 
     public TraderConfig(String id, boolean enabled, String displayName, String plainName, String skin,
                         List<String> worlds, int lifetimeSeconds, int spawnIntervalSeconds,
@@ -43,7 +44,7 @@ public class TraderConfig {
                         SchematicConfig schematic, List<String> tradeIds, boolean holdItem,
                         int randomTradesCount, int tradeCooldownSeconds, String spawnSound,
                         String fixedSpawnWorld, double fixedSpawnX, double fixedSpawnY, double fixedSpawnZ,
-                        int fixedSpawnSearchRadius) {
+                        int fixedSpawnSearchRadius, boolean surfaceOnly) {
         this.id = id;
         this.enabled = enabled;
         this.displayName = displayName;
@@ -70,6 +71,7 @@ public class TraderConfig {
         this.fixedSpawnY = fixedSpawnY;
         this.fixedSpawnZ = fixedSpawnZ;
         this.fixedSpawnSearchRadius = Math.max(0, Math.min(32, fixedSpawnSearchRadius));
+        this.surfaceOnly = surfaceOnly;
     }
 
     public static TraderConfig from(String id, ConfigurationSection section) {
@@ -110,7 +112,8 @@ public class TraderConfig {
                 Cfg.dbl(spawn, "x", 0.0D),
                 Cfg.dbl(spawn, "y", 0.0D),
                 Cfg.dbl(spawn, "z", 0.0D),
-                Math.max(0, Cfg.num(spawn, "search-radius", 0))
+                Math.max(0, Cfg.num(spawn, "search-radius", 0)),
+                Cfg.bool(section, "surface-only", "experienced".equalsIgnoreCase(id))
         );
     }
 
@@ -141,4 +144,5 @@ public class TraderConfig {
     public double fixedSpawnY() { return fixedSpawnY; }
     public double fixedSpawnZ() { return fixedSpawnZ; }
     public int fixedSpawnSearchRadius() { return fixedSpawnSearchRadius; }
+    public boolean surfaceOnly() { return surfaceOnly; }
 }

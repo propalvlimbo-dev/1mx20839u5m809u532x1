@@ -14,6 +14,8 @@ worlds:
   - 'world'
 
 lifetime-seconds: 7200
+# Только верхняя поверхность: подземные пещеры и шахты исключены.
+surface-only: true
 random-trades: 14
 trade-cooldown-seconds: 60
 

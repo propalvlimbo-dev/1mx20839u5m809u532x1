@@ -87,41 +87,32 @@ public class ElytrixTraderCommand implements TabExecutor {
         if (args.length > 2) {
             count = Math.max(1, Math.min(10, (int) Numbers.parseDouble(args[2], 1.0D)));
         }
-        int spawned = 0;
-        List<TraderInstance> started = new ArrayList<>();
-
-        for (int i = 0; i < count; i++) {
-            TraderInstance instance = null;
-            Location randomLoc = plugin.traders().findLocation(config);
-            if (randomLoc != null) {
-                instance = plugin.traders().spawnForce(config, randomLoc, false);
-            }
-            if (instance == null) {
-                try {
-                    for (World w : Bukkit.getWorlds()) {
-                        if (!config.worlds().isEmpty() && !config.worlds().contains(w.getName())) continue;
-                        Location ws = w.getSpawnLocation();
-                        w.loadChunk(ws.getBlockX() >> 4, ws.getBlockZ() >> 4, true);
-                        instance = plugin.traders().spawnForce(config, ws, false);
-                        if (instance != null) break;
-                    }
-                } catch (Throwable ignored) {}
-            }
-            if (instance != null) {
-                spawned++;
-                started.add(instance);
-            }
-        }
-
-        if (spawned == 0) {
-            plugin.messages().send(sender, "admin.spawn-failed");
-        } else {
-            plugin.messages().send(sender, "admin.spawned", sender instanceof Player ? (Player) sender : null,
-                    map("trader", config.id(), "amount", String.valueOf(spawned)));
-            // Ручной запуск анонсируется как начало ивента.
-            plugin.announcer().eventStarted(started);
-        }
+        spawnRequested(sender, config, count, new ArrayList<>());
         return true;
+    }
+
+    private void spawnRequested(CommandSender sender, TraderConfig config, int remaining,
+                                List<TraderInstance> started) {
+        if (remaining <= 0 || !plugin.isEnabled()) {
+            finishSpawnRequest(sender, config, started);
+            return;
+        }
+        plugin.traders().spawnAsync(config, true, false, instance -> {
+            if (instance != null) started.add(instance);
+            spawnRequested(sender, config, remaining - 1, started);
+        });
+    }
+
+    private void finishSpawnRequest(CommandSender sender, TraderConfig config,
+                                   List<TraderInstance> started) {
+        if (started.isEmpty()) {
+            plugin.messages().send(sender, "admin.spawn-failed");
+            return;
+        }
+        plugin.messages().send(sender, "admin.spawned", sender instanceof Player ? (Player) sender : null,
+                map("trader", config.id(), "amount", String.valueOf(started.size())));
+        // Ручной запуск анонсируется как начало ивента.
+        plugin.announcer().eventStarted(started);
     }
 
     private boolean stop(CommandSender sender, String[] args) {

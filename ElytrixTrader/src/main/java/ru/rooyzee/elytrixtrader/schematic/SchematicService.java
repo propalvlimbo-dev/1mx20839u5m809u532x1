@@ -25,11 +25,14 @@ import ru.rooyzee.elytrixtrader.model.SchematicConfig;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SchematicService {
 
     private final Main plugin;
+    private final Map<String, Clipboard> clipboardCache = new HashMap<>();
 
     public SchematicService(Main plugin) {
         this.plugin = plugin;
@@ -138,6 +141,42 @@ public class SchematicService {
         return snap != null;
     }
 
+    /** Returns the affected chunk bounds in order minX, maxX, minZ, maxZ. */
+    public int[] requiredChunkBounds(Location location, SchematicConfig config) {
+        if (worldEdit() == null || location == null || location.getWorld() == null
+                || config == null || !config.enabled()) return null;
+        File file = resolve(config.file());
+        if (file == null) return null;
+        try {
+            Clipboard clipboard = loadClipboard(file);
+            if (clipboard == null) return null;
+            int[] bounds = affectedBounds(location.getWorld(), location, clipboard, config);
+            return new int[]{bounds[0] >> 4, bounds[1] >> 4, bounds[4] >> 4, bounds[5] >> 4};
+        } catch (Throwable ignored) {
+            return null;
+        }
+    }
+
+    private synchronized Clipboard loadClipboard(File file) throws Exception {
+        String key = file.getCanonicalPath() + ':' + file.length() + ':' + file.lastModified();
+        Clipboard cached = clipboardCache.get(key);
+        if (cached != null) return cached;
+
+        ClipboardFormat format = ClipboardFormats.findByFile(file);
+        if (format == null) format = ClipboardFormats.findByAlias("sponge");
+        if (format == null) return null;
+
+        Clipboard clipboard;
+        try (ClipboardReader reader = format.getReader(new FileInputStream(file))) {
+            clipboard = reader.read();
+        }
+        if (clipboard != null) {
+            clipboardCache.clear();
+            clipboardCache.put(key, clipboard);
+        }
+        return clipboard;
+    }
+
     public SchematicSnapshot pasteWithBackup(Location location, SchematicConfig config) {
         WorldEditPlugin worldEdit = worldEdit();
         if (worldEdit == null) {
@@ -152,20 +191,8 @@ public class SchematicService {
         }
         long started = System.currentTimeMillis();
         try {
-            ClipboardFormat format = ClipboardFormats.findByFile(file);
-            if (format == null) {
-                format = ClipboardFormats.findByAlias("sponge");
-            }
-            if (format == null) {
-                return null;
-            }
-            Clipboard clipboard;
-            try (ClipboardReader reader = format.getReader(new FileInputStream(file))) {
-                clipboard = reader.read();
-            }
-            if (clipboard == null) {
-                return null;
-            }
+            Clipboard clipboard = loadClipboard(file);
+            if (clipboard == null) return null;
 
             World world = location.getWorld();
 
@@ -176,6 +203,11 @@ public class SchematicService {
             // синхронных обращений к блокам на главном потоке (микролаг
             // при спавне). Логика отката не меняется.
             int[] bounds = affectedBounds(world, location, clipboard, config);
+            if (!isAreaLoaded(world, bounds)) {
+                // Never let a schematic read/paste implicitly load chunks on the
+                // server thread; async spawn preparation owns chunk loading.
+                return null;
+            }
             java.util.Map<Long, BlockSnapshot> originals = backupArea(world, bounds);
 
             clearArea(world, location, config);
@@ -227,6 +259,19 @@ public class SchematicService {
             }
             return null;
         }
+    }
+
+    private boolean isAreaLoaded(World world, int[] bounds) {
+        int minChunkX = bounds[0] >> 4;
+        int maxChunkX = bounds[1] >> 4;
+        int minChunkZ = bounds[4] >> 4;
+        int maxChunkZ = bounds[5] >> 4;
+        for (int chunkX = minChunkX; chunkX <= maxChunkX; chunkX++) {
+            for (int chunkZ = minChunkZ; chunkZ <= maxChunkZ; chunkZ++) {
+                if (!world.isChunkLoaded(chunkX, chunkZ)) return false;
+            }
+        }
+        return true;
     }
 
     /**

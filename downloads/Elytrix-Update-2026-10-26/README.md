@@ -3,7 +3,7 @@
 ## Downloads
 
 - `ElytrixCemetery.jar` — Cemetery ghost cap is 8; killed ghosts respawn after 10 minutes; only canonical Ghost Shards drop, with no XP or player kill message. Cemetery ghosts are cleared on plugin shutdown.
-- `ElytrixTrader.jar` (2.3; also available as `downloads/ElytrixTrader-2.3.jar`) — Ghost Trader appears for 1 hour every 2 hours, with a different nearby safe spawn point when alternatives exist. Both traders use the shared `ghost.schem`; hologram lines use visible legacy colors. Ghost trades still accept only canonical Cemetery Ghost Shards, and offers/prices remain empty until configured with `/etr edit ghost`.
+- `ElytrixTrader.jar` (2.3.1; also available as `downloads/ElytrixTrader-2.3.1.jar`) — chunk loading for scheduled/manual spawns uses Paper's asynchronous API; there is no synchronous `loadChunk()` path. The Experienced Trader now checks only safe surface positions (never caves/mines). Ghost Trader still appears for 1 hour every 2 hours, with a different nearby safe spawn point when alternatives exist. Both traders use the shared `ghost.schem`; Ghost trades accept only canonical Cemetery Ghost Shards, and offers/prices remain empty until configured with `/etr edit ghost`. On servers without Paper's async chunk API, unloaded chunks are skipped rather than synchronously loaded.
 - `ElytrixItem-2.5.7.jar` — Donshar now reflects the raw attack damage before the target's armor/mitigation, with a 5% chance. The returned hit uses a magic source and is not reduced by the holder's armor. Existing real enchantments and potion/arrow effects remain. `ElytrixItem-2.5.6.jar` in this folder is an older release; use 2.5.7.
 - `ElytrixSubscribe-2.0.1.jar` — fixes a lost-wakeup race in asynchronous `data.yml` saves and ensures shutdown writes the final snapshot.
 - `ElytrixDuelsBridge-1.12.4.jar` — separates the 2v2 queue-cancel message from the 1v1 `queue-left` key; duplicate YAML key removed.
@@ -15,9 +15,9 @@
 - `ElytrixDungeons-1.0.0.jar` — refreshed root download, byte-identical to the current source build (the older `Elytrix-full.zip` remains historical).
 - `ElytrixCasino-2.2.1.jar` (also named `ElytrixCasino.jar` at the root) — config upgrades now merge missing defaults and create backups instead of replacing custom settings.
 - `Elytrix-Menus.zip` — compact BMenu overlay with the changed ElytriX menus and config.
-- `Elytrix-BMenu-Full-Fixed-2026-10-26.zip` — full 72-file BMenu configuration tree from the repository, including all menu folders and examples, plus `INSTALL.txt`. This is config/menu content, not the BMenu plugin JAR; merge server-specific settings instead of blindly replacing them. Includes the same fixes: `/salary`, `/seller`, `/free` run as the player; `/help` links to `/event` with Cemetery and Dungeons; `/moneyshop` stays empty; `/donate` stays decorative; Paradise Place stays absent.
+- `Elytrix-BMenu-Full-Fixed-2026-10-26.zip` — full 72-file BMenu configuration tree from the repository, including all menu folders and examples, plus `INSTALL.txt`. This is config/menu content, not the BMenu plugin JAR; merge server-specific settings instead of blindly replacing them. Includes the same fixes: `/salary`, `/seller`, `/free` run as the player; `/help` links to `/event` with Cemetery and Dungeons; `/moneyshop` stays empty; `/donate` is restyled in ElytriX colors while preserving existing package text/actions and adding no privileges or purchase/grant action; Paradise Place stays absent.
 
-  SHA-256: `63482ed6fa90e1433053c6a758857b5b774899c2a35cd684ae41b026d482a2c4`.
+  SHA-256: `065343e746329723603f379cae9527349d3b81af7b56b0cba3f3e32a036264e6`.
 - `ElytrixSeller-configs.zip` — RU/EN seller defaults with farmer crops (including Nether Wart), a new farm autosell category, deepslate/raw/copper/amethyst ore types and loot from newer mobs/trial chambers. Merge into existing files; this is a config pack, separate from the two Seller JARs above.
 
 ## BMenu migration notes

@@ -18,11 +18,16 @@ import ru.rooyzee.elytrixtrader.region.RegionManager;
 import ru.rooyzee.elytrixtrader.region.TraderRegion;
 import ru.rooyzee.elytrixtrader.schematic.SchematicSnapshot;
 
+import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
+import java.util.function.Consumer;
 
 public class TraderManager {
 
     private static final int REGION_PADDING = 20;
+    private static final int MAX_SCHEMATIC_CHUNKS_TO_PRELOAD = 256;
 
     private final Main plugin;
     private final List<TraderInstance> instances = new ArrayList<>();
@@ -33,6 +38,7 @@ public class TraderManager {
     private final Map<String, BukkitTask> intervalScheduleTasks = new HashMap<>();
     private final Map<String, Long> nextIntervalSpawnAtMillis = new HashMap<>();
     private final Map<String, Location> lastFixedSpawnLocations = new HashMap<>();
+    private boolean asyncChunkApiWarningIssued;
     private int cycleIndex;
     private boolean eventEndedAnnounced;
 
@@ -71,14 +77,12 @@ public class TraderManager {
                 System.currentTimeMillis() + config.spawnIntervalSeconds() * 1000L);
         if (count(traderId) > 0) return;
 
-        TraderInstance spawned = null;
-        try {
-            spawned = spawn(config, false);
-        } catch (Throwable ignored) {
-        }
-        if (spawned != null) {
-            try { plugin.announcer().eventStarted(Collections.singletonList(spawned)); } catch (Throwable ignored) {}
-        }
+        spawnAsync(config, false, false, spawned -> {
+            if (spawned != null) {
+                try { plugin.announcer().eventStarted(Collections.singletonList(spawned)); }
+                catch (Throwable ignored) {}
+            }
+        });
     }
 
     private void scheduleNextEvent() {
@@ -136,21 +140,29 @@ public class TraderManager {
             }
         }
 
-        TraderInstance spawned = null;
-        for (int attempt = 0; attempt < enabled.size(); attempt++) {
-            TraderConfig config = enabled.get(cycleIndex % enabled.size());
-            cycleIndex = (cycleIndex + 1) % enabled.size();
-
-            // Keep the old rotation slots, but skip interval-scheduled traders
-            // rather than running them from the global clock.
-            if (config.spawnIntervalSeconds() > 0) continue;
-            try { spawned = spawn(config, false); } catch (Throwable ignored) { spawned = null; }
-            if (spawned != null) break;
-        }
-        if (spawned != null) {
-            try { plugin.announcer().eventStarted(Collections.singletonList(spawned)); } catch (Throwable ignored) {}
-        }
         scheduleNextEvent();
+        spawnNextScheduledCandidate(enabled, 0);
+    }
+
+    private void spawnNextScheduledCandidate(List<TraderConfig> enabled, int attempt) {
+        if (attempt >= enabled.size()) return;
+        TraderConfig config = enabled.get(cycleIndex % enabled.size());
+        cycleIndex = (cycleIndex + 1) % enabled.size();
+
+        // Keep the old rotation: interval traders are skipped, and the next
+        // ordinary trader is tried only if this candidate cannot be spawned.
+        if (config.spawnIntervalSeconds() > 0) {
+            spawnNextScheduledCandidate(enabled, attempt + 1);
+            return;
+        }
+        spawnAsync(config, false, false, spawned -> {
+            if (spawned != null) {
+                try { plugin.announcer().eventStarted(Collections.singletonList(spawned)); }
+                catch (Throwable ignored) {}
+            } else {
+                spawnNextScheduledCandidate(enabled, attempt + 1);
+            }
+        });
     }
 
     public String nextEventTime() {
@@ -185,6 +197,94 @@ public class TraderManager {
         return spawnInternal(config, loc, announce);
     }
 
+    /**
+     * Spawns without ever synchronously loading a chunk. Unloaded chunks are
+     * requested through Paper's async API (when available); terrain is inspected
+     * only after the chunks are confirmed loaded on the server thread.
+     */
+    public void spawnAsync(TraderConfig config, boolean force, boolean announce,
+                           Consumer<TraderInstance> completion) {
+        if (!Bukkit.isPrimaryThread()) {
+            runOnMainThread(() -> spawnAsync(config, force, announce, completion));
+            return;
+        }
+        if (config == null || !config.enabled()
+                || (!force && count(config.id()) >= config.maxSimultaneous())) {
+            completeSpawn(completion, null);
+            return;
+        }
+
+        if (config.hasFixedSpawnLocation()) {
+            loadFixedSpawnAreaAsync(config, () -> {
+                if (!plugin.isEnabled()) return;
+                Location location = findFixedLocation(config);
+                if (location == null) completeSpawn(completion, null);
+                else spawnAtLocationAsync(config, location, announce, completion);
+            });
+            return;
+        }
+
+        Location alreadyLoaded = findLocation(config);
+        if (alreadyLoaded != null) {
+            spawnAtLocationAsync(config, alreadyLoaded, announce, completion);
+            return;
+        }
+
+        List<Location> candidates = randomSpawnCandidates(config, 8);
+        if (candidates.isEmpty()) {
+            completeSpawn(completion, null);
+            return;
+        }
+        loadChunksAsync(chunkTargets(candidates), () -> {
+            if (!plugin.isEnabled()) return;
+            Location location = findSafeCandidate(config, candidates);
+            if (location == null) completeSpawn(completion, null);
+            else spawnAtLocationAsync(config, location, announce, completion);
+        });
+    }
+
+    private void spawnAtLocationAsync(TraderConfig config, Location location, boolean announce,
+                                      Consumer<TraderInstance> completion) {
+        if (!config.schematic().enabled() || !plugin.schematics().available()) {
+            completeSpawn(completion, spawnInternal(config, location, announce));
+            return;
+        }
+
+        Location schematicAnchor = config.schematic().anchor(location.clone().add(0, 1, 0));
+        int[] bounds = plugin.schematics().requiredChunkBounds(schematicAnchor, config.schematic());
+        if (bounds == null) {
+            completeSpawn(completion, spawnInternal(config, location, announce));
+            return;
+        }
+
+        long chunkCount = (long) (bounds[1] - bounds[0] + 1)
+                * (long) (bounds[3] - bounds[2] + 1);
+        if (chunkCount <= 0 || chunkCount > MAX_SCHEMATIC_CHUNKS_TO_PRELOAD) {
+            plugin.getLogger().warning("Skipping schematic paste for trader " + config.id()
+                    + ": affected area is too large to preload safely.");
+            completeSpawn(completion, spawnInternal(config, location, announce));
+            return;
+        }
+
+        Set<Long> chunks = new LinkedHashSet<>();
+        for (int chunkX = bounds[0]; chunkX <= bounds[1]; chunkX++) {
+            for (int chunkZ = bounds[2]; chunkZ <= bounds[3]; chunkZ++) {
+                chunks.add(((long) chunkX << 32) ^ (chunkZ & 0xffffffffL));
+            }
+        }
+        Map<World, Set<Long>> targets = new IdentityHashMap<>();
+        targets.put(location.getWorld(), chunks);
+        loadChunksAsync(targets, () -> {
+            if (!plugin.isEnabled()) return;
+            completeSpawn(completion, spawnInternal(config, location, announce));
+        });
+    }
+
+    private void completeSpawn(Consumer<TraderInstance> completion, TraderInstance instance) {
+        if (completion == null) return;
+        try { completion.accept(instance); } catch (Throwable ignored) {}
+    }
+
     public TraderInstance spawnAt(TraderConfig config, Location loc) {
         return spawnInternal(config, loc, true);
     }
@@ -192,17 +292,17 @@ public class TraderManager {
     private TraderInstance spawnInternal(TraderConfig config, Location loc, boolean announce) {
         if (config == null || !config.enabled() || loc == null || loc.getWorld() == null) return null;
         World world = loc.getWorld();
-        ensureChunkLoaded(world, loc.getBlockX(), loc.getBlockZ());
+        if (!isChunkLoadedAt(world, loc.getBlockX(), loc.getBlockZ())) return null;
 
         int top = world.getMaxHeight() - 8;
         int floor = Math.max(SchematicConfig.getMinHeight(world) + 2, 0);
-        int safeY = config.hasFixedSpawnLocation()
-                ? findSafeYNear(world, loc.getBlockX(), loc.getBlockZ(), loc.getBlockY(), top, floor)
-                : findSafeY(world, loc.getBlockX(), loc.getBlockZ(), top, floor);
-        if (safeY < floor) safeY = findSafeY(world, loc.getBlockX(), loc.getBlockZ(), top, floor);
-        if (safeY > 0) {
-            loc = new Location(world, loc.getX(), safeY, loc.getZ(), loc.getYaw(), loc.getPitch());
-        }
+        int safeY = config.surfaceOnly()
+                ? findSurfaceSafeY(world, loc.getBlockX(), loc.getBlockZ(), top, floor)
+                : config.hasFixedSpawnLocation()
+                    ? findSafeYNear(world, loc.getBlockX(), loc.getBlockZ(), loc.getBlockY(), top, floor)
+                    : findSafeY(world, loc.getBlockX(), loc.getBlockZ(), top, floor);
+        if (safeY < floor || safeY + 1 >= world.getMaxHeight()) return null;
+        loc = new Location(world, loc.getX(), safeY, loc.getZ(), loc.getYaw(), loc.getPitch());
 
         Location schematicAnchor = loc.clone().add(0, 1, 0);
         SchematicSnapshot snapshot = null;
@@ -261,57 +361,231 @@ public class TraderManager {
         if (worlds.isEmpty()) worlds.add("world");
         Collections.shuffle(worlds, random);
 
-        AppConfig cfg = plugin.config();
-
         for (String name : worlds) {
             World world = Bukkit.getWorld(name);
             if (world == null) continue;
-
-            List<int[]> regionBounds = protectedRegionBounds(world);
-
-            // 1. Сначала ищем среди уже загруженных чанков (0 мс задержки!)
-            Location fromLoaded = tryFindFromLoadedChunks(world, config, regionBounds);
-            if (fromLoaded != null) {
-                return fromLoaded;
-            }
-
-            // 2. Если в загруженных чанках подходящего места нет, делаем быстрый поиск с ограничением
-            Location spawn = world.getSpawnLocation();
-            double cx = spawn.getX(), cz = spawn.getZ();
-            int top = world.getMaxHeight() - 8;
-            int floor = Math.max(SchematicConfig.getMinHeight(world) + 2, 0);
-
-            for (int attempt = 0; attempt < 35; attempt++) {
-                double angle = random.nextDouble() * Math.PI * 2.0;
-                double dist = cfg.minRadius() + random.nextDouble() * (cfg.maxRadius() - cfg.minRadius());
-                int x = (int) (cx + Math.cos(angle) * dist);
-                int z = (int) (cz + Math.sin(angle) * dist);
-
-                if (!isFarFromRegions(world, x, z, REGION_PADDING, regionBounds)) continue;
-
-                ensureChunkLoaded(world, x, z);
-
-                int y = findSafeY(world, x, z, top, floor);
-                if (y < 0) continue;
-                if (!isFlatEnough(world, x, z, y)) continue;
-
-                return new Location(world, x + 0.5, y, z + 0.5);
-            }
-        }
-
-        // Fallback: spawn
-        for (String name : worlds) {
-            World world = Bukkit.getWorld(name);
-            if (world == null) continue;
-            Location s = world.getSpawnLocation();
-            int y = findSafeY(world, s.getBlockX(), s.getBlockZ(), world.getMaxHeight() - 8, 0);
-            if (y < 1) y = 64;
-            for (int dy = 0; dy < 3; dy++) {
-                world.getBlockAt(s.getBlockX(), y + dy, s.getBlockZ()).setType(Material.AIR, false);
-            }
-            return new Location(world, s.getBlockX() + 0.5, y + 1, s.getBlockZ() + 0.5);
+            Location fromLoaded = tryFindFromLoadedChunks(world, config, protectedRegionBounds(world));
+            if (fromLoaded != null) return fromLoaded;
         }
         return null;
+    }
+
+    private List<Location> randomSpawnCandidates(TraderConfig config, int limit) {
+        List<Location> candidates = new ArrayList<>();
+        List<String> worlds = new ArrayList<>(config.worlds());
+        if (worlds.isEmpty()) worlds.add("world");
+        Collections.shuffle(worlds, random);
+
+        AppConfig cfg = plugin.config();
+        Map<World, Set<Long>> seenChunks = new IdentityHashMap<>();
+        for (String name : worlds) {
+            World world = Bukkit.getWorld(name);
+            if (world == null) continue;
+            Location spawn = world.getSpawnLocation();
+            List<int[]> regions = protectedRegionBounds(world);
+            Set<Long> seen = seenChunks.computeIfAbsent(world, ignored -> new HashSet<>());
+            double radiusRange = Math.max(0.0D, cfg.maxRadius() - cfg.minRadius());
+
+            for (int attempt = 0; attempt < 128 && candidates.size() < limit; attempt++) {
+                double angle = random.nextDouble() * Math.PI * 2.0D;
+                double distance = cfg.minRadius() + random.nextDouble() * radiusRange;
+                int rawX = (int) Math.floor(spawn.getX() + Math.cos(angle) * distance);
+                int rawZ = (int) Math.floor(spawn.getZ() + Math.sin(angle) * distance);
+                int chunkX = rawX >> 4;
+                int chunkZ = rawZ >> 4;
+                long key = ((long) chunkX << 32) ^ (chunkZ & 0xffffffffL);
+                if (!seen.add(key)) continue;
+
+                int x = (chunkX << 4) + 8;
+                int z = (chunkZ << 4) + 8;
+                double dx = x - spawn.getX();
+                double dz = z - spawn.getZ();
+                double centerDistance = Math.sqrt(dx * dx + dz * dz);
+                if (centerDistance < cfg.minRadius() || centerDistance > cfg.maxRadius()) continue;
+                if (!isFarFromRegions(world, x, z, REGION_PADDING, regions)) continue;
+                Location candidate = new Location(world, x + 0.5D, 0.0D, z + 0.5D);
+                if (!world.getWorldBorder().isInside(candidate)) continue;
+                candidates.add(candidate);
+            }
+            if (candidates.size() >= limit) break;
+        }
+        return candidates;
+    }
+
+    private Location findSafeCandidate(TraderConfig config, List<Location> candidates) {
+        for (Location candidate : candidates) {
+            World world = candidate.getWorld();
+            if (world == null || !isChunkLoadedAt(world, candidate.getBlockX(), candidate.getBlockZ())) continue;
+            int x = candidate.getBlockX();
+            int z = candidate.getBlockZ();
+            if (!isFarFromRegions(world, x, z, REGION_PADDING, protectedRegionBounds(world))) continue;
+
+            int top = world.getMaxHeight() - 8;
+            int floor = Math.max(SchematicConfig.getMinHeight(world) + 2, 0);
+            int y = findSpawnY(config, world, x, z, top, floor);
+            if (y < floor || y + 1 >= world.getMaxHeight()) continue;
+            Location safe = new Location(world, x + 0.5D, y, z + 0.5D);
+            if (!world.getWorldBorder().isInside(safe)) continue;
+            if (!isFlatEnough(config, world, x, z, y)) continue;
+            return safe;
+        }
+        return null;
+    }
+
+    private Map<World, Set<Long>> chunkTargets(Collection<Location> locations) {
+        Map<World, Set<Long>> targets = new IdentityHashMap<>();
+        for (Location location : locations) {
+            if (location == null || location.getWorld() == null) continue;
+            int chunkX = location.getBlockX() >> 4;
+            int chunkZ = location.getBlockZ() >> 4;
+            long key = ((long) chunkX << 32) ^ (chunkZ & 0xffffffffL);
+            targets.computeIfAbsent(location.getWorld(), ignored -> new LinkedHashSet<>()).add(key);
+        }
+        return targets;
+    }
+
+    private void loadFixedSpawnAreaAsync(TraderConfig config, Runnable completion) {
+        World world = Bukkit.getWorld(config.fixedSpawnWorld());
+        if (world == null) {
+            runOnMainThread(completion);
+            return;
+        }
+
+        int centerX = (int) Math.floor(config.fixedSpawnX());
+        int centerZ = (int) Math.floor(config.fixedSpawnZ());
+        int radius = config.fixedSpawnSearchRadius();
+        int minChunkX = (centerX - radius) >> 4;
+        int maxChunkX = (centerX + radius) >> 4;
+        int minChunkZ = (centerZ - radius) >> 4;
+        int maxChunkZ = (centerZ + radius) >> 4;
+        Set<Long> chunks = new LinkedHashSet<>();
+        for (int chunkX = minChunkX; chunkX <= maxChunkX; chunkX++) {
+            for (int chunkZ = minChunkZ; chunkZ <= maxChunkZ; chunkZ++) {
+                chunks.add(((long) chunkX << 32) ^ (chunkZ & 0xffffffffL));
+            }
+        }
+        Map<World, Set<Long>> targets = new IdentityHashMap<>();
+        targets.put(world, chunks);
+        loadChunksAsync(targets, completion);
+    }
+
+    private void loadChunksAsync(Map<World, Set<Long>> targets, Runnable completion) {
+        List<CompletableFuture<Boolean>> futures = new ArrayList<>();
+        for (Map.Entry<World, Set<Long>> entry : targets.entrySet()) {
+            World world = entry.getKey();
+            for (long key : entry.getValue()) {
+                int chunkX = (int) (key >> 32);
+                int chunkZ = (int) key;
+                futures.add(requestChunkLoadAsync(world, chunkX, chunkZ));
+            }
+        }
+        CompletableFuture<?>[] all = futures.toArray(new CompletableFuture<?>[0]);
+        CompletableFuture.allOf(all).whenComplete((ignored, error) -> runOnMainThread(completion));
+    }
+
+    private CompletableFuture<Boolean> requestChunkLoadAsync(World world, int chunkX, int chunkZ) {
+        try {
+            if (world.isChunkLoaded(chunkX, chunkZ)) return CompletableFuture.completedFuture(true);
+        } catch (Throwable ignored) {
+            return CompletableFuture.completedFuture(false);
+        }
+
+        List<Method> methods = new ArrayList<>();
+        try {
+            for (Method method : world.getClass().getMethods()) {
+                if (!"getChunkAtAsync".equals(method.getName())) continue;
+                Class<?>[] parameters = method.getParameterTypes();
+                if (parameters.length < 2 || parameters[0] != int.class || parameters[1] != int.class) continue;
+                boolean supported = true;
+                boolean hasConsumer = false;
+                for (int i = 2; i < parameters.length; i++) {
+                    if (parameters[i] == boolean.class) continue;
+                    if (java.util.function.Consumer.class.isAssignableFrom(parameters[i])) {
+                        hasConsumer = true;
+                        continue;
+                    }
+                    supported = false;
+                    break;
+                }
+                if (!supported || (!hasConsumer
+                        && !CompletionStage.class.isAssignableFrom(method.getReturnType()))) continue;
+                methods.add(method);
+            }
+        } catch (Throwable ignored) {
+        }
+
+        methods.sort((left, right) -> {
+            boolean leftCallback = hasConsumerParameter(left);
+            boolean rightCallback = hasConsumerParameter(right);
+            if (leftCallback != rightCallback) return leftCallback ? 1 : -1;
+            return Integer.compare(right.getParameterCount(), left.getParameterCount());
+        });
+
+        for (Method method : methods) {
+            CompletableFuture<Boolean> loaded = new CompletableFuture<>();
+            try {
+                java.util.function.Consumer<Object> callback = ignored -> runOnMainThread(() ->
+                        loaded.complete(isChunkLoaded(world, chunkX, chunkZ)));
+                Object[] arguments = asyncChunkArguments(method, chunkX, chunkZ, callback);
+                Object result = method.invoke(world, arguments);
+                if (result instanceof CompletionStage<?>) {
+                    ((CompletionStage<?>) result).whenComplete((ignored, error) -> runOnMainThread(() ->
+                            loaded.complete(error == null && isChunkLoaded(world, chunkX, chunkZ))));
+                    return loaded;
+                }
+                if (hasConsumerParameter(method)) return loaded;
+                if (isChunkLoaded(world, chunkX, chunkZ)) return CompletableFuture.completedFuture(true);
+            } catch (Throwable ignored) {
+                // Try another Paper API overload, if present.
+            }
+        }
+
+        if (!asyncChunkApiWarningIssued) {
+            asyncChunkApiWarningIssued = true;
+            plugin.getLogger().warning("Paper async chunk loading is unavailable; trader spawn will skip unloaded chunks instead of blocking the server thread.");
+        }
+        return CompletableFuture.completedFuture(false);
+    }
+
+    private boolean hasConsumerParameter(Method method) {
+        for (Class<?> parameter : method.getParameterTypes()) {
+            if (java.util.function.Consumer.class.isAssignableFrom(parameter)) return true;
+        }
+        return false;
+    }
+
+    private Object[] asyncChunkArguments(Method method, int chunkX, int chunkZ,
+                                         java.util.function.Consumer<Object> callback) {
+        Class<?>[] parameters = method.getParameterTypes();
+        Object[] arguments = new Object[parameters.length];
+        arguments[0] = chunkX;
+        arguments[1] = chunkZ;
+        boolean firstBoolean = true;
+        for (int i = 2; i < parameters.length; i++) {
+            if (parameters[i] == boolean.class) {
+                arguments[i] = firstBoolean;
+                firstBoolean = false;
+            } else if (java.util.function.Consumer.class.isAssignableFrom(parameters[i])) {
+                arguments[i] = callback;
+            } else {
+                throw new IllegalArgumentException("Unsupported async chunk API overload");
+            }
+        }
+        return arguments;
+    }
+
+    private boolean isChunkLoaded(World world, int chunkX, int chunkZ) {
+        try { return world != null && world.isChunkLoaded(chunkX, chunkZ); }
+        catch (Throwable ignored) { return false; }
+    }
+
+    private void runOnMainThread(Runnable action) {
+        if (action == null || !plugin.isEnabled()) return;
+        try {
+            if (Bukkit.isPrimaryThread()) action.run();
+            else Bukkit.getScheduler().runTask(plugin, action);
+        } catch (Throwable ignored) {
+        }
     }
 
     private Location findFixedLocation(TraderConfig config) {
@@ -335,10 +609,12 @@ public class TraderManager {
                     if (radius > 0 && Math.max(Math.abs(dx), Math.abs(dz)) != radius) continue;
                     int x = centerX + dx;
                     int z = centerZ + dz;
-                    ensureChunkLoaded(world, x, z);
+                    if (!isChunkLoadedAt(world, x, z)) continue;
 
-                    int y = findSafeYNear(world, x, z, (int) Math.floor(config.fixedSpawnY()), top, floor);
-                    if (y < floor) y = findSafeY(world, x, z, top, floor);
+                    int y = config.surfaceOnly()
+                            ? findSurfaceSafeY(world, x, z, top, floor)
+                            : findSafeYNear(world, x, z, (int) Math.floor(config.fixedSpawnY()), top, floor);
+                    if (y < floor && !config.surfaceOnly()) y = findSafeY(world, x, z, top, floor);
                     if (y < floor || y + 1 >= world.getMaxHeight()) continue;
                     Location candidate = new Location(world, x + 0.5, y, z + 0.5);
                     if (!world.getWorldBorder().isInside(candidate)) continue;
@@ -386,16 +662,37 @@ public class TraderManager {
 
             if (!isFarFromRegions(world, x, z, REGION_PADDING, regionBounds)) continue;
 
-            int y = findSafeY(world, x, z, top, floor);
-            if (y < 0) continue;
-            if (!isFlatEnough(world, x, z, y)) continue;
+            int y = findSpawnY(config, world, x, z, top, floor);
+            if (y < floor) continue;
+            Location candidate = new Location(world, x + 0.5, y, z + 0.5);
+            if (!world.getWorldBorder().isInside(candidate)) continue;
+            if (!isFlatEnough(config, world, x, z, y)) continue;
 
-            return new Location(world, x + 0.5, y, z + 0.5);
+            return candidate;
         }
         return null;
     }
 
+    private int findSpawnY(TraderConfig config, World world, int x, int z, int top, int floor) {
+        return config.surfaceOnly()
+                ? findSurfaceSafeY(world, x, z, top, floor)
+                : findSafeY(world, x, z, top, floor);
+    }
+
+    private int findSurfaceSafeY(World world, int x, int z, int top, int floor) {
+        if (!isChunkLoadedAt(world, x, z)) return -1;
+        int minY = Math.max(floor, SchematicConfig.getMinHeight(world) + 1);
+        int maxY = Math.min(top, world.getMaxHeight() - 3);
+        if (maxY <= minY) return -1;
+
+        // Only test the highest ground position. Do not descend into caves or mines.
+        int y = world.getHighestBlockYAt(x, z) + 1;
+        if (y < minY || y > maxY) return -1;
+        return isSafeSpawnY(world, x, z, y) ? y : -1;
+    }
+
     private int findSafeY(World world, int x, int z, int top, int floor) {
+        if (!isChunkLoadedAt(world, x, z)) return -1;
         int minY = Math.max(floor, SchematicConfig.getMinHeight(world) + 1);
         int maxY = Math.min(top, world.getMaxHeight() - 3);
         if (maxY <= minY) return -1;
@@ -409,6 +706,7 @@ public class TraderManager {
     }
 
     private int findSafeYNear(World world, int x, int z, int preferredY, int top, int floor) {
+        if (!isChunkLoadedAt(world, x, z)) return -1;
         int minY = Math.max(floor, SchematicConfig.getMinHeight(world) + 1);
         int maxY = Math.min(top, world.getMaxHeight() - 3);
         int highest = world.getHighestBlockYAt(x, z);
@@ -429,6 +727,8 @@ public class TraderManager {
     }
 
     private boolean isSafeSpawnY(World world, int x, int z, int y) {
+        if (!isChunkLoadedAt(world, x, z) || y <= SchematicConfig.getMinHeight(world)
+                || y + 1 >= world.getMaxHeight()) return false;
         Block floorBlock = world.getBlockAt(x, y - 1, z);
         Block feet = world.getBlockAt(x, y, z);
         Block head = world.getBlockAt(x, y + 1, z);
@@ -437,15 +737,19 @@ public class TraderManager {
                 && feet.isEmpty() && head.isEmpty();
     }
 
-    private boolean isFlatEnough(World world, int x, int z, int y) {
+    private boolean isFlatEnough(TraderConfig config, World world, int x, int z, int y) {
         for (int dx = -3; dx <= 3; dx += 2) {
             for (int dz = -3; dz <= 3; dz += 2) {
                 if (dx == 0 && dz == 0) continue;
-                int checkY = findSafeY(world, x + dx, z + dz, y + 3, y - 3);
+                int checkY = findSpawnY(config, world, x + dx, z + dz, y + 3, y - 3);
                 if (checkY < 0 || Math.abs(checkY - y) > 1) return false;
             }
         }
         return true;
+    }
+
+    private boolean isChunkLoadedAt(World world, int x, int z) {
+        return world != null && world.isChunkLoaded(x >> 4, z >> 4);
     }
 
     private List<int[]> protectedRegionBounds(World world) {
@@ -487,16 +791,6 @@ public class TraderManager {
             }
         }
         return true;
-    }
-
-    private void ensureChunkLoaded(World world, int x, int z) {
-        try {
-            int cx = x >> 4, cz = z >> 4;
-            if (!world.isChunkLoaded(cx, cz)) {
-                world.loadChunk(cx, cz, true);
-                world.getChunkAt(cx, cz);
-            }
-        } catch (Throwable ignored) {}
     }
 
     private boolean solid(Block block) {

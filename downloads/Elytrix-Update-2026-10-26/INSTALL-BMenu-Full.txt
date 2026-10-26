@@ -9,6 +9,6 @@
 4. Удалите устаревшие open_commands для salary, paradise_event и help_freedonate, если они остались в действующей конфигурации. Удалите устаревшие страницы salary/rub.yml, help/seller_stub.yml, help/help_freedonate.yml и events/paradise_event.yml. Не удаляйте events/cemetery_event.yml и events/dungeons_event.yml.
 5. Перезапустите сервер или штатно перезагрузите BMenu и проверьте /help, /salary, /seller, /free, /event и /moneyshop.
 
-В наборе соблюдены текущие условия: /help ведёт к /event; в /event доступны Кладбище и Данжи; /salary, /seller и /free вызываются от имени игрока; /moneyshop — пустая заглушка; /donate — только декоративный пункт без новых привилегий. Ghost Trader и другие существующие меню сохранены.
+В наборе соблюдены текущие условия: /help ведёт к /event; в /event доступны Кладбище и Данжи; /salary, /seller и /free вызываются от имени игрока; /moneyshop — пустая заглушка. /donate визуально оформлено в стиле ElytriX: сохранены существующие названия, цены, описания и переходы, новые привилегии и действия покупки/выдачи не добавлялись. Ghost Trader и другие существующие меню сохранены.
 
 Не устанавливайте одновременно весь этот архив и Elytrix-Menus.zip как два разных набора: Elytrix-Menus.zip — компактный пакет только затронутых меню ElytriX и config.yml; этот архив содержит полный каталог BMenu/.

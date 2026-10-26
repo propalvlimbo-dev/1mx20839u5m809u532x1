@@ -1,0 +1,89 @@
+name: Build ElytrixTrader
+
+on:
+  push:
+    branches:
+      - arena/6ab59a12-1mx20839u5m809u532x1
+    paths:
+      - .github/workflows/build-elytrix-trader.yml
+      - ElytrixTrader/**
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+          cache-dependency-path: ElytrixTrader/pom.xml
+
+      - name: Build Trader
+        working-directory: ElytrixTrader
+        run: mvn -B -ntp clean package
+
+      - name: Validate and copy the release JAR
+        shell: bash
+        run: |
+          set -euo pipefail
+          jar='ElytrixTrader/target/ElytrixTrader.jar'
+          test -f "$jar"
+          python3 - "$jar" <<'PY'
+          import re
+          import sys
+          from zipfile import ZipFile
+
+          path = sys.argv[1]
+          with ZipFile(path) as archive:
+              bad = archive.testzip()
+              if bad:
+                  raise SystemExit(f'{path}: corrupt entry {bad}')
+              entries = set(archive.namelist())
+              descriptor = archive.read('plugin.yml').decode('utf-8')
+              main = re.search(r'(?m)^main:\s*[\"\']?([^\s\"\']+)', descriptor)
+              version = re.search(r'(?m)^version:\s*[\"\']?([^\s\"\']+)', descriptor)
+              if not main or main.group(1).replace('.', '/') + '.class' not in entries:
+                  raise SystemExit(f'{path}: plugin.yml main class is missing')
+              if not version or version.group(1) != '2.3.1':
+                  raise SystemExit(f'{path}: expected plugin version 2.3.1')
+              if 'ru/rooyzee/elytrixtrader/trader/TraderManager.class' not in entries:
+                  raise SystemExit(f'{path}: TraderManager class is missing')
+              print(f'validated {path}: ElytrixTrader {version.group(1)}')
+          PY
+          mkdir -p downloads/Elytrix-Update-2026-10-26
+          cp "$jar" downloads/ElytrixTrader-2.3.1.jar
+          cp "$jar" downloads/Elytrix-Update-2026-10-26/ElytrixTrader.jar
+          sha256sum downloads/ElytrixTrader-2.3.1.jar
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ElytrixTrader-2.3.1
+          path: |
+            downloads/ElytrixTrader-2.3.1.jar
+            downloads/Elytrix-Update-2026-10-26/ElytrixTrader.jar
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Commit built JARs to this branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add downloads/ElytrixTrader-2.3.1.jar downloads/Elytrix-Update-2026-10-26/ElytrixTrader.jar
+          if git diff --cached --quiet; then
+            echo "Built JARs are already up to date."
+          else
+            git commit -m "Build ElytrixTrader 2.3.1"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
