@@ -1,0 +1,131 @@
+id: elytrix:help_earnings
+provider: default
+type: chest
+size: 54
+title: '&#F8BEFB&lСпособы заработка'
+items:
+  salary:
+    material: gold_ingot
+    name: '&7« &#F8BEFBЕжедневная зарплата &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fОткрой меню зарплаты: &#F8BEFB/rub'
+    - '&#F8BEFB&l┃ &fДоступ и размер зависят от привилегии.'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите, чтобы открыть зарплаты'
+    on_click:
+    - '[open] elytrix:salary_rub'
+  auction:
+    material: emerald
+    name: '&7« &#F8BEFBПродажа предметов &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fВыставляй предметы на аукцион игроков.'
+    - '&#F8BEFB&l┃ &fКоманда: &#F8BEFB/ah sell <цена>'
+    - '&#F8BEFB&l┃ &fЦена указывается в монетах; доход будет после покупки.'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите, чтобы открыть аукцион'
+    on_click:
+    - '[player] ah'
+    - '[close]'
+  cemetery:
+    material: iron_shovel
+    name: '&7« &#F8BEFBКладбище &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fРаскопывай могилы и забирай добычу из сундуков.'
+    - '&#F8BEFB&l┃ &fПризраки и стражи дают Призрачные осколки.'
+    - '&#F8BEFB&l┃ &fКоманда: &#F8BEFB/cemetery tp'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите, чтобы отправиться на Кладбище'
+    on_click:
+    - '[close]'
+    - '[player] cemetery tp'
+  dungeons:
+    material: trial_key
+    name: '&7« &#F8BEFBДанжи &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fИщи сундуки и шалкеры в наземных и подземных данжах.'
+    - '&#F8BEFB&l┃ &fСильные мобы и боссы могут оставить осколки.'
+    - '&#F8BEFB&l┃ &fСписок данжей: &#F8BEFB/dungeons'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите, чтобы открыть список данжей'
+    on_click:
+    - '[player] dungeons'
+    - '[close]'
+  events:
+    material: nether_star
+    name: '&7« &#F8BEFBСерверные ивенты &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fУчаствуй в событиях и забирай доступную добычу.'
+    - '&#F8BEFB&l┃ &fСписок и расписание: &#F8BEFB/event'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите, чтобы открыть ивенты'
+    on_click:
+    - '[open] elytrix:events'
+  info:
+    material: book
+    name: '&7« &#F8BEFBЧто делать с монетами &7»'
+    lore:
+    - '&#F8BEFB&l┃ '
+    - '&#F8BEFB&l┃ &fМагазин за монеты: &#F8BEFB/moneyshop'
+    - '&#F8BEFB&l┃ &fСейчас он является заглушкой без покупок.'
+    - '&#F8BEFB&l┃ '
+    - '&7● &fНажмите, чтобы открыть заглушку магазина'
+    on_click:
+    - '[open] elytrix:moneyshop'
+  back:
+    material: black_dye
+    name: '&7« &#F8BEFBНазад в меню помощи &7»'
+    lore:
+    - '&#F8BEFB&l┃ &fВернуться в главное меню помощи.'
+    on_click:
+    - '[open] elytrix:help'
+  close:
+    material: red_dye
+    name: '&7« &cЗакрыть меню &7»'
+    on_click:
+    - '[close]'
+  design_purple_panel:
+    material: purple_stained_glass_pane
+    name: '&r'
+  design_black_panel:
+    material: black_stained_glass_pane
+    name: '&r'
+animation:
+  - tick: 0
+    opcodes:
+      - st: close 53
+      - st: info 49
+      - st: design_purple_panel 46,47,48,50,51,52
+      - sound: 'block.enchantment_table.use 0.3 1.4'
+  - opcodes:
+      - st: design_purple_panel 36,37,43,44
+      - st: design_black_panel 0,1,2,3,4,5,6,7,8
+      - sound: 'block.note_block.chime 0.23 0.95'
+  - opcodes:
+      - st: design_black_panel 9,10,16,17,18,19,25,26
+  - opcodes:
+      - st: design_black_panel 27,28,34,35
+      - sound: 'block.note_block.chime 0.28 1.15'
+  - opcodes:
+      - st: salary 20
+      - sound: 'block.note_block.pling 0.26 1.0'
+  - opcodes:
+      - st: auction 22
+      - sound: 'block.note_block.pling 0.28 1.12'
+  - opcodes:
+      - st: cemetery 24
+      - sound: 'block.note_block.pling 0.3 1.24'
+  - opcodes:
+      - st: dungeons 30
+      - sound: 'block.note_block.pling 0.32 1.36'
+  - opcodes:
+      - st: events 32
+      - sound: 'block.note_block.pling 0.34 1.48'
+  - opcodes:
+      - st: back 45
+      - st: info 49
+      - sound: 'block.amethyst_block.chime 0.4 1.5'

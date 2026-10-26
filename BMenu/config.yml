@@ -60,6 +60,8 @@ open_commands:
     menu: elytrix:shop
     aliases:
       - магазин
+  moneyshop:
+    menu: elytrix:moneyshop
   arrows:
     menu: elytrix:arrows
   customize:

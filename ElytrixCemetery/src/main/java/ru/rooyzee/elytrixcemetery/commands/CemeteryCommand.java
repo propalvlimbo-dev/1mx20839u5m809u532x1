@@ -23,8 +23,7 @@ import java.util.List;
 public class CemeteryCommand implements CommandExecutor, TabCompleter {
 
     private static final long TELEPORT_COOLDOWN_MILLIS = 5L * 60L * 1000L;
-    private static final int TELEPORT_SEARCH_RADIUS = 4;
-    private static final int[] SAFE_Y_OFFSETS = {0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5};
+    private static final int TELEPORT_SEARCH_RADIUS = 12;
 
     private final Main plugin;
     private final NamespacedKey teleportCooldownKey;
@@ -214,9 +213,10 @@ public class CemeteryCommand implements CommandExecutor, TabCompleter {
 
         int boundaryRadius = Math.max(0, plugin.getConfigManager().getBoundaryRadius());
         int targetX = target.getBlockX();
-        int targetY = target.getBlockY();
         int targetZ = target.getBlockZ();
 
+        // Search outward from the intended landing spot, and across the full build height.
+        // The old fixed +/-5 Y window missed raised terrain, caves and changed build heights.
         for (int radius = 0; radius <= TELEPORT_SEARCH_RADIUS; radius++) {
             for (int dx = -radius; dx <= radius; dx++) {
                 for (int dz = -radius; dz <= radius; dz++) {
@@ -226,28 +226,65 @@ public class CemeteryCommand implements CommandExecutor, TabCompleter {
                     int z = targetZ + dz;
                     if (Math.abs(x - cemeteryCenter.getBlockX()) > boundaryRadius
                             || Math.abs(z - cemeteryCenter.getBlockZ()) > boundaryRadius
-                            || !world.isChunkLoaded(x >> 4, z >> 4)) continue;
+                            || !ensureChunkLoadedWithoutGeneration(world, x, z)) continue;
 
-                    for (int dy : SAFE_Y_OFFSETS) {
-                        int feetY = targetY + dy;
-                        if (feetY <= world.getMinHeight() || feetY + 1 >= world.getMaxHeight()) continue;
-
-                        Block feet = world.getBlockAt(x, feetY, z);
-                        Block head = world.getBlockAt(x, feetY + 1, z);
-                        Block floor = world.getBlockAt(x, feetY - 1, z);
-                        if (!feet.isPassable() || feet.isLiquid() || isUnsafeTeleportBlock(feet.getType())
-                                || !head.isPassable() || head.isLiquid() || isUnsafeTeleportBlock(head.getType())
-                                || !floor.getType().isSolid() || floor.isLiquid()
-                                || isUnsafeTeleportBlock(floor.getType())) continue;
-
-                        Location candidate = new Location(world, x + 0.5, feetY, z + 0.5,
-                                target.getYaw(), target.getPitch());
-                        if (world.getWorldBorder().isInside(candidate)) return candidate;
-                    }
+                    Location safe = findSafeLocationInColumn(world, x, z, target.getBlockY(), target);
+                    if (safe != null) return safe;
                 }
             }
         }
         return null;
+    }
+
+    private Location findSafeLocationInColumn(World world, int x, int z, int preferredY, Location orientation) {
+        int minFeetY = world.getMinHeight() + 1;
+        int maxFeetY = world.getMaxHeight() - 2;
+        if (maxFeetY < minFeetY) return null;
+
+        int startY = Math.max(minFeetY, Math.min(maxFeetY, preferredY));
+        int maxDistance = Math.max(startY - minFeetY, maxFeetY - startY);
+        for (int distance = 0; distance <= maxDistance; distance++) {
+            int above = startY + distance;
+            if (above <= maxFeetY) {
+                Location candidate = safeCandidate(world, x, z, above, orientation);
+                if (candidate != null) return candidate;
+            }
+            if (distance > 0) {
+                int below = startY - distance;
+                if (below >= minFeetY) {
+                    Location candidate = safeCandidate(world, x, z, below, orientation);
+                    if (candidate != null) return candidate;
+                }
+            }
+        }
+        return null;
+    }
+
+    private Location safeCandidate(World world, int x, int z, int feetY, Location orientation) {
+        Block feet = world.getBlockAt(x, feetY, z);
+        Block head = world.getBlockAt(x, feetY + 1, z);
+        Block floor = world.getBlockAt(x, feetY - 1, z);
+        if (!feet.isPassable() || feet.isLiquid() || isUnsafeTeleportBlock(feet.getType())
+                || !head.isPassable() || head.isLiquid() || isUnsafeTeleportBlock(head.getType())
+                || !floor.getType().isSolid() || floor.isLiquid()
+                || isUnsafeTeleportBlock(floor.getType())) return null;
+
+        Location candidate = new Location(world, x + 0.5, feetY, z + 0.5,
+                orientation.getYaw(), orientation.getPitch());
+        return world.getWorldBorder().isInside(candidate) ? candidate : null;
+    }
+
+    private boolean ensureChunkLoadedWithoutGeneration(World world, int blockX, int blockZ) {
+        int chunkX = blockX >> 4;
+        int chunkZ = blockZ >> 4;
+        if (world.isChunkLoaded(chunkX, chunkZ)) return true;
+        try {
+            // The cemetery is already built; load existing chunks but don't generate new terrain.
+            world.loadChunk(chunkX, chunkZ, false);
+        } catch (Throwable ignored) {
+            return false;
+        }
+        return world.isChunkLoaded(chunkX, chunkZ);
     }
 
     private boolean isUnsafeTeleportBlock(Material material) {

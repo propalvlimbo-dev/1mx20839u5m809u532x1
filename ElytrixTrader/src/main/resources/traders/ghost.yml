@@ -1,0 +1,57 @@
+# Призрачный торговец появляется на центральном острове Эндер-мира — рядом с драконом.
+# Он использует обычную систему сделок ElytrixTrader. Товары и цены намеренно
+# оставлены пустыми: добавьте реальные предложения через /etr edit ghost.
+# В редакторе можно положить сам Призрачный осколок в слот цены — точный предмет
+# с метаданными будет проверяться при покупке.
+
+enabled: true
+display-name: '&#B7A8FF&lПризрачный Торговец'
+skin: 'Steve'
+hold-item: true
+spawn-sound: ENTITY_WITHER_SPAWN
+
+worlds:
+  - 'world_the_end'
+
+# Фиксированная точка у центрального острова; торговец ищет безопасный блок
+# рядом с заданной высотой в радиусе 8 и проверяет границы мира.
+spawn:
+  world: 'world_the_end'
+  x: 5.5
+  y: 65.0
+  z: 0.5
+  search-radius: 8
+
+lifetime-seconds: 7200
+random-trades: 14
+trade-cooldown-seconds: 60
+
+hologram:
+  enabled: true
+  height: 2.8
+  line-height: 0.30
+  lines:
+    - '&#B7A8FF&lПРИЗРАЧНЫЙ ТОРГОВЕЦ'
+    - '&7Странник с края мира'
+    - ' '
+    - '• &#B7A8FFПКМ &8— &fоткрыть обмен'
+    - '• &#B7A8FFВалюта: &fПризрачные осколки'
+    - '• &#B7A8FFМесто: &fостров дракона'
+
+icon:
+  material: amethyst_shard
+  amount: 1
+  glow: true
+
+info-item:
+  material: book
+  display-name: '&#B7A8FF&l{trader}'
+  lore:
+    - '&#B7A8FF&l┃ &fДо исчезновения: &#B7A8FF{left}'
+    - '&#B7A8FF&l┃ &fМесто: &#B7A8FFЭндер-мир, остров дракона'
+    - '&#B7A8FF&l┃ &fВалюта: &#B7A8FFПризрачные осколки'
+
+schematic:
+  enabled: false
+
+trades: []

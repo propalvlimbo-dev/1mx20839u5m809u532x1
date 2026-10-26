@@ -141,7 +141,11 @@ public class GraveManager {
             ParticleUtil.spawn(world, ParticleUtil.SOUL, center.clone().add(0, 2, 0), 50, 15, 2, 15, 0.05);
 
             for (Player p : Bukkit.getOnlinePlayers()) {
-                p.sendMessage(ColorUtil.colorize("&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &#F8BEFBМогилы на кладбище закопаны! Лут обновлён."));
+                p.sendMessage("");
+                p.sendMessage(ColorUtil.colorize("&f☁ &#F8BEFBᴇʟʏᴛʀɪx &7» &#F8BEFBОбновление Кладбища"));
+                p.sendMessage(ColorUtil.colorize("&#F8BEFB&l┃ &fВсе раскопанные могилы снова &#96FF91закопаны&f, лут &#F8BEFBобновлён&f!"));
+                p.sendMessage(ColorUtil.colorize("&#F8BEFB&l┃ &fМожно вернуться на Кладбище: &#F8BEFB/cemetery tp"));
+                p.sendMessage("");
             }
         }
 

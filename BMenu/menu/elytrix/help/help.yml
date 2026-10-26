@@ -46,13 +46,13 @@ items:
     name: '&7« &#F8BEFBЗаработок &7»'
     lore:
     - '&#F8BEFB&l┃ '
-    - '&#F8BEFB&l┃ &fЧто внутри: &#F8BEFBСпособы фарма коинов'
-    - '&#F8BEFB&l┃ &fТемы: &#F8BEFBСкупщик, рынок, аукцион'
-    - '&#F8BEFB&l┃ &fПолезно: &#F8BEFBБыстрый старт экономики'
+    - '&#F8BEFB&l┃ &fЧто внутри: &#F8BEFBзарплата, аукцион и добыча'
+    - '&#F8BEFB&l┃ &fГде искать: &#F8BEFBданжи, Кладбище и ивенты'
+    - '&#F8BEFB&l┃ &fКоманды и подсказки без выдуманных цен'
     - '&#F8BEFB&l┃ '
     - '&7● &fНажмите для перехода'
     on_click:
-    - '[message] &cРаздел «Заработок» пока недоступен: исходное меню help_earnings отсутствует в репозитории.'
+    - '[open] elytrix:help_earnings'
   info:
     material: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFjNjNkOWI5ZmQ4NzQyZWFlYjA0YzY5MjE3MmNiOWRhNDM3ODE2OThhNTc1Y2RhYmUxYzA0ZGYxMmMzZiJ9fX0=
     name: '&7« &#F8BEFBНаши сообщества &7»'

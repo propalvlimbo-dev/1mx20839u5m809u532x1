@@ -5,7 +5,8 @@
 ## Что перенесено
 
 - Перенесённых меню: **31** (все YAML из `gui_menus/`, включая файлы вне `DeluxeMenus/config.yml`) плюс **1** демонстрационный кейс с анимацией.
-- В перенесённых меню: **283** уникальных предмета, **1071** размещение по слотам (мультислот-панели считаются по каждому слоту). В демо-кейсе ещё 13 предметов.
+- Дополнительно добавлены меню для заработка, данжей, Кладбища, Призрачного торговца и заглушки `/moneyshop`.
+- Таблица ниже содержит актуальное число определений предметов по каждому меню; для новых страниц источником является `—`.
 - Команды открытия, права, алиасы, приоритеты `oneOf`, `view_requirement`, `click_requirement` с `deny_commands`, `update`, флаги, зачарования, цвет зелий/стрел и головы `basehead-` сохранены.
 
 ## Таблица меню
@@ -16,17 +17,21 @@
 | `elytrix:customizemenu` | `customize/customizemenu.yml` | `DeluxeMenus/gui_menus/customize/customizemenu.yml` | 54 | 6 |
 | `elytrix:titles` | `customize/titles.yml` | `DeluxeMenus/gui_menus/customize/titles.yml` | 54 | 15 |
 | `elytrix:airdrop_event` | `events/airdrop_event.yml` | `DeluxeMenus/gui_menus/events/airdrop_event.yml` | 54 | 8 |
-| `elytrix:events` | `events/events.yml` | `DeluxeMenus/gui_menus/events/events.yml` | 54 | 9 |
+| `elytrix:events` | `events/events.yml` | `DeluxeMenus/gui_menus/events/events.yml` | 54 | 12 |
+| `elytrix:dungeons_event` | `events/dungeons_event.yml` | — (новое меню) | 27 | 7 |
+| `elytrix:cemetery_event` | `events/cemetery_event.yml` | — (новое меню) | 27 | 8 |
+| `elytrix:ghost_trader_event` | `events/ghost_trader_event.yml` | — (новое меню) | 27 | 7 |
 | `elytrix:merchant_event` | `events/merchant_event.yml` | `DeluxeMenus/gui_menus/events/merchant_event.yml` | 54 | 7 |
 | `elytrix:paradise_event` | `events/paradise_event.yml` | `DeluxeMenus/gui_menus/events/paradise_event.yml` | 54 | 8 |
 | `elytrix:shulkerpvp_event` | `events/shulkerpvp_event.yml` | `DeluxeMenus/gui_menus/events/shulkerpvp_event.yml` | 54 | 6 |
 | `elytrix:talisman_event` | `events/talisman_event.yml` | `DeluxeMenus/gui_menus/events/talisman_event.yml` | 54 | 7 |
 | `elytrix:help` | `help/help.yml` | `DeluxeMenus/gui_menus/help/help.yml` | 54 | 8 |
 | `elytrix:help_basics` | `help/help_basics.yml` | `DeluxeMenus/gui_menus/help/help_basics.yml` | 54 | 10 |
+| `elytrix:help_earnings` | `help/help_earnings.yml` | — (новое меню) | 54 | 10 |
 | `elytrix:help_events` | `help/help_events.yml` | `DeluxeMenus/gui_menus/help/help_events.yml` | 9 | 9 |
 | `elytrix:help_freedonate` | `help/help_freedonate.yml` | `DeluxeMenus/gui_menus/help/help_freedonate.yml` | 54 | 5 |
 | `elytrix:lobby` | `lobby/lobby.yml` | `DeluxeMenus/gui_menus/lobby/lobby.yml` | 54 | 5 |
-| `elytrix:don` | `main/don.yml` | `DeluxeMenus/gui_menus/main/don.yml` | 54 | 12 |
+| `elytrix:don` | `main/don.yml` | `DeluxeMenus/gui_menus/main/don.yml` | 54 | 13 |
 | `elytrix:menu` | `main/menu.yml` | `DeluxeMenus/gui_menus/main/menu.yml` | 54 | 12 (10 кнопок + 2 панели анимации) |
 | `elytrix:rtp` | `main/rtp.yml` | `DeluxeMenus/gui_menus/main/rtp.yml` | 54 | 7 |
 | `elytrix:sub` | `main/sub.yml` | `DeluxeMenus/gui_menus/main/sub.yml` | 54 | 10 |
@@ -40,6 +45,7 @@
 | `elytrix:potions` | `shop/potions.yml` | `DeluxeMenus/gui_menus/shop/potions.yml` | 54 | 10 |
 | `elytrix:shari` | `shop/shari.yml` | `DeluxeMenus/gui_menus/shop/shari.yml` | 54 | 9 |
 | `elytrix:shop` | `shop/shop.yml` | `DeluxeMenus/gui_menus/shop/shop.yml` | 54 | 15 |
+| `elytrix:moneyshop` | `shop/moneyshop.yml` | — (заглушка магазина за монеты) | 27 | 5 |
 | `elytrix:spawners` | `shop/spawners.yml` | `DeluxeMenus/gui_menus/shop/spawners.yml` | 54 | 7 |
 | `elytrix:totems` | `shop/totems.yml` | `DeluxeMenus/gui_menus/shop/totems.yml` | 54 | 9 |
 | `elytrix:unical_items` | `shop/unical_items.yml` | `DeluxeMenus/gui_menus/shop/unical_items.yml` | 54 | 10 |
@@ -57,6 +63,7 @@
 | `/sub` | подписка | `elytrix:sub` | — |
 | `/donate` | donat, don, d, донат | `elytrix:don` | — |
 | `/shop` | магазин | `elytrix:shop` | — |
+| `/moneyshop` | — | `elytrix:moneyshop` | — |
 | `/arrows` | — | `elytrix:arrows` | — |
 | `/customize` | custom, title, titles, titul, титулы, титул, кастомизация, ешеду, ешедуы, сгыещьшяу | `elytrix:customizemenu` | — |
 | `/talisman_event` | event_talisman, talisman_menu | `elytrix:talisman_event` | — |
