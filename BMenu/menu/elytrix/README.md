@@ -11,6 +11,8 @@
 | Основы игры | `elytrix:help_basics` | `help/help_basics.yml` |
 | Способы заработка | `elytrix:help_earnings` | `help/help_earnings.yml` |
 | Ивенты `/event` | `elytrix:events` | `events/events.yml` |
+| Кладбище | `elytrix:cemetery_event` | `events/cemetery_event.yml` |
+| Данжи | `elytrix:dungeons_event` | `events/dungeons_event.yml` |
 | Опытный торговец | `elytrix:merchant_event` | `events/merchant_event.yml` |
 | Призрачный торговец | `elytrix:ghost_trader_event` | `events/ghost_trader_event.yml` |
 | Магазин за монеты — пустая заглушка | `elytrix:moneyshop` | `shop/moneyshop.yml` |
@@ -22,7 +24,7 @@
 - Скупщик ресурсов вызывает существующую команду `/seller`; отдельная заглушка скупщика удалена.
 - В описании наград за мобов указано, что сумма зависит от моба.
 - Кнопка бесплатного доната вызывает `/free` от имени игрока; отдельная информационная заглушка удалена.
-- `/event` оставлен рабочим. Из списка и страниц меню убраны Кладбище, Данжи и Райское место; доступны оставленные актуальные активности и торговцы.
+- В меню помощи восстановлена кнопка `/event`. В `/event` снова доступны страницы Кладбища и Данжей; Райское место по-прежнему удалено.
 - Страница Призрачного торговца оформлена в размере 54 слота, как страница Опытного торговца. Меню `moneyshop` также увеличено до 54 слотов, но остаётся пустой заглушкой без товаров, покупок и транзакций.
 - `/donate` не меняет назначение: декоративный пункт за 1299 ₽ без добавленных привилегий.
 
@@ -35,6 +37,6 @@
 1. Сделайте резервную копию `plugins/BMenu/config.yml` и `plugins/BMenu/menu/elytrix/`.
 2. Скопируйте меню из архива в `plugins/BMenu/menu/elytrix/`, сохранив подпапки.
 3. Объедините `BMenu/config.yml` с текущим конфигом, не затирая настройки других команд. Удалите старые `open_commands` для `salary`, `paradise_event` и `help_freedonate`, чтобы BMenu не перехватывал команды.
-4. Удалите старые файлы меню: `salary/rub.yml`, `help/seller_stub.yml`, `help/help_freedonate.yml`, `events/cemetery_event.yml`, `events/dungeons_event.yml`, `events/paradise_event.yml`.
+4. Удалите устаревшие страницы меню: `salary/rub.yml`, `help/seller_stub.yml`, `help/help_freedonate.yml` и `events/paradise_event.yml`. Страницы `events/cemetery_event.yml` и `events/dungeons_event.yml` входят в этот архив и должны остаться.
 5. Установите обновлённый ElytrixTrader.jar вместе с файлами меню, затем перезапустите сервер или перезагрузите BMenu.
 6. Проверьте `/help`, `/salary`, `/seller`, `/free`, `/event` и `/moneyshop`.

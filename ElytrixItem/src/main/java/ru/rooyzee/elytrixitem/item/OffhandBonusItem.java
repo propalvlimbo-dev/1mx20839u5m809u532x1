@@ -154,7 +154,7 @@ public interface OffhandBonusItem extends CustomItem {
             return chance;
         }
 
-        /** Multiplier applied to the final hit damage when this is a reflection drawback. */
+        /** Multiplier applied to raw attack damage before target mitigation when reflecting. */
         public double getDamageMultiplier() {
             return damageMultiplier;
         }
@@ -165,7 +165,7 @@ public interface OffhandBonusItem extends CustomItem {
                 case EFFECT -> percent(chance) + " шанс " + label + " после удара";
                 case FIRE -> percent(chance) + " шанс загореться после удара "
                         + "(сквозь огнестойкость)";
-                case REFLECT -> percent(chance) + " шанс " + label
+                case REFLECT -> percent(chance) + " Шанс на обратный урон"
                         + (damageMultiplier == 1.0D ? "" : " ×" + number(damageMultiplier) + " урона");
             };
         }

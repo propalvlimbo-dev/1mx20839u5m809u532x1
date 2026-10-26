@@ -19,7 +19,6 @@ import org.bukkit.persistence.PersistentDataType;
 import org.by1337.blib.geom.Vec3d;
 import ru.rooyzee.elytrixtrader.Main;
 import ru.rooyzee.elytrixtrader.model.TraderConfig;
-import ru.rooyzee.elytrixtrader.util.ColorUtil;
 import ru.rooyzee.elytrixtrader.util.Components;
 
 import java.util.ArrayList;
@@ -415,12 +414,10 @@ public final class TraderNpc {
             if (line != null) text = text.append(line);
         }
 
-        try {
-            textDisplayApi.getMethod("text", Component.class).invoke(display, text);
-        } catch (NoSuchMethodException ignored) {
-            textDisplayApi.getMethod("setText", String.class)
-                    .invoke(display, ColorUtil.translate(String.join("\n", lines)));
-        }
+        // Adventure components preserve all legacy and RGB colors. Bukkit's String
+        // TextDisplay#setText fallback does not consistently parse color codes, so
+        // unsupported APIs fall back to the virtual armor-stand hologram instead.
+        textDisplayApi.getMethod("text", Component.class).invoke(display, text);
     }
 
     private void removeTransparentHologram() {

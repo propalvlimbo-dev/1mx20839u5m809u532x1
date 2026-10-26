@@ -211,7 +211,7 @@ public final class OffhandBonusListener implements Listener {
      * Минусы шара: срабатывают с шансом, когда владелец бьёт.
      *
      * Эффект вешается на владельца, огонь поджигает его же (и проходит сквозь
-     * огнестойкость), а отражение наносит владельцу заданную долю финального урона.
+     * огнестойкость), а отражение использует исходный урон атаки до защиты цели.
      */
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onHit(EntityDamageByEntityEvent event) {
@@ -235,9 +235,12 @@ public final class OffhandBonusListener implements Listener {
                         true);
                 case FIRE -> ignite(player, drawback.getDurationTicks());
                 case REFLECT -> {
-                    double reflected = event.getFinalDamage() * drawback.getDamageMultiplier();
+                    // getDamage() is the raw attack amount before the target's armor,
+                    // resistance and other final-damage reductions. Reflect that value,
+                    // not the smaller amount the armored target actually loses.
+                    double reflected = event.getDamage() * drawback.getDamageMultiplier();
                     if (reflected > 0.0D) {
-                        // MAGIC bypasses the holder's armor so the returned damage is not silently reduced again.
+                        // MAGIC bypasses the holder's armor so the returned raw damage is not reduced again.
                         player.damage(reflected, DamageSource.builder(DamageType.MAGIC).build());
                     }
                 }

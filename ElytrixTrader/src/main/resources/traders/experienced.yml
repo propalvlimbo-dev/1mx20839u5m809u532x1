@@ -22,13 +22,13 @@ hologram:
   height: 2.8
   line-height: 0.30
   lines:
-    - '&#F8BEFB&lОПЫТНЫЙ ТОРГОВЕЦ'
-    - 'Уникальный странствующий торговец'
+    - '&d&lОПЫТНЫЙ ТОРГОВЕЦ'
+    - '&fУникальный странствующий торговец'
     - ' '
-    - '• &#F8BEFBПКМ &8— &fОткрыть меню сделок'
-    - '• &#F8BEFBИсчезнет через: &#F8BEFB{left}'
+    - '&d• &fПКМ &8— &fОткрыть меню сделок'
+    - '&d• &fИсчезнет через: &d{left}'
     - ' '
-    - '• &#F8BEFBНаш сайт: &felytrix.pw'
+    - '&d• &fНаш сайт: &delytrix.pw'
 
 icon:
   material: experience_bottle
@@ -47,7 +47,7 @@ info-item:
 
 schematic:
   enabled: true
-  file: 'experienced_trader'
+  file: 'ghost.schem'
   marker-material: BEEHIVE
   rotation: 0
   offset-x: 0

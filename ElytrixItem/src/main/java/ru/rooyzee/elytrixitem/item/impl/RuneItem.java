@@ -141,7 +141,11 @@ public final class RuneItem implements OffhandBonusItem {
                 }
             }
             for (Drawback drawback : drawbacks) {
-                lore.add(ColorUtil.color("&#F8BEFB&l┃ &cМинус: &#F8BEFB" + drawback.describe()));
+                if ("donshar".equals(id) && drawback.getKind() == Drawback.Kind.REFLECT) {
+                    lore.add(ColorUtil.color("&#F8BEFB&l┃ &f" + drawback.describe()));
+                } else {
+                    lore.add(ColorUtil.color("&#F8BEFB&l┃ &cМинус: &#F8BEFB" + drawback.describe()));
+                }
             }
             lore.add(ColorUtil.color("&#F8BEFB&l┃ "));
 

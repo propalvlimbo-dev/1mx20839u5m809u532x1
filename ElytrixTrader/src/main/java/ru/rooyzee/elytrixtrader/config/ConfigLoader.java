@@ -58,6 +58,14 @@ public class ConfigLoader {
                 String id = file.getName().replaceAll("(?i)\\.yml$", "").toLowerCase(Locale.ROOT);
                 try {
                     YamlConfiguration config = ru.rooyzee.elytrixtrader.util.ItemCodec.loadYaml(file);
+                    // Migrate the bundled Experienced Trader schematic to the shared
+                    // Ghost Trader schematic, but leave any server-customized path alone.
+                    if ("experienced".equals(id)
+                            && "experienced_trader".equalsIgnoreCase(
+                                    config.getString("schematic.file", ""))) {
+                        config.set("schematic.file", "ghost.schem");
+                        try { config.save(file); } catch (Exception ignored) {}
+                    }
                     result.put(id, TraderConfig.from(id, config));
                 } catch (Throwable t) {
                 }

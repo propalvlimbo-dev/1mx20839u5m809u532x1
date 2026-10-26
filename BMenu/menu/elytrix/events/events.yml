@@ -1,4 +1,4 @@
-# Активные события и торговцы ElytriX. Удалённые локации/разделы здесь не перечисляются.
+# Активные события и торговцы ElytriX, включая страницы Кладбища и Данжей.
 id: elytrix:events
 provider: default
 type: chest
@@ -74,6 +74,30 @@ items:
       - '[open] elytrix:ghost_trader_event'
     tick_speed: 400
     on_tick: '[update]'
+  dungeons:
+    material: trial_key
+    name: '&7« &#F8BEFBДанжи мира &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fТипы: &#F8BEFBназемные дома и подземные данжи'
+      - '&#F8BEFB&l┃ &fСписок и статус: &#F8BEFB/dungeons'
+      - '&#F8BEFB&l┃ &fЛут: &#F8BEFBсундуки, шалкеры и добыча данжей'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для подробностей'
+    on_click:
+      - '[open] elytrix:dungeons_event'
+  cemetery:
+    material: iron_shovel
+    name: '&7« &#F8BEFBКладбище &7»'
+    lore:
+      - '&#F8BEFB&l┃ '
+      - '&#F8BEFB&l┃ &fСтатус: &#96FF91активно всегда'
+      - '&#F8BEFB&l┃ &fМогилы, призраки и Призрачные осколки'
+      - '&#F8BEFB&l┃ &fКоманды: &#F8BEFB/cemetery info, /cemetery tp'
+      - '&#F8BEFB&l┃ '
+      - '&7● &fНажмите для подробностей'
+    on_click:
+      - '[open] elytrix:cemetery_event'
   info:
     material: paper
     name: '&7« &#F8BEFBИнформация &7»'
@@ -126,8 +150,14 @@ animation:
       - st: talisman 24
       - sound: 'block.note_block.pling 0.3 1.2'
   - opcodes:
-      - st: exp_merchant 30
+      - st: exp_merchant 28
       - sound: 'block.note_block.pling 0.32 1.3'
   - opcodes:
-      - st: ghost_trader 32
-      - sound: 'block.amethyst_block.chime 0.4 1.4'
+      - st: ghost_trader 30
+      - sound: 'block.note_block.pling 0.33 1.36'
+  - opcodes:
+      - st: dungeons 32
+      - sound: 'block.note_block.pling 0.35 1.42'
+  - opcodes:
+      - st: cemetery 34
+      - sound: 'block.amethyst_block.chime 0.4 1.5'

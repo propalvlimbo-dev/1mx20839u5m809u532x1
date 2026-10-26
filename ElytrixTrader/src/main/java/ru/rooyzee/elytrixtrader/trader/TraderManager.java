@@ -32,6 +32,7 @@ public class TraderManager {
     private BukkitTask scheduleTask;
     private final Map<String, BukkitTask> intervalScheduleTasks = new HashMap<>();
     private final Map<String, Long> nextIntervalSpawnAtMillis = new HashMap<>();
+    private final Map<String, Location> lastFixedSpawnLocations = new HashMap<>();
     private int cycleIndex;
     private boolean eventEndedAnnounced;
 
@@ -237,6 +238,9 @@ public class TraderManager {
         } catch (Throwable ignored) {}
 
         instances.add(instance);
+        if (config.hasFixedSpawnLocation() && instance.alive()) {
+            lastFixedSpawnLocations.put(config.id().toLowerCase(Locale.ROOT), instance.location().clone());
+        }
         if (instances.size() == 1) {
             eventEndedAnnounced = false;
         }
@@ -319,7 +323,12 @@ public class TraderManager {
         int top = world.getMaxHeight() - 8;
         int floor = Math.max(SchematicConfig.getMinHeight(world) + 2, 0);
         int searchRadius = config.fixedSpawnSearchRadius();
+        Location previous = lastFixedSpawnLocations.get(config.id().toLowerCase(Locale.ROOT));
+        if (previous != null && (previous.getWorld() == null
+                || !world.getName().equals(previous.getWorld().getName()))) previous = null;
 
+        List<Location> alternatives = new ArrayList<>();
+        List<Location> fallback = new ArrayList<>();
         for (int radius = 0; radius <= searchRadius; radius++) {
             for (int dx = -radius; dx <= radius; dx++) {
                 for (int dz = -radius; dz <= radius; dz++) {
@@ -332,11 +341,25 @@ public class TraderManager {
                     if (y < floor) y = findSafeY(world, x, z, top, floor);
                     if (y < floor || y + 1 >= world.getMaxHeight()) continue;
                     Location candidate = new Location(world, x + 0.5, y, z + 0.5);
-                    if (world.getWorldBorder().isInside(candidate)) return candidate;
+                    if (!world.getWorldBorder().isInside(candidate)) continue;
+                    fallback.add(candidate);
+
+                    // Keep each recurring fixed-location trader near its anchor,
+                    // but avoid reusing the previous block if another safe spot exists.
+                    long dxFromPrevious = previous == null ? Long.MAX_VALUE
+                            : (long) candidate.getBlockX() - previous.getBlockX();
+                    long dzFromPrevious = previous == null ? Long.MAX_VALUE
+                            : (long) candidate.getBlockZ() - previous.getBlockZ();
+                    if (previous == null || dxFromPrevious * dxFromPrevious
+                            + dzFromPrevious * dzFromPrevious >= 4L) {
+                        alternatives.add(candidate);
+                    }
                 }
             }
         }
-        return null;
+
+        List<Location> choices = alternatives.isEmpty() ? fallback : alternatives;
+        return choices.isEmpty() ? null : choices.get(random.nextInt(choices.size()));
     }
 
     private Location tryFindFromLoadedChunks(World world, TraderConfig config, List<int[]> regionBounds) {
