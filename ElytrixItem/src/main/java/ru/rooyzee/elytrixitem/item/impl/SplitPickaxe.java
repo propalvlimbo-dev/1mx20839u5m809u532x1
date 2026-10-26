@@ -58,7 +58,7 @@ public final class SplitPickaxe implements CustomItem {
             item.setItemMeta(meta);
         }
 
-        ItemStackUtil.hideAllFlags(item);
+        ItemStackUtil.showAllDetails(item);
         return item;
     }
 }

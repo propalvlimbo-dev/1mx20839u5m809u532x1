@@ -11,9 +11,7 @@ import ru.rooyzee.elytrixitem.item.CustomItem;
 import ru.rooyzee.elytrixitem.util.ColorUtil;
 import ru.rooyzee.elytrixitem.util.ItemStackUtil;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,7 +27,6 @@ public final class GearItem implements CustomItem {
     private final Material material;
     private final String name;
     private final Map<Enchantment, Integer> enchantments = new LinkedHashMap<>();
-    private final List<String> enchantmentLore = new ArrayList<>();
 
     public GearItem(Main plugin, String id, Material material, String name) {
         this.key = new NamespacedKey(plugin, "custom_item_id");
@@ -38,19 +35,10 @@ public final class GearItem implements CustomItem {
         this.name = name;
     }
 
-    /** Добавить зачарование (уровни выше ванильных разрешены). */
-    public GearItem enchant(Enchantment enchantment, int level, String russianName) {
+    /** Add a real vanilla enchantment; levels above the vanilla maximum are allowed. */
+    public GearItem enchant(Enchantment enchantment, int level) {
         this.enchantments.put(enchantment, level);
-        this.enchantmentLore.add(level > 1 ? russianName + " " + roman(level) : russianName);
         return this;
-    }
-
-    private static String roman(int value) {
-        String[] ones = {"", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"};
-        if (value >= 1 && value <= 10) {
-            return ones[value];
-        }
-        return String.valueOf(value);
     }
 
     @Override
@@ -68,26 +56,25 @@ public final class GearItem implements CustomItem {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
 
-        if (meta != null) {
-            meta.setDisplayName(ColorUtil.gradient("« " + name + " »"));
-
-            List<String> lore = new ArrayList<>();
-            lore.add(ColorUtil.color("&#F8BEFB&l┃ "));
-            for (String line : enchantmentLore) {
-                lore.add(ColorUtil.color("&#F8BEFB&l┃ &f" + line));
-            }
-            lore.add(ColorUtil.color("&#F8BEFB&l┃ "));
-            meta.setLore(lore);
-
-            for (Map.Entry<Enchantment, Integer> entry : enchantments.entrySet()) {
-                meta.addEnchant(entry.getKey(), entry.getValue(), true);
-            }
-
-            meta.getPersistentDataContainer().set(key, PersistentDataType.STRING, id);
-            item.setItemMeta(meta);
+        if (meta == null) {
+            return item;
         }
 
-        ItemStackUtil.hideAllFlags(item);
+        meta.setDisplayName(ColorUtil.gradient("« " + name + " »"));
+        for (Map.Entry<Enchantment, Integer> entry : enchantments.entrySet()) {
+            meta.addEnchant(entry.getKey(), entry.getValue(), true);
+        }
+        meta.getPersistentDataContainer().set(key, PersistentDataType.STRING, id);
+        item.setItemMeta(meta);
+
+        // Verify the metadata survived ItemMeta round-tripping, and force-add only if a server rejects it.
+        for (Map.Entry<Enchantment, Integer> entry : enchantments.entrySet()) {
+            if (item.getEnchantmentLevel(entry.getKey()) != entry.getValue()) {
+                item.addUnsafeEnchantment(entry.getKey(), entry.getValue());
+            }
+        }
+
+        ItemStackUtil.showAllDetails(item);
         return item;
     }
 }

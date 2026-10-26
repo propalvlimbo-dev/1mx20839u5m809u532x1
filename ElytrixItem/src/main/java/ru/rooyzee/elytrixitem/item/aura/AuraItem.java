@@ -2,7 +2,6 @@ package ru.rooyzee.elytrixitem.item.aura;
 
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
@@ -48,11 +47,11 @@ public abstract class AuraItem implements CustomItem {
             meta.setDisplayName(ColorUtil.color(getDisplayName()));
             meta.setLore(buildLore(true));
             meta.getPersistentDataContainer().set(key, PersistentDataType.STRING, getId());
-            meta.addEnchant(Enchantment.UNBREAKING, 1, true);
+            meta.setEnchantmentGlintOverride(true);
             item.setItemMeta(meta);
         }
 
-        ItemStackUtil.hideAllFlags(item);
+        ItemStackUtil.showAllDetails(item);
         return item;
     }
 

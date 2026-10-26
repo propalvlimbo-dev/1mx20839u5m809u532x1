@@ -1,12 +1,12 @@
 package ru.rooyzee.elytrixitem.enchant;
 
 import org.bukkit.NamespacedKey;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import ru.rooyzee.elytrixitem.Main;
 import ru.rooyzee.elytrixitem.util.ColorUtil;
+import ru.rooyzee.elytrixitem.util.ItemStackUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,14 +58,7 @@ public abstract class CustomEnchant {
         lore.add(0, line);
 
         meta.setLore(lore);
-
-        meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
-        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-        meta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
-        meta.addItemFlags(ItemFlag.HIDE_DYE);
-        meta.addItemFlags(ItemFlag.HIDE_PLACED_ON);
-        meta.addItemFlags(ItemFlag.HIDE_DESTROYS);
-
         item.setItemMeta(meta);
+        ItemStackUtil.showAllDetails(item);
     }
 }

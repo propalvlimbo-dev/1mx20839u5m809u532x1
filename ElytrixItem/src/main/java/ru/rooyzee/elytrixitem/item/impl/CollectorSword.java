@@ -48,7 +48,7 @@ public final class CollectorSword implements CustomItem {
             item.setItemMeta(meta);
         }
 
-        ItemStackUtil.hideAllFlags(item);
+        ItemStackUtil.showAllDetails(item);
         return item;
     }
 }

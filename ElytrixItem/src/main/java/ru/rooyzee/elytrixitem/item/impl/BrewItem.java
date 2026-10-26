@@ -15,15 +15,13 @@ import ru.rooyzee.elytrixitem.item.CustomItem;
 import ru.rooyzee.elytrixitem.util.ColorUtil;
 import ru.rooyzee.elytrixitem.util.ItemStackUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Зелье или стрела с эффектами.
+ * Зелье или стрела с настоящими эффектами в PotionMeta.
  *
- * Базовое зелье — WATER: своих эффектов у него нет, все эффекты накладываются
- * при использовании и перечислены в лоре. Цвет задаётся так же, как раньше
- * в ExecutableItems (potionColor).
+ * Базовое зелье — WATER: все эффекты задаются через addCustomEffect и отображаются
+ * штатной подсказкой Minecraft. Цвет задаётся так же, как раньше в ExecutableItems.
  */
 public final class BrewItem implements CustomItem {
 
@@ -43,9 +41,9 @@ public final class BrewItem implements CustomItem {
         this.effects = List.of(effects);
     }
 
-    /** Описание одного эффекта: тип, длительность в тиках, усилитель и русское название. */
-    public static Effect effect(PotionEffectType type, int duration, int amplifier, String label) {
-        return new Effect(type, duration, amplifier, label);
+    /** Native potion effect: type, duration in ticks, and amplifier. */
+    public static Effect effect(PotionEffectType type, int duration, int amplifier) {
+        return new Effect(type, duration, amplifier);
     }
 
     @Override
@@ -68,15 +66,6 @@ public final class BrewItem implements CustomItem {
 
             meta.setDisplayName(ColorUtil.gradient("« " + name + " »"));
 
-            List<String> lore = new ArrayList<>();
-            lore.add(ColorUtil.color("&#F8BEFB&l┃ "));
-            for (Effect effect : effects) {
-                lore.add(ColorUtil.color("&#F8BEFB&l┃ &f" + effect.label + " "
-                        + roman(effect.amplifier + 1) + " &7(" + time(effect.duration) + ")"));
-            }
-            lore.add(ColorUtil.color("&#F8BEFB&l┃ "));
-            meta.setLore(lore);
-
             if (material != Material.TIPPED_ARROW) {
                 meta.setMaxStackSize(64);
             }
@@ -84,23 +73,8 @@ public final class BrewItem implements CustomItem {
             item.setItemMeta(meta);
         }
 
-        ItemStackUtil.hideAllFlags(item);
+        ItemStackUtil.showAllDetails(item);
         return item;
-    }
-
-    private static String time(int ticks) {
-        int totalSeconds = ticks / 20;
-        int minutes = totalSeconds / 60;
-        int seconds = totalSeconds % 60;
-        return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
-    }
-
-    private static String roman(int value) {
-        String[] ones = {"", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"};
-        if (value >= 1 && value <= 10) {
-            return ones[value];
-        }
-        return String.valueOf(value);
     }
 
     public static final class Effect {
@@ -108,13 +82,11 @@ public final class BrewItem implements CustomItem {
         private final PotionEffectType type;
         private final int duration;
         private final int amplifier;
-        private final String label;
 
-        public Effect(PotionEffectType type, int duration, int amplifier, String label) {
+        public Effect(PotionEffectType type, int duration, int amplifier) {
             this.type = type;
             this.duration = duration;
             this.amplifier = amplifier;
-            this.label = label;
         }
     }
 }

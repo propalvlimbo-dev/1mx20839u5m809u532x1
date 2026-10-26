@@ -1,7 +1,6 @@
 package ru.rooyzee.elytrixitem.enchant.impl;
 
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import ru.rooyzee.elytrixitem.Main;
@@ -51,11 +50,11 @@ public final class DrillBook implements CustomItem {
             );
 
             meta.setLore(lore);
-            meta.addEnchant(Enchantment.UNBREAKING, 1, true);
+            meta.setEnchantmentGlintOverride(true);
             item.setItemMeta(meta);
         }
 
-        ItemStackUtil.hideAllFlags(item);
+        ItemStackUtil.showAllDetails(item);
 
         DrillEnchant enchant = (DrillEnchant) plugin.getEnchantRegistry().get(DrillEnchant.ID);
         if (enchant != null) {

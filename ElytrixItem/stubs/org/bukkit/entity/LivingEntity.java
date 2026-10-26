@@ -18,6 +18,7 @@ public interface LivingEntity extends Entity {
     boolean isDead();
     void damage(double amount);
     void damage(double amount, Entity source);
+    void damage(double amount, org.bukkit.damage.DamageSource source);
     Player getKiller();
     Location getEyeLocation();
     Vector getVelocity();

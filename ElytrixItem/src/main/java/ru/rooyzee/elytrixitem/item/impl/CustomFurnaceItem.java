@@ -92,7 +92,7 @@ public final class CustomFurnaceItem implements CustomItem {
             item.setItemMeta(meta);
         }
 
-        ItemStackUtil.hideAllFlags(item);
+        ItemStackUtil.showAllDetails(item);
         return item;
     }
 }

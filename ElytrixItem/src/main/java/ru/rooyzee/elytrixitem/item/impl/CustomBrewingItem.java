@@ -78,7 +78,7 @@ public final class CustomBrewingItem implements CustomItem {
             item.setItemMeta(meta);
         }
 
-        ItemStackUtil.hideAllFlags(item);
+        ItemStackUtil.showAllDetails(item);
         return item;
     }
 }

@@ -6,8 +6,11 @@ import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -208,9 +211,9 @@ public final class OffhandBonusListener implements Listener {
      * Минусы шара: срабатывают с шансом, когда владелец бьёт.
      *
      * Эффект вешается на владельца, огонь поджигает его же (и проходит сквозь
-     * огнестойкость), а обратный удар возвращает ему урон его же удара.
+     * огнестойкость), а отражение наносит владельцу заданную долю финального урона.
      */
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onHit(EntityDamageByEntityEvent event) {
         if (!(event.getDamager() instanceof Player player) || event.getEntity().equals(player)) {
             return;
@@ -231,7 +234,13 @@ public final class OffhandBonusListener implements Listener {
                         drawback.getDurationTicks(), drawback.getLevel() - 1, false, true, true),
                         true);
                 case FIRE -> ignite(player, drawback.getDurationTicks());
-                case REFLECT -> player.damage(Math.max(0.5D, event.getFinalDamage()));
+                case REFLECT -> {
+                    double reflected = event.getFinalDamage() * drawback.getDamageMultiplier();
+                    if (reflected > 0.0D) {
+                        // MAGIC bypasses the holder's armor so the returned damage is not silently reduced again.
+                        player.damage(reflected, DamageSource.builder(DamageType.MAGIC).build());
+                    }
+                }
             }
         }
     }

@@ -94,7 +94,7 @@ public final class ExperiencePot implements CustomItem {
         }
 
         item.setItemMeta(meta);
-        ItemStackUtil.hideAllFlags(item);
+        ItemStackUtil.showAllDetails(item);
     }
 
     private static List<String> buildLore(int storedExperience) {

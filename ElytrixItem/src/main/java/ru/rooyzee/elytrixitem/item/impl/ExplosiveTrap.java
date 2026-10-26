@@ -48,7 +48,7 @@ public final class ExplosiveTrap implements CustomItem {
             meta.getPersistentDataContainer().set(key, PersistentDataType.STRING, ID);
             item.setItemMeta(meta);
         }
-        ItemStackUtil.hideAllFlags(item);
+        ItemStackUtil.showAllDetails(item);
         return item;
     }
 }

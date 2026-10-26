@@ -28,7 +28,8 @@ public final class ItemStackUtil {
         return result;
     }
 
-    public static void hideAllFlags(ItemStack item) {
+    /** Keep vanilla enchantments, attributes, potion effects, and special tooltips visible. */
+    public static void showAllDetails(ItemStack item) {
         if (item == null) {
             return;
         }
@@ -38,10 +39,8 @@ public final class ItemStackUtil {
             return;
         }
 
-        for (ItemFlag flag : ItemFlag.values()) {
-            meta.addItemFlags(flag);
-        }
-
+        // Old builds hid every tooltip flag, concealing real enchants and potion effects.
+        meta.removeItemFlags(ItemFlag.values());
         item.setItemMeta(meta);
     }
 }

@@ -66,7 +66,7 @@ public final class MechanicItems {
                 .stat(Attribute.ATTACK_DAMAGE, 4.0D, "к урону")
                 .stat(Attribute.ARMOR, 3.0D, "к броне")
                 .stat(Attribute.MAX_HEALTH, 4.0D, "к здоровью")
-                .drawback(OffhandBonusItem.Drawback.reflect(0.05D))
+                .drawback(OffhandBonusItem.Drawback.reflect(1.0D, 2.0D))
                 .awaken(PotionEffectType.STRENGTH, 2, "Сила")
                 .awaken(PotionEffectType.SPEED, 2, "Скорость")
                 .awaken(PotionEffectType.RESISTANCE, 1, "Сопротивление")

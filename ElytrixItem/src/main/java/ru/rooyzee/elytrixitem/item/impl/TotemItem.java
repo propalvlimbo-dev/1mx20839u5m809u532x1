@@ -87,7 +87,7 @@ public final class TotemItem implements OffhandBonusItem {
             item.setItemMeta(meta);
         }
 
-        ItemStackUtil.hideAllFlags(item);
+        ItemStackUtil.showAllDetails(item);
         return item;
     }
 }

@@ -27,66 +27,66 @@ public final class ConsumableItems {
     private static void registerPotions(Main plugin, ItemRegistry registry) {
         registry.register(new BrewItem(plugin, "potion_healt", Material.POTION,
                 "Зелье Оздоровления", 11534374,
-                BrewItem.effect(PotionEffectType.REGENERATION, 1200, 3, "Регенерация"),
-                BrewItem.effect(PotionEffectType.RESISTANCE, 1800, 1, "Сопротивление")));
+                BrewItem.effect(PotionEffectType.REGENERATION, 1200, 3),
+                BrewItem.effect(PotionEffectType.RESISTANCE, 1800, 1)));
 
         registry.register(new BrewItem(plugin, "potion_lightness", Material.POTION,
                 "Зелье Лёгкости", 13513912,
-                BrewItem.effect(PotionEffectType.SPEED, 900, 2, "Скорость"),
-                BrewItem.effect(PotionEffectType.HASTE, 3600, 0, "Спешка")));
+                BrewItem.effect(PotionEffectType.SPEED, 900, 2),
+                BrewItem.effect(PotionEffectType.HASTE, 3600, 0)));
 
         registry.register(new BrewItem(plugin, "potion_voina", Material.POTION,
                 "Зелье Войны", 13103616,
-                BrewItem.effect(PotionEffectType.STRENGTH, 1800, 1, "Сила"),
-                BrewItem.effect(PotionEffectType.SPEED, 1800, 1, "Скорость"),
-                BrewItem.effect(PotionEffectType.FIRE_RESISTANCE, 9600, 0, "Огнестойкость")));
+                BrewItem.effect(PotionEffectType.STRENGTH, 1800, 1),
+                BrewItem.effect(PotionEffectType.SPEED, 1800, 1),
+                BrewItem.effect(PotionEffectType.FIRE_RESISTANCE, 9600, 0)));
 
         registry.register(new BrewItem(plugin, "potion_disappearances", Material.POTION,
                 "Зелье Исчезновения", 8453888,
-                BrewItem.effect(PotionEffectType.INVISIBILITY, 9600, 1, "Невидимость"),
-                BrewItem.effect(PotionEffectType.SPEED, 3600, 1, "Скорость"),
-                BrewItem.effect(PotionEffectType.RESISTANCE, 3600, 0, "Сопротивление")));
+                BrewItem.effect(PotionEffectType.INVISIBILITY, 9600, 1),
+                BrewItem.effect(PotionEffectType.SPEED, 3600, 1),
+                BrewItem.effect(PotionEffectType.RESISTANCE, 3600, 0)));
 
         registry.register(new BrewItem(plugin, "potion_sportsmena", Material.POTION,
                 "Зелье Спортсмена", 3846578,
-                BrewItem.effect(PotionEffectType.REGENERATION, 2100, 1, "Регенерация"),
-                BrewItem.effect(PotionEffectType.HASTE, 900, 1, "Спешка"),
-                BrewItem.effect(PotionEffectType.FIRE_RESISTANCE, 9600, 0, "Огнестойкость")));
+                BrewItem.effect(PotionEffectType.REGENERATION, 2100, 1),
+                BrewItem.effect(PotionEffectType.HASTE, 900, 1),
+                BrewItem.effect(PotionEffectType.FIRE_RESISTANCE, 9600, 0)));
 
         registry.register(new BrewItem(plugin, "potion_salvation", Material.POTION,
                 "Зелье Спасения", 16383486,
-                BrewItem.effect(PotionEffectType.LEVITATION, 100, 3, "Левитация"),
-                BrewItem.effect(PotionEffectType.LUCK, 1800, 1, "Удача")));
+                BrewItem.effect(PotionEffectType.LEVITATION, 100, 3),
+                BrewItem.effect(PotionEffectType.LUCK, 1800, 1)));
     }
 
     private static void registerArrows(Main plugin, ItemRegistry registry) {
         registry.register(new BrewItem(plugin, "arrow1", Material.TIPPED_ARROW,
                 "Стрела поражения", 9768414,
-                BrewItem.effect(PotionEffectType.MINING_FATIGUE, 200, 0, "Утомление")));
+                BrewItem.effect(PotionEffectType.MINING_FATIGUE, 200, 0)));
 
         registry.register(new BrewItem(plugin, "arrow2", Material.TIPPED_ARROW,
                 "Стрела негатива", 7194613,
-                BrewItem.effect(PotionEffectType.NAUSEA, 200, 1, "Тошнота"),
-                BrewItem.effect(PotionEffectType.BLINDNESS, 200, 1, "Слепота")));
+                BrewItem.effect(PotionEffectType.NAUSEA, 200, 1),
+                BrewItem.effect(PotionEffectType.BLINDNESS, 200, 1)));
 
         registry.register(new BrewItem(plugin, "arrow3", Material.TIPPED_ARROW,
                 "Стрела психа", 6194613,
-                BrewItem.effect(PotionEffectType.NAUSEA, 200, 1, "Тошнота"),
-                BrewItem.effect(PotionEffectType.POISON, 200, 1, "Отравление")));
+                BrewItem.effect(PotionEffectType.NAUSEA, 200, 1),
+                BrewItem.effect(PotionEffectType.POISON, 200, 1)));
 
         registry.register(new BrewItem(plugin, "arrow4", Material.TIPPED_ARROW,
                 "Стрела мотылька", 139,
-                BrewItem.effect(PotionEffectType.SLOWNESS, 200, 1, "Замедление"),
-                BrewItem.effect(PotionEffectType.GLOWING, 200, 1, "Свечение")));
+                BrewItem.effect(PotionEffectType.SLOWNESS, 200, 1),
+                BrewItem.effect(PotionEffectType.GLOWING, 200, 1)));
 
         registry.register(new BrewItem(plugin, "arrow5", Material.TIPPED_ARROW,
                 "Стрела черепахи", 16744704,
-                BrewItem.effect(PotionEffectType.WEAKNESS, 200, 1, "Слабость"),
-                BrewItem.effect(PotionEffectType.HUNGER, 200, 1, "Голод")));
+                BrewItem.effect(PotionEffectType.WEAKNESS, 200, 1),
+                BrewItem.effect(PotionEffectType.HUNGER, 200, 1)));
 
         registry.register(new BrewItem(plugin, "arrow_levit", Material.TIPPED_ARROW,
                 "Стрела фантома", 16382196,
-                BrewItem.effect(PotionEffectType.LEVITATION, 100, 1, "Левитация")));
+                BrewItem.effect(PotionEffectType.LEVITATION, 100, 1)));
     }
 
     private static void registerTotems(Main plugin, ItemRegistry registry) {

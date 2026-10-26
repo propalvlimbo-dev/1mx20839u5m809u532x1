@@ -59,7 +59,7 @@ public final class InfiniteFirework implements CustomItem {
             item.setItemMeta(meta);
         }
 
-        ItemStackUtil.hideAllFlags(item);
+        ItemStackUtil.showAllDetails(item);
         return item;
     }
 
@@ -119,6 +119,6 @@ public final class InfiniteFirework implements CustomItem {
         meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "custom_item_instance"), PersistentDataType.STRING, UUID.randomUUID().toString());
         item.setItemMeta(meta);
 
-        ItemStackUtil.hideAllFlags(item);
+        ItemStackUtil.showAllDetails(item);
     }
 }

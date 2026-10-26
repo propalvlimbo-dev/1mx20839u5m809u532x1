@@ -100,29 +100,37 @@ public interface OffhandBonusItem extends CustomItem {
         private final int level;
         private final int durationTicks;
         private final double chance;
+        private final double damageMultiplier;
         private final String label;
 
         public Drawback(PotionEffectType type, int level, int durationTicks, double chance,
                         String label) {
-            this(Kind.EFFECT, type, level, durationTicks, chance, label);
+            this(Kind.EFFECT, type, level, durationTicks, chance, 1.0D, label);
         }
 
         private Drawback(Kind kind, PotionEffectType type, int level, int durationTicks,
-                         double chance, String label) {
+                         double chance, double damageMultiplier, String label) {
             this.kind = kind;
             this.type = type;
             this.level = level;
             this.durationTicks = durationTicks;
             this.chance = chance;
+            this.damageMultiplier = damageMultiplier;
             this.label = label;
         }
 
         public static Drawback fire(int durationTicks, double chance) {
-            return new Drawback(Kind.FIRE, null, 0, durationTicks, chance, "загореться");
+            return new Drawback(Kind.FIRE, null, 0, durationTicks, chance, 1.0D, "загореться");
         }
 
         public static Drawback reflect(double chance) {
-            return new Drawback(Kind.REFLECT, null, 0, 0, chance, "обратного удара");
+            return reflect(chance, 1.0D);
+        }
+
+        /** Chance and multiplier for returned hit damage. */
+        public static Drawback reflect(double chance, double damageMultiplier) {
+            return new Drawback(Kind.REFLECT, null, 0, 0, chance,
+                    Math.max(0.0D, damageMultiplier), "обратного удара");
         }
 
         public Kind getKind() {
@@ -141,19 +149,30 @@ public interface OffhandBonusItem extends CustomItem {
             return durationTicks;
         }
 
-        /** Шанс от 0 до 1. */
+        /** Chance from 0 to 1. */
         public double getChance() {
             return chance;
         }
 
-        /** «5% шанс отравления после удара» — как минус пишется в лоре. */
+        /** Multiplier applied to the final hit damage when this is a reflection drawback. */
+        public double getDamageMultiplier() {
+            return damageMultiplier;
+        }
+
+        /** Human-readable drawback text used on the item. */
         public String describe() {
             return switch (kind) {
                 case EFFECT -> percent(chance) + " шанс " + label + " после удара";
                 case FIRE -> percent(chance) + " шанс загореться после удара "
                         + "(сквозь огнестойкость)";
-                case REFLECT -> percent(chance) + " шанс " + label;
+                case REFLECT -> percent(chance) + " шанс " + label
+                        + (damageMultiplier == 1.0D ? "" : " ×" + number(damageMultiplier) + " урона");
             };
+        }
+
+        private static String number(double value) {
+            if (value == Math.rint(value)) return String.valueOf((long) value);
+            return String.format(java.util.Locale.ROOT, "%.2f", value);
         }
 
         private static String percent(double value) {

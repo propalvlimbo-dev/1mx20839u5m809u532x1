@@ -4,7 +4,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -165,7 +164,8 @@ public final class RuneItem implements OffhandBonusItem {
             meta.setCustomModelData(3);
 
             if ("donshar".equals(id)) {
-                meta.addEnchant(Enchantment.VANISHING_CURSE, 1, true);
+                // Keep the item glint without attaching a hidden Vanishing Curse.
+                meta.setEnchantmentGlintOverride(true);
             }
 
             meta.getPersistentDataContainer().set(key, PersistentDataType.STRING, id);
@@ -173,7 +173,7 @@ public final class RuneItem implements OffhandBonusItem {
             item.setItemMeta(meta);
         }
 
-        ItemStackUtil.hideAllFlags(item);
+        ItemStackUtil.showAllDetails(item);
         return item;
     }
 
