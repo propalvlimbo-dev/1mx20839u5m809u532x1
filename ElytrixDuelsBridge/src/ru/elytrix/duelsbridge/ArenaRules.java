@@ -338,7 +338,22 @@ final class ArenaRules implements Listener {
         Bounds active = resolve(player);
         if (active == null || active.instance != warning.instance || !inWorld(location, active)
                 || !active.tooHigh(location, heightWarningBlocks())) return;
-        forfeit(player, active.instance);
+        scheduleForfeit(player, active.instance);
+    }
+
+    /** Defer out of PlayerMoveEvent, then re-check that the player stayed high. */
+    private void scheduleForfeit(final Player player, final Object instance) {
+        Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
+            @Override
+            public void run() {
+                if (!player.isOnline() || plugin.isAdmin(player)) return;
+                Bounds active = resolve(player);
+                Location location = player.getLocation();
+                if (active == null || active.instance != instance || !inWorld(location, active)
+                        || !active.tooHigh(location, heightWarningBlocks())) return;
+                forfeit(player, instance);
+            }
+        }, 1L);
     }
 
     private String blockText(double blocks) {
